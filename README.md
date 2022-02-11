@@ -5,9 +5,9 @@
 <!-- [![build](https://github.com/gt4sd/gt4sd-core/workflows/build/badge.svg)](https://github.com/gt4sd/gt4sd-core/actions) -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Contributions](https://img.shields.io/badge/contributions-welcome-blue)]()
 <!-- [![Downloads](https://pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd) -->
 <!-- [![Downloads](https://pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd) -->
-[![Contributions](https://img.shields.io/badge/contributions-welcome-blue)]()
 <!-- [![Docs](https://img.shields.io/badge/website-live-brightgreen)](https://pages.github.com/GT4SD/gt4sd-core/)) -->
 
 <img src="./docs/_static/gt4sd_logo.png" alt="logo" width="500"/>
