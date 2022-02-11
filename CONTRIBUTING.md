@@ -6,7 +6,7 @@
 
 If you would like to contribute to the package, we recommend the following development setup.
 
-1. Create a copy of the [repository](https://github.com/GT4SD/gt4sd-core) via the ‘Fork’ button.
+1. Create a copy of the [repository](https://github.com/GT4SD/gt4sd-core) via the "_Fork_" button.
 
 2. Clone the gt4sd-core repository:
 
@@ -65,7 +65,7 @@ If you would like to contribute to the package, we recommend the following devel
     git push -u origin a-super-nice-feature-we-all-need
     ```
 
-8. Open a PR via the "Pull request" button, the maintainers will be happy to review it.
+8. From your fork, open a pull request via the "_Contribute_" button, the maintainers will be happy to review it.
 
 ## Contributing to GT4SD documentation
 
