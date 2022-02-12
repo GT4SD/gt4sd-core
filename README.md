@@ -37,7 +37,6 @@ pip install git+https://github.com/GT4SD/gt4sd-core
 ### Development setup & installation
 
 If you would like to contribute to the package, we recommend the following development setup:
-Clone the gt4sd-core repository:
 
 ```sh
 git clone git@github.com:GT4SD/gt4sd-core.git
