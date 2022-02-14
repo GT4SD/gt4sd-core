@@ -10,27 +10,29 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: ammaraskar/sphinx-action@master
-      with:
-        docs-folder: "docs/"
-    - uses: actions/upload-artifact@v1
-      with:
-        name: html-docs
-        path: docs/_build/html/
-    - name: Commit documentation changes
-      run: |
-        git clone https://github.com/ammaraskar/sphinx-action-test.git --branch gh-pages --single-branch gh-pages
-        cp -r docs/_build/html/* gh-pages/
-        cd gh-pages
-        touch .nojekyll
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add .
-        git commit -m "docs: updating documentation." -a || true
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        branch: gh-pages
-        directory: gh-pages
-        github_token: ${{ secrets.GH_TOKEN }}
+      - uses: actions/checkout@v1
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: gt4sd
+          environment-file: conda.yml
+          auto-activate-base: false
+      - uses: ammaraskar/sphinx-action@master
+        with:
+          pre-build-command: pip install -r requirements.txt && pip install -r dev_requirements.txt && pip install -e .
+          docs-folder: "docs/"
+      - name: Commit documentation changes
+        run: |
+          git clone https://github.com/GT4SD/gt4sd --branch gh_pages --single-branch gh_pages
+          cp -r docs/_build/html/* gh_pages/
+          touch gh_pages/.nojekyll
+          cd gh_pages
+          git config --local user.email "gt4sd-actions@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "docs: update documentation." -a || true
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: gh_pages
+          directory: gh_pages
+          github_token: ${{ secrets.GH_TOKEN }}
