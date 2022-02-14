@@ -1,0 +1,73 @@
+name: "Running tests: style, pytests and entry-points"
+
+on:
+  push:
+    branches:    
+      - '**'
+      - '!gh-pages'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}  # for conda command
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: gt4sd
+          environment-file: conda.yml
+          auto-activate-base: false
+          use-only-tar-bz2: true
+      - name: Install gt4sd from source
+        run: |
+          conda activate gt4sd
+          pip install --no-deps .
+  style:
+    needs: setup
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}  # for conda command
+    steps:
+      - name: Check black
+        run: |
+          conda activate gt4sd
+          python -m black src/gt4sd --check --diff --color
+      - name: Check isort
+        run: |
+          conda activate gt4sd
+          python -m isort src/gt4sd --check-only
+      - name: Check flake8
+        run: |
+          conda activate gt4sd
+          python -m flake8 --disable-noqa --per-file-ignores="__init__.py:F401" src/gt4sd
+      - name: Check mypy
+        run: |
+          conda activate gt4sd
+          python -m mypy src/gt4sd
+  pytest:
+    needs: setup
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}  # for conda command
+    steps:
+      - name: Run style checks
+        run: |
+          conda activate gt4sd
+          python -m pytest -sv --cov=src/gt4sd --cov-fail-under=65
+  entry-points:
+    needs: setup
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}  # for conda command
+    steps:
+      - name: Test entry-points
+        run: |
+          conda activate gt4sd
+          gt4sd-hf-to-st --help
+          gt4sd-trainer --help
+          gt4sd-pl-to-hf --help
