@@ -34,7 +34,6 @@ pip install git+https://github.com/GT4SD/gt4sd-core
 ### Development setup & installation
 
 If you would like to contribute to the package, we recommend the following development setup:
-Clone the gt4sd-core repository:
 
 ```sh
 git clone git@github.com:GT4SD/gt4sd-core.git
@@ -144,14 +143,13 @@ gt4sd-trainer --training_pipeline_name ${TRAINING_PIPELINE_NAME} --help
 If you use `gt4sd` in your projects, please consider citing the following:
 
 ```bib
-@misc{GT4SD,
-  author = {GT4SD Team},
-  title = {GT4SD (Generative Toolkit for Scientific Discovery)},
-  year = {2022},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/GT4SD/gt4sd-core}},
-  commit = {main}
+@software{GT4SD,
+author = {GT4SD Team},
+month = {2},
+title = {{GT4SD (Generative Toolkit for Scientific Discovery)}},
+url = {https://github.com/GT4SD/gt4sd-core},
+version = {main},
+year = {2022}
 }
 ```
 
