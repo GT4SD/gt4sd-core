@@ -10,7 +10,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: gt4sd
@@ -18,7 +18,7 @@ jobs:
           auto-activate-base: false
       - uses: ammaraskar/sphinx-action@master
         with:
-          pre-build-command: pip install --no-deps .
+          pre-build-command: conda activate gt4sd && pip install --no-deps .
           docs-folder: "docs/"
       - name: Commit documentation changes
         run: |
