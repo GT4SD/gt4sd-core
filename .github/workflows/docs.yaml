@@ -12,27 +12,19 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}  # for conda command
-    env:
-      # increase this value to reset cache if conda.yml and requirements.txt have not changed
-      CACHE_NUMBER: 0
     steps:
       - uses: actions/checkout@v2
-      - name: Cache conda environment
-        uses: actions/cache@v2
-        with:
-          path: ~/conda_pkgs_dir  # from: conda-incubator/setup-miniconda@v2
-          key: conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('conda.yml', 'requirements.txt', 'dev_requirements.txt') }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: gt4sd
           environment-file: conda.yml
           auto-activate-base: false
           use-only-tar-bz2: true
-      - uses: ammaraskar/sphinx-action@master
-        with:
-          shell: sh -l {0}  # for conda command
-          pre-build-command: conda activate gt4sd && pip install --no-deps .
-          docs-folder: "docs/"
+      - name: Build docs
+        run: |
+          conda activate gt4sd
+          pip install --no-deps .
+          cd docs && make html && cd ..
       - name: Commit documentation changes
         run: |
           git clone https://github.com/GT4SD/gt4sd --branch gh_pages --single-branch gh_pages
