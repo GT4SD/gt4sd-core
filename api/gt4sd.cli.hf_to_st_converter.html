@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.cli.hf_to_st_converter module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd.cli.load_arguments_from_dataclass module" href="gt4sd.cli.load_arguments_from_dataclass.html" />
+    <link rel="prev" title="gt4sd.cli.argument_parser module" href="gt4sd.cli.argument_parser.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.configuration.html">gt4sd.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.conftest.html">gt4sd.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.exceptions.html">gt4sd.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.s3.html">gt4sd.s3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.algorithms.html">gt4sd.algorithms package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="gt4sd.cli.html">gt4sd.cli package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.cli.argument_parser.html">gt4sd.cli.argument_parser module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">gt4sd.cli.hf_to_st_converter module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.cli.load_arguments_from_dataclass.html">gt4sd.cli.load_arguments_from_dataclass module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.cli.pl_to_hf_converter.html">gt4sd.cli.pl_to_hf_converter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.cli.trainer.html">gt4sd.cli.trainer module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.domains.html">gt4sd.domains package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.extras.html">gt4sd.extras package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.tests.html">gt4sd.tests package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="gt4sd.html">gt4sd package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.cli.html">gt4sd.cli package</a> &raquo;</li>
+        
+      <li>gt4sd.cli.hf_to_st_converter module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/gt4sd.cli.hf_to_st_converter.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-gt4sd.cli.hf_to_st_converter">
+<span id="gt4sd-cli-hf-to-st-converter-module"></span><h1>gt4sd.cli.hf_to_st_converter module<a class="headerlink" href="#module-gt4sd.cli.hf_to_st_converter" title="Permalink to this headline">¶</a></h1>
+<p>Transformers pretrained model to SentenceTransformer model converter.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments" title="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TransformersToSentenceTransformersArguments</span></code></a></p></td>
+<td><p>Transformers to Sentence Transformers converter arguments.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.cli.hf_to_st_converter.main" title="gt4sd.cli.hf_to_st_converter.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a></p></td>
+<td><p>Convert HF pretrained model to SentenceTransformer.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments">
+<em class="property">class </em><code class="sig-name descname">TransformersToSentenceTransformersArguments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_name_or_path</span></em>, <em class="sig-param"><span class="n">pooling</span></em>, <em class="sig-param"><span class="n">output_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/cli/hf_to_st_converter.html#TransformersToSentenceTransformersArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Transformers to Sentence Transformers converter arguments.</p>
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__name__">
+<code class="sig-name descname">__name__</code><em class="property"> = 'TransformersToSentenceTransformersArguments'</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__name__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.model_name_or_path">
+<code class="sig-name descname">model_name_or_path</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.model_name_or_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.pooling">
+<code class="sig-name descname">pooling</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.pooling" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.output_path">
+<code class="sig-name descname">output_path</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.output_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'model_name_or_path': &lt;class 'str'&gt;, 'output_path': &lt;class 'str'&gt;, 'pooling': &lt;class 'str'&gt;}</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__dataclass_fields__">
+<code class="sig-name descname">__dataclass_fields__</code><em class="property"> = {'model_name_or_path': Field(name='model_name_or_path',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'HF model name or path.'}),_field_type=_FIELD), 'output_path': Field(name='output_path',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Path to the converted model.'}),_field_type=_FIELD), 'pooling': Field(name='pooling',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Comma separated pooling modes. Supported types: cls, max, mean, mean_sqrt.'}),_field_type=_FIELD)}</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__dataclass_fields__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__dataclass_params__">
+<code class="sig-name descname">__dataclass_params__</code><em class="property"> = _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False)</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__dataclass_params__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.cli.hf_to_st_converter', '__annotations__': {'model_name_or_path': &lt;class 'str'&gt;, 'pooling': &lt;class 'str'&gt;, 'output_path': &lt;class 'str'&gt;}, '__doc__': 'Transformers to Sentence Transformers converter arguments.', '__name__': 'hf_to_st_converter_args', '__dict__': &lt;attribute '__dict__' of 'TransformersToSentenceTransformersArguments' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'TransformersToSentenceTransformersArguments' objects&gt;, '__dataclass_params__': _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False), '__dataclass_fields__': {'model_name_or_path': Field(name='model_name_or_path',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'HF model name or path.'}),_field_type=_FIELD), 'pooling': Field(name='pooling',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Comma separated pooling modes. Supported types: cls, max, mean, mean_sqrt.'}),_field_type=_FIELD), 'output_path': Field(name='output_path',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Path to the converted model.'}),_field_type=_FIELD)}, '__init__': &lt;function __create_fn__.&lt;locals&gt;.__init__&gt;, '__repr__': &lt;function __create_fn__.&lt;locals&gt;.__repr__&gt;, '__eq__': &lt;function __create_fn__.&lt;locals&gt;.__eq__&gt;, '__hash__': None})</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Transformers to Sentence Transformers converter arguments.'</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__hash__">
+<code class="sig-name descname">__hash__</code><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_name_or_path</span></em>, <em class="sig-param"><span class="n">pooling</span></em>, <em class="sig-param"><span class="n">output_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.cli.hf_to_st_converter'</em><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.TransformersToSentenceTransformersArguments.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="gt4sd.cli.hf_to_st_converter.main">
+<code class="sig-name descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/cli/hf_to_st_converter.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.cli.hf_to_st_converter.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert HF pretrained model to SentenceTransformer.</p>
+<p>Create a SentenceTransformer model having a given HF model as
+word embedding model plus an optional pooling layer. We can
+also concatenate multiple poolings together.</p>
+<dl class="simple">
+<dt>Parsing from the command line the following parameters:</dt><dd><ul class="simple">
+<li><p>HF pretrained model to be used as word embedding model.</p></li>
+<li><dl class="simple">
+<dt>the pooling mode (more than one can be provided as a list), the implemented</dt><dd><p>options are “cls”, “max”, “mean”, “mean” and “sqrt”.</p>
+</dd>
+</dl>
+</li>
+<li><p>path to save the generated SentenceTransformer model.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gt4sd.cli.load_arguments_from_dataclass.html" class="btn btn-neutral float-right" title="gt4sd.cli.load_arguments_from_dataclass module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd.cli.argument_parser.html" class="btn btn-neutral float-left" title="gt4sd.cli.argument_parser module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

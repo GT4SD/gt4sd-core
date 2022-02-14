@@ -1,0 +1,551 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../training_pipelines.html">gt4sd.training_pipelines</a> &raquo;</li>
+        
+      <li>gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Dataset routines-filtering, dataset building.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">DatasetDict</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">ConcatDataset</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AutoTokenizer</span><span class="p">,</span>
+    <span class="n">DataCollatorForLanguageModeling</span><span class="p">,</span>
+    <span class="n">DataCollatorForPermutationLanguageModeling</span><span class="p">,</span>
+    <span class="n">default_data_collator</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">transformers.tokenization_utils_base</span> <span class="kn">import</span> <span class="n">BatchEncoding</span>
+
+
+<div class="viewcode-block" id="LMDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.LMDataset">[docs]</a><span class="k">class</span> <span class="nc">LMDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LM dataset class.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LMDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.LMDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">tokenizer</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the LM data module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filepath: path where the dataset is located.</span>
+<span class="sd">            tokenizer: tokenize function to be used in the module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">LMDataset</span><span class="o">.</span><span class="n">count_examples</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.jsonl&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> is not a .jsonl or a json.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LMDataset.examples_reader"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.LMDataset.examples_reader">[docs]</a>    <span class="nd">@lru_cache</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">examples_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Read instances from a filepath.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           list of instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fp</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LMDataset.count_examples"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.LMDataset.count_examples">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">count_examples</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Count instances of a filepath.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           filepath: path of the dataset.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">           number of examples existed in the given filepath.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_make_gen</span><span class="p">(</span><span class="n">reader</span><span class="p">):</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">reader</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">yield</span> <span class="n">b</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">buf</span> <span class="ow">in</span> <span class="n">_make_gen</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">raw</span><span class="o">.</span><span class="n">read</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+        <span class="k">return</span> <span class="n">count</span></div>
+
+<div class="viewcode-block" id="LMDataset.__len__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.LMDataset.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Number of instances of the dataset.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           number of instances</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span></div>
+
+<div class="viewcode-block" id="LMDataset.__getitem__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.LMDataset.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BatchEncoding</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get an item of the dataset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index: index of the item.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tokenized item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">examples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">examples_reader</span><span class="p">()</span>
+        <span class="n">example</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">examples</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">example</span></div></div>
+
+
+<div class="viewcode-block" id="DataModule"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.DataModule">[docs]</a><span class="k">class</span> <span class="nc">DataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pytorch-lightning-style data module for LM dataset.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DataModule.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.DataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tokenizer</span><span class="p">:</span> <span class="n">AutoTokenizer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the data module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset_args: dictionary containing the arguments for the lightning data module creation.</span>
+<span class="sd">            tokenizer: tokenizer to be used in the module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span> <span class="n">DatasetDict</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span> <span class="o">=</span> <span class="n">dataset_args</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span> <span class="o">=</span> <span class="n">default_data_collator</span>
+
+        <span class="k">if</span> <span class="s2">&quot;num_dataloader_workers&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;num_dataloader_workers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
+
+            <span class="n">cpus_count</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">cpus_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;num_dataloader_workers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;num_dataloader_workers&quot;</span><span class="p">],</span> <span class="n">cpus_count</span>
+                <span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataModule.build_dataset"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.DataModule.build_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">build_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the dataset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path: path where the dataset is located.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            a torch Dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.jsonl&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">LMDataset</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenize_function</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ConcatDataset</span><span class="p">(</span>
+                <span class="n">datasets</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">LMDataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenize_function</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.jsonl&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> type is not supported for dataset&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataModule.tokenize_function"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.DataModule.tokenize_function">[docs]</a>    <span class="k">def</span> <span class="nf">tokenize_function</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">examples</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BatchEncoding</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Tokenize the given examples.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            examples: list of examples.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tokenized examples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">truncation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;truncation&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;padding&quot;</span><span class="p">,</span> <span class="s2">&quot;max_length&quot;</span><span class="p">)</span>
+        <span class="n">max_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_length&quot;</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+            <span class="n">examples</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span>
+            <span class="n">truncation</span><span class="o">=</span><span class="n">truncation</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataModule.load"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.DataModule.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Load datasets from the given files.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;train_file&quot;</span><span class="p">]),</span>
+            <span class="s2">&quot;validation&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;validation_file&quot;</span><span class="p">]),</span>
+        <span class="p">}</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Training set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> - Validation set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;validation&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>  <span class="c1"># type: ignore</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataModule.train_dataloader"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.DataModule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create the DataLoader for the traning step.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pytorch-like dataloader.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span>  <span class="c1"># type: ignore</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">],</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;num_dataloader_workers&quot;</span><span class="p">],</span>
+            <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataModule.val_dataloader"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.DataModule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create the DataLoader for the traning step.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pytorch-like dataloader.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">],</span>  <span class="c1"># type: ignore</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">],</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;num_dataloader_workers&quot;</span><span class="p">],</span>
+            <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MLMDataModule"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.MLMDataModule">[docs]</a><span class="k">class</span> <span class="nc">MLMDataModule</span><span class="p">(</span><span class="n">DataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pytorch-lightning-style data module for MLM dataset.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MLMDataModule.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.MLMDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">tokenizer</span><span class="p">:</span> <span class="n">AutoTokenizer</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the data module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset_args: dictionary containing the metadata for the lightning data module creation.</span>
+<span class="sd">            tokenizer: tokenizer to be used in the module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataset_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span> <span class="o">=</span> <span class="n">DataCollatorForLanguageModeling</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;mlm_probability&quot;</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="CGMDataModule"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.CGMDataModule">[docs]</a><span class="k">class</span> <span class="nc">CGMDataModule</span><span class="p">(</span><span class="n">DataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pytorch-lightning-style data module for conditional generation dataset.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CGMDataModule.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.CGMDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">tokenizer</span><span class="p">:</span> <span class="n">AutoTokenizer</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the data module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset_args: dictionary containing the metadata for the lightning data module creation.</span>
+<span class="sd">            tokenizer: tokenizer to be used in the module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataset_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CGMDataModule.tokenize_function"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.CGMDataModule.tokenize_function">[docs]</a>    <span class="k">def</span> <span class="nf">tokenize_function</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">examples</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BatchEncoding</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Tokenize the given examples.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            examples: list of examples.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tokenized examples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">truncation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;truncation&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;padding&quot;</span><span class="p">,</span> <span class="s2">&quot;max_length&quot;</span><span class="p">)</span>
+        <span class="n">max_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_length&quot;</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
+
+        <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+            <span class="n">examples</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span>
+            <span class="n">truncation</span><span class="o">=</span><span class="n">truncation</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+            <span class="n">examples</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span>
+            <span class="n">truncation</span><span class="o">=</span><span class="n">truncation</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">BatchEncoding</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">source</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">source</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;decoder_attention_mask&quot;</span><span class="p">:</span> <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CLMDataModule"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.CLMDataModule">[docs]</a><span class="k">class</span> <span class="nc">CLMDataModule</span><span class="p">(</span><span class="n">DataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pytorch-lightning-style data module for CLM dataset.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CLMDataModule.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.CLMDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">tokenizer</span><span class="p">:</span> <span class="n">AutoTokenizer</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the data module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset_args: dictionary containing the metadata for the lightning data module creation.</span>
+<span class="sd">            tokenizer: tokenizer to be used in the module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataset_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CLMDataModule.tokenize_function"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.CLMDataModule.tokenize_function">[docs]</a>    <span class="k">def</span> <span class="nf">tokenize_function</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">examples</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BatchEncoding</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Tokenize the given examples.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            examples: list of examples.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tokenized examples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">tokenized_data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">tokenize_function</span><span class="p">(</span><span class="n">examples</span><span class="p">)</span>
+
+        <span class="n">tokenized_data</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokenized_data</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">tokenized_data</span></div></div>
+
+
+<div class="viewcode-block" id="PLMDataModule"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.PLMDataModule">[docs]</a><span class="k">class</span> <span class="nc">PLMDataModule</span><span class="p">(</span><span class="n">DataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pytorch-lightning-style data module for PLM dataset.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PLMDataModule.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.lm_datasets.PLMDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">tokenizer</span><span class="p">:</span> <span class="n">AutoTokenizer</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the data module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset_args: dictionary containing the metadata for the lightning data module creation.</span>
+<span class="sd">            tokenizer: tokenizer to be used in the module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataset_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span> <span class="o">=</span> <span class="n">DataCollatorForPermutationLanguageModeling</span><span class="p">(</span>
+            <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="n">plm_probability</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;plm_probability&quot;</span><span class="p">],</span>
+            <span class="n">max_span_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;max_span_length&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

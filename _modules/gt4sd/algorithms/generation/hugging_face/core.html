@@ -1,0 +1,519 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.generation.hugging_face.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.generation.hugging_face.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.generation.hugging_face.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;HuggingFace generation algorithm.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AlgorithmConfiguration</span><span class="p">,</span>
+    <span class="n">GeneratorAlgorithm</span><span class="p">,</span>
+    <span class="n">Untargeted</span><span class="p">,</span>
+    <span class="n">get_configuration_class_with_attributes</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">...registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
+<span class="kn">from</span> <span class="nn">.implementation</span> <span class="kn">import</span> <span class="n">MODEL_TYPES</span><span class="p">,</span> <span class="n">Generator</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="HuggingFaceGenerationAlgorithm"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceGenerationAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">HuggingFaceGenerationAlgorithm</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
+<div class="viewcode-block" id="HuggingFaceGenerationAlgorithm.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceGenerationAlgorithm.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;HuggingFace generation algorithm.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: domain and application</span>
+<span class="sd">                specification, defining types and validations.</span>
+<span class="sd">            target: unused since it is not a conditional generator.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            An example for using a generative algorithm from HuggingFace::</span>
+
+<span class="sd">                configuration = HuggingFaceXLMGenerator()</span>
+<span class="sd">                algorithm = HuggingFaceGenerationAlgorithm(configuration=configuration)</span>
+<span class="sd">                items = list(algorithm.sample(1))</span>
+<span class="sd">                print(items)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+        <span class="c1"># TODO there might also be a validation/check on the target input</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">,</span>
+            <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type:ignore</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="HuggingFaceGenerationAlgorithm.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceGenerationAlgorithm.get_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_generator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Untargeted</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get the function to sample batches.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: helps to set up the application.</span>
+<span class="sd">            target: context or condition for the generation. Unused in the algorithm.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            callable generating a batch of items.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ensure artifacts for the application are present.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">ensure_artifacts</span><span class="p">()</span>
+        <span class="n">implementation</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">get_conditional_generator</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">implementation</span><span class="o">.</span><span class="n">sample</span></div>
+
+<div class="viewcode-block" id="HuggingFaceGenerationAlgorithm.validate_configuration"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceGenerationAlgorithm.validate_configuration">[docs]</a>    <span class="k">def</span> <span class="nf">validate_configuration</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfiguration</span><span class="p">:</span>
+        <span class="c1"># TODO raise InvalidAlgorithmConfiguration</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">configuration</span><span class="p">,</span> <span class="n">AlgorithmConfiguration</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">configuration</span></div></div>
+
+
+<div class="viewcode-block" id="HuggingFaceConfiguration"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceConfiguration">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">HuggingFaceGenerationAlgorithm</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">HuggingFaceConfiguration</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Basic configuration for an hugging face algorithm.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;generation&quot;</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;nlp&quot;</span>
+
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Type of the model. Supported: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;I&#39;m a stochastic parrot.&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prompt for text generation.&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Length of the generated text.&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">stop_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Stop token for text generation.&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Temperature for sampling, the lower the greedier the sampling.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">repetition_penalty</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Primarily useful for CTRL model, where 1.2 should be used.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of top-k probability tokens to keep.&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Only tokens with cumulative probabilities summing up to this value are kept.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Text defining context provided prior to the prompt.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">number_of_sequences</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of text sequences to generate.&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="HuggingFaceConfiguration.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceConfiguration.get_target_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            target description, returns None in case no target is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="HuggingFaceConfiguration.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceConfiguration.get_conditional_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Generator</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">,</span>
+            <span class="n">prompt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span>
+            <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span>
+            <span class="n">stop_token</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stop_token</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="n">repetition_penalty</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">repetition_penalty</span><span class="p">,</span>
+            <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
+            <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">number_of_sequences</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_sequences</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HuggingFaceXLMGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceXLMGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">HuggingFaceGenerationAlgorithm</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">HuggingFaceXLMGenerator</span><span class="p">(</span><span class="n">HuggingFaceConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configuration to generate text using XLM.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;xlm-mlm-en-2048&quot;</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;xlm&quot;</span>
+
+<div class="viewcode-block" id="HuggingFaceXLMGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceXLMGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;more algorithm versions can be found on https://huggingface.co/models&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">})</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HuggingFaceCTRLGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceCTRLGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">HuggingFaceGenerationAlgorithm</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">HuggingFaceCTRLGenerator</span><span class="p">(</span><span class="n">HuggingFaceConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configuration to generate text using CTRL.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ctrl&quot;</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ctrl&quot;</span>
+
+<div class="viewcode-block" id="HuggingFaceCTRLGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceCTRLGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;more algorithm versions can be found on https://huggingface.co/models&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">})</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HuggingFaceGPT2Generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceGPT2Generator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">HuggingFaceGenerationAlgorithm</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">HuggingFaceGPT2Generator</span><span class="p">(</span><span class="n">HuggingFaceConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configuration to generate text using GPT2.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt2&quot;</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt2&quot;</span>
+
+<div class="viewcode-block" id="HuggingFaceGPT2Generator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceGPT2Generator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;more algorithm versions can be found on https://huggingface.co/models&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">})</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HuggingFaceOpenAIGPTGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceOpenAIGPTGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">HuggingFaceGenerationAlgorithm</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">HuggingFaceOpenAIGPTGenerator</span><span class="p">(</span><span class="n">HuggingFaceConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configuration to generate text using OpenAIGPT.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;openai-gpt&quot;</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;openai-gpt&quot;</span>
+
+<div class="viewcode-block" id="HuggingFaceOpenAIGPTGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceOpenAIGPTGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;more algorithm versions can be found on https://huggingface.co/models&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">})</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HuggingFaceXLNetGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceXLNetGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">HuggingFaceGenerationAlgorithm</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">HuggingFaceXLNetGenerator</span><span class="p">(</span><span class="n">HuggingFaceConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configuration to generate text using XLNet.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;xlnet-large-cased&quot;</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;xlnet&quot;</span>
+
+<div class="viewcode-block" id="HuggingFaceXLNetGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceXLNetGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;more algorithm versions can be found on https://huggingface.co/models&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">})</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HuggingFaceTransfoXLGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceTransfoXLGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">HuggingFaceGenerationAlgorithm</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">HuggingFaceTransfoXLGenerator</span><span class="p">(</span><span class="n">HuggingFaceConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configuration to generate text using TransfoXL.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;transfo-xl-wt103&quot;</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;transfo-xl&quot;</span>
+
+<div class="viewcode-block" id="HuggingFaceTransfoXLGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceTransfoXLGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;more algorithm versions can be found on https://huggingface.co/models&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">})</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

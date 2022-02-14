@@ -1,0 +1,682 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.granular.dataloader.dataset module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd.frameworks.granular.dataloader.sampler module" href="gt4sd.frameworks.granular.dataloader.sampler.html" />
+    <link rel="prev" title="gt4sd.frameworks.granular.dataloader.data_module module" href="gt4sd.frameworks.granular.dataloader.data_module.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.configuration.html">gt4sd.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.conftest.html">gt4sd.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.exceptions.html">gt4sd.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.s3.html">gt4sd.s3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.algorithms.html">gt4sd.algorithms package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.cli.html">gt4sd.cli package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.domains.html">gt4sd.domains package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.extras.html">gt4sd.extras package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.enzeptional.html">gt4sd.frameworks.enzeptional package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="gt4sd.frameworks.granular.html">gt4sd.frameworks.granular package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.granular.arg_parser.html">gt4sd.frameworks.granular.arg_parser package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="gt4sd.frameworks.granular.dataloader.html">gt4sd.frameworks.granular.dataloader package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.granular.ml.html">gt4sd.frameworks.granular.ml package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.granular.tokenizer.html">gt4sd.frameworks.granular.tokenizer package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.torch.html">gt4sd.frameworks.torch package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.tests.html">gt4sd.tests package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="gt4sd.html">gt4sd package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.html">gt4sd.frameworks package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.granular.html">gt4sd.frameworks.granular package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.granular.dataloader.html">gt4sd.frameworks.granular.dataloader package</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.granular.dataloader.dataset module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/gt4sd.frameworks.granular.dataloader.dataset.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-gt4sd.frameworks.granular.dataloader.dataset">
+<span id="gt4sd-frameworks-granular-dataloader-dataset-module"></span><h1>gt4sd.frameworks.granular.dataloader.dataset module<a class="headerlink" href="#module-gt4sd.frameworks.granular.dataloader.dataset" title="Permalink to this headline">¶</a></h1>
+<p>Dataset module.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset" title="gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AutoEncoderDataset</span></code></a></p></td>
+<td><p>Autoencoder dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset" title="gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CombinedGranularDataset</span></code></a></p></td>
+<td><p>General dataset combining multiple granular datasets.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset" title="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GranularDataset</span></code></a></p></td>
+<td><p>A dataset wrapper for granular</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset" title="gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatentModelDataset</span></code></a></p></td>
+<td><p>Latent model dataset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset" title="gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SmilesTokenizationPreProcessingDataset</span></code></a></p></td>
+<td><p>Dataset for SMILES/SELFIES preprocessing.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.build_architecture" title="gt4sd.frameworks.granular.dataloader.dataset.build_architecture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_architecture</span></code></a></p></td>
+<td><p>Build architecture configuration for the selected model type and dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.build_data_columns" title="gt4sd.frameworks.granular.dataloader.dataset.build_data_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_data_columns</span></code></a></p></td>
+<td><p>Build data columns from hyper-parameters.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.build_dataset" title="gt4sd.frameworks.granular.dataloader.dataset.build_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_dataset</span></code></a></p></td>
+<td><p>Build a granular dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.build_dataset_and_architecture" title="gt4sd.frameworks.granular.dataloader.dataset.build_dataset_and_architecture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_dataset_and_architecture</span></code></a></p></td>
+<td><p>Build a dataset and an architecture configuration.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset">
+<em class="property">class </em><code class="sig-name descname">GranularDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#GranularDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.dataset.T_co</span></code>]</p>
+<p>A dataset wrapper for granular</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#GranularDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a granular dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – dataset name.</p></li>
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dataset samples.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__len__">
+<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#GranularDataset.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>length of the dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#GranularDataset.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve an item from the dataset by index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – index for the item.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>an item.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'A dataset wrapper for granular'</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.dataloader.dataset'</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__parameters__">
+<code class="sig-name descname">__parameters__</code><em class="property"> = ()</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__parameters__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset">
+<em class="property">class </em><code class="sig-name descname">CombinedGranularDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datasets</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#CombinedGranularDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.dataset.T_co</span></code>]</p>
+<p>General dataset combining multiple granular datasets.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datasets</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#CombinedGranularDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a general dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>datasets</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – list of dataset configurations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__len__">
+<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#CombinedGranularDataset.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>length of the dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#CombinedGranularDataset.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve an item from the dataset by index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – index for the item.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>an item.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'General dataset combining multiple granular datasets.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.dataloader.dataset'</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__parameters__">
+<code class="sig-name descname">__parameters__</code><em class="property"> = ()</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__parameters__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset">
+<em class="property">class </em><code class="sig-name descname">SmilesTokenizationPreProcessingDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">data_columns</span></em>, <em class="sig-param"><span class="n">input_smiles</span></em>, <em class="sig-param"><span class="n">target_smiles</span></em>, <em class="sig-param"><span class="n">tokenizer</span></em>, <em class="sig-param"><span class="n">set_seq_size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#SmilesTokenizationPreProcessingDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.dataset.T_co</span></code>]</p>
+<p>Dataset for SMILES/SELFIES preprocessing.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">data_columns</span></em>, <em class="sig-param"><span class="n">input_smiles</span></em>, <em class="sig-param"><span class="n">target_smiles</span></em>, <em class="sig-param"><span class="n">tokenizer</span></em>, <em class="sig-param"><span class="n">set_seq_size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#SmilesTokenizationPreProcessingDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a SmilesTokenizationPreProcessingDataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – dataset name.</p></li>
+<li><p><strong>data_columns</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – data columns mapping.</p></li>
+<li><p><strong>input_smiles</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – dataframe containing input SMILES.</p></li>
+<li><p><strong>target_smiles</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – dataframe containing target SMILES.</p></li>
+<li><p><strong>tokenizer</strong> (<a class="reference internal" href="gt4sd.frameworks.granular.tokenizer.tokenizer.html#gt4sd.frameworks.granular.tokenizer.tokenizer.Tokenizer" title="gt4sd.frameworks.granular.tokenizer.tokenizer.Tokenizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tokenizer</span></code></a>) – a tokenizer defining the molecule representation used.</p></li>
+<li><p><strong>set_seq_size</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – sequence size. Defaults to None, a.k.a., define this
+using the input SMILES.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.smiles_to_ids">
+<code class="sig-name descname">smiles_to_ids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_smiles</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">target_smiles</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#SmilesTokenizationPreProcessingDataset.smiles_to_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.smiles_to_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process input SMILES lists generating examples by tokenizing strings and converting them to tensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_smiles</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – list of input SMILES representations. Defaults to [].</p></li>
+<li><p><strong>target_smiles</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – list of target SMILES representations. Defaults to [].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Dataset for SMILES/SELFIES preprocessing.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.dataloader.dataset'</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__parameters__">
+<code class="sig-name descname">__parameters__</code><em class="property"> = ()</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__parameters__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.dataset">
+<code class="sig-name descname">dataset</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset">
+<em class="property">class </em><code class="sig-name descname">LatentModelDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">data_columns</span></em>, <em class="sig-param"><span class="n">target_data</span></em>, <em class="sig-param"><span class="n">scaling</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#LatentModelDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.dataset.T_co</span></code>]</p>
+<p>Latent model dataset.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">data_columns</span></em>, <em class="sig-param"><span class="n">target_data</span></em>, <em class="sig-param"><span class="n">scaling</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#LatentModelDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a LatentModelDataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – dataset name.</p></li>
+<li><p><strong>data_columns</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – data columns mapping.</p></li>
+<li><p><strong>target_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – dataframe for targets.</p></li>
+<li><p><strong>scaling</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – feature scaling process. Defaults to None, a.k.a. no scaling. Currently not supported.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – in case a scaling is selected.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Latent model dataset.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.dataloader.dataset'</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__parameters__">
+<code class="sig-name descname">__parameters__</code><em class="property"> = ()</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__parameters__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.dataset">
+<code class="sig-name descname">dataset</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset">
+<em class="property">class </em><code class="sig-name descname">AutoEncoderDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">data_columns</span></em>, <em class="sig-param"><span class="n">input_data</span></em>, <em class="sig-param"><span class="n">target_data</span></em>, <em class="sig-param"><span class="n">scaling</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#AutoEncoderDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.dataset.T_co</span></code>]</p>
+<p>Autoencoder dataset.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">data_columns</span></em>, <em class="sig-param"><span class="n">input_data</span></em>, <em class="sig-param"><span class="n">target_data</span></em>, <em class="sig-param"><span class="n">scaling</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#AutoEncoderDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct an AutoEncoderDataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – dataset name.</p></li>
+<li><p><strong>data_columns</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – data columns mapping.</p></li>
+<li><p><strong>input_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – dataframe for inputs.</p></li>
+<li><p><strong>target_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – dataframe for targets.</p></li>
+<li><p><strong>scaling</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – feature scaling process. Defaults to None, a.k.a. no scaling. Feasible values: “onehot”, “min-max” and “standard”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – in case requested scaling is not supported.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Autoencoder dataset.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.dataloader.dataset'</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__parameters__">
+<code class="sig-name descname">__parameters__</code><em class="property"> = ()</em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__parameters__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.dataset">
+<code class="sig-name descname">dataset</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.build_data_columns">
+<code class="sig-name descname">build_data_columns</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hparams</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#build_data_columns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.build_data_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build data columns from hyper-parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hparams</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – hyper-parameters for the data columns.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>data columns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.build_dataset">
+<code class="sig-name descname">build_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">dataset_type</span></em>, <em class="sig-param"><span class="n">data_columns</span></em>, <em class="sig-param"><span class="n">hparams</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#build_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.build_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a granular dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – dataset name.</p></li>
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – dataframe representing the dataset.</p></li>
+<li><p><strong>dataset_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – dataset type. Feasible values: “latentmodel”, “smiles”, “selfies” and “autoencoder”.</p></li>
+<li><p><strong>data_columns</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – data columns mapping.</p></li>
+<li><p><strong>hparams</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – hyper-parameters for the data columns.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – in case requested dataset type is not supported.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset" title="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GranularDataset</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a granular dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.build_architecture">
+<code class="sig-name descname">build_architecture</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_type</span></em>, <em class="sig-param"><span class="n">data_columns</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">hparams</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#build_architecture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.build_architecture" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build architecture configuration for the selected model type and dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – model type. Feasible values: “vae_rnn”, “vae_trans”, “mlp_predictor”, “no_encoding”, “mlp_autoencoder” and “vae_mlp”.</p></li>
+<li><p><strong>data_columns</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – data columns mapping.</p></li>
+<li><p><strong>dataset</strong> (<a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset" title="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GranularDataset</span></code></a>) – a granular dataset.</p></li>
+<li><p><strong>hparams</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – hyper-parameters for the data columns.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – in case requested model type is not supported.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>architecture configuration.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gt4sd.frameworks.granular.dataloader.dataset.build_dataset_and_architecture">
+<code class="sig-name descname">build_dataset_and_architecture</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">data_path</span></em>, <em class="sig-param"><span class="n">data_file</span></em>, <em class="sig-param"><span class="n">dataset_type</span></em>, <em class="sig-param"><span class="n">model_type</span></em>, <em class="sig-param"><span class="n">hparams</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/dataloader/dataset.html#build_dataset_and_architecture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.dataloader.dataset.build_dataset_and_architecture" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a dataset and an architecture configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – dataset name.</p></li>
+<li><p><strong>data_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the dataset.</p></li>
+<li><p><strong>data_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – data file name.</p></li>
+<li><p><strong>dataset_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – dataset type. Feasible values: “latentmodel”, “smiles”, “selfies” and “autoencoder”.</p></li>
+<li><p><strong>model_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – model type. Feasible values: “vae_rnn”, “vae_trans”, “mlp_predictor”, “no_encoding”, “mlp_autoencoder” and “vae_mlp”.</p></li>
+<li><p><strong>hparams</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – hyper-parameters for the data columns.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – in case the data file has an unsupported extension/format.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset" title="gt4sd.frameworks.granular.dataloader.dataset.GranularDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GranularDataset</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a tuple containing a granular dataset and a related architecture configuration.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gt4sd.frameworks.granular.dataloader.sampler.html" class="btn btn-neutral float-right" title="gt4sd.frameworks.granular.dataloader.sampler module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd.frameworks.granular.dataloader.data_module.html" class="btn btn-neutral float-left" title="gt4sd.frameworks.granular.dataloader.data_module module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

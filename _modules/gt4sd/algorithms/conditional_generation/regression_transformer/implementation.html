@@ -1,0 +1,794 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.conditional_generation.regression_transformer.implementation &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.conditional_generation.regression_transformer.implementation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.conditional_generation.regression_transformer.implementation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implementation of Regression Transformer conditional generators.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">terminator.collators</span> <span class="kn">import</span> <span class="n">MaskedTextCollator</span><span class="p">,</span> <span class="n">PropertyCollator</span>
+<span class="kn">from</span> <span class="nn">terminator.inference</span> <span class="kn">import</span> <span class="n">InferenceRT</span>
+<span class="kn">from</span> <span class="nn">terminator.search</span> <span class="kn">import</span> <span class="n">SEARCH_FACTORY</span><span class="p">,</span> <span class="n">Search</span>
+<span class="kn">from</span> <span class="nn">terminator.selfies</span> <span class="kn">import</span> <span class="n">decoder</span>
+<span class="kn">from</span> <span class="nn">terminator.tokenization</span> <span class="kn">import</span> <span class="n">InferenceBertTokenizer</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoConfig</span><span class="p">,</span> <span class="n">AutoModelWithLMHead</span><span class="p">,</span> <span class="n">XLNetLMHeadModel</span>
+
+<span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">Property</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">validate_molecules</span>
+<span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="ConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator">[docs]</a><span class="k">class</span> <span class="nc">ConditionalGenerator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Main interface for a regression transformer.&quot;&quot;&quot;</span>
+
+    <span class="c1"># device where the inference is running.</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span>
+
+    <span class="c1"># The task the RT is currently performing. Either &#39;regression&#39; or &#39;generation&#39;</span>
+    <span class="n">task</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="c1"># method to convert logits to predictions. Either GreedySearch or SamplingSearch</span>
+    <span class="n">search</span><span class="p">:</span> <span class="n">Search</span>
+
+    <span class="c1"># ***** Additional attributes for text generation *****</span>
+    <span class="c1"># data collator for property prediction of self-generated items</span>
+    <span class="n">property_collator</span><span class="p">:</span> <span class="n">PropertyCollator</span>
+
+    <span class="c1"># percentage of tolerated deviation between desired and obtained property</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># number of samples obtained per call</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span>
+
+<div class="viewcode-block" id="ConditionalGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the generator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: directory where to find models and parameters.</span>
+<span class="sd">            temperature: temperature for the sampling. Defaults to 1.4.</span>
+<span class="sd">            generated_length: maximum length of the generated molecules.</span>
+<span class="sd">                Defaults to 100.</span>
+<span class="sd">            samples_per_protein: number of points sampled per protein.</span>
+<span class="sd">                It has to be greater than 1. Defaults to 10.</span>
+<span class="sd">            device: device where the inference is running either as a dedicated class</span>
+<span class="sd">                or a string. If not provided is inferred.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># Set up the data preparation pipeline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">InferenceBertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="p">,</span> <span class="n">pad_even</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collator</span> <span class="o">=</span> <span class="n">MaskedTextCollator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="c1"># Set up model: First load the pretrained XLNet model</span>
+        <span class="n">xlnet_model</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span>
+        <span class="c1"># Initialize the custom RT model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">InferenceRT</span><span class="p">(</span><span class="n">xlnet_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># Set up inference parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_inference</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.load_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">XLNetLMHeadModel</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loading a XLNetLMHeadModel which constitutes the base of a RT model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: path to the model.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            XLNetLMHeadModel: base of a Regression Transformer model.</span>
+<span class="sd">            XLNetConfig: configuration of the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;config.json&quot;</span><span class="p">)</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">config_name</span><span class="p">,</span> <span class="n">mem_len</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="n">xlnet_model</span> <span class="o">=</span> <span class="n">AutoModelWithLMHead</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="p">,</span> <span class="n">from_tf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span>
+        <span class="p">)</span>
+        <span class="n">xlnet_model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">))</span>
+        <span class="n">xlnet_model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">xlnet_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model restored from </span><span class="si">{</span><span class="n">resources_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xlnet_model</span><span class="p">,</span> <span class="n">config</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.load_inference"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.load_inference">[docs]</a>    <span class="k">def</span> <span class="nf">load_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load and set up all parameters necessary for inference.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: path to the model folder.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;inference.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;property_token&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_length</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;property_mask_length&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;property_ranges&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;property_ranges&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Could not restore inference parameters from </span><span class="si">{</span><span class="n">resources_path</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.denormalize"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.denormalize">[docs]</a>    <span class="k">def</span> <span class="nf">denormalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Denormalize from [0,1] scale to original scale.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: normalized value.</span>
+<span class="sd">            precision: optional rounding precision. Defaults to 4.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Value in regular scale.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.normalize"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Normalize from original scale to [0,1] scale.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: unnormalized input.</span>
+<span class="sd">            precision: optional rounding precision.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Normalized value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_</span><span class="p">),</span> <span class="n">precision</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.validate_input"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expression separator </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="si">}</span><span class="s2"> not &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;found in input </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Nothing to do, no mask to fill (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span><span class="si">}</span><span class="s2">) found&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;in input </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">property</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No property token (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="si">}</span><span class="s2">) found in input&quot;</span><span class="p">)</span>
+
+        <span class="n">text_sequence</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">number_sequence</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">text_sequence</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span> <span class="ow">in</span> <span class="n">text_sequence</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span> <span class="ow">in</span> <span class="n">number_sequence</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Do not mask number and text sequence at the same time like in </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">text_sequence</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies that the non-numerical part of the input is a proper sequence.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence: input sequence to be validated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.safely_determine_task"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.safely_determine_task">[docs]</a>    <span class="k">def</span> <span class="nf">safely_determine_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines whether the passed sequence adheres to regression or generation task.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: the user-provided input sequence for the model, inluding mask tokens.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if the sequence does not adhere to the formatting rules.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the task, either &#39;regression&#39; or &#39;generation&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_input</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span>
+            <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;generation&quot;</span>
+
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;To predict </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="si">}</span><span class="s2"> you have to mask </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">property_mask_length</span><span class="si">}</span><span class="s2"> times&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">&quot;regression&quot;</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.generate_batch_regression"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.generate_batch_regression">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Property</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict the property of a sample.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            context: a string with a masked property, a separator and an</span>
+<span class="sd">                entity. E.g. &lt;stab&gt;[MASK][MASK][MASK][MASK]|GSQEVNSGTQTYKNASPEEAERIARKAGATTWTEKGNKWEIRI.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Property]: a list of (denormalized) predicted properties for the entity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting prediction for sequence </span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Prepare the batch</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collator</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">context</span><span class="p">)])</span>
+        <span class="n">input_ids</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+
+        <span class="c1"># Forward pass</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+        <span class="c1"># Obtain the singular predictions</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;logits&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compile_regression_result</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.compile_regression_result"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.compile_regression_result">[docs]</a>    <span class="k">def</span> <span class="nf">compile_regression_result</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">prediction</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Property</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Postprocesses the prediction from the property task to obtain a float.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_ids: 2D Tensor of shape (batch_size, sequence_length).</span>
+<span class="sd">            prediction: 2D Tensor of shape (batch_size, sequence_length).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Property]: list of property values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">inp</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">prediction</span><span class="p">):</span>
+            <span class="n">in_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="n">inp</span><span class="p">,</span> <span class="n">clean_up_tokenization_spaces</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="n">out_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="n">pred</span><span class="p">,</span> <span class="n">clean_up_tokenization_spaces</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="n">joined</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">get_sample_prediction</span><span class="p">(</span><span class="n">out_tokens</span><span class="p">,</span> <span class="n">in_tokens</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">gen_prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">aggregate_tokens</span><span class="p">(</span><span class="n">joined</span><span class="p">,</span> <span class="n">label_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">properties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">denormalize</span><span class="p">(</span><span class="n">gen_prop</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]))</span>
+        <span class="k">return</span> <span class="n">properties</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.generate_batch_generation"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.generate_batch_generation">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Conditionally generate sequences given a continuous property value and a fixed</span>
+<span class="sd">        sequence. This function first conditionally generates the novel sequences and</span>
+<span class="sd">        then predicts their properties using the RT again. Only if the predicted</span>
+<span class="sd">        property is within the tolerance range, the novel sequence is returned.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence: the input sequence with masked tokens on the text.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[Tuple[str, float]]: a tuple of tuples, each containing the generated</span>
+<span class="sd">                sequence alongside its predicted property value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># The property score has to be in the range [0, 1]</span>
+        <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting prediction for sequence </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Prepare the batch</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collator</span><span class="p">([</span><span class="n">tokens</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="n">input_ids</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        <span class="c1"># Forward pass</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="c1"># Obtain model predictions via the search method</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;logits&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="c1"># Combine predictions with the static part to obtain the full sequences</span>
+        <span class="n">generations</span> <span class="o">=</span> <span class="n">input_ids</span>
+        <span class="n">generations</span><span class="p">[</span><span class="n">generations</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[</span>
+            <span class="n">generations</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token_id</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Second part: Predict the properties of the just generated sequence</span>
+        <span class="n">_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_collator</span><span class="o">.</span><span class="n">mask_tokens</span><span class="p">(</span><span class="n">generations</span><span class="p">)</span>
+        <span class="n">prediction_input</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;perm_mask&quot;</span><span class="p">:</span> <span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;target_mapping&quot;</span><span class="p">:</span> <span class="n">_input</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_collator</span><span class="o">.</span><span class="n">attention_mask</span><span class="p">(</span><span class="n">generations</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="c1"># Pass through model</span>
+        <span class="n">property_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">prediction_input</span><span class="p">)</span>
+        <span class="c1"># It&#39;s a design choice to go with greedy predictions here</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">property_outputs</span><span class="p">[</span><span class="s2">&quot;logits&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># Obtain floating predictions</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compile_regression_result</span><span class="p">(</span><span class="n">generations</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+        <span class="c1"># Obtain the sequences (AAS or SELFIES)</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">to_readable</span><span class="p">(</span>
+                <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">generations</span>
+        <span class="p">]</span>
+        <span class="n">successes</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="nb">filter</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span><span class="p">)</span>
+                <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span>
+                <span class="nb">zip</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">properties</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successes: </span><span class="si">{</span><span class="n">successes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">successes</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.normalize_sequence"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.normalize_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Take a sequence with a unnormalized property score and convert it to a</span>
+<span class="sd">        sequence with a normalized score.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            context: sequence with unnormalized property.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Sequence: sequence with normalized property.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="n">numerical_tokens</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span>
+            <span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">)</span>
+            <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">unnorm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">floating_tokens_to_float</span><span class="p">(</span><span class="n">numerical_tokens</span><span class="p">)</span>
+        <span class="c1"># Declard as class variable since used by other methods</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">unnorm</span><span class="p">)</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_value</span><span class="p">)[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_length</span><span class="p">]</span>
+
+        <span class="n">tokens</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[:</span> <span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="o">+</span> <span class="n">norm</span>
+            <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)</span> <span class="p">:])</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.validate_numerical"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_numerical">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">validate_numerical</span><span class="p">(</span><span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate whether a list of sequences contains only numerical values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequences: a list of hopefully only numerical values.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">             List[Any]: a tuple containing of the validated floats and valid indexes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">]</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">float</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">items</span><span class="p">,</span> <span class="n">idxs</span></div></div>
+
+
+<div class="viewcode-block" id="ChemicalLanguageRT"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT">[docs]</a><span class="k">class</span> <span class="nc">ChemicalLanguageRT</span><span class="p">(</span><span class="n">ConditionalGenerator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hybrid regression and conditional molecular generation model as implemented in</span>
+<span class="sd">    https://arxiv.org/abs/2202.01338. It generates molecules with a desired solubility</span>
+<span class="sd">    (ESOL) score or predicts the ESOL of a given molecule.</span>
+<span class="sd">    For details on the ESOL task see: https://pubs.acs.org/doi/10.1021/ci034243x</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        resources_path: path to the model.</span>
+<span class="sd">        context: user-specified input text for the model.</span>
+<span class="sd">        search: search key to instantiate a search via terminator.search.SEARCH_FACTORY.</span>
+<span class="sd">        temperature: the temperature parameter in case of a `sample` search.</span>
+<span class="sd">        batch_size: the batch size for the model, applicable only to generative task.</span>
+<span class="sd">        tolerance: the tolerance for the property of the generated molecules.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ChemicalLanguageRT.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sample&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.4</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the molecule generator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: directory where to find models and parameters.</span>
+<span class="sd">            search: search key to instantiate a search, defaults to `sample`.</span>
+<span class="sd">            temperature: temperature for the sampling. Defaults to 1.4.</span>
+<span class="sd">            batch_size: number of points sampled per call. Defaults to 8.</span>
+<span class="sd">            tolerance: the tolerance for the property of the generated molecules.</span>
+<span class="sd">                Given in percent. Defaults to 20.</span>
+<span class="sd">            device: device where the inference s running either as a dedicated class</span>
+<span class="sd">                or a string. If not provided is inferred.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
+
+        <span class="c1"># Validate input and determine task</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">safely_determine_task</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+
+        <span class="c1"># Console outputs for usage of search methods</span>
+        <span class="k">if</span> <span class="n">search</span> <span class="o">==</span> <span class="s2">&quot;sample&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;For regression task, greedy search is recommended&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">search</span> <span class="o">==</span> <span class="s2">&quot;greedy&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;generation&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;For generation task, sample search is recommended&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">search</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SEARCH_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pick a search of </span><span class="si">{</span><span class="n">SEARCH_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2"> not: </span><span class="si">{</span><span class="n">search</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search</span> <span class="o">=</span> <span class="n">SEARCH_FACTORY</span><span class="p">[</span><span class="n">search</span><span class="p">](</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
+
+        <span class="c1"># Based on task, set the correct generate_batch method</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_batch_regression</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;generation&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_batch_generation</span>  <span class="c1"># type: ignore</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">property_collator</span> <span class="o">=</span> <span class="n">PropertyCollator</span><span class="p">(</span>
+                <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
+                <span class="n">property_tokens</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">],</span>
+                <span class="n">num_tokens_to_mask</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># Tolerance on [0,1] scale</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span> <span class="o">/</span> <span class="mf">100.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown task: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalLanguageRT.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies that the non-numerical part of the input sequence is a SELFIES.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence: input sequence to be validated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Fractional molecules based on non-masked parts of the SELFIES sequence</span>
+        <span class="n">smis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="n">sequence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">smis</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid sequence: </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChemicalLanguageRT.validate_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_output">[docs]</a>    <span class="k">def</span> <span class="nf">validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate the output of the RT model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequences: list of sequences to be validated.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of validated items (Chem.rdchem.Mol in the case of a generation task</span>
+<span class="sd">                floating values otherwise) and a list of valid indexes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_numerical</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Convert SELFIES to SMILES</span>
+            <span class="n">smiles_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">sequences</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">smiles_list</span> <span class="o">==</span> <span class="p">[]:</span>
+                <span class="k">return</span> <span class="p">([</span><span class="kc">None</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">validate_molecules</span><span class="p">(</span><span class="n">smiles_list</span><span class="o">=</span><span class="n">smiles_list</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div></div>
+
+
+<div class="viewcode-block" id="ProteinLanguageRT"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT">[docs]</a><span class="k">class</span> <span class="nc">ProteinLanguageRT</span><span class="p">(</span><span class="n">ConditionalGenerator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hybrid regression and conditional protein generation model as implemented in</span>
+<span class="sd">    https://arxiv.org/abs/2202.01338. It generates peptides with a desired stability</span>
+<span class="sd">    score or predicts the stability score of a given molecule.</span>
+<span class="sd">    For details on the stability task see: https://doi.org/10.1126/science.aan0693</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        resources_path: path to the model.</span>
+<span class="sd">        context: user-specified input text for the model.</span>
+<span class="sd">        search: search key to instantiate a search via terminator.search.SEARCH_FACTORY.</span>
+<span class="sd">        temperature: the temperature parameter in case of a `sample` search.</span>
+<span class="sd">        batch_size: the batch size for the model, applicable only to generative task.</span>
+<span class="sd">        tolerance: the tolerance for the property of the generated molecules.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ProteinLanguageRT.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sample&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.4</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the protein generator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: directory where to find models and parameters.</span>
+<span class="sd">            search: search key to instantiate a search, defaults to `sample`.</span>
+<span class="sd">            temperature: temperature for the sampling. Defaults to 1.4.</span>
+<span class="sd">            batch_size: number of points sampled per call. Defaults to 8.</span>
+<span class="sd">            tolerance: the tolerance for the property of the generated molecules.</span>
+<span class="sd">                Given in percent. Defaults to 20.</span>
+<span class="sd">            device: device where the inference s running either as a dedicated class</span>
+<span class="sd">                or a string. If not provided is inferred.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
+
+        <span class="c1"># Validate input and determine task</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">safely_determine_task</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+
+        <span class="c1"># Console outputs for usage of search methods</span>
+        <span class="k">if</span> <span class="n">search</span> <span class="o">==</span> <span class="s2">&quot;sample&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;For regression task, greedy search is recommended&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">search</span> <span class="o">==</span> <span class="s2">&quot;greedy&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;generation&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;For generation task, sample search is recommended&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">search</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SEARCH_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pick a search of </span><span class="si">{</span><span class="n">SEARCH_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2"> not: </span><span class="si">{</span><span class="n">search</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search</span> <span class="o">=</span> <span class="n">SEARCH_FACTORY</span><span class="p">[</span><span class="n">search</span><span class="p">](</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
+
+        <span class="c1"># Based on task, set the correct generate_batch method</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_batch_regression</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;generation&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_batch_generation</span>  <span class="c1"># type: ignore</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">property_collator</span> <span class="o">=</span> <span class="n">PropertyCollator</span><span class="p">(</span>
+                <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
+                <span class="n">property_tokens</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">],</span>
+                <span class="n">num_tokens_to_mask</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># Tolerance on [0,1] scale</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span> <span class="o">/</span> <span class="mf">100.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown task: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProteinLanguageRT.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies that the non-numerical part of the input sequence is a valid AAS.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence: input sequence to be validated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sequence</span> <span class="o">!=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Sequence </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2"> does not follow IUPAC convention for AAS&quot;</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProteinLanguageRT.validate_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_output">[docs]</a>    <span class="k">def</span> <span class="nf">validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate the output of the RT model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequences: list of sequences to be validated.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of validated items and a list of valid indexes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_numerical</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">item</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+                    <span class="p">)</span>
+                    <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">else</span> <span class="kc">None</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sequences</span>
+            <span class="p">]</span>
+            <span class="n">idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">items</span><span class="p">,</span> <span class="n">idxs</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.granular.ml.models.vae_rnn.core module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd.frameworks.granular.ml.models.vae_trans package" href="gt4sd.frameworks.granular.ml.models.vae_trans.html" />
+    <link rel="prev" title="gt4sd.frameworks.granular.ml.models.vae_rnn package" href="gt4sd.frameworks.granular.ml.models.vae_rnn.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.configuration.html">gt4sd.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.conftest.html">gt4sd.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.exceptions.html">gt4sd.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.s3.html">gt4sd.s3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.algorithms.html">gt4sd.algorithms package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.cli.html">gt4sd.cli package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.domains.html">gt4sd.domains package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.extras.html">gt4sd.extras package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.enzeptional.html">gt4sd.frameworks.enzeptional package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="gt4sd.frameworks.granular.html">gt4sd.frameworks.granular package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.granular.arg_parser.html">gt4sd.frameworks.granular.arg_parser package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.granular.dataloader.html">gt4sd.frameworks.granular.dataloader package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="gt4sd.frameworks.granular.ml.html">gt4sd.frameworks.granular.ml package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.granular.tokenizer.html">gt4sd.frameworks.granular.tokenizer package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.torch.html">gt4sd.frameworks.torch package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.tests.html">gt4sd.tests package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="gt4sd.html">gt4sd package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.html">gt4sd.frameworks package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.granular.html">gt4sd.frameworks.granular package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.granular.ml.html">gt4sd.frameworks.granular.ml package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.granular.ml.models.html">gt4sd.frameworks.granular.ml.models package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.granular.ml.models.vae_rnn.html">gt4sd.frameworks.granular.ml.models.vae_rnn package</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.granular.ml.models.vae_rnn.core module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/gt4sd.frameworks.granular.ml.models.vae_rnn.core.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-gt4sd.frameworks.granular.ml.models.vae_rnn.core">
+<span id="gt4sd-frameworks-granular-ml-models-vae-rnn-core-module"></span><h1>gt4sd.frameworks.granular.ml.models.vae_rnn.core module<a class="headerlink" href="#module-gt4sd.frameworks.granular.ml.models.vae_rnn.core" title="Permalink to this headline">¶</a></h1>
+<p>VaeRnn implementation.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn" title="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VaeRnn</span></code></a></p></td>
+<td><p>VaeRnn - variational encoder using RNN with Gaussian prior and approximate posterior.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn">
+<em class="property">class </em><code class="sig-name descname">VaeRnn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">position</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">vocab_size</span></em>, <em class="sig-param"><span class="n">embedding_size</span></em>, <em class="sig-param"><span class="n">tokenizer</span></em>, <em class="sig-param"><span class="n">hidden_size_enc</span><span class="o">=</span><span class="default_value">265</span></em>, <em class="sig-param"><span class="n">n_layers_enc</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">hidden_size_dec</span><span class="o">=</span><span class="default_value">265</span></em>, <em class="sig-param"><span class="n">n_layers_dec</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">bidirectional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">latent_size</span><span class="o">=</span><span class="default_value">196</span></em>, <em class="sig-param"><span class="n">teacher_forcing</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">loss_function</span><span class="o">=</span><span class="default_value">'ce'</span></em>, <em class="sig-param"><span class="n">kl_low</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">kl_high</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">kl_n_epochs</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">kl_start_epoch</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">inference_check_frequency</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="gt4sd.frameworks.granular.ml.models.base_model.html#gt4sd.frameworks.granular.ml.models.base_model.GranularEncoderDecoderModel" title="gt4sd.frameworks.granular.ml.models.base_model.GranularEncoderDecoderModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">gt4sd.frameworks.granular.ml.models.base_model.GranularEncoderDecoderModel</span></code></a></p>
+<p>VaeRnn - variational encoder using RNN with Gaussian prior and approximate posterior.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">position</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">vocab_size</span></em>, <em class="sig-param"><span class="n">embedding_size</span></em>, <em class="sig-param"><span class="n">tokenizer</span></em>, <em class="sig-param"><span class="n">hidden_size_enc</span><span class="o">=</span><span class="default_value">265</span></em>, <em class="sig-param"><span class="n">n_layers_enc</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">hidden_size_dec</span><span class="o">=</span><span class="default_value">265</span></em>, <em class="sig-param"><span class="n">n_layers_dec</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">bidirectional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">latent_size</span><span class="o">=</span><span class="default_value">196</span></em>, <em class="sig-param"><span class="n">teacher_forcing</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">loss_function</span><span class="o">=</span><span class="default_value">'ce'</span></em>, <em class="sig-param"><span class="n">kl_low</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">kl_high</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">kl_n_epochs</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">kl_start_epoch</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">inference_check_frequency</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct VaeRnn.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – model name.</p></li>
+<li><p><strong>position</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – position of the model.</p></li>
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – data name mappings.</p></li>
+<li><p><strong>vocab_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – size of the vocabulary.</p></li>
+<li><p><strong>embedding_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – size of the embedding vectors.</p></li>
+<li><p><strong>tokenizer</strong> (<a class="reference internal" href="gt4sd.frameworks.granular.tokenizer.tokenizer.html#gt4sd.frameworks.granular.tokenizer.tokenizer.Tokenizer" title="gt4sd.frameworks.granular.tokenizer.tokenizer.Tokenizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tokenizer</span></code></a>) – tokenizer.</p></li>
+<li><p><strong>hidden_size_enc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – encoder hidden size. Defaults to 256.</p></li>
+<li><p><strong>n_layers_enc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of layers for the encoder. Defaults to 2.</p></li>
+<li><p><strong>hidden_size_dec</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – decoder hidden size. Defaults to 256.</p></li>
+<li><p><strong>n_layers_dec</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of layers for the decoder. Defaults to 2.</p></li>
+<li><p><strong>bidirectional</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether the RNN cell is bidirectional. Defaults to False.</p></li>
+<li><p><strong>latent_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – latent size. Defaults to 196.</p></li>
+<li><p><strong>teacher_forcing</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether to teacher forcing. Defaults to True.</p></li>
+<li><p><strong>loss_function</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – loss function. Defaults to “ce”.</p></li>
+<li><p><strong>kl_low</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – low KL weight. Defaults to 0.0.</p></li>
+<li><p><strong>kl_high</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – high KL weight. Defaults to 0.1.</p></li>
+<li><p><strong>kl_n_epochs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – KL number of epochs. Defaults to 100.</p></li>
+<li><p><strong>kl_start_epoch</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – KL starting epoch. Defaults to 0.</p></li>
+<li><p><strong>inference_check_frequency</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – frequency for checking inference quality. Defaults to 50.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – in case the provided loss function is not supported.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.position">
+<code class="sig-name descname">position</code><em class="property">: int</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.position" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.latent_size">
+<code class="sig-name descname">latent_size</code><em class="property">: int</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.latent_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.decode">
+<code class="sig-name descname">decode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">z</span></em>, <em class="sig-param"><span class="n">max_len</span><span class="o">=</span><span class="default_value">127</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode a latent space point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – latent point.</p></li>
+<li><p><strong>max_len</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – maximum sequence length. Defaults to 127.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tuple with decoded texts and token indices.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._sampling_step">
+<code class="sig-name descname">_sampling_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn._sampling_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._sampling_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a sampling step in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – model input.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>model sampling step output.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.encode">
+<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode a sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – input sample.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>latent encoding.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.encode_decode">
+<code class="sig-name descname">encode_decode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">max_len</span><span class="o">=</span><span class="default_value">127</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn.encode_decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.encode_decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode and decode a sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – input sample.</p></li>
+<li><p><strong>max_len</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – maximum sequence length. Defaults to 127.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>decoded sample.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.inference">
+<code class="sig-name descname">inference</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn.inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.inference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the model in inference mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – sample.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>generated output.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._run_step">
+<code class="sig-name descname">_run_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn._run_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._run_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a step in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – model input.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>model step output.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_data</span></em>, <em class="sig-param"><span class="n">target_data</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">'cpu'</span></em>, <em class="sig-param"><span class="n">current_epoch</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Training step for the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – input for the step.</p></li>
+<li><p><strong>target_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – target for the step.</p></li>
+<li><p><strong>device</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – string representing the device to use. Defaults to “cpu”.</p></li>
+<li><p><strong>current_epoch</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – current epoch. Defaults to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a tuple containing the step output, the loss and the logs for the module.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.val_step">
+<code class="sig-name descname">val_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_data</span></em>, <em class="sig-param"><span class="n">target_data</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">'cpu'</span></em>, <em class="sig-param"><span class="n">current_epoch</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn.val_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.val_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validation step for the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – input for the step.</p></li>
+<li><p><strong>target_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – target for the step.</p></li>
+<li><p><strong>device</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – string representing the device to use. Defaults to “cpu”.</p></li>
+<li><p><strong>current_epoch</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – current epoch. Defaults to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a tuple containing the step output, the loss and the logs for the module.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.add_model_specific_args">
+<em class="property">static </em><code class="sig-name descname">add_model_specific_args</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent_parser</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/vae_rnn/core.html#VaeRnn.add_model_specific_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.add_model_specific_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adding to a parser model specific arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent_parser</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentParser</span></code>) – patent parser.</p></li>
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – model name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentParser</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>updated parser.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'VaeRnn - variational encoder using RNN with Gaussian prior and approximate posterior.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.ml.models.vae_rnn.core'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.from_position">
+<code class="sig-name descname">from_position</code><em class="property">: List<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.from_position" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._is_full_backward_hook">
+<code class="sig-name descname">_is_full_backward_hook</code><em class="property">: Optional<span class="p">[</span>bool<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._is_full_backward_hook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._parameters">
+<code class="sig-name descname">_parameters</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>Optional<span class="p">[</span>Parameter<span class="p">]</span><span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._buffers">
+<code class="sig-name descname">_buffers</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>Optional<span class="p">[</span>Tensor<span class="p">]</span><span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._buffers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._non_persistent_buffers_set">
+<code class="sig-name descname">_non_persistent_buffers_set</code><em class="property">: Set<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._non_persistent_buffers_set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._backward_hooks">
+<code class="sig-name descname">_backward_hooks</code><em class="property">: Dict<span class="p">[</span>int<span class="p">, </span>Callable<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._backward_hooks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._forward_hooks">
+<code class="sig-name descname">_forward_hooks</code><em class="property">: Dict<span class="p">[</span>int<span class="p">, </span>Callable<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._forward_hooks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._forward_pre_hooks">
+<code class="sig-name descname">_forward_pre_hooks</code><em class="property">: Dict<span class="p">[</span>int<span class="p">, </span>Callable<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._forward_pre_hooks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._state_dict_hooks">
+<code class="sig-name descname">_state_dict_hooks</code><em class="property">: Dict<span class="p">[</span>int<span class="p">, </span>Callable<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._state_dict_hooks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._load_state_dict_pre_hooks">
+<code class="sig-name descname">_load_state_dict_pre_hooks</code><em class="property">: Dict<span class="p">[</span>int<span class="p">, </span>Callable<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._load_state_dict_pre_hooks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._modules">
+<code class="sig-name descname">_modules</code><em class="property">: Dict[str, Optional[‘Module’]]</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.vae_rnn.core.VaeRnn._modules" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gt4sd.frameworks.granular.ml.models.vae_trans.html" class="btn btn-neutral float-right" title="gt4sd.frameworks.granular.ml.models.vae_trans package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd.frameworks.granular.ml.models.vae_rnn.html" class="btn btn-neutral float-left" title="gt4sd.frameworks.granular.ml.models.vae_rnn package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,700 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../../_static/jquery.js"></script>
+        <script src="../../../../../../_static/underscore.js"></script>
+        <script src="../../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Controlled sampling of concatenated encodings via Gaussian Process.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">skopt</span> <span class="kn">import</span> <span class="n">gp_minimize</span>
+<span class="kn">from</span> <span class="nn">skopt.space</span> <span class="kn">import</span> <span class="n">Real</span>
+
+<span class="kn">from</span> <span class="nn">.....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+
+<span class="n">Point</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]</span>
+<span class="n">MINIMUM_REAL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">min</span>
+<span class="n">MAXIMUM_REAL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
+
+
+<div class="viewcode-block" id="point_to_tensor"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.point_to_tensor">[docs]</a><span class="k">def</span> <span class="nf">point_to_tensor</span><span class="p">(</span><span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert point to tensor.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        point: a point.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tensor representing a point.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">point</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">point</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Representation"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Representation</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A generic representation for a composition problem.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        model: a torch module for decoding.</span>
+<span class="sd">        z_dimension: dimension of the latent space.</span>
+<span class="sd">        fixed_representation: fixed representation in the latent space.</span>
+<span class="sd">        z_index: slice for indexing a point to represent the latent space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
+    <span class="n">z_dimension</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">fixed_representation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">z_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">slice</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Representation.decode"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Decode the representation from the latent space.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            z: a point in the latent space.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the decoded representation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">point_to_tensor</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">reconstructed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="k">return</span> <span class="n">reconstructed</span></div>
+
+<div class="viewcode-block" id="Representation.deserialize"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deserialize a representation from file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filepath: path to the serialized represantation.</span>
+<span class="sd">            device: device where the inference</span>
+<span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the representation object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># type:ignore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PropertyPredictor"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor">[docs]</a><span class="k">class</span> <span class="nc">PropertyPredictor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Property prediction class.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        input_representations: order of the input representations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">input_representations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="PropertyPredictor.__call__"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Call the property predictor on the point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            z: the point.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the predicted property.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Propery prediction not implemented&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Scaler"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler">[docs]</a><span class="k">class</span> <span class="nc">Scaler</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Scaler class.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Scaler.__call__"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">example</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Scale the example appropriately.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            example: an example prior to scaling.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the scaled example.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Scaler not implemented not implemented&quot;</span><span class="p">)</span></div></div>
+
+
+<span class="n">RepresentationsDict</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Representation</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="Objective"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective">[docs]</a><span class="k">class</span> <span class="nc">Objective</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Objective function for representations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Objective.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">targets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">property_predictors</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PropertyPredictor</span><span class="p">],</span>
+        <span class="n">representations</span><span class="p">:</span> <span class="n">RepresentationsDict</span><span class="p">,</span>
+        <span class="n">representation_order</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">scalers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Scaler</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">custom_score_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">Point</span><span class="p">,</span> <span class="n">RepresentationsDict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Scaler</span><span class="p">]]],</span> <span class="nb">float</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">custom_score_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs an objective function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            targets: a dictionary of target values.</span>
+<span class="sd">            property_predictors: a dictionary of target property predictors.</span>
+<span class="sd">            representations: a dictionary of decodeable representations.</span>
+<span class="sd">            representation_order: order of the representations. Defaults to None, a.k.a., lexicographic order.</span>
+<span class="sd">            scalers: scalers for represantation features. Defaults to None, a.k.a., no scaling.</span>
+<span class="sd">            weights: weights for each the target. Defaults to None, a.k.a., targets evenly weigthed.</span>
+<span class="sd">            custom_score_function: a custom score function to apply on decoded representations. Defaults to None, a.k.a., no custom score.</span>
+<span class="sd">            custom_score_weight: weight for the custom score. Defaults to 1.0.</span>
+<span class="sd">            minimize: whether the objective needs to be minimized. Defaults to True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">property_predictors</span> <span class="o">=</span> <span class="n">property_predictors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">representations</span> <span class="o">=</span> <span class="n">representations</span>
+        <span class="k">if</span> <span class="n">representation_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">representation_order</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">representations</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">representation_order</span> <span class="o">=</span> <span class="n">representation_order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scalers</span> <span class="o">=</span> <span class="n">scalers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_score_function</span> <span class="o">=</span> <span class="n">custom_score_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_score_weight</span> <span class="o">=</span> <span class="n">custom_score_weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimize</span> <span class="o">=</span> <span class="n">minimize</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">weights_dictionary</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">weights_dictionary</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights_dictionary</span></div>
+
+<div class="viewcode-block" id="Objective.construct_property_representation"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.construct_property_representation">[docs]</a>    <span class="k">def</span> <span class="nf">construct_property_representation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">property_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Construct a representation for a specific property.</span>
+
+<span class="sd">        The encoded point and fixed encodings (or slices thereof) if available</span>
+<span class="sd">        are concatenated in the right order.</span>
+
+<span class="sd">        Todo:</span>
+<span class="sd">            Check explanation and improve it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            z: the point.</span>
+<span class="sd">            property_name: name of the property for which to construct the representation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            representation for which a specific property can be predicted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO make generic for self.representations: RepresentationsDict</span>
+        <span class="c1"># defer this to the configuration, or some other place that defines how representations belong together</span>
+        <span class="n">propery_predictor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_predictors</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">propery_predictor</span><span class="o">.</span><span class="n">input_representations</span><span class="p">:</span>
+            <span class="n">representation_names</span> <span class="o">=</span> <span class="n">propery_predictor</span><span class="o">.</span><span class="n">input_representations</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">representation_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">representation_order</span>
+        <span class="n">z_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">representation_name</span> <span class="ow">in</span> <span class="n">representation_names</span><span class="p">:</span>
+            <span class="n">representation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">representation</span><span class="o">.</span><span class="n">fixed_representation</span><span class="p">:</span>
+                <span class="n">z_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">representation</span><span class="o">.</span><span class="n">fixed_representation</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">z_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">representation</span><span class="o">.</span><span class="n">z_index</span><span class="p">])</span>
+        <span class="n">z_latent</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">z_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">z_latent</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">z_latent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Objective.evaluate"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate objective function for a point in latent space.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            z: the point.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the score of the point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">point_to_tensor</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="c1"># predict all properties</span>
+        <span class="n">predicted_properties</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">property_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">property_predictor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_predictors</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span>
+                <span class="n">latent_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">construct_property_representation</span><span class="p">(</span>
+                    <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">property_name</span><span class="o">=</span><span class="n">property_name</span>
+                <span class="p">)</span>
+                <span class="n">predicted_properties</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">property_predictor</span><span class="p">(</span><span class="n">latent_z</span><span class="p">)</span>
+
+                <span class="c1"># TODO aggregate the following scores over different properties,</span>
+                <span class="c1"># or really only keep last one?</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_score_function</span><span class="p">:</span>
+                    <span class="n">custom_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_score_function</span><span class="p">(</span>
+                        <span class="n">latent_z</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">scalers</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">custom_score</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">property_name</span><span class="p">,</span> <span class="n">predicted_property</span> <span class="ow">in</span> <span class="n">predicted_properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span> <span class="o">-</span> <span class="n">predicted_property</span><span class="p">))</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+
+        <span class="c1"># this is to penalize `custom_score` the non normalization</span>
+        <span class="n">total_score</span> <span class="o">=</span> <span class="n">score</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_score_weight</span> <span class="o">*</span> <span class="n">custom_score</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimize</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">total_score</span>
+        <span class="k">return</span> <span class="n">total_score</span></div></div>
+
+
+<div class="viewcode-block" id="GaussianProcessRepresentationsSampler"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler">[docs]</a><span class="k">class</span> <span class="nc">GaussianProcessRepresentationsSampler</span><span class="p">:</span>
+<div class="viewcode-block" id="GaussianProcessRepresentationsSampler.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">targets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">property_predictors</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PropertyPredictor</span><span class="p">],</span>
+        <span class="n">representations</span><span class="p">:</span> <span class="n">RepresentationsDict</span><span class="p">,</span>
+        <span class="n">representation_order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">bounds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="c1"># TODO Any should be type of scaler; default to lambda returning 0?</span>
+        <span class="n">scalers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Scaler</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">custom_score_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">Point</span><span class="p">,</span> <span class="n">RepresentationsDict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Scaler</span><span class="p">]]],</span> <span class="nb">float</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">custom_score_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
+        <span class="n">random_starts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constucts a GaussianProcessRepresentationsSampler.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            targets: a dictionary of target values.</span>
+<span class="sd">            property_predictors: a dictionary of target property predictors.</span>
+<span class="sd">            representations: a dictionary of decodeable representations.</span>
+<span class="sd">            representation_order: order of the representations. Defaults to None, a.k.a., lexicographic order.</span>
+<span class="sd">            bounds: bounds for the optmization. Defaults to None, a.k.a., unbounded.</span>
+<span class="sd">            scalers: scalers for represantation features. Defaults to None, a.k.a., no scaling.</span>
+<span class="sd">            weights: weights for each the target. Defaults to None, a.k.a., targets evenly weigthed.</span>
+<span class="sd">            custom_score_function: a custom score function to apply on decoded representations. Defaults to None, a.k.a., no custom score.</span>
+<span class="sd">            custom_score_weight: weight for the custom score. Defaults to 1.0.</span>
+<span class="sd">            minimize: whether the objective needs to be minimized. Defaults to True.</span>
+<span class="sd">            random_state: random state. Defaults to 42.</span>
+<span class="sd">            random_starts: number of random restarts. Defaults to 10.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">property_predictors</span> <span class="o">=</span> <span class="n">property_predictors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">representations</span> <span class="o">=</span> <span class="n">representations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">representation_order</span> <span class="o">=</span> <span class="n">representation_order</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">representation_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">representation_order</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">representations</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scalers</span> <span class="o">=</span> <span class="n">scalers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weigths</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_score_function</span> <span class="o">=</span> <span class="n">custom_score_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_score_weight</span> <span class="o">=</span> <span class="n">custom_score_weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimize</span> <span class="o">=</span> <span class="n">minimize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_starts</span> <span class="o">=</span> <span class="n">random_starts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">define_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">representation_order</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GaussianProcessRepresentationsSampler._get_bounds"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler._get_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">_get_bounds</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">minimum_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">maximum_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z_dimension</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define a list of bounds for an hypercube.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            minimum_value: minimum value.</span>
+<span class="sd">            maximum_value: maximum value.</span>
+<span class="sd">            z_dimension: dimension of the hypercube.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the list of bounds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">minimum_value</span><span class="p">,</span> <span class="n">maximum_value</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">z_dimension</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="GaussianProcessRepresentationsSampler.set_bounds"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.set_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">set_bounds</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">bounds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Set the bounds for the optimization.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bounds: bounds for the optmization. Defaults to None, a.k.a., unbounded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">bounds</span> <span class="k">if</span> <span class="n">bounds</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">representation_name</span><span class="p">,</span> <span class="n">bounds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>  <span class="c1"># type:ignore</span>
+            <span class="n">z_dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span><span class="o">.</span><span class="n">z_dimension</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_bounds</span><span class="p">(</span>
+                    <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">z_dimension</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounds</span>  <span class="c1"># type:ignore</span>
+        <span class="k">for</span> <span class="n">representation_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">z_dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span><span class="o">.</span><span class="n">z_dimension</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_bounds</span><span class="p">(</span>
+                <span class="n">MINIMUM_REAL</span><span class="p">,</span> <span class="n">MAXIMUM_REAL</span><span class="p">,</span> <span class="n">z_dimension</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GaussianProcessRepresentationsSampler.define_dimensions"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.define_dimensions">[docs]</a>    <span class="k">def</span> <span class="nf">define_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">representation_order</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Real</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Define the dimensions of the optimization space.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            representation_order: order of the representations.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a list of dimensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dimensions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">latent_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">representation_name</span> <span class="ow">in</span> <span class="n">representation_order</span><span class="p">:</span>
+            <span class="n">representation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span>
+            <span class="n">representation_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span>
+            <span class="n">representation</span><span class="o">.</span><span class="n">z_index</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span>
+                <span class="n">latent_index</span><span class="p">,</span> <span class="n">latent_index</span> <span class="o">+</span> <span class="n">representation</span><span class="o">.</span><span class="n">z_dimension</span>
+            <span class="p">)</span>
+            <span class="n">latent_index</span> <span class="o">+=</span> <span class="n">representation</span><span class="o">.</span><span class="n">z_dimension</span>
+            <span class="n">dimensions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">Real</span><span class="p">(</span><span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">)</span>  <span class="c1"># type:ignore</span>
+                    <span class="k">for</span> <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="ow">in</span> <span class="n">representation_bounds</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">dimensions</span></div>
+
+<div class="viewcode-block" id="GaussianProcessRepresentationsSampler.optimize"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.optimize">[docs]</a>    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">targets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">relevant_representations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">representation_order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">z0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Point</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">number_of_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">number_of_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">acquisition_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PI&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Run the optimization.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            targets: a dictionary of target values. Defaults to None, a.k.a., use the ones defined at construction time.</span>
+<span class="sd">            relevant_representations: list of relevant representations to be optimized. Defaults to None, a.k.a., inferred from non fixed representations.</span>
+<span class="sd">            representation_order: order of the representations. Defaults to None, a.k.a., use the one defined at construction time.</span>
+<span class="sd">            z0: the starting point for the optimization. Defaults to None, a.k.a., perform random starts.</span>
+<span class="sd">            number_of_points: number of optimal points to return. Defaults to 1.</span>
+<span class="sd">            number_of_steps: number of optimization steps. Defaults to 50.</span>
+<span class="sd">            random_state: random state. Defaults to 42.</span>
+<span class="sd">            verbose: control verbosity. Defaults to False.</span>
+<span class="sd">            weights: weights for each the target. Defaults to None, a.k.a., use the ones defined at construction time.</span>
+<span class="sd">            acquisition_method: acquisition method to use in the Gaussian Process optimization. Defaults to &quot;PI&quot;. More details at: https://scikit-optimize.github.io/stable/modules/generated/skopt.gp_minimize.html.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: invalid acquisition function.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of orderd optimal points with decoded relevant representations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">representation_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">representation_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">representation_order</span>
+        <span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">define_dimensions</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">representation_order</span><span class="p">))</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">acquisition_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;PI&quot;</span><span class="p">,</span> <span class="s2">&quot;LCB&quot;</span><span class="p">,</span> <span class="s2">&quot;EI&quot;</span><span class="p">,</span> <span class="s2">&quot;gp_hedge&quot;</span><span class="p">,</span> <span class="s2">&quot;EIps&quot;</span><span class="p">,</span> <span class="s2">&quot;PIps&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Give valid acquisition function&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span>
+
+        <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weigths</span>
+
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="p">(</span>
+            <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
+            <span class="n">property_predictors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">property_predictors</span><span class="p">,</span>
+            <span class="n">representations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="p">,</span>
+            <span class="n">representation_order</span><span class="o">=</span><span class="n">representation_order</span><span class="p">,</span>
+            <span class="n">scalers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scalers</span><span class="p">,</span>
+            <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+            <span class="n">custom_score_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_score_function</span><span class="p">,</span>
+            <span class="n">custom_score_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_score_weight</span><span class="p">,</span>
+            <span class="n">minimize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">minimize</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">y0</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">random_starts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">z0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">random_starts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_starts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">random_starts</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">gaussian_process_results</span> <span class="o">=</span> <span class="n">gp_minimize</span><span class="p">(</span>
+            <span class="n">objective</span><span class="o">.</span><span class="n">evaluate</span><span class="p">,</span>
+            <span class="n">dimensions</span><span class="p">,</span>
+            <span class="n">n_calls</span><span class="o">=</span><span class="n">number_of_steps</span><span class="p">,</span>
+            <span class="n">n_random_starts</span><span class="o">=</span><span class="n">random_starts</span><span class="p">,</span>
+            <span class="n">x0</span><span class="o">=</span><span class="n">z0</span><span class="p">,</span>
+            <span class="n">y0</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span>
+            <span class="n">acq_func</span><span class="o">=</span><span class="n">acquisition_method</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">random_state</span><span class="p">),</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">objective_values</span><span class="p">,</span> <span class="n">points</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="o">*</span><span class="nb">sorted</span><span class="p">(</span>
+                <span class="nb">zip</span><span class="p">(</span>
+                    <span class="n">gaussian_process_results</span><span class="o">.</span><span class="n">func_vals</span><span class="p">,</span> <span class="n">gaussian_process_results</span><span class="o">.</span><span class="n">x_iters</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">results_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">relevant_representations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">relevant_representations</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">representation_name</span>
+                <span class="k">for</span> <span class="n">representation_name</span><span class="p">,</span> <span class="n">representation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">representation</span><span class="o">.</span><span class="n">fixed_representation</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">point</span><span class="p">,</span> <span class="n">objective_value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">points</span><span class="p">[:</span><span class="n">number_of_points</span><span class="p">],</span> <span class="n">objective_values</span><span class="p">[:</span><span class="n">number_of_points</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">optimization_result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;objective&quot;</span><span class="p">:</span> <span class="n">objective_value</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">point</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">representation_name</span> <span class="ow">in</span> <span class="n">relevant_representations</span><span class="p">:</span>
+                <span class="n">representation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="n">representation</span><span class="o">.</span><span class="n">z_index</span><span class="p">]</span>
+                <span class="n">optimization_result</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">representation</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+            <span class="n">results_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">optimization_result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results_list</span></div></div>
+
+
+<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator">[docs]</a><span class="k">class</span> <span class="nc">Generator</span><span class="p">:</span>
+<div class="viewcode-block" id="Generator.generate_samples"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.generate_samples">[docs]</a>    <span class="k">def</span> <span class="nf">generate_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Generate samples.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target: target for generation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            samples generated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Generate samples not implemented.&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

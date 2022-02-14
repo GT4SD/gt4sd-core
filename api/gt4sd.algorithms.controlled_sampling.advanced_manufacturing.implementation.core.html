@@ -1,0 +1,866 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr package" href="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.html" />
+    <link rel="prev" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation package" href="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.configuration.html">gt4sd.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.conftest.html">gt4sd.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.exceptions.html">gt4sd.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.s3.html">gt4sd.s3 module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="gt4sd.algorithms.html">gt4sd.algorithms package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.core.html">gt4sd.algorithms.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.registry.html">gt4sd.algorithms.registry module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.conditional_generation.html">gt4sd.algorithms.conditional_generation package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="gt4sd.algorithms.controlled_sampling.html">gt4sd.algorithms.controlled_sampling package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.html">gt4sd.algorithms.controlled_sampling.advanced_manufacturing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.algorithms.controlled_sampling.class_controlled_sampling.html">gt4sd.algorithms.controlled_sampling.class_controlled_sampling package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.algorithms.controlled_sampling.paccmann_gp.html">gt4sd.algorithms.controlled_sampling.paccmann_gp package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.generation.html">gt4sd.algorithms.generation package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.prediction.html">gt4sd.algorithms.prediction package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.html#summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.html#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.cli.html">gt4sd.cli package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.domains.html">gt4sd.domains package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.extras.html">gt4sd.extras package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.tests.html">gt4sd.tests package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="gt4sd.html">gt4sd package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.algorithms.html">gt4sd.algorithms package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.algorithms.controlled_sampling.html">gt4sd.algorithms.controlled_sampling package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.html">gt4sd.algorithms.controlled_sampling.advanced_manufacturing package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.html">gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation package</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core">
+<span id="gt4sd-algorithms-controlled-sampling-advanced-manufacturing-implementation-core-module"></span><h1>gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core module<a class="headerlink" href="#module-gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core" title="Permalink to this headline">¶</a></h1>
+<p>Controlled sampling of concatenated encodings via Gaussian Process.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GaussianProcessRepresentationsSampler</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Generator</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Objective</span></code></a></p></td>
+<td><p>Objective function for representations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PropertyPredictor</span></code></a></p></td>
+<td><p>Property prediction class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Representation</span></code></a></p></td>
+<td><p>A generic representation for a composition problem.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Scaler</span></code></a></p></td>
+<td><p>Scaler class.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.point_to_tensor" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.point_to_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">point_to_tensor</span></code></a></p></td>
+<td><p>Convert point to tensor.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.point_to_tensor">
+<code class="sig-name descname">point_to_tensor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">point</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#point_to_tensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.point_to_tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert point to tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>point</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – a point.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tensor representing a point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation">
+<em class="property">class </em><code class="sig-name descname">Representation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">z_dimension</span></em>, <em class="sig-param"><span class="n">fixed_representation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z_index</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Representation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A generic representation for a composition problem.</p>
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.model">
+<code class="sig-name descname">model</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>a torch module for decoding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.nn.modules.module.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.z_dimension">
+<code class="sig-name descname">z_dimension</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.z_dimension" title="Permalink to this definition">¶</a></dt>
+<dd><p>dimension of the latent space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.fixed_representation">
+<code class="sig-name descname">fixed_representation</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.fixed_representation" title="Permalink to this definition">¶</a></dt>
+<dd><p>fixed representation in the latent space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[torch.Tensor]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.z_index">
+<code class="sig-name descname">z_index</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.z_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>slice for indexing a point to represent the latent space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[slice]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id0">
+<code class="sig-name descname">model</code><em class="property">: torch.nn.modules.module.Module</em><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="id1">
+<code class="sig-name descname">z_dimension</code><em class="property">: int</em><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="id2">
+<code class="sig-name descname">fixed_representation</code><em class="property">: Optional<span class="p">[</span>torch.Tensor<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="id3">
+<code class="sig-name descname">z_index</code><em class="property">: Optional<span class="p">[</span>slice<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.decode">
+<code class="sig-name descname">decode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">z</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Representation.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode the representation from the latent space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>z</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – a point in the latent space.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the decoded representation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.deserialize">
+<code class="sig-name descname">deserialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Representation.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a representation from file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the serialized represantation.</p></li>
+<li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">device</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – device where the inference
+is running either as a dedicated class or a string. If not provided is inferred.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the representation object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'fixed_representation': typing.Union[torch.Tensor, NoneType], 'model': &lt;class 'torch.nn.modules.module.Module'&gt;, 'z_dimension': &lt;class 'int'&gt;, 'z_index': typing.Union[slice, NoneType]}</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__dataclass_fields__">
+<code class="sig-name descname">__dataclass_fields__</code><em class="property"> = {'fixed_representation': Field(name='fixed_representation',type=typing.Union[torch.Tensor, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD), 'model': Field(name='model',type=&lt;class 'torch.nn.modules.module.Module'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD), 'z_dimension': Field(name='z_dimension',type=&lt;class 'int'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD), 'z_index': Field(name='z_index',type=typing.Union[slice, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD)}</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__dataclass_fields__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__dataclass_params__">
+<code class="sig-name descname">__dataclass_params__</code><em class="property"> = _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False)</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__dataclass_params__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core', '__annotations__': {'model': &lt;class 'torch.nn.modules.module.Module'&gt;, 'z_dimension': &lt;class 'int'&gt;, 'fixed_representation': typing.Union[torch.Tensor, NoneType], 'z_index': typing.Union[slice, NoneType]}, '__doc__': '\n    A generic representation for a composition problem.\n\n    Attributes:\n        model: a torch module for decoding.\n        z_dimension: dimension of the latent space.\n        fixed_representation: fixed representation in the latent space.\n        z_index: slice for indexing a point to represent the latent space.\n    ', 'fixed_representation': None, 'z_index': None, 'decode': &lt;function Representation.decode&gt;, 'deserialize': &lt;function Representation.deserialize&gt;, '__dict__': &lt;attribute '__dict__' of 'Representation' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Representation' objects&gt;, '__dataclass_params__': _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False), '__dataclass_fields__': {'model': Field(name='model',type=&lt;class 'torch.nn.modules.module.Module'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD), 'z_dimension': Field(name='z_dimension',type=&lt;class 'int'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD), 'fixed_representation': Field(name='fixed_representation',type=typing.Union[torch.Tensor, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD), 'z_index': Field(name='z_index',type=typing.Union[slice, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD)}, '__init__': &lt;function __create_fn__.&lt;locals&gt;.__init__&gt;, '__repr__': &lt;function __create_fn__.&lt;locals&gt;.__repr__&gt;, '__eq__': &lt;function __create_fn__.&lt;locals&gt;.__eq__&gt;, '__hash__': None})</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = '\n    A generic representation for a composition problem.\n\n    Attributes:\n        model: a torch module for decoding.\n        z_dimension: dimension of the latent space.\n        fixed_representation: fixed representation in the latent space.\n        z_index: slice for indexing a point to represent the latent space.\n    '</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__hash__">
+<code class="sig-name descname">__hash__</code><em class="property"> = None</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">z_dimension</span></em>, <em class="sig-param"><span class="n">fixed_representation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z_index</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core'</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor">
+<em class="property">class </em><code class="sig-name descname">PropertyPredictor</code><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#PropertyPredictor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Property prediction class.</p>
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.input_representations">
+<code class="sig-name descname">input_representations</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.input_representations" title="Permalink to this definition">¶</a></dt>
+<dd><p>order of the input representations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Optional[List[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id4">
+<code class="sig-name descname">input_representations</code><em class="property">: Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">z</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#PropertyPredictor.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the property predictor on the point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>z</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – the point.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the predicted property.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'input_representations': typing.Union[typing.List[str], NoneType]}</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core', '__annotations__': {'input_representations': typing.Union[typing.List[str], NoneType]}, '__doc__': 'Property prediction class.\n\n    Attributes:\n        input_representations: order of the input representations.\n    ', 'input_representations': None, '__call__': &lt;function PropertyPredictor.__call__&gt;, '__dict__': &lt;attribute '__dict__' of 'PropertyPredictor' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'PropertyPredictor' objects&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Property prediction class.\n\n    Attributes:\n        input_representations: order of the input representations.\n    '</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core'</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler">
+<em class="property">class </em><code class="sig-name descname">Scaler</code><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Scaler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Scaler class.</p>
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">example</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Scaler.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale the example appropriately.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>example</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – an example prior to scaling.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the scaled example.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core', '__doc__': 'Scaler class.', '__call__': &lt;function Scaler.__call__&gt;, '__dict__': &lt;attribute '__dict__' of 'Scaler' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Scaler' objects&gt;, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Scaler class.'</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core'</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective">
+<em class="property">class </em><code class="sig-name descname">Objective</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">property_predictors</span></em>, <em class="sig-param"><span class="n">representations</span></em>, <em class="sig-param"><span class="n">representation_order</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scalers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weights</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_score_function</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_score_weight</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">minimize</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Objective"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Objective function for representations.</p>
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">property_predictors</span></em>, <em class="sig-param"><span class="n">representations</span></em>, <em class="sig-param"><span class="n">representation_order</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scalers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weights</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_score_function</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_score_weight</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">minimize</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Objective.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs an objective function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – a dictionary of target values.</p></li>
+<li><p><strong>property_predictors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyPredictor</span></code></a>]) – a dictionary of target property predictors.</p></li>
+<li><p><strong>representations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Representation</span></code></a>]) – a dictionary of decodeable representations.</p></li>
+<li><p><strong>representation_order</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – order of the representations. Defaults to None, a.k.a., lexicographic order.</p></li>
+<li><p><strong>scalers</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scaler</span></code></a>]]) – scalers for represantation features. Defaults to None, a.k.a., no scaling.</p></li>
+<li><p><strong>weights</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – weights for each the target. Defaults to None, a.k.a., targets evenly weigthed.</p></li>
+<li><p><strong>custom_score_function</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Representation</span></code></a>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scaler</span></code></a>]]], <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – a custom score function to apply on decoded representations. Defaults to None, a.k.a., no custom score.</p></li>
+<li><p><strong>custom_score_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – weight for the custom score. Defaults to 1.0.</p></li>
+<li><p><strong>minimize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether the objective needs to be minimized. Defaults to True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.construct_property_representation">
+<code class="sig-name descname">construct_property_representation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">z</span></em>, <em class="sig-param"><span class="n">property_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Objective.construct_property_representation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.construct_property_representation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a representation for a specific property.</p>
+<p>The encoded point and fixed encodings (or slices thereof) if available
+are concatenated in the right order.</p>
+<div class="admonition-todo admonition" id="id5">
+<p class="admonition-title">Todo</p>
+<p>Check explanation and improve it.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – the point.</p></li>
+<li><p><strong>property_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the property for which to construct the representation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>representation for which a specific property can be predicted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.evaluate">
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">z</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Objective.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate objective function for a point in latent space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>z</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – the point.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the score of the point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core', '__doc__': '\n    Objective function for representations.\n    ', '__init__': &lt;function Objective.__init__&gt;, 'construct_property_representation': &lt;function Objective.construct_property_representation&gt;, 'evaluate': &lt;function Objective.evaluate&gt;, '__dict__': &lt;attribute '__dict__' of 'Objective' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Objective' objects&gt;, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = '\n    Objective function for representations.\n    '</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core'</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Objective.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler">
+<em class="property">class </em><code class="sig-name descname">GaussianProcessRepresentationsSampler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">property_predictors</span></em>, <em class="sig-param"><span class="n">representations</span></em>, <em class="sig-param"><span class="n">representation_order</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bounds</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scalers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weights</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_score_function</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_score_weight</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">minimize</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em>, <em class="sig-param"><span class="n">random_starts</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#GaussianProcessRepresentationsSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">property_predictors</span></em>, <em class="sig-param"><span class="n">representations</span></em>, <em class="sig-param"><span class="n">representation_order</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bounds</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scalers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weights</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_score_function</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_score_weight</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">minimize</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em>, <em class="sig-param"><span class="n">random_starts</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#GaussianProcessRepresentationsSampler.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constucts a GaussianProcessRepresentationsSampler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – a dictionary of target values.</p></li>
+<li><p><strong>property_predictors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.PropertyPredictor"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyPredictor</span></code></a>]) – a dictionary of target property predictors.</p></li>
+<li><p><strong>representations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Representation</span></code></a>]) – a dictionary of decodeable representations.</p></li>
+<li><p><strong>representation_order</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – order of the representations. Defaults to None, a.k.a., lexicographic order.</p></li>
+<li><p><strong>bounds</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]], <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]]]) – bounds for the optmization. Defaults to None, a.k.a., unbounded.</p></li>
+<li><p><strong>scalers</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scaler</span></code></a>]]) – scalers for represantation features. Defaults to None, a.k.a., no scaling.</p></li>
+<li><p><strong>weights</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – weights for each the target. Defaults to None, a.k.a., targets evenly weigthed.</p></li>
+<li><p><strong>custom_score_function</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Representation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Representation</span></code></a>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Scaler"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scaler</span></code></a>]]], <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – a custom score function to apply on decoded representations. Defaults to None, a.k.a., no custom score.</p></li>
+<li><p><strong>custom_score_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – weight for the custom score. Defaults to 1.0.</p></li>
+<li><p><strong>minimize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether the objective needs to be minimized. Defaults to True.</p></li>
+<li><p><strong>random_state</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – random state. Defaults to 42.</p></li>
+<li><p><strong>random_starts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of random restarts. Defaults to 10.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler._get_bounds">
+<code class="sig-name descname">_get_bounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">minimum_value</span></em>, <em class="sig-param"><span class="n">maximum_value</span></em>, <em class="sig-param"><span class="n">z_dimension</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#GaussianProcessRepresentationsSampler._get_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler._get_bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a list of bounds for an hypercube.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>minimum_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – minimum value.</p></li>
+<li><p><strong>maximum_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – maximum value.</p></li>
+<li><p><strong>z_dimension</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – dimension of the hypercube.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the list of bounds.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.set_bounds">
+<code class="sig-name descname">set_bounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bounds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#GaussianProcessRepresentationsSampler.set_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.set_bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the bounds for the optimization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>bounds</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]], <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]]]) – bounds for the optmization. Defaults to None, a.k.a., unbounded.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.define_dimensions">
+<code class="sig-name descname">define_dimensions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">representation_order</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#GaussianProcessRepresentationsSampler.define_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.define_dimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the dimensions of the optimization space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>representation_order</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – order of the representations.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Real</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a list of dimensions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core', '__init__': &lt;function GaussianProcessRepresentationsSampler.__init__&gt;, '_get_bounds': &lt;function GaussianProcessRepresentationsSampler._get_bounds&gt;, 'set_bounds': &lt;function GaussianProcessRepresentationsSampler.set_bounds&gt;, 'define_dimensions': &lt;function GaussianProcessRepresentationsSampler.define_dimensions&gt;, 'optimize': &lt;function GaussianProcessRepresentationsSampler.optimize&gt;, '__dict__': &lt;attribute '__dict__' of 'GaussianProcessRepresentationsSampler' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'GaussianProcessRepresentationsSampler' objects&gt;, '__doc__': None, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core'</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.optimize">
+<code class="sig-name descname">optimize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">targets</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relevant_representations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">representation_order</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">number_of_points</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">number_of_steps</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">weights</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">acquisition_method</span><span class="o">=</span><span class="default_value">'PI'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#GaussianProcessRepresentationsSampler.optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the optimization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – a dictionary of target values. Defaults to None, a.k.a., use the ones defined at construction time.</p></li>
+<li><p><strong>relevant_representations</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – list of relevant representations to be optimized. Defaults to None, a.k.a., inferred from non fixed representations.</p></li>
+<li><p><strong>representation_order</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – order of the representations. Defaults to None, a.k.a., use the one defined at construction time.</p></li>
+<li><p><strong>z0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – the starting point for the optimization. Defaults to None, a.k.a., perform random starts.</p></li>
+<li><p><strong>number_of_points</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of optimal points to return. Defaults to 1.</p></li>
+<li><p><strong>number_of_steps</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of optimization steps. Defaults to 50.</p></li>
+<li><p><strong>random_state</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – random state. Defaults to 42.</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – control verbosity. Defaults to False.</p></li>
+<li><p><strong>weights</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – weights for each the target. Defaults to None, a.k.a., use the ones defined at construction time.</p></li>
+<li><p><strong>acquisition_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – acquisition method to use in the Gaussian Process optimization. Defaults to “PI”. More details at: <a class="reference external" href="https://scikit-optimize.github.io/stable/modules/generated/skopt.gp_minimize.html">https://scikit-optimize.github.io/stable/modules/generated/skopt.gp_minimize.html</a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – invalid acquisition function.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of orderd optimal points with decoded relevant representations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator">
+<em class="property">class </em><code class="sig-name descname">Generator</code><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core', 'generate_samples': &lt;function Generator.generate_samples&gt;, '__dict__': &lt;attribute '__dict__' of 'Generator' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Generator' objects&gt;, '__doc__': None, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core'</em><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.generate_samples">
+<code class="sig-name descname">generate_samples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/controlled_sampling/advanced_manufacturing/implementation/core.html#Generator.generate_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.Generator.generate_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>target</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – target for generation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>samples generated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.html" class="btn btn-neutral float-right" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.html" class="btn btn-neutral float-left" title="gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
