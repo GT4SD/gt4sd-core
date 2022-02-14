@@ -1,0 +1,55 @@
+name: "Running tests: style, pytests and entry-points"
+
+env:
+  GT4SD_CI: true
+
+on:
+  push:
+    branches:    
+      - '**'
+      - '!gh-pages'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}  # for conda command
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: gt4sd
+          environment-file: conda.yml
+          auto-activate-base: false
+          use-only-tar-bz2: true
+      - name: Install gt4sd from source
+        run: |
+          conda activate gt4sd
+          pip install --no-deps .
+      - name: Check black
+        run: |
+          conda activate gt4sd
+          python -m black src/gt4sd --check --diff --color
+      - name: Check isort
+        run: |
+          conda activate gt4sd
+          python -m isort src/gt4sd --check-only
+      - name: Check flake8
+        run: |
+          conda activate gt4sd
+          python -m flake8 --disable-noqa --per-file-ignores="__init__.py:F401" src/gt4sd
+      - name: Check mypy
+        run: |
+          conda activate gt4sd
+          python -m mypy src/gt4sd
+      - name: Run pytests
+        run: |
+          conda activate gt4sd
+          python -m pytest -sv
+      - name: Test entry-points
+        run: |
+          conda activate gt4sd
+          gt4sd-hf-to-st --help
+          gt4sd-trainer --help
+          gt4sd-pl-to-hf --help

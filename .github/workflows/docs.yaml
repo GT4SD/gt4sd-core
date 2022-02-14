@@ -1,0 +1,43 @@
+name: "Build docs with Sphinx"
+
+on:
+  push:
+    branches:
+      - main
+      - ci-setup
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}  # for conda command
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: gt4sd
+          environment-file: conda.yml
+          auto-activate-base: false
+          use-only-tar-bz2: true
+      - name: Build docs
+        run: |
+          conda activate gt4sd
+          pip install --no-deps .
+          cd docs && make html && cd ..
+      - name: Commit documentation changes
+        run: |
+          git clone https://github.com/GT4SD/gt4sd-core --branch gh-pages --single-branch gh-pages
+          cp -r docs/_build/html/* gh-pages/
+          touch gh-pages/.nojekyll
+          cd gh-pages
+          git config --local user.email "gt4sd-actions@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "docs: update documentation." -a || true
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: gh-pages
+          directory: gh-pages
+          github_token: ${{ secrets.GH_TOKEN }}

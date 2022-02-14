@@ -33,10 +33,6 @@ def test_list_available_local_via_S3SyncError(mock_wrong_s3_env):
     assert len(ApplicationsRegistry.list_available()) >= AT_LEAST
 
 
-def test_list_available_local_via_KeyError(mock_missing_s3_env):
-    assert len(ApplicationsRegistry.list_available()) >= AT_LEAST
-
-
 def test_inherited_validation():
     Config = next(iter(ApplicationsRegistry.applications.values())).configuration_class
     with pytest.raises(

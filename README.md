@@ -1,32 +1,29 @@
 # GT4SD (Generative Toolkit for Scientific Discovery)
 
-<!-- commented badges to be renabled once the functionalities are active -->
-<!-- [![PyPI version](https://badge.fury.io/py/gt4sd.svg)](https://badge.fury.io/py/gt4sd) -->
-<!-- [![build](https://github.com/gt4sd/gt4sd-core/workflows/build/badge.svg)](https://github.com/gt4sd/gt4sd-core/actions) -->
+[![PyPI version](https://badge.fury.io/py/gt4sd.svg)](https://badge.fury.io/py/gt4sd)
+[![Actions tests](https://github.com/gt4sd/gt4sd-core/workflows/tests/badge.svg)](https://github.com/gt4sd/gt4sd-core/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Contributions](https://img.shields.io/badge/contributions-welcome-blue)]()
-<!-- [![Downloads](https://pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd) -->
-<!-- [![Downloads](https://pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd) -->
-<!-- [![Docs](https://img.shields.io/badge/website-live-brightgreen)](https://pages.github.com/GT4SD/gt4sd-core/)) -->
+[![Contributions](https://img.shields.io/badge/contributions-welcome-blue)](https://github.com/GT4SD/gt4sd-core/blob/main/CONTRIBUTING.md)
+[![Docs](https://img.shields.io/badge/website-live-brightgreen)](https://gt4sd.github.io/gt4sd-core/)
+[![Total downloads](https://pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd)
+[![Monthly downloads](https://pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd)
 
 <img src="./docs/_static/gt4sd_logo.png" alt="logo" width="500"/>
 
 The GT4SD (Generative Toolkit for Scientific Discovery) is an open-source platform to accelerate hypothesis generation in the scientific discovery process. It provides a library for making state-of-the-art generative AI models easier to use.
 
-<!-- enable once docs are there -->
-<!-- For full details on the library API and examples see the [docs](https://pages.github.com/GT4SD/gt4sd-core/). -->
+For full details on the library API and examples see the [docs](https://gt4sd.github.io/gt4sd-core/).
 
 ## Installation
 
 ### pip
 
-<!-- uncomment once the package is there -->
-<!-- If you simply want to use `gt4sd` in your projects, install it via `pip` from [PyPI](https://pypi.org/project/gt4sd/):
+If you simply want to use `gt4sd` in your projects, install it via `pip` from [PyPI](https://pypi.org/project/gt4sd/):
 
 ```sh
 pip install gt4sd
-``` -->
+```
 
 You can install `gt4sd` directly from GitHub:
 
