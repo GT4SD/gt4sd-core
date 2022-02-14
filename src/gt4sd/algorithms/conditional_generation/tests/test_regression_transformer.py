@@ -12,6 +12,9 @@ from gt4sd.algorithms.conditional_generation.regression_transformer import (
 )
 from gt4sd.algorithms.core import AlgorithmConfiguration
 from gt4sd.algorithms.registry import ApplicationsRegistry
+from gt4sd.tests.utils import GT4SDTestSettings
+
+test_settings = GT4SDTestSettings.get_instance()
 
 
 def get_classvar_type(class_var):
@@ -79,29 +82,33 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
 @pytest.mark.parametrize(
     "config, example_target, algorithm, params",
     [
-        (
+        pytest.param(
             RegressionTransformerMolecules,
             "<esol>[MASK][MASK][MASK][MASK][MASK]|[Cl][C][Branch1_2][Branch1_2][=C][Branch1_1][C][Cl][Cl][Cl]",
             RegressionTransformer,
             {"search": "greedy", "num_samples": 1},
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
-        (
+        pytest.param(
             RegressionTransformerMolecules,
             "<esol>-3.499|[C][C][MASK][MASK][MASK][C][Br]",
             RegressionTransformer,
             {"search": "sample", "temperature": 2.0, "num_samples": 5},
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
-        (
+        pytest.param(
             RegressionTransformerProteins,
             "<stab>[MASK][MASK][MASK][MASK][MASK]|GSQEVNSNASPEEAEIARKAGATTWTEKGNKWEIRI",
             RegressionTransformer,
             {"search": "greedy", "num_samples": 1},
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
-        (
+        pytest.param(
             RegressionTransformerProteins,
             "<stab>1.1234|TTIKNG[MASK][MASK][MASK]YTVPLSPEQAAK[MASK][MASK][MASK]KKRWPDYEVQIHGNTVKVT",
             RegressionTransformer,
             {"search": "sample", "temperature": 2.0, "num_samples": 5},
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
     ],
 )
@@ -117,25 +124,29 @@ def test_generation_via_import(config, example_target, algorithm, params):
 @pytest.mark.parametrize(
     "algorithm_application, target, params",
     [
-        (
+        pytest.param(
             RegressionTransformerMolecules.__name__,
             "<esol>[MASK][MASK][MASK][MASK][MASK]|[Cl][C][Branch1_2][Branch1_2][=C][Branch1_1][C][Cl][Cl][Cl]",
             {"search": "greedy", "num_samples": 1},
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
-        (
+        pytest.param(
             RegressionTransformerMolecules.__name__,
             "<esol>-3.499|[C][C][MASK][MASK][MASK][C][Br]",
             {"search": "sample", "temperature": 2.0, "num_samples": 5},
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
-        (
+        pytest.param(
             RegressionTransformerProteins.__name__,
             "<stab>[MASK][MASK][MASK][MASK][MASK]|GSQEVNSNASPEEAEIARKAGATTWTEKGNKWEIRI",
             {"search": "greedy", "num_samples": 1},
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
-        (
+        pytest.param(
             RegressionTransformerProteins.__name__,
             "<stab>1.1234|TTIKNG[MASK][MASK][MASK]YTVPLSPEQAAK[MASK][MASK][MASK]KKRWPDYEVQIHGNTVKVT",
             {"search": "sample", "temperature": 2.0, "num_samples": 5},
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
     ],
 )
