@@ -1,12 +1,12 @@
 # GT4SD (Generative Toolkit for Scientific Discovery)
 
 <!-- commented badges to be renabled once the functionalities are active -->
-<!-- [![PyPI version](https://badge.fury.io/py/gt4sd.svg)](https://badge.fury.io/py/gt4sd) -->
-<!-- [![build](https://github.com/gt4sd/gt4sd-core/workflows/build/badge.svg)](https://github.com/gt4sd/gt4sd-core/actions) -->
+[![PyPI version](https://badge.fury.io/py/gt4sd.svg)](https://badge.fury.io/py/gt4sd)
+[![build](https://github.com/gt4sd/gt4sd-core/workflows/build/badge.svg)](https://github.com/gt4sd/gt4sd-core/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-<!-- [![Downloads](https://pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd) -->
-<!-- [![Downloads](https://pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd) -->
+[![Downloads](https://pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd)
+[![Downloads](https://pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd)
 [![Contributions](https://img.shields.io/badge/contributions-welcome-blue)]()
 <!-- [![Docs](https://img.shields.io/badge/website-live-brightgreen)](https://pages.github.com/GT4SD/gt4sd-core/)) -->
 
