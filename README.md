@@ -1,7 +1,7 @@
 # GT4SD (Generative Toolkit for Scientific Discovery)
 
 [![PyPI version](https://badge.fury.io/py/gt4sd.svg)](https://badge.fury.io/py/gt4sd)
-[![Actions tests](https://github.com/gt4sd/gt4sd-core/actions/workflows/tests/badge.svg)](https://github.com/gt4sd/gt4sd-core/actions)
+[![Actions tests](https://github.com/gt4sd/gt4sd-core/actions/workflows/tests.yaml/badge.svg)](https://github.com/gt4sd/gt4sd-core/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Contributions](https://img.shields.io/badge/contributions-welcome-blue)](https://github.com/GT4SD/gt4sd-core/blob/main/CONTRIBUTING.md)
