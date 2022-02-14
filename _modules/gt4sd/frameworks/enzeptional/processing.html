@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.enzeptional.processing &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.enzeptional.processing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.enzeptional.processing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;enzeptional - data processing utilities.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">tape.datasets</span> <span class="kn">import</span> <span class="n">pad_sequences</span>
+<span class="kn">from</span> <span class="nn">tape.registry</span> <span class="kn">import</span> <span class="n">registry</span>
+<span class="kn">from</span> <span class="nn">tape.tokenizers</span> <span class="kn">import</span> <span class="n">TAPETokenizer</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelWithLMHead</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+
+<span class="kn">from</span> <span class="nn">..torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>  <span class="c1"># used for sample embedding</span>
+
+
+<div class="viewcode-block" id="Embedding"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.Embedding">[docs]</a><span class="k">class</span> <span class="nc">Embedding</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Abstract embedding class.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Embedding.embed_one"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.Embedding.embed_one">[docs]</a>    <span class="k">def</span> <span class="nf">embed_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Embed one sample.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sample: sample representation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            embedding vector for the sample.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__call__</span><span class="p">([</span><span class="n">sample</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Embedding.__call__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.Embedding.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Embed multiple samples sample.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            samples: a list of sample representations.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            embedding vectors for the samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+
+
+<span class="n">StringEmbedding</span> <span class="o">=</span> <span class="n">Embedding</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="TAPEEmbedding"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.TAPEEmbedding">[docs]</a><span class="k">class</span> <span class="nc">TAPEEmbedding</span><span class="p">(</span><span class="n">StringEmbedding</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Embed AA sequence using TAPE.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TAPEEmbedding.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.TAPEEmbedding.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;transformer&quot;</span><span class="p">,</span>
+        <span class="n">model_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bert-base&quot;</span><span class="p">,</span>
+        <span class="n">aa_vocabulary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;iupac&quot;</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the TAPE embedding class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_type: TAPE model type. Defaults to &quot;transformer&quot;.</span>
+<span class="sd">            model_dir: model directory. Defaults to &quot;bert-base&quot;.</span>
+<span class="sd">            aa_vocabulary: type of vocabulary. Defaults to &quot;iupac&quot;.</span>
+<span class="sd">            device: device where the inference</span>
+<span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># task and model definition</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_specification</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get_task_spec</span><span class="p">(</span><span class="s2">&quot;embed&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get_task_model</span><span class="p">(</span>
+            <span class="n">model_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_specification</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">load_dir</span><span class="o">=</span><span class="n">model_dir</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">TAPETokenizer</span><span class="p">(</span><span class="n">vocab</span><span class="o">=</span><span class="n">aa_vocabulary</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TAPEEmbedding._encode_and_mask"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.TAPEEmbedding._encode_and_mask">[docs]</a>    <span class="k">def</span> <span class="nf">_encode_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Encode and mask a sequence.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence: AA sequence.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a tuple containing the token ids and the mask.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">token_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">token_ids</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">token_ids</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TAPEEmbedding.__call__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.TAPEEmbedding.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Embed multiple protein sequences using TAPE.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            samples: a list of protein sequences.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a numpy array containing the embedding vectors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># prepare input</span>
+        <span class="n">token_ids</span><span class="p">,</span> <span class="n">masks</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_encode_and_mask</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">input_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">pad_sequences</span><span class="p">(</span><span class="n">token_ids</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+            <span class="s2">&quot;input_mask&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">pad_sequences</span><span class="p">(</span><span class="n">masks</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">sequence_lenghts</span> <span class="o">=</span> <span class="n">input_data</span><span class="p">[</span><span class="s2">&quot;input_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">sequence_embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">input_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="c1"># get average embedding</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">sequence_embedding</span><span class="p">[:</span><span class="n">sequence_length</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">sequence_embedding</span><span class="p">,</span> <span class="n">sequence_length</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>  <span class="c1"># type:ignore</span>
+                    <span class="n">sequence_embeddings</span><span class="p">,</span> <span class="n">sequence_lenghts</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HuggingFaceTransformerEmbedding"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.HuggingFaceTransformerEmbedding">[docs]</a><span class="k">class</span> <span class="nc">HuggingFaceTransformerEmbedding</span><span class="p">(</span><span class="n">StringEmbedding</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Embed a string representation of a molecule using an HF transformers model.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HuggingFaceTransformerEmbedding.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.HuggingFaceTransformerEmbedding.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;seyonec/ChemBERTa-zinc-base-v1&quot;</span><span class="p">,</span>
+        <span class="n">tokenizer_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;seyonec/ChemBERTa-zinc-base-v1&quot;</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the HF transformers embedding class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_name: model name. Defaults to &quot;seyonec/ChemBERTa-zinc-base-v1&quot;.</span>
+<span class="sd">            tokenizer_name: tokenizer name. Defaults to &quot;seyonec/ChemBERTa-zinc-base-v1&quot;.</span>
+<span class="sd">            device: device where the inference</span>
+<span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># tokenizer and model definition</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelWithLMHead</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">tokenizer_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HuggingFaceTransformerEmbedding.__call__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.HuggingFaceTransformerEmbedding.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Embed multiple protein sequences using TAPE.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            samples: a list of strings representing molecules.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a numpy array containing the embedding vectors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get the CLS token representation from each SMILES.</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span>
+                <span class="o">**</span><span class="p">{</span>
+                    <span class="n">key</span><span class="p">:</span> <span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>
+                        <span class="n">samples</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="p">}</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="mutate_sequence_with_variant"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.mutate_sequence_with_variant">[docs]</a><span class="k">def</span> <span class="nf">mutate_sequence_with_variant</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Given an AA sequence and a variant returns the mutated AA sequence.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sequence: an AA sequence.</span>
+<span class="sd">        variant: a variant annotation.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the mutated sequence.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">edits</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">variant_string</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">variant</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">variant_string</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">variant_string</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span> <span class="n">variant</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
+    <span class="p">]</span>
+    <span class="n">mutated_sequence</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">aa_to</span> <span class="ow">in</span> <span class="n">edits</span><span class="p">:</span>
+        <span class="n">mutated_sequence</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">aa_to</span>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mutated_sequence</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sanitize_intervals"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.sanitize_intervals">[docs]</a><span class="k">def</span> <span class="nf">sanitize_intervals</span><span class="p">(</span><span class="n">intervals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Sanitize intervals merging overlapping ones and sorting them.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        intervals: intervals to sanitize.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        sorted and non overlapping intervals.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sorted_intervals</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">intervals</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">interval</span><span class="p">:</span> <span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">merged_intervals</span> <span class="o">=</span> <span class="p">[</span><span class="n">sorted_intervals</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">sorted_intervals</span><span class="p">:</span>
+        <span class="n">previous_end</span> <span class="o">=</span> <span class="n">merged_intervals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">current</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">previous_end</span><span class="p">:</span>
+            <span class="n">previous_end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">previous_end</span><span class="p">,</span> <span class="n">current</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">merged_intervals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">merged_intervals</span></div>
+
+
+<div class="viewcode-block" id="reconstruct_sequence_with_mutation_range"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.processing.html#gt4sd.frameworks.enzeptional.processing.reconstruct_sequence_with_mutation_range">[docs]</a><span class="k">def</span> <span class="nf">reconstruct_sequence_with_mutation_range</span><span class="p">(</span>
+    <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mutated_sequence_range</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">intervals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reconstruct a sequence replacing in given positions sub-sequences from a mutated range.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sequence: original sequence.</span>
+<span class="sd">        mutated_sequence_range: mutated sequence range.</span>
+<span class="sd">        intervals: sorted and non overlapping intervals.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        reconstructed sequence.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># create the mutated sequence, considering sorted intervals</span>
+    <span class="n">mutated_range_offset</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># offset with respect to the mutated_sequence_range</span>
+    <span class="n">mutated_sequence_offset</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># offset with respect to the full mutated sequence.</span>
+    <span class="n">mutated_sequence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">intervals</span><span class="p">:</span>
+        <span class="n">mutated_sequence</span> <span class="o">+=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">mutated_sequence_offset</span><span class="p">:</span><span class="n">start</span><span class="p">]</span>
+        <span class="n">chunk_length</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">mutated_sequence</span> <span class="o">+=</span> <span class="n">mutated_sequence_range</span><span class="p">[</span>
+            <span class="n">mutated_range_offset</span> <span class="p">:</span> <span class="n">mutated_range_offset</span> <span class="o">+</span> <span class="n">chunk_length</span>
+        <span class="p">]</span>
+        <span class="n">mutated_range_offset</span> <span class="o">+=</span> <span class="n">chunk_length</span>
+        <span class="n">mutated_sequence_offset</span> <span class="o">=</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">mutated_sequence</span> <span class="o">+=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">mutated_sequence</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

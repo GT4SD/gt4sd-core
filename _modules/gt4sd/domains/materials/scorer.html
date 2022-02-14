@@ -1,0 +1,546 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.domains.materials.scorer &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../materials.html">gt4sd.domains.materials</a> &raquo;</li>
+        
+      <li>gt4sd.domains.materials.scorer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.domains.materials.scorer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implementation of Scorers&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span> <span class="nn">guacamol.common_scoring_functions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">IsomerScoringFunction</span><span class="p">,</span>
+    <span class="n">RdkitScoringFunction</span><span class="p">,</span>
+    <span class="n">SMARTSScoringFunction</span><span class="p">,</span>
+    <span class="n">TanimotoScoringFunction</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">guacamol.score_modifier</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ClippedScoreModifier</span><span class="p">,</span>
+    <span class="n">GaussianModifier</span><span class="p">,</span>
+    <span class="n">MaxGaussianModifier</span><span class="p">,</span>
+    <span class="n">MinGaussianModifier</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">guacamol.scoring_function</span> <span class="kn">import</span> <span class="n">ScoringFunction</span>
+<span class="kn">from</span> <span class="nn">guacamol.utils.descriptors</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">bertz</span><span class="p">,</span>
+    <span class="n">logP</span><span class="p">,</span>
+    <span class="n">mol_weight</span><span class="p">,</span>
+    <span class="n">num_aromatic_rings</span><span class="p">,</span>
+    <span class="n">num_rings</span><span class="p">,</span>
+    <span class="n">num_rotatable_bonds</span><span class="p">,</span>
+    <span class="n">qed</span><span class="p">,</span>
+    <span class="n">tpsa</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">MODIFIERS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;gaussian_modifier&quot;</span><span class="p">:</span> <span class="n">GaussianModifier</span><span class="p">,</span>
+    <span class="s2">&quot;min_gaussian_modifier&quot;</span><span class="p">:</span> <span class="n">MinGaussianModifier</span><span class="p">,</span>
+    <span class="s2">&quot;max_gaussian_modifier&quot;</span><span class="p">:</span> <span class="n">MaxGaussianModifier</span><span class="p">,</span>
+    <span class="s2">&quot;clipped_score_modifier&quot;</span><span class="p">:</span> <span class="n">ClippedScoreModifier</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">MODIFIERS_PARAMETERS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;gaussian_modifier&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span>
+    <span class="s2">&quot;min_gaussian_modifier&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">},</span>
+    <span class="s2">&quot;max_gaussian_modifier&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+    <span class="s2">&quot;clipped_score_modifier&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;upper_x&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">},</span>
+<span class="p">}</span>
+<span class="n">DESCRIPTOR</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;num_rotatable_bonds&quot;</span><span class="p">:</span> <span class="n">num_rotatable_bonds</span><span class="p">,</span>
+    <span class="s2">&quot;num_aromatic_rings&quot;</span><span class="p">:</span> <span class="n">num_aromatic_rings</span><span class="p">,</span>
+    <span class="s2">&quot;log_p&quot;</span><span class="p">:</span> <span class="n">logP</span><span class="p">,</span>
+    <span class="s2">&quot;tpsa&quot;</span><span class="p">:</span> <span class="n">tpsa</span><span class="p">,</span>
+    <span class="s2">&quot;bertz&quot;</span><span class="p">:</span> <span class="n">bertz</span><span class="p">,</span>
+    <span class="s2">&quot;qed&quot;</span><span class="p">:</span> <span class="n">qed</span><span class="p">,</span>
+    <span class="s2">&quot;mol_weight&quot;</span><span class="p">:</span> <span class="n">mol_weight</span><span class="p">,</span>
+    <span class="s2">&quot;num_rings&quot;</span><span class="p">:</span> <span class="n">num_rings</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="distance_to_score"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.distance_to_score">[docs]</a><span class="k">def</span> <span class="nf">distance_to_score</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;calculating exponential for a given distance</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        distance: A float.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        An exponential score value for a given SMILES</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="n">distance</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DistanceScorer"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.DistanceScorer">[docs]</a><span class="k">class</span> <span class="nc">DistanceScorer</span><span class="p">(</span><span class="n">ScoringFunction</span><span class="p">):</span>
+<div class="viewcode-block" id="DistanceScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.DistanceScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.00000001</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;DistanceScorer is used to call a partial copy of distance_to_score function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            beta: A float value used for getting an exponential score value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partical_distance_score</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">distance_to_score</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DistanceScorer.get_distance"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.DistanceScorer.get_distance">[docs]</a>    <span class="k">def</span> <span class="nf">get_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smile_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generates a partial copy of distance_to_score function</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles: SMILES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An exponential score value for a given SMILES</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">partical_distance_score</span><span class="p">(</span><span class="n">smile_distance</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TargetValueScorer"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.TargetValueScorer">[docs]</a><span class="k">class</span> <span class="nc">TargetValueScorer</span><span class="p">(</span><span class="n">DistanceScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="TargetValueScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.TargetValueScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scoring_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Scoring function which is used to generate a socre based on a taget and a scroing function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target: target score that will be used to get the distance to the score of the SMILES</span>
+<span class="sd">            scoring_function: an instance of a scoring class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring_function</span> <span class="o">=</span> <span class="n">scoring_function</span></div>
+
+<div class="viewcode-block" id="TargetValueScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.TargetValueScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles: SMILES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A score for the given SMILES</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scoring_function</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TargetValueScorer.score_list"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.TargetValueScorer.score_list">[docs]</a>    <span class="k">def</span> <span class="nf">score_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Generates a list of scores for a given SMILES List</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles_list: A List of SMILES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A List of scores</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">smiles</span> <span class="ow">in</span> <span class="n">smiles_list</span>
+            <span class="k">if</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="ow">and</span> <span class="n">smiles</span>
+        <span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="CombinedScorer"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.CombinedScorer">[docs]</a><span class="k">class</span> <span class="nc">CombinedScorer</span><span class="p">:</span>
+<div class="viewcode-block" id="CombinedScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.CombinedScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">scorer_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Scoring function which generates a combined score for a SMILES as per the given scoring functions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scorer_list: A list of the scoring functions</span>
+<span class="sd">            weights: A list of weights</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scorer_list</span> <span class="o">=</span> <span class="n">scorer_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombinedScorer._normalize_weights"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.CombinedScorer._normalize_weights">[docs]</a>    <span class="k">def</span> <span class="nf">_normalize_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;It is used for normalizing weights.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            weights: A list of weights.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Sum of all the scores generated by the given scoring functions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="k">if</span> <span class="n">weights</span> <span class="k">else</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scorer_list</span><span class="p">)</span>
+        <span class="n">offsetted_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">weight</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="k">for</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">weight</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">offsetted_weights</span><span class="p">))</span> <span class="k">for</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">offsetted_weights</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CombinedScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.CombinedScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles: SMILES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Sum of all the scores generated by the given scoring functions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">scorer</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span>
+                <span class="k">for</span> <span class="n">scorer</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scorer_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombinedScorer.score_list"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.CombinedScorer.score_list">[docs]</a>    <span class="k">def</span> <span class="nf">score_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Generates a list of scores for a given SMILES List</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles_list: A List of SMILES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A List of scores</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="k">for</span> <span class="n">smiles</span> <span class="ow">in</span> <span class="n">smiles_list</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="RDKitDescriptorScorer"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.RDKitDescriptorScorer">[docs]</a><span class="k">class</span> <span class="nc">RDKitDescriptorScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="RDKitDescriptorScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.RDKitDescriptorScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">modifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gaussian_modifier&quot;</span><span class="p">,</span>
+        <span class="n">descriptor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;num_rotatable_bonds&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Scoring function wrapping RDKit descriptors.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target: target score that will be used to get the distance to the score of the SMILES</span>
+<span class="sd">            modifier: score modifier</span>
+<span class="sd">            descriptor:  molecular descriptors</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modifier</span> <span class="o">=</span> <span class="n">MODIFIERS</span><span class="p">[</span><span class="n">modifier</span><span class="p">](</span><span class="o">**</span><span class="n">MODIFIERS_PARAMETERS</span><span class="p">[</span><span class="n">modifier</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descriptor</span> <span class="o">=</span> <span class="n">DESCRIPTOR</span><span class="p">[</span><span class="n">descriptor</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RDKitDescriptorScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.RDKitDescriptorScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles: SMILES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A score for the given SMILES</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scoring_function</span> <span class="o">=</span> <span class="n">RdkitScoringFunction</span><span class="p">(</span>
+            <span class="n">descriptor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">descriptor</span><span class="p">,</span>
+            <span class="n">score_modifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">modifier</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">scoring_function</span><span class="o">.</span><span class="n">score_mol</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="TanimotoScorer"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.TanimotoScorer">[docs]</a><span class="k">class</span> <span class="nc">TanimotoScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="TanimotoScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.TanimotoScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">target_smile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">fp_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ECFP4&quot;</span><span class="p">,</span>
+        <span class="n">modifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gaussian_modifier&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Scoring function that looks at the fingerprint similarity against a target molecule.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target: target score that will be used to get the distance to the score of the SMILES</span>
+<span class="sd">            target_smile: target molecule to compare similarity</span>
+<span class="sd">            fp_type: fingerprint type</span>
+<span class="sd">            modifier: score modifier</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_smile</span> <span class="o">=</span> <span class="n">target_smile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp_type</span> <span class="o">=</span> <span class="n">fp_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modifier</span> <span class="o">=</span> <span class="n">MODIFIERS</span><span class="p">[</span><span class="n">modifier</span><span class="p">](</span><span class="o">**</span><span class="n">MODIFIERS_PARAMETERS</span><span class="p">[</span><span class="n">modifier</span><span class="p">])</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TanimotoScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.TanimotoScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles: SMILES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A score for the given SMILES</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scoring_function</span> <span class="o">=</span> <span class="n">TanimotoScoringFunction</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_smile</span><span class="p">,</span>
+            <span class="n">fp_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fp_type</span><span class="p">,</span>
+            <span class="n">score_modifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">modifier</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">scoring_function</span><span class="o">.</span><span class="n">score_mol</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="IsomerScorer"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.IsomerScorer">[docs]</a><span class="k">class</span> <span class="nc">IsomerScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="IsomerScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.IsomerScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">target_smile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Scoring function for closeness to a molecular formula.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target: target score that will be used to get the distance to the score of the SMILES</span>
+<span class="sd">            target_smile: targeted SMILES to compare closeness with</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_smile</span> <span class="o">=</span> <span class="n">target_smile</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IsomerScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.IsomerScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles: SMILES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A score for the given SMILES</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scoring_function</span> <span class="o">=</span> <span class="n">IsomerScoringFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_smile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">scoring_function</span><span class="o">.</span><span class="n">raw_score</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SMARTSScorer"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.SMARTSScorer">[docs]</a><span class="k">class</span> <span class="nc">SMARTSScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="SMARTSScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.SMARTSScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">target_smile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Scoring function that looks at the fingerprint similarity against a target molecule.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target: target score that will be used to get the distance to the score of the SMILES</span>
+<span class="sd">            target_smile: The SMARTS string to match</span>
+<span class="sd">            inverse: If True then SMARTS is desired else it is not desired in the molecules</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_smile</span> <span class="o">=</span> <span class="n">target_smile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span> <span class="o">=</span> <span class="n">inverse</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SMARTSScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.SMARTSScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles: SMILES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A score for the given SMILES</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scoring_function</span> <span class="o">=</span> <span class="n">SMARTSScoringFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_smile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">scoring_function</span><span class="o">.</span><span class="n">score_mol</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="QEDScorer"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.QEDScorer">[docs]</a><span class="k">class</span> <span class="nc">QEDScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="QEDScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.QEDScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Scoring function that calculates the weighted sum of ADS mapped properties using QED module of rdkit</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target: target score that will be used to get the distance to the score of the SMILES</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QEDScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.QEDScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles: SMILES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A score for the given SMILES</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Chem</span><span class="o">.</span><span class="n">QED</span><span class="o">.</span><span class="n">qed</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">))</span></div></div>
+
+
+<span class="n">SCORING_FUNCTIONS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;rdkit_scorer&quot;</span><span class="p">:</span> <span class="n">RDKitDescriptorScorer</span><span class="p">,</span>
+    <span class="s2">&quot;tanimoto_scorer&quot;</span><span class="p">:</span> <span class="n">TanimotoScorer</span><span class="p">,</span>
+    <span class="s2">&quot;isomer_scorer&quot;</span><span class="p">:</span> <span class="n">IsomerScorer</span><span class="p">,</span>
+    <span class="s2">&quot;smarts_scorer&quot;</span><span class="p">:</span> <span class="n">SMARTSScorer</span><span class="p">,</span>
+    <span class="s2">&quot;qed_scorer&quot;</span><span class="p">:</span> <span class="n">QEDScorer</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

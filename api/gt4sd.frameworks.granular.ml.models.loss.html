@@ -1,0 +1,602 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.granular.ml.models.loss module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd.frameworks.granular.ml.models.model_builder module" href="gt4sd.frameworks.granular.ml.models.model_builder.html" />
+    <link rel="prev" title="gt4sd.frameworks.granular.ml.models.base_model module" href="gt4sd.frameworks.granular.ml.models.base_model.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.configuration.html">gt4sd.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.conftest.html">gt4sd.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.exceptions.html">gt4sd.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.s3.html">gt4sd.s3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.algorithms.html">gt4sd.algorithms package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.cli.html">gt4sd.cli package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.domains.html">gt4sd.domains package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.extras.html">gt4sd.extras package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.enzeptional.html">gt4sd.frameworks.enzeptional package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="gt4sd.frameworks.granular.html">gt4sd.frameworks.granular package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.granular.arg_parser.html">gt4sd.frameworks.granular.arg_parser package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.granular.dataloader.html">gt4sd.frameworks.granular.dataloader package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="gt4sd.frameworks.granular.ml.html">gt4sd.frameworks.granular.ml package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.granular.tokenizer.html">gt4sd.frameworks.granular.tokenizer package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.torch.html">gt4sd.frameworks.torch package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.tests.html">gt4sd.tests package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="gt4sd.html">gt4sd package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.html">gt4sd.frameworks package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.granular.html">gt4sd.frameworks.granular package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.granular.ml.html">gt4sd.frameworks.granular.ml package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.granular.ml.models.html">gt4sd.frameworks.granular.ml.models package</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.granular.ml.models.loss module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/gt4sd.frameworks.granular.ml.models.loss.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-gt4sd.frameworks.granular.ml.models.loss">
+<span id="gt4sd-frameworks-granular-ml-models-loss-module"></span><h1>gt4sd.frameworks.granular.ml.models.loss module<a class="headerlink" href="#module-gt4sd.frameworks.granular.ml.models.loss" title="Permalink to this headline">¶</a></h1>
+<p>Losses for granular models.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9" title="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MSLELossNegMix9</span></code></a></p></td>
+<td><p>MSLE loss negative mix 9.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91" title="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MSLELossNegMix91</span></code></a></p></td>
+<td><p>MSLE loss negative mix 91.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92" title="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MSLELossNegMix92</span></code></a></p></td>
+<td><p>MSLE loss negative mix 92.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99" title="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MSLELossNegMix99</span></code></a></p></td>
+<td><p>MSLE loss negative mix 99.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.ml.models.loss.MaeWithNans" title="gt4sd.frameworks.granular.ml.models.loss.MaeWithNans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaeWithNans</span></code></a></p></td>
+<td><p>MAE with NaNs handling.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.frameworks.granular.ml.models.loss.MseWithNans" title="gt4sd.frameworks.granular.ml.models.loss.MseWithNans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MseWithNans</span></code></a></p></td>
+<td><p>MSE with NaNs handling.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9">
+<em class="property">class </em><code class="sig-name descname">MSLELossNegMix9</code><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>MSLE loss negative mix 9.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix9.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the loss.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prediction</span></em>, <em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix9.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass in the loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – predictions.</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – groundtruth.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>loss value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'MSLE loss negative mix 9.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.ml.models.loss'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9._is_full_backward_hook">
+<code class="sig-name descname">_is_full_backward_hook</code><em class="property">: Optional<span class="p">[</span>bool<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix9._is_full_backward_hook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91">
+<em class="property">class </em><code class="sig-name descname">MSLELossNegMix91</code><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix91"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>MSLE loss negative mix 91.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix91.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the loss.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prediction</span></em>, <em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix91.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass in the loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – predictions.</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – groundtruth.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>loss value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'MSLE loss negative mix 91.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.ml.models.loss'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91._is_full_backward_hook">
+<code class="sig-name descname">_is_full_backward_hook</code><em class="property">: Optional<span class="p">[</span>bool<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix91._is_full_backward_hook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MseWithNans">
+<em class="property">class </em><code class="sig-name descname">MseWithNans</code><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MseWithNans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MseWithNans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>MSE with NaNs handling.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MseWithNans.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MseWithNans.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MseWithNans.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the loss.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MseWithNans.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prediction</span></em>, <em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MseWithNans.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MseWithNans.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass in the loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – predictions.</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – groundtruth.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>loss value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MseWithNans.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'MSE with NaNs handling.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MseWithNans.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MseWithNans.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.ml.models.loss'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MseWithNans.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MseWithNans.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MseWithNans.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MseWithNans._is_full_backward_hook">
+<code class="sig-name descname">_is_full_backward_hook</code><em class="property">: Optional<span class="p">[</span>bool<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MseWithNans._is_full_backward_hook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MaeWithNans">
+<em class="property">class </em><code class="sig-name descname">MaeWithNans</code><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MaeWithNans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MaeWithNans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>MAE with NaNs handling.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MaeWithNans.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MaeWithNans.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MaeWithNans.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the loss.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MaeWithNans.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prediction</span></em>, <em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MaeWithNans.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MaeWithNans.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass in the loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – predictions.</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – groundtruth.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>loss value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MaeWithNans.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'MAE with NaNs handling.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MaeWithNans.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MaeWithNans.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.ml.models.loss'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MaeWithNans.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MaeWithNans.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MaeWithNans.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MaeWithNans._is_full_backward_hook">
+<code class="sig-name descname">_is_full_backward_hook</code><em class="property">: Optional<span class="p">[</span>bool<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MaeWithNans._is_full_backward_hook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92">
+<em class="property">class </em><code class="sig-name descname">MSLELossNegMix92</code><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix92"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>MSLE loss negative mix 92.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix92.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the loss.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prediction</span></em>, <em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix92.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass in the loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – predictions.</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – groundtruth.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>loss value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'MSLE loss negative mix 92.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.ml.models.loss'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92._is_full_backward_hook">
+<code class="sig-name descname">_is_full_backward_hook</code><em class="property">: Optional<span class="p">[</span>bool<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix92._is_full_backward_hook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99">
+<em class="property">class </em><code class="sig-name descname">MSLELossNegMix99</code><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix99"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>MSLE loss negative mix 99.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix99.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the loss.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prediction</span></em>, <em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/granular/ml/models/loss.html#MSLELossNegMix99.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass in the loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – predictions.</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – groundtruth.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>loss value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'MSLE loss negative mix 99.'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.granular.ml.models.loss'</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99._is_full_backward_hook">
+<code class="sig-name descname">_is_full_backward_hook</code><em class="property">: Optional<span class="p">[</span>bool<span class="p">]</span></em><a class="headerlink" href="#gt4sd.frameworks.granular.ml.models.loss.MSLELossNegMix99._is_full_backward_hook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gt4sd.frameworks.granular.ml.models.model_builder.html" class="btn btn-neutral float-right" title="gt4sd.frameworks.granular.ml.models.model_builder module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd.frameworks.granular.ml.models.base_model.html" class="btn btn-neutral float-left" title="gt4sd.frameworks.granular.ml.models.base_model module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

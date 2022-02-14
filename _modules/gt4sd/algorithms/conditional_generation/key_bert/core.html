@@ -1,0 +1,385 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.conditional_generation.key_bert.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.conditional_generation.key_bert.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.conditional_generation.key_bert.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Algortihms for keyword generation using BERT models.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AlgorithmConfiguration</span><span class="p">,</span>
+    <span class="n">GeneratorAlgorithm</span><span class="p">,</span>
+    <span class="n">get_configuration_class_with_attributes</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">...registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
+<span class="kn">from</span> <span class="nn">.implementation</span> <span class="kn">import</span> <span class="n">KeyBERT</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
+<span class="n">Targeted</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+
+
+<div class="viewcode-block" id="KeywordBERTGenerationAlgorithm"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeywordBERTGenerationAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">KeywordBERTGenerationAlgorithm</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Topics prediction algorithm.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="KeywordBERTGenerationAlgorithm.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeywordBERTGenerationAlgorithm.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate KeywordBERTGenerationAlgorithm ready to predict topics.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: domain and application</span>
+<span class="sd">                specification defining parameters, types and validations.</span>
+<span class="sd">            target: a target for which to generate items.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            An example for predicting topics for a given text::</span>
+
+<span class="sd">                config = KeyBERTGenerator()</span>
+<span class="sd">                algorithm = KeywordBERTGenerationAlgorithm(configuration=config, target=&quot;This is a text I want to understand better&quot;)</span>
+<span class="sd">                items = list(algorithm.sample(1))</span>
+<span class="sd">                print(items)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+        <span class="c1"># TODO there might also be a validation/check on the target input</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">,</span>  <span class="c1"># type:ignore</span>
+            <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>  <span class="c1"># type:ignore</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="KeywordBERTGenerationAlgorithm.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeywordBERTGenerationAlgorithm.get_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_generator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Targeted</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get the function to perform the prediction via KeywordBERTGenerationAlgorithm&#39;s generator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: helps to set up specific application of KeywordBERTGenerationAlgorithm.</span>
+<span class="sd">            target: context or condition for the generation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            callable with target generating keywords sorted by relevance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ensure artifacts for the application are present.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">ensure_artifacts</span><span class="p">()</span>
+        <span class="n">implementation</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">get_conditional_generator</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">implementation</span><span class="o">.</span><span class="n">predict</span></div></div>
+
+
+<div class="viewcode-block" id="KeyBERTGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeyBERTGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">KeywordBERTGenerationAlgorithm</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">KeyBERTGenerator</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Configuration to generate keywords.</span>
+
+<span class="sd">    If the  model is not found in the cache, models are collected from https://www.sbert.net/docs/pretrained_models.html.</span>
+<span class="sd">    distilbert-base-nli-stsb-mean-tokens is recommended for english, while xlm-r-bert-base-nli-stsb-mean-tokens for all</span>
+<span class="sd">    other languages as it support 100+ languages.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_name</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">KeywordBERTGenerationAlgorithm</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;conditional_generation&quot;</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;nlp&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;distilbert-base-nli-mean-tokens&quot;</span>
+
+    <span class="n">minimum_keyphrase_ngram</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Lower bound for phrase size.&quot;</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="n">maximum_keyphrase_ngram</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Upper bound for phrase size.&quot;</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="n">stop_words</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;english&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Language for the stop words removal.&quot;</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Number of keywords to extract.&quot;</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="n">use_maxsum</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Control usage of max sum similarity for keywords generated.&quot;</span><span class="p">)</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">use_mmr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;Control usage of max marginal relevance for keywords generated.&quot;</span>
+            <span class="p">)</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">diversity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Diversity for the results when enabling use_mmr.&quot;</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="n">number_of_candidates</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Candidates considered when enabling use_maxsum.&quot;</span><span class="p">)),</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="KeyBERTGenerator.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeyBERTGenerator.get_target_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            target description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Text to analyze&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Text considered for the keyword generation task.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="KeyBERTGenerator.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeyBERTGenerator.get_conditional_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KeyBERT</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            instance with :meth:`generate_batch&lt;gt4sd.algorithms.conditional_generation.key_bert.implementation.KeyBERT.predict&gt;` method for targeted generation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">KeyBERT</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
+            <span class="n">minimum_keyphrase_ngram</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">minimum_keyphrase_ngram</span><span class="p">,</span>
+            <span class="n">maximum_keyphrase_ngram</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">maximum_keyphrase_ngram</span><span class="p">,</span>
+            <span class="n">stop_words</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stop_words</span><span class="p">,</span>
+            <span class="n">top_n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">top_n</span><span class="p">,</span>
+            <span class="n">use_maxsum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_maxsum</span><span class="p">,</span>
+            <span class="n">use_mmr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_mmr</span><span class="p">,</span>
+            <span class="n">diversity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">diversity</span><span class="p">,</span>
+            <span class="n">number_of_candidates</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_candidates</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="KeyBERTGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeyBERTGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;more algorithm versions can be found on https://www.sbert.net/docs/pretrained_models.html&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">})</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

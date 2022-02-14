@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.granular.dataloader.data_module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.granular.dataloader.data_module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.granular.dataloader.data_module</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Data module for granular.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">,</span> <span class="n">Subset</span><span class="p">,</span> <span class="n">random_split</span>
+
+<span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">CombinedGranularDataset</span><span class="p">,</span> <span class="n">GranularDataset</span>
+<span class="kn">from</span> <span class="nn">.sampler</span> <span class="kn">import</span> <span class="n">StratifiedSampler</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="GranularDataModule"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.data_module.html#gt4sd.frameworks.granular.dataloader.data_module.GranularDataModule">[docs]</a><span class="k">class</span> <span class="nc">GranularDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Data module from granular.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GranularDataModule.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.data_module.html#gt4sd.frameworks.granular.dataloader.data_module.GranularDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">GranularDataset</span><span class="p">],</span>
+        <span class="n">validation_split</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">validation_indices_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">stratified_batch_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">stratified_value_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Construct GranularDataModule.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset_list: a list of granular datasets.</span>
+<span class="sd">            validation_split: proportion used for validation. Defaults to None,</span>
+<span class="sd">                a.k.a., use indices file if provided otherwise uses half of the data for validation.</span>
+<span class="sd">            validation_indices_file: indices to use for validation. Defaults to None, a.k.a.,</span>
+<span class="sd">                use validation split proportion, if not provided uses half of the data for validation.</span>
+<span class="sd">            stratified_batch_file: stratified batch file for sampling. Defaults to None, a.k.a.,</span>
+<span class="sd">                no stratified sampling.</span>
+<span class="sd">            stratified_value_name: stratified value name. Defaults to None, a.k.a.,</span>
+<span class="sd">                no stratified sampling. Needed in case a stratified batch file is provided.</span>
+<span class="sd">            batch_size: batch size. Defaults to 64.</span>
+<span class="sd">            num_workers: number of workers. Defaults to 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validation_split</span> <span class="o">=</span> <span class="n">validation_split</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validation_indices_file</span> <span class="o">=</span> <span class="n">validation_indices_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_list</span> <span class="o">=</span> <span class="n">dataset_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stratified_batch_file</span> <span class="o">=</span> <span class="n">stratified_batch_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stratified_value_name</span> <span class="o">=</span> <span class="n">stratified_value_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_train_data</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GranularDataModule.combine_datasets"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.data_module.html#gt4sd.frameworks.granular.dataloader.data_module.GranularDataModule.combine_datasets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">combine_datasets</span><span class="p">(</span>
+        <span class="n">dataset_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">GranularDataset</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CombinedGranularDataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Combine granular datasets.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset_list: a list of granular datasets.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a combined granular dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CombinedGranularDataset</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">a_dataset</span><span class="o">.</span><span class="n">dataset</span> <span class="k">for</span> <span class="n">a_dataset</span> <span class="ow">in</span> <span class="n">dataset_list</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GranularDataModule.prepare_train_data"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.data_module.html#gt4sd.frameworks.granular.dataloader.data_module.GranularDataModule.prepare_train_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_train_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Prepare training dataset.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">GranularDataModule</span><span class="o">.</span><span class="n">combine_datasets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GranularDataModule.prepare_test_data"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.data_module.html#gt4sd.frameworks.granular.dataloader.data_module.GranularDataModule.prepare_test_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_test_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">GranularDataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Prepare testing dataset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset_list: a list of granular datasets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="o">=</span> <span class="n">GranularDataModule</span><span class="o">.</span><span class="n">combine_datasets</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GranularDataModule.setup"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.data_module.html#gt4sd.frameworks.granular.dataloader.data_module.GranularDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Setup the data module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stage: stage considered, unused. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stratified_batch_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stratified_value_name</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;stratified_batch_file=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">stratified_batch_file</span><span class="si">}</span><span class="s2">, need to set stratified_value_name as well&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_indices_file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_split</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validation_split</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_indices_file</span><span class="p">:</span>
+            <span class="n">val_indices</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_indices_file</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">train_indices</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val_indices</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_data</span> <span class="o">=</span> <span class="n">Subset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">train_indices</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_data</span> <span class="o">=</span> <span class="n">Subset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">val_indices</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">)</span> <span class="o">*</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_split</span><span class="p">)))</span>
+            <span class="n">train</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">)</span> <span class="o">-</span> <span class="n">val</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_data</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="p">[</span><span class="n">train</span><span class="p">,</span> <span class="n">val</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;number of data points used for training: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;number of data points used for validation: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;validation proportion: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GranularDataModule.get_stratified_batch_sampler"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.data_module.html#gt4sd.frameworks.granular.dataloader.data_module.GranularDataModule.get_stratified_batch_sampler">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_stratified_batch_sampler</span><span class="p">(</span>
+        <span class="n">stratified_batch_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">stratified_value_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">selector_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StratifiedSampler</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get stratified batch sampler.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stratified_batch_file: stratified batch file for sampling.</span>
+<span class="sd">            stratified_value_name: stratified value name.</span>
+<span class="sd">            batch_size: batch size.</span>
+<span class="sd">            selector_fn: selector function for stratified sampling.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            a stratified batch sampler.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stratified_batch_dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">stratified_batch_file</span><span class="p">)</span>
+        <span class="n">stratified_data</span> <span class="o">=</span> <span class="n">stratified_batch_dataframe</span><span class="p">[</span>
+            <span class="n">selector_fn</span><span class="p">(</span><span class="n">stratified_batch_dataframe</span><span class="p">)</span>
+        <span class="p">][</span><span class="n">stratified_value_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">stratified_data_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">stratified_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">StratifiedSampler</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="n">stratified_data_tensor</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GranularDataModule.train_dataloader"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.data_module.html#gt4sd.frameworks.granular.dataloader.data_module.GranularDataModule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get a training data loader.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a training data loader.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sampler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sampler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stratified_batch_file</span><span class="p">:</span>
+            <span class="n">sampler</span> <span class="o">=</span> <span class="n">GranularDataModule</span><span class="o">.</span><span class="n">get_stratified_batch_sampler</span><span class="p">(</span>
+                <span class="n">stratified_batch_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stratified_batch_file</span><span class="p">,</span>
+                <span class="n">stratified_value_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stratified_value_name</span><span class="p">),</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+                <span class="n">selector_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">dataframe</span><span class="p">:</span> <span class="o">~</span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">pin_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">sampler</span><span class="o">=</span><span class="n">sampler</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GranularDataModule.val_dataloader"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.data_module.html#gt4sd.frameworks.granular.dataloader.data_module.GranularDataModule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get a validation data loader.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a validation data loader.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sampler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sampler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stratified_batch_file</span><span class="p">:</span>
+            <span class="n">sampler</span> <span class="o">=</span> <span class="n">GranularDataModule</span><span class="o">.</span><span class="n">get_stratified_batch_sampler</span><span class="p">(</span>
+                <span class="n">stratified_batch_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stratified_batch_file</span><span class="p">,</span>
+                <span class="n">stratified_value_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stratified_value_name</span><span class="p">),</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+                <span class="n">selector_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">dataframe</span><span class="p">:</span> <span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">pin_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">sampler</span><span class="o">=</span><span class="n">sampler</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get a testing data loader.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a testing data loader.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">pin_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implementation of PaccMann^GP conditional generator.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">paccmann_chemistry.models.vae</span> <span class="kn">import</span> <span class="n">StackGRUDecoder</span><span class="p">,</span> <span class="n">StackGRUEncoder</span><span class="p">,</span> <span class="n">TeacherVAE</span>
+<span class="kn">from</span> <span class="nn">paccmann_chemistry.utils.search</span> <span class="kn">import</span> <span class="n">SamplingSearch</span>
+<span class="kn">from</span> <span class="nn">paccmann_gp.affinity_minimization</span> <span class="kn">import</span> <span class="n">AffinityMinimization</span>
+<span class="kn">from</span> <span class="nn">paccmann_gp.combined_minimization</span> <span class="kn">import</span> <span class="n">CombinedMinimization</span>
+<span class="kn">from</span> <span class="nn">paccmann_gp.gp_optimizer</span> <span class="kn">import</span> <span class="n">GPOptimizer</span>
+<span class="kn">from</span> <span class="nn">paccmann_gp.mw_minimization</span> <span class="kn">import</span> <span class="n">MWMinimization</span>
+<span class="kn">from</span> <span class="nn">paccmann_gp.qed_minimization</span> <span class="kn">import</span> <span class="n">QEDMinimization</span>
+<span class="kn">from</span> <span class="nn">paccmann_gp.sa_minimization</span> <span class="kn">import</span> <span class="n">SAMinimization</span>
+<span class="kn">from</span> <span class="nn">paccmann_gp.smiles_generator</span> <span class="kn">import</span> <span class="n">SmilesGenerator</span>
+<span class="kn">from</span> <span class="nn">paccmann_predictor.models</span> <span class="kn">import</span> <span class="n">MODEL_FACTORY</span>
+<span class="kn">from</span> <span class="nn">pytoda.proteins.protein_language</span> <span class="kn">import</span> <span class="n">ProteinLanguage</span>
+<span class="kn">from</span> <span class="nn">pytoda.smiles.smiles_language</span> <span class="kn">import</span> <span class="n">SMILESLanguage</span>
+
+<span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="n">MINIMIZATION_FUNCTIONS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;qed&quot;</span><span class="p">:</span> <span class="n">QEDMinimization</span><span class="p">,</span>
+    <span class="s2">&quot;sa&quot;</span><span class="p">:</span> <span class="n">SAMinimization</span><span class="p">,</span>
+    <span class="s2">&quot;molwt&quot;</span><span class="p">:</span> <span class="n">MWMinimization</span><span class="p">,</span>
+    <span class="s2">&quot;affinity&quot;</span><span class="p">:</span> <span class="n">AffinityMinimization</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="GPConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator">[docs]</a><span class="k">class</span> <span class="nc">GPConditionalGenerator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Conditional generator as implemented in https://doi.org/10.1021/acs.jcim.1c00889.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GPConditionalGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.4</span><span class="p">,</span>
+        <span class="n">generated_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="n">limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+        <span class="n">acquisition_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EI&quot;</span><span class="p">,</span>
+        <span class="n">number_of_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="n">number_of_initial_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="n">initial_point_generator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;random&quot;</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
+        <span class="n">number_of_optimization_rounds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">sampling_variance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">samples_for_evaluation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">maximum_number_of_sampling_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the conditional generator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: directory where to find models and parameters.</span>
+<span class="sd">            temperature: temperature parameter for the softmax sampling in decoding. Defaults to 1.4.</span>
+<span class="sd">            generated_length: maximum length in tokens of the generated molcules (relates to the SMILES length). Defaults to 100.</span>
+<span class="sd">            batch_size: batch size used for the generative model sampling. Defaults to 16.</span>
+<span class="sd">            limit: hypercube limits in the latent space. Defaults to 5.0.</span>
+<span class="sd">            acquisition_function: acquisition function used in the Gaussian process. Defaults to &quot;EI&quot;. More details in https://scikit-optimize.github.io/stable/modules/generated/skopt.gp_minimize.html.</span>
+<span class="sd">            number_of_steps: number of steps for an optmization round. Defaults to 32.</span>
+<span class="sd">            number_of_initial_points: number of initial points evaluated. Defaults to 16.</span>
+<span class="sd">            initial_point_generator: scheme to generate initial points. Defaults to &quot;random&quot;. More details in https://scikit-optimize.github.io/stable/modules/generated/skopt.gp_minimize.html.</span>
+<span class="sd">            seed: seed used for random number generation in the optimizer. Defaults to 42.</span>
+<span class="sd">            number_of_optimization_rounds: maximum number of optimization rounds. Defaults to 1.</span>
+<span class="sd">            sampling_variance: variance of the Gaussian noise applied during sampling from the optimal point. Defaults to 0.1.</span>
+<span class="sd">            samples_for_evaluation: number of samples averaged for each minimization function evaluation. Defaults to 4.</span>
+<span class="sd">            maximum_number_of_sampling_steps: maximum number of sampling steps in an optmization round. Defaults to 32.</span>
+<span class="sd">            device: . Defaults to None, a.k.a, picking a default one (&quot;gpu&quot; if present, &quot;cpu&quot; otherwise).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># setting sampling parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generated_length</span> <span class="o">=</span> <span class="n">generated_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="c1"># setting VAE parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">svae_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;vae_model_params.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">svae_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="n">smiles_language</span> <span class="o">=</span> <span class="n">SMILESLanguage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;selfies_language.pkl&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="c1"># initialize encoder, decoder, testVAE, and GP_generator_MW</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gru_encoder</span> <span class="o">=</span> <span class="n">StackGRUEncoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">svae_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gru_decoder</span> <span class="o">=</span> <span class="n">StackGRUDecoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">svae_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gru_vae</span> <span class="o">=</span> <span class="n">TeacherVAE</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gru_encoder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gru_decoder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gru_vae</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;vae_weights.pt&quot;</span><span class="p">),</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gru_vae</span><span class="o">.</span><span class="n">_associate_language</span><span class="p">(</span><span class="n">smiles_language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gru_vae</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smiles_generator</span> <span class="o">=</span> <span class="n">SmilesGenerator</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gru_vae</span><span class="p">,</span>
+            <span class="n">search</span><span class="o">=</span><span class="n">SamplingSearch</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">),</span>
+            <span class="n">generated_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">generated_length</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gru_decoder</span><span class="o">.</span><span class="n">latent_dim</span>
+        <span class="c1"># setting affinity predictor parameters</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;mca_model_params.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">predictor_params</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span> <span class="o">=</span> <span class="n">MODEL_FACTORY</span><span class="p">[</span><span class="s2">&quot;bimodal_mca&quot;</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;mca_weights.pt&quot;</span><span class="p">),</span>
+            <span class="n">map_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">affinity_protein_language</span> <span class="o">=</span> <span class="n">ProteinLanguage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;protein_language.pkl&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">affinity_smiles_language</span> <span class="o">=</span> <span class="n">SMILESLanguage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;smiles_language.pkl&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span><span class="o">.</span><span class="n">_associate_language</span><span class="p">(</span><span class="n">affinity_smiles_language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span><span class="o">.</span><span class="n">_associate_language</span><span class="p">(</span><span class="n">affinity_protein_language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="c1"># setting optimizer parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="n">limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">=</span> <span class="n">acquisition_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_initial_points</span> <span class="o">=</span> <span class="n">number_of_initial_points</span>
+        <span class="k">if</span> <span class="n">number_of_steps</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_initial_points</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;number of initial points is larger than number of steps &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_initial_points</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">number_of_steps</span><span class="si">}</span><span class="s2">). &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Resetting number of steps to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_initial_points</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">number_of_steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_initial_points</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">number_of_steps</span> <span class="o">=</span> <span class="n">number_of_steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_point_generator</span> <span class="o">=</span> <span class="n">initial_point_generator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_optimization_rounds</span> <span class="o">=</span> <span class="n">number_of_optimization_rounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_variance</span> <span class="o">=</span> <span class="n">sampling_variance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples_for_evaluation</span> <span class="o">=</span> <span class="n">samples_for_evaluation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maximum_number_of_sampling_steps</span> <span class="o">=</span> <span class="n">maximum_number_of_sampling_steps</span></div>
+
+<div class="viewcode-block" id="GPConditionalGenerator.target_to_minimization_function"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.target_to_minimization_function">[docs]</a>    <span class="k">def</span> <span class="nf">target_to_minimization_function</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CombinedMinimization</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Use the target to configure a minimization function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target: dictionary or JSON string describing the optimization target.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a minimization function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">target_dictionary</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">target_dictionary</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> is not supported: provide &#39;str&#39; or &#39;Dict[str, Dict[str, Any]]&#39;&quot;</span>
+            <span class="p">)</span>
+        <span class="n">minimization_functions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">minimization_function_name</span><span class="p">,</span> <span class="n">parameters</span> <span class="ow">in</span> <span class="n">target_dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">if</span> <span class="s2">&quot;weight&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+                <span class="n">weight</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span>
+            <span class="n">function_parameters</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="o">**</span><span class="n">parameters</span><span class="p">,</span>
+                <span class="o">**</span><span class="p">{</span>
+                    <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_for_evaluation</span><span class="p">,</span>
+                    <span class="s2">&quot;smiles_decoder&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">smiles_generator</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+            <span class="n">minimization_function</span> <span class="o">=</span> <span class="n">MINIMIZATION_FUNCTIONS</span><span class="p">[</span><span class="n">minimization_function_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">minimization_function_name</span> <span class="o">==</span> <span class="s2">&quot;affinity&quot;</span><span class="p">:</span>
+                <span class="n">function_parameters</span><span class="p">[</span><span class="s2">&quot;affinity_predictor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span>
+            <span class="n">minimization_functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">minimization_function</span><span class="p">(</span><span class="o">**</span><span class="n">function_parameters</span><span class="p">))</span>
+            <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">CombinedMinimization</span><span class="p">(</span>
+            <span class="n">minimization_functions</span><span class="o">=</span><span class="n">minimization_functions</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">function_weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GPConditionalGenerator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Generate molecules given a target.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target: dictionary or JSON string describing the optimization target.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a list of molecules as SMILES string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># make sure the seed is transformed to avoid redundancy over multiple calls (using Knuth multiplicative hashing)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">*</span> <span class="mi">2654435761</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">32</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;configuring optimization for target: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># target configuration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimization_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_to_minimization_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+        <span class="c1"># optimizer configuration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_optimizer</span> <span class="o">=</span> <span class="n">GPOptimizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minimization_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">)</span>
+        <span class="n">optimization_parameters</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">dimensions</span><span class="o">=</span><span class="p">[(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">)]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span>
+            <span class="n">acq_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span><span class="p">,</span>
+            <span class="n">n_calls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_steps</span><span class="p">,</span>
+            <span class="n">n_initial_points</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_initial_points</span><span class="p">,</span>
+            <span class="n">initial_point_generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_point_generator</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;running optimization with the following parameters: </span><span class="si">{</span><span class="n">optimization_parameters</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">smiles_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;running at most </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_optimization_rounds</span><span class="si">}</span><span class="s2"> optmization rounds&quot;</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">optimization_round</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_optimization_rounds</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;starting round </span><span class="si">{</span><span class="n">optimization_round</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">optimization_parameters</span><span class="p">[</span><span class="s2">&quot;random_state&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">optimization_round</span>  <span class="c1"># type:ignore</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_optimizer</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">optimization_parameters</span><span class="p">)</span>
+            <span class="n">latent_point</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">]])</span>
+            <span class="n">smiles_set_per_round</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;starting sampling for </span><span class="si">{</span><span class="n">optimization_round</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maximum_number_of_sampling_steps</span><span class="p">):</span>
+                <span class="n">generated_smiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smiles_generator</span><span class="o">.</span><span class="n">generate_smiles</span><span class="p">(</span>
+                    <span class="n">latent_point</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+                        <span class="p">(</span>
+                            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">),</span>
+                            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_variance</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+                            <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">),</span>
+                        <span class="p">),</span>
+                        <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">smiles_set_per_round</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">generated_smiles</span><span class="p">))</span>
+            <span class="n">smiles_set</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">smiles_set_per_round</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;completing round </span><span class="si">{</span><span class="n">optimization_round</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;generated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">smiles_set</span><span class="p">)</span><span class="si">}</span><span class="s2"> molecules in the current run&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">molecule_smiles</span> <span class="k">for</span> <span class="n">molecule_smiles</span> <span class="ow">in</span> <span class="n">smiles_set</span> <span class="k">if</span> <span class="n">molecule_smiles</span><span class="p">]</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

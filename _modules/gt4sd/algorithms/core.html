@@ -1,0 +1,698 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Bases classes and core code used across multiple algorithms.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Any</span><span class="p">,</span>
+    <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">ClassVar</span><span class="p">,</span>
+    <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">Generic</span><span class="p">,</span>
+    <span class="n">Iterable</span><span class="p">,</span>
+    <span class="n">Iterator</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">Set</span><span class="p">,</span>
+    <span class="n">Type</span><span class="p">,</span>
+    <span class="n">TypeVar</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">..configuration</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GT4SDConfiguration</span><span class="p">,</span>
+    <span class="n">get_algorithm_subdirectories_in_cache</span><span class="p">,</span>
+    <span class="n">get_algorithm_subdirectories_with_s3</span><span class="p">,</span>
+    <span class="n">get_cached_algorithm_path</span><span class="p">,</span>
+    <span class="n">sync_algorithm_with_s3</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="kn">import</span> <span class="n">InvalidItem</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">,</span> <span class="n">SamplingError</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="n">gt4sd_configuration_instance</span> <span class="o">=</span> <span class="n">GT4SDConfiguration</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
+
+<span class="c1"># leave typing generic for algorithm implementation</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">)</span>  <span class="c1"># used for generated items</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>  <span class="c1"># used for target of generation</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">)</span>  <span class="c1"># used for additional context (e.g. part of target definition)</span>
+
+<span class="c1"># callable taking a target</span>
+<span class="n">Targeted</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+<span class="c1"># callable not taking any target</span>
+<span class="n">Untargeted</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+
+
+<div class="viewcode-block" id="GeneratorAlgorithm"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">GeneratorAlgorithm</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Interface for automated generation via an :class:`AlgorithmConfiguration`.&quot;&quot;&quot;</span>
+
+    <span class="n">generator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Untargeted</span><span class="p">,</span> <span class="n">Targeted</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
+
+    <span class="c1">#: The maximum amount of time we should let the algorithm run</span>
+    <span class="n">max_runtime</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_runtime</span>
+    <span class="c1">#: The maximum number of samples a user can try to run in one go</span>
+    <span class="n">max_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_number_of_samples</span>
+
+    <span class="n">generate</span><span class="p">:</span> <span class="n">Untargeted</span>
+
+<div class="viewcode-block" id="GeneratorAlgorithm.__init__"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Targeted or untargeted generation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: application specific helper that allows to setup the</span>
+<span class="sd">                generator.</span>
+<span class="sd">            target: context or condition for the generation. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;runnning </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> with configuration=</span><span class="si">{</span><span class="n">configuration</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">generator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_generator</span><span class="p">(</span><span class="n">configuration</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="s2">&quot;generate&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_untargeted_generator</span><span class="p">(</span>
+                <span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span>
+            <span class="p">),</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GeneratorAlgorithm.get_generator"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm.get_generator">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_generator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Untargeted</span><span class="p">,</span> <span class="n">Targeted</span><span class="p">[</span><span class="n">T</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Set up the detail implementation using the configuration.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This is the major method to implement in child classes, it is called</span>
+<span class="sd">            at instantiation of the GeneratorAlgorithm and must return a callable:</span>
+
+<span class="sd">            - Either :obj:`Untargeted`: the callable is taking no arguements,</span>
+<span class="sd">              and target has to be :obj:`None`.</span>
+<span class="sd">            - Or :obj:`Targeted`: the callable with the target (but not :obj:`None`).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: application specific helper that allows to setup the</span>
+<span class="sd">                generator.</span>
+<span class="sd">            target: context or condition for the generation. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            generator, the detail implementation used for generation.</span>
+<span class="sd">            If the target is None, the generator is assumed to be untargeted.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="GeneratorAlgorithm._setup_untargeted_generator"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm._setup_untargeted_generator">[docs]</a>    <span class="k">def</span> <span class="nf">_setup_untargeted_generator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
+        <span class="n">generator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Untargeted</span><span class="p">,</span> <span class="n">Targeted</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Untargeted</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Targeted or untargeted generation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: application specific helper that allows to setup the</span>
+<span class="sd">                generator.</span>
+<span class="sd">            generator: the detail implementation used for generation.</span>
+<span class="sd">                If the target is None, the generator is assumed to be untargeted.</span>
+<span class="sd">            target: context or condition for the generation. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span> <span class="o">=</span> <span class="n">configuration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generator</span> <span class="o">=</span> <span class="n">generator</span>
+
+        <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span>  <span class="c1"># type: ignore</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+
+<div class="viewcode-block" id="GeneratorAlgorithm.timeout"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm.timeout">[docs]</a>    <span class="k">def</span> <span class="nf">timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signum</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+            <span class="s2">&quot;Alarm signal received, probably because a signal.alarm timed out.&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GeneratorAlgorithm.sample"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number_of_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">S</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Generate a number of unique and valid items.</span>
+
+<span class="sd">        Filters duplicate items and iterates batches of generated items to reach</span>
+<span class="sd">        the desired number of samples, but the number of yielded items is not</span>
+<span class="sd">        guaranteed:</span>
+<span class="sd">        In case the generate method does not create new samples for</span>
+<span class="sd">        GT4SD_MAX_NUMBER_OF_STUCK_CALLS times, it will terminate the</span>
+<span class="sd">        sampling process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            number_of_items: number of items to generate.</span>
+<span class="sd">                Defaults to 100.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            SamplingError: when requesting too many items or when no items were yielded.</span>
+<span class="sd">                The later happens in case of not generating samples in a number of calls</span>
+<span class="sd">                and when taking longer than the allowed time limit.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            the items.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">number_of_items</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span><span class="p">:</span>
+            <span class="n">detail</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">number_of_items</span><span class="si">}</span><span class="s2"> is too many items to generate, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;must be under </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> samples.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">detail</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">SamplingError</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Exceeding max_samples&quot;</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">raise_if_none_sampled</span><span class="p">(</span><span class="n">items</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;If exiting early there should be at least one generated item.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                items: to check if it&#39;s empty.</span>
+<span class="sd">                detail: error message in case the exception is raised.</span>
+
+<span class="sd">            Raises:</span>
+<span class="sd">                SamplingError: using the given detail.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SamplingError</span><span class="p">(</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;No samples generated&quot;</span><span class="p">,</span>
+                    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;No samples generated.&quot;</span> <span class="o">+</span> <span class="n">detail</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="n">item_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">stuck_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">item_set_length</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_runtime</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">generated_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>  <span class="c1"># type:ignore</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">generated_items</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">item_set</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">valid_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">validate_item</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                            <span class="k">yield</span> <span class="n">valid_item</span>
+                            <span class="n">item_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span> <span class="o">==</span> <span class="n">number_of_items</span><span class="p">:</span>
+                                <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                                <span class="k">return</span>
+                        <span class="k">except</span> <span class="n">InvalidItem</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;item </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2"> could not be validated, &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;raising </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">detail</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                            <span class="k">continue</span>
+                <span class="c1"># make sure we don&#39;t keep sampling more than a given number of times,</span>
+                <span class="c1"># in case no new items are generated.</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span> <span class="o">==</span> <span class="n">item_set_length</span><span class="p">:</span>
+                    <span class="n">stuck_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">stuck_counter</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">stuck_counter</span>
+                    <span class="o">&gt;=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_number_of_stuck_calls</span>
+                <span class="p">):</span>
+                    <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;no novel samples generared for more than </span><span class="si">{</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_number_of_stuck_calls</span><span class="si">}</span><span class="s2"> cycles&quot;</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">detail</span> <span class="o">+</span> <span class="s2">&quot;, exiting&quot;</span><span class="p">)</span>
+                    <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">raise_if_none_sampled</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">item_set</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="n">item_set_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
+            <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Samples took longer than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_runtime</span><span class="si">}</span><span class="s2"> seconds to generate&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">detail</span> <span class="o">+</span> <span class="s2">&quot;, exiting&quot;</span><span class="p">)</span>
+            <span class="n">raise_if_none_sampled</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">item_set</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GeneratorAlgorithm.validate_configuration"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm.validate_configuration">[docs]</a>    <span class="k">def</span> <span class="nf">validate_configuration</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfiguration</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Overload to validate the a configuration for the algorithm.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: the algorithm configuration.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidAlgorithmConfiguration: in case the configuration for the algorithm is invalid.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the validated configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;no parameters validation&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">configuration</span></div></div>
+
+
+<div class="viewcode-block" id="AlgorithmConfiguration"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">AlgorithmConfiguration</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Algorithm parameter definitions and implementation setup.</span>
+
+<span class="sd">    The signature of this class constructor (given by the instance attributes) is used</span>
+<span class="sd">    for the REST API and needs to be serializable.</span>
+
+<span class="sd">    Child classes will add additional instance attributes to configure their respective</span>
+<span class="sd">    algorithms. This will require setting default values for all of the attributes defined</span>
+<span class="sd">    here.</span>
+<span class="sd">    However, the values for :attr:`algorithm_name` and :attr:`algorithm_application`</span>
+<span class="sd">    are set the registering decorator.</span>
+
+<span class="sd">    This strict setup has the following desired effects:</span>
+
+<span class="sd">    - Ease child implementation. For example::</span>
+
+<span class="sd">        from typing import ClassVar</span>
+
+<span class="sd">        from gt4sd.algorithms.registry import ApplicationsRegistry</span>
+<span class="sd">        from gt4sd.algorithms.core import AlgorithmConfiguration</span>
+
+<span class="sd">        @ApplicationsRegistry.register_algorithm_application(ChildOfGeneratorAlgorithm)</span>
+<span class="sd">        class ConfigurationForChildOfGeneratorAlgorithm(AlgorithmConfiguration):</span>
+<span class="sd">            algorithm_type: ClassVar[str] = &#39;generation&#39;</span>
+<span class="sd">            domain: ClassVar[str] = &#39;materials&#39;</span>
+<span class="sd">            algorithm_version: str = &#39;version3.14&#39;</span>
+<span class="sd">            actual_parameter: float = 1.61</span>
+
+<span class="sd">            # no __init__ definition required</span>
+
+
+<span class="sd">    2. Retrieve the algorithm and configuration easily (via the four class attributes)</span>
+<span class="sd">    from the :class:`ApplicationsRegistry&lt;gt4sd.algorithms.registry.ApplicationsRegistry&gt;`.</span>
+<span class="sd">    For example::</span>
+
+<span class="sd">       from gt4sd.algorithms.registry import ApplicationsRegistry</span>
+
+<span class="sd">       application = ApplicationsRegistry.get_application(</span>
+<span class="sd">            algorithm_type=&#39;generation&#39;,</span>
+<span class="sd">            domain=&#39;materials&#39;,</span>
+<span class="sd">            algorithm_name=&#39;ChildOfGeneratorAlgorithm&#39;,</span>
+<span class="sd">            algorithm_application=&#39;ConfigurationForChildOfGeneratorAlgorithm&#39;,</span>
+<span class="sd">        )</span>
+<span class="sd">        Algorithm = application.algorithm_class</span>
+<span class="sd">        Configuration = application.configuration_class</span>
+
+<span class="sd">    3. An effortless validation at instantiation via :mod:`pydantic`.</span>
+
+<span class="sd">    4. An effortless mapping to artifacts on s3, see :meth:`ensure_artifacts`.</span>
+
+<span class="sd">    Todo:</span>
+<span class="sd">        show how to register a configuration manually (in case it applies to multiple</span>
+<span class="sd">        algorithms and/or applications)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: General type of generative algorithm.</span>
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="c1">#: General application domain. Hints at input/output types.</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="c1">#: Name of the algorithm to use with this configuration.</span>
+    <span class="c1">#:</span>
+    <span class="c1">#: Will be set when registering to :class:`ApplicationsRegistry&lt;gt4sd.algorithms.registry.ApplicationsRegistry&gt;`</span>
+    <span class="n">algorithm_name</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="c1">#: Unique name for the application that is the use of this</span>
+    <span class="c1">#: configuration together with a specific algorithm.</span>
+    <span class="c1">#:</span>
+    <span class="c1">#: Will be set when registering to :class:`ApplicationsRegistry&lt;gt4sd.algorithms.registry.ApplicationsRegistry&gt;`,</span>
+    <span class="c1">#: but can be given by direct registration (See :meth:`register_algorithm_application&lt;gt4sd.algorithms.registry.ApplicationsRegistry.register_algorithm_application&gt;`)</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="c1">#: To differentiate between different versions of an application.</span>
+    <span class="c1">#:</span>
+    <span class="c1">#: There is no imposed naming convention.</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<div class="viewcode-block" id="AlgorithmConfiguration.get_target_description"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration.get_target_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            target description, returns None in case no target is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Target for generation&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Optional target for generation.&quot;</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="AlgorithmConfiguration.to_dict"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Represent the configuration as a dictionary.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            description of the configuration with parameters description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">base_configuration_fields_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">AlgorithmConfiguration</span><span class="o">.</span><span class="n">__dataclass_fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>  <span class="c1"># type:ignore</span>
+        <span class="p">)</span>
+        <span class="n">application_configuration_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">base_description</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pydantic_model__</span><span class="o">.</span><span class="n">schema</span><span class="p">()[</span>  <span class="c1"># type:ignore</span>
+            <span class="s2">&quot;properties&quot;</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_configuration_fields_set</span><span class="p">:</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                    <span class="nb">getattr</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__dataclass_fields__</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="p">{}</span>  <span class="c1"># type:ignore</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">description</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base_description</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">description</span><span class="p">:</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s2">&quot;optional&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s2">&quot;optional&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">application_configuration_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">description</span>  <span class="c1"># type:ignore</span>
+        <span class="k">return</span> <span class="n">application_configuration_dict</span></div>
+
+<div class="viewcode-block" id="AlgorithmConfiguration.validate_item"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration.validate_item">[docs]</a>    <span class="k">def</span> <span class="nf">validate_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">S</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Overload to validate an item.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            item: validate an item.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidItem: in case the item can not be validated.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            S: the validated item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># no item validation</span>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="AlgorithmConfiguration.ensure_artifacts"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration.ensure_artifacts">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_artifacts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The artifacts matching the path defined by class attributes are downloaded.</span>
+
+<span class="sd">        That is all objects under ``algorithm_type/algorithm_name/algorithm_application/algorithm_version``</span>
+<span class="sd">        in the bucket are downloaded.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the common local path of the matching artifacts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">algorithm_type</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">algorithm_name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">algorithm_application</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">local_path</span> <span class="o">=</span> <span class="n">sync_algorithm_with_s3</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;searching S3 raised </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, using local cache only.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="n">local_path</span> <span class="o">=</span> <span class="n">get_cached_algorithm_path</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">local_path</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;artifacts directory </span><span class="si">{</span><span class="n">local_path</span><span class="si">}</span><span class="s2"> does not exist locally, and syncing with s3 failed: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">local_path</span></div>
+
+<div class="viewcode-block" id="AlgorithmConfiguration.list_versions"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        S3 is searched as well as the local cache is searched for matching versions.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_type</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_name</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_application</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">versions</span> <span class="o">=</span> <span class="n">get_algorithm_subdirectories_with_s3</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;searching S3 raised </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, using local cache only.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="n">versions</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">versions</span> <span class="o">=</span> <span class="n">versions</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">get_algorithm_subdirectories_in_cache</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">versions</span></div></div>
+
+
+<div class="viewcode-block" id="get_configuration_class_with_attributes"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.get_configuration_class_with_attributes">[docs]</a><span class="k">def</span> <span class="nf">get_configuration_class_with_attributes</span><span class="p">(</span>
+    <span class="n">klass</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AlgorithmConfiguration</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">AlgorithmConfiguration</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Get AlgorithmConfiguration with set attributes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        klass: a class to be used to extract attributes from.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a class with the attributes set.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">configuration_class</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">)</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">configuration_class</span><span class="p">,</span> <span class="s2">&quot;algorithm_type&quot;</span><span class="p">,</span> <span class="n">klass</span><span class="o">.</span><span class="n">algorithm_type</span><span class="p">)</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">configuration_class</span><span class="p">,</span> <span class="s2">&quot;algorithm_name&quot;</span><span class="p">,</span> <span class="n">klass</span><span class="o">.</span><span class="n">algorithm_name</span><span class="p">)</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">configuration_class</span><span class="p">,</span> <span class="s2">&quot;algorithm_application&quot;</span><span class="p">,</span> <span class="n">klass</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">configuration_class</span><span class="p">,</span> <span class="s2">&quot;algorithm_version&quot;</span><span class="p">,</span> <span class="n">klass</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">configuration_class</span></div>
+
+
+<div class="viewcode-block" id="PropertyPredictor"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.PropertyPredictor">[docs]</a><span class="k">class</span> <span class="nc">PropertyPredictor</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">U</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;WIP&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PropertyPredictor.__init__"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.PropertyPredictor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">U</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Property predictor to investigate items.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            context: the context in which a property of an item can be</span>
+<span class="sd">                computed or checked is very application specific.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span></div>
+        <span class="c1"># or pass these with methods?</span>
+
+<div class="viewcode-block" id="PropertyPredictor.satisfies"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.PropertyPredictor.satisfies">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">satisfies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">S</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Check whether an item satisfies given requirements.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            item: the item to check.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool:</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="PropertyPredictor.compute"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.PropertyPredictor.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">S</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compute some metric/property on an item.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            item: the item to compute a metric on.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Any: the computed metric/property.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

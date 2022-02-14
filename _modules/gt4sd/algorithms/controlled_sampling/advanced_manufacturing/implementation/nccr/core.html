@@ -1,0 +1,427 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../../../" src="../../../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../../../_static/jquery.js"></script>
+        <script src="../../../../../../../_static/underscore.js"></script>
+        <script src="../../../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Catalyst design for NCCR project.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">......frameworks.granular.ml.models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GranularEncoderDecoderModel</span><span class="p">,</span>
+    <span class="n">MlpPredictor</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">......frameworks.granular.ml.module</span> <span class="kn">import</span> <span class="n">GranularModule</span>
+<span class="kn">from</span> <span class="nn">......frameworks.granular.tokenizer.tokenizer</span> <span class="kn">import</span> <span class="n">SmilesTokenizer</span>
+<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GaussianProcessRepresentationsSampler</span><span class="p">,</span>
+    <span class="n">Generator</span><span class="p">,</span>
+    <span class="n">Point</span><span class="p">,</span>
+    <span class="n">PropertyPredictor</span><span class="p">,</span>
+    <span class="n">Representation</span><span class="p">,</span>
+    <span class="n">point_to_tensor</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="CatalystVAE"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE">[docs]</a><span class="k">class</span> <span class="nc">CatalystVAE</span><span class="p">(</span><span class="n">Representation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Catalyst VAE for suzuki reactions.&quot;&quot;&quot;</span>
+
+    <span class="n">model</span><span class="p">:</span> <span class="n">GranularEncoderDecoderModel</span>
+
+<div class="viewcode-block" id="CatalystVAE.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">padding_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">127</span><span class="p">,</span>
+        <span class="n">maximum_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">primer_smiles</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Constructs a CatalystVAE.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: directory where to find models and configurations.</span>
+<span class="sd">            pading_length: size of the padded sequence. Defaults to 127.</span>
+<span class="sd">            maximum_length: maximum length of the synthesis.</span>
+<span class="sd">            primer_smiles: primer SMILES representation. Default to &quot;&quot;, a.k.a., no primer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vocabulary_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;vocab_combined.csv&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;epoch=199-step=5799.ckpt&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">SmilesTokenizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vocabulary_filepath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="n">GranularEncoderDecoderModel</span><span class="p">,</span>
+            <span class="n">GranularModule</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_filepath</span><span class="p">)</span><span class="o">.</span><span class="n">autoencoders</span><span class="p">[</span>
+                <span class="mi">0</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">padding_length</span> <span class="o">=</span> <span class="n">padding_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">latent_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maximum_length</span> <span class="o">=</span> <span class="n">maximum_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">primer_smiles</span> <span class="o">=</span> <span class="n">primer_smiles</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">primer_smiles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">primer_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smiles_to_latent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">primer_smiles</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">primer_point</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_dimension</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">sos_token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">unk_token</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="CatalystVAE.smiles_to_latent"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE.smiles_to_latent">[docs]</a>    <span class="k">def</span> <span class="nf">smiles_to_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Encode a SMILES into a latent point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            smiles: a SMILES representation of a molecule.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the encoded latent space point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>  <span class="c1"># type:ignore</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">add_padding_tokens</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_tokens_to_ids</span><span class="p">(</span>
+                            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">sos_token</span><span class="p">]</span>
+                            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token</span><span class="p">]</span>
+                        <span class="p">),</span>
+                        <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">padding_length</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="CatalystVAE.decode"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Decode a catalyst from the latent space.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            z: a latent space point.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a catalyst in SMILES format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">point_to_tensor</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">reconstructed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">maximum_length</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span>
+            <span class="mi">0</span>
+        <span class="p">]</span>  <span class="c1"># type:ignore</span>
+        <span class="n">reconstructed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_regex</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">reconstructed</span><span class="p">)</span>
+        <span class="n">match_ending</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">reconstructed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match_ending</span><span class="p">:</span>
+            <span class="n">reconstructed</span> <span class="o">=</span> <span class="n">reconstructed</span><span class="p">[:</span> <span class="n">match_ending</span><span class="o">.</span><span class="n">start</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">reconstructed</span></div></div>
+
+
+<div class="viewcode-block" id="CatalystBindingEnergyPredictor"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor">[docs]</a><span class="k">class</span> <span class="nc">CatalystBindingEnergyPredictor</span><span class="p">(</span><span class="n">PropertyPredictor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Catalyst binding energy predictor for suzuki reactions.&quot;&quot;&quot;</span>
+
+    <span class="n">model</span><span class="p">:</span> <span class="n">MlpPredictor</span>
+
+<div class="viewcode-block" id="CatalystBindingEnergyPredictor.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Constructs a CatalystBindingEnergyPredictor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: directory where to find models and configurations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vocabulary_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;vocab_combined.csv&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;epoch=199-step=5799.ckpt&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">SmilesTokenizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vocabulary_filepath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="n">MlpPredictor</span><span class="p">,</span>
+            <span class="n">GranularModule</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_filepath</span><span class="p">)</span><span class="o">.</span><span class="n">latent_models</span><span class="p">[</span>
+                <span class="mi">0</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CatalystBindingEnergyPredictor.__call__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Predict binding energy.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            z: a latent space point.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the predicted binding energy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">point_to_tensor</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">z</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="CatalystGenerator"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystGenerator">[docs]</a><span class="k">class</span> <span class="nc">CatalystGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Catalyst generator.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CatalystGenerator.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">generated_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">number_of_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">number_of_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">primer_smiles</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs catalyst generator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resource_path: directory where to find models and configurations.</span>
+<span class="sd">            generated_length: maximum lenght of the generated molecule. Defaults to 100.</span>
+<span class="sd">            number_of_points: number of optimal points to return. Defaults to 10.</span>
+<span class="sd">            number_of_steps: number of optimization steps. Defaults to 50.</span>
+<span class="sd">            primer_smiles: primer SMILES representation. Default to &quot;&quot;, a.k.a., no primer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span> <span class="o">=</span> <span class="n">resources_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generated_length</span> <span class="o">=</span> <span class="n">generated_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_points</span> <span class="o">=</span> <span class="n">number_of_points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_steps</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_points</span><span class="p">,</span> <span class="n">number_of_steps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">primer_smiles</span> <span class="o">=</span> <span class="n">primer_smiles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vae</span> <span class="o">=</span> <span class="n">CatalystVAE</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="p">,</span>
+            <span class="n">maximum_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">generated_length</span><span class="p">,</span>
+            <span class="n">primer_smiles</span><span class="o">=</span><span class="n">primer_smiles</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span> <span class="o">=</span> <span class="n">CatalystBindingEnergyPredictor</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimum_latent_coordinate</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maximum_latent_coordinate</span> <span class="o">=</span> <span class="mf">100.0</span></div>
+
+<div class="viewcode-block" id="CatalystGenerator.generate_samples"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystGenerator.generate_samples">[docs]</a>    <span class="k">def</span> <span class="nf">generate_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_energy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Generate samples given a target energy.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target_energy: target energy value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            catalysts sampled for the target value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_energy</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;target energy (</span><span class="si">{</span><span class="n">target_energy</span><span class="si">}</span><span class="s2">) passed as string, casting to float&quot;</span>
+            <span class="p">)</span>
+            <span class="n">target_energy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">target_energy</span><span class="p">)</span>
+        <span class="n">sampler</span> <span class="o">=</span> <span class="n">GaussianProcessRepresentationsSampler</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="n">target_energy</span><span class="p">},</span>
+            <span class="n">property_predictors</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="p">},</span>
+            <span class="n">representations</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">vae</span><span class="p">},</span>
+            <span class="n">bounds</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">minimum_latent_coordinate</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">maximum_latent_coordinate</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;smiles&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">sampler</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span>
+                <span class="n">number_of_points</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_points</span><span class="p">,</span>
+                <span class="n">number_of_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_steps</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">]</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

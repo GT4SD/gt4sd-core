@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.training_pipelines &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.training_pipelines</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.training_pipelines</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module initialization for gt4sd traning pipelines.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+
+<span class="kn">from</span> <span class="nn">..cli.load_arguments_from_dataclass</span> <span class="kn">import</span> <span class="n">extract_fields_from_class</span>
+<span class="kn">from</span> <span class="nn">.paccmann.core</span> <span class="kn">import</span> <span class="n">PaccMannDataArguments</span><span class="p">,</span> <span class="n">PaccMannTrainingArguments</span>
+<span class="kn">from</span> <span class="nn">.paccmann.vae.core</span> <span class="kn">import</span> <span class="n">PaccMannVAEModelArguments</span><span class="p">,</span> <span class="n">PaccMannVAETrainingPipeline</span>
+<span class="kn">from</span> <span class="nn">.pytorch_lightning.core</span> <span class="kn">import</span> <span class="n">PytorchLightningTrainingArguments</span>
+<span class="kn">from</span> <span class="nn">.pytorch_lightning.granular.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GranularDataArguments</span><span class="p">,</span>
+    <span class="n">GranularModelArguments</span><span class="p">,</span>
+    <span class="n">GranularTrainingPipeline</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.pytorch_lightning.language_modeling.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LanguageModelingDataArguments</span><span class="p">,</span>
+    <span class="n">LanguageModelingModelArguments</span><span class="p">,</span>
+    <span class="n">LanguageModelingTrainingPipeline</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="n">TRAINING_PIPELINE_NAME_METADATA_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mock_training_pipeline&quot;</span><span class="p">:</span> <span class="s2">&quot;mock_training_pipeline.json&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Terminator training&quot;</span><span class="p">:</span> <span class="s2">&quot;terminator_training.json&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">TRAINING_PIPELINE_ARGUMENTS_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;language-modeling-trainer&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">PytorchLightningTrainingArguments</span><span class="p">,</span>
+        <span class="n">LanguageModelingDataArguments</span><span class="p">,</span>
+        <span class="n">LanguageModelingModelArguments</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;paccmann-vae-trainer&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">PaccMannTrainingArguments</span><span class="p">,</span>
+        <span class="n">PaccMannDataArguments</span><span class="p">,</span>
+        <span class="n">PaccMannVAEModelArguments</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;granular-trainer&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">PytorchLightningTrainingArguments</span><span class="p">,</span>
+        <span class="n">GranularDataArguments</span><span class="p">,</span>
+        <span class="n">GranularModelArguments</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">TRAINING_PIPELINE_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;language-modeling-trainer&quot;</span><span class="p">:</span> <span class="n">LanguageModelingTrainingPipeline</span><span class="p">,</span>
+    <span class="s2">&quot;paccmann-vae-trainer&quot;</span><span class="p">:</span> <span class="n">PaccMannVAETrainingPipeline</span><span class="p">,</span>
+    <span class="s2">&quot;granular-trainer&quot;</span><span class="p">:</span> <span class="n">GranularTrainingPipeline</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="training_pipeline_name_to_metadata"><a class="viewcode-back" href="../../api/gt4sd.training_pipelines.html#gt4sd.training_pipelines.training_pipeline_name_to_metadata">[docs]</a><span class="k">def</span> <span class="nf">training_pipeline_name_to_metadata</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Retrieve training pipeline metadata from the name.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name: name of the pipeline.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dictionary describing the parameters of the pipeline. If the pipeline is not found, no metadata (a.k.a., an empty dictionary is returned).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;training_pipeline&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">TRAINING_PIPELINE_NAME_METADATA_MAPPING</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+                <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
+                    <span class="s2">&quot;gt4sd&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;training_pipelines/</span><span class="si">{</span><span class="n">TRAINING_PIPELINE_NAME_METADATA_MAPPING</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;rt&quot;</span><span class="p">,</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;training pipeline &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot; metadata fetching failed, returning an empty metadata dictionary&#39;</span>
+            <span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">TRAINING_PIPELINE_ARGUMENTS_MAPPING</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">training_argument_class</span> <span class="ow">in</span> <span class="n">TRAINING_PIPELINE_ARGUMENTS_MAPPING</span><span class="p">[</span><span class="n">name</span><span class="p">]:</span>
+            <span class="n">field_types</span> <span class="o">=</span> <span class="n">extract_fields_from_class</span><span class="p">(</span><span class="n">training_argument_class</span><span class="p">)</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">field_types</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;training pipeline &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot; metadata not found, returning an empty metadata dictionary&#39;</span>
+        <span class="p">)</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;A training pipeline.&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">metadata</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

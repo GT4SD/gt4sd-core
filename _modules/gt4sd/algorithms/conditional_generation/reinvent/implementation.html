@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.conditional_generation.reinvent.implementation &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.conditional_generation.reinvent.implementation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.conditional_generation.reinvent.implementation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implementation of Reinvent conditional generators.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span> <span class="nn">reinvent_models.lib_invent.models.model</span> <span class="kn">import</span> <span class="n">DecoratorModel</span>
+
+<span class="kn">from</span> <span class="nn">.reinvent_core.core</span> <span class="kn">import</span> <span class="n">ReinventBase</span><span class="p">,</span> <span class="n">SampledSequencesDTO</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="SampledTuple"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.SampledTuple">[docs]</a><span class="k">class</span> <span class="nc">SampledTuple</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">scaffold</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">decoration</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">nll</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+<div class="viewcode-block" id="ReinventConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator">[docs]</a><span class="k">class</span> <span class="nc">ReinventConditionalGenerator</span><span class="p">(</span><span class="n">ReinventBase</span><span class="p">):</span>
+<div class="viewcode-block" id="ReinventConditionalGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">randomize</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">sample_uniquely</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize Reinvent.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: path where to load hypothesis, candidate labels and, optionally, the model.</span>
+<span class="sd">            batch_size: number of samples to generate per scaffold</span>
+<span class="sd">            randomize: randomize the scaffolds if set to true</span>
+<span class="sd">            sample_uniquely: generate unique sample sequences if set to true</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span> <span class="o">=</span> <span class="n">resources_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">randomize</span> <span class="o">=</span> <span class="n">randomize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_uniquely</span> <span class="o">=</span> <span class="n">sample_uniquely</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;model.prior&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;reinvent model files does not exist locally&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;artifacts file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="si">}</span><span class="s2"> does not exist locally&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">DecoratorModel</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">randomize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_uniquely</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReinventConditionalGenerator.sample_unique_sequences"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.sample_unique_sequences">[docs]</a>    <span class="k">def</span> <span class="nf">sample_unique_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampled_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Samples the model for the given number of SMILES.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scaffold_list: A list of SampledTuple.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of SampledTuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">SampledSequencesDTO</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span> <span class="n">decoration</span><span class="p">,</span> <span class="n">nll</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">scaffold</span><span class="p">,</span> <span class="n">decoration</span><span class="p">,</span> <span class="n">nll</span> <span class="ow">in</span> <span class="n">sampled_sequences</span>
+        <span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;getting unique sample sequences from generated samples&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">scaffold</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">decoration</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">nll</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_unique_sequences</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="ReinventConditionalGenerator.generate_sampled_tuples"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.generate_sampled_tuples">[docs]</a>    <span class="k">def</span> <span class="nf">generate_sampled_tuples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scaffold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">SampledTuple</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Samples the model for the given number of SMILES.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            scaffold_list: A list of scaffold SMILES.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A Set of SampledTuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">!=</span> <span class="n">scaffold</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">scaffold</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dataloader</span><span class="p">([</span><span class="n">scaffold</span><span class="p">])))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;initialization of the dataloader&quot;</span><span class="p">)</span>
+            <span class="n">scaffold_seqs</span><span class="p">,</span> <span class="n">scaffold_seq_lengths</span> <span class="o">=</span> <span class="n">batch</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scaffold_seqs</span> <span class="o">=</span> <span class="n">scaffold_seqs</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scaffold_seqs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scaffold_seq_lengths</span> <span class="o">=</span> <span class="n">scaffold_seq_lengths</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;started generating samples with an nll score value&quot;</span><span class="p">)</span>
+        <span class="n">sampled_sequences</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sample_decorations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaffold_seqs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaffold_seq_lengths</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_uniquely</span><span class="p">:</span>
+            <span class="n">sampled_sequences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_unique_sequences</span><span class="p">(</span><span class="n">sampled_sequences</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">SampledTuple</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span> <span class="n">decoration</span><span class="p">,</span> <span class="n">nll</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">scaffold</span><span class="p">,</span> <span class="n">decoration</span><span class="p">,</span> <span class="n">nll</span> <span class="ow">in</span> <span class="n">sampled_sequences</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReinventConditionalGenerator.generate_samples"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.generate_samples">[docs]</a>    <span class="k">def</span> <span class="nf">generate_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scaffold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Samples the model for the given number of SMILES.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scaffold: A scaffold SMILES.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A Set of SMILES representing molecules.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">molecule</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">molecule</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_sampled_tuples</span><span class="p">(</span><span class="n">scaffold</span><span class="p">)]</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

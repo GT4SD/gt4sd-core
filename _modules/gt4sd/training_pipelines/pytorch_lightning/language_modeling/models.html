@@ -1,0 +1,478 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.training_pipelines.pytorch_lightning.language_modeling.models &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../training_pipelines.html">gt4sd.training_pipelines</a> &raquo;</li>
+        
+      <li>gt4sd.training_pipelines.pytorch_lightning.language_modeling.models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.training_pipelines.pytorch_lightning.language_modeling.models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Model for Language Modeling.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AutoConfig</span><span class="p">,</span>
+    <span class="n">AutoModel</span><span class="p">,</span>
+    <span class="n">AutoModelForCausalLM</span><span class="p">,</span>
+    <span class="n">AutoModelForMaskedLM</span><span class="p">,</span>
+    <span class="n">AutoTokenizer</span><span class="p">,</span>
+    <span class="n">BartConfig</span><span class="p">,</span>
+    <span class="n">BartForConditionalGeneration</span><span class="p">,</span>
+    <span class="n">T5Config</span><span class="p">,</span>
+    <span class="n">T5ForConditionalGeneration</span><span class="p">,</span>
+    <span class="n">XLNetLMHeadModel</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="LMModule"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule">[docs]</a><span class="k">class</span> <span class="nc">LMModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pytorch lightning model for LM training.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LMModule.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Construct an LM lightning module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_args: model&#39;s arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span> <span class="o">=</span> <span class="n">model_args</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span> <span class="n">AutoModel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">:</span> <span class="n">AutoTokenizer</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s2">&quot;cache_dir&quot;</span> <span class="ow">in</span> <span class="n">model_args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">=</span> <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_model</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LMModule.init_model"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.init_model">[docs]</a>    <span class="k">def</span> <span class="nf">init_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize an AutoModel.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">],</span>
+                <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training from scratch&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LMModule.forward"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+        <span class="sd">&quot;&quot;&quot;Forward pass on Transformer model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: tensor of shape (batch_size, seq_length) containing the input_ids.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            logits of the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">logits</span>  <span class="c1"># type:ignore</span></div>
+
+<div class="viewcode-block" id="LMModule.configure_optimizers"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Create and return the optimizer.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            output (dict of str: Any):</span>
+<span class="sd">                - optimizer: the optimizer used to update the parameter.</span>
+<span class="sd">                - ls_scheduler: the scheduler used to reduce the learning rate in every epoch.</span>
+<span class="sd">                - monitor: the metric that the scheduler will track over the training.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;lr&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Learning rate should be float&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;lr_decay&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Learning rate decay rate should be float&quot;</span><span class="p">)</span>
+
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;lr&quot;</span><span class="p">])</span>
+
+        <span class="n">scheduler</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;lr_decay&quot;</span><span class="p">])</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="p">,</span>
+            <span class="s2">&quot;lr_scheduler&quot;</span><span class="p">:</span> <span class="n">scheduler</span><span class="p">,</span>
+            <span class="s2">&quot;monitor&quot;</span><span class="p">:</span> <span class="s2">&quot;val_loss&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="LMModule.training_step"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Training step which encompasses the forward pass and the computation of the loss value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch: dictionary containing the input_ids and optionally the token_type_ids and the attention_type.</span>
+<span class="sd">            batch_idx: index of the current batch, unused.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            loss computed on the batch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">batch</span><span class="p">)</span><span class="o">.</span><span class="n">loss</span>  <span class="c1"># type:ignore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;train_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss</span></div>
+
+<div class="viewcode-block" id="LMModule.validation_step"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validation step which encompasses the forward pass and the computation of the loss value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch: dictionary containing the input_ids and optionally the token_type_ids and the attention_type.</span>
+<span class="sd">            batch_idx: index of the current batch, unused.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            loss computed on the batch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">batch</span><span class="p">)</span><span class="o">.</span><span class="n">loss</span>  <span class="c1"># type:ignore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss</span></div></div>
+
+
+<div class="viewcode-block" id="MLMModule"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule">[docs]</a><span class="k">class</span> <span class="nc">MLMModule</span><span class="p">(</span><span class="n">LMModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pytorch lightning model for MLM training.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MLMModule.init_model"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.init_model">[docs]</a>    <span class="k">def</span> <span class="nf">init_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a MLM model.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForMaskedLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForMaskedLM</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training from scratch&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;tokenizer&quot;</span><span class="p">],</span> <span class="n">use_fast</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">))</span>  <span class="c1"># type: ignore</span></div></div>
+
+
+<div class="viewcode-block" id="CGMModule"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule">[docs]</a><span class="k">class</span> <span class="nc">CGMModule</span><span class="p">(</span><span class="n">LMModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pytorch lightning model for conditional generation training.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CGMModule.init_model"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.init_model">[docs]</a>    <span class="k">def</span> <span class="nf">init_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a model for conditional generation.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;t5&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">]:</span>  <span class="c1"># type:ignore</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">T5ForConditionalGeneration</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">],</span>  <span class="c1"># type:ignore</span>
+                    <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;bart&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">]:</span>  <span class="c1"># type:ignore</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">BartForConditionalGeneration</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">],</span>  <span class="c1"># type:ignore</span>
+                    <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s1">&#39;model_name_or_path&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> is not supported for conditional generation training.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;t5&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">]:</span>
+                <span class="n">config</span> <span class="o">=</span> <span class="n">T5Config</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
+                <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">T5ForConditionalGeneration</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;bart&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">]:</span>
+                <span class="n">config</span> <span class="o">=</span> <span class="n">BartConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
+                <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">BartForConditionalGeneration</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s1">&#39;model_name_or_path&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> is not supported for conditional generation training.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training from scratch&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;tokenizer&quot;</span><span class="p">],</span> <span class="n">use_fast</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">))</span>  <span class="c1"># type: ignore</span></div></div>
+
+
+<div class="viewcode-block" id="CLMModule"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule">[docs]</a><span class="k">class</span> <span class="nc">CLMModule</span><span class="p">(</span><span class="n">LMModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pytorch lightning model for CLM training.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CLMModule.init_model"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.init_model">[docs]</a>    <span class="k">def</span> <span class="nf">init_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a CLM model.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training from scratch&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;tokenizer&quot;</span><span class="p">],</span>
+            <span class="n">sep_token</span><span class="o">=</span><span class="s2">&quot;&lt;|sep|&gt;&quot;</span><span class="p">,</span>
+            <span class="n">pad_token</span><span class="o">=</span><span class="s2">&quot;&lt;|pad|&gt;&quot;</span><span class="p">,</span>
+            <span class="n">use_fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">))</span>  <span class="c1"># type: ignore</span></div></div>
+
+
+<div class="viewcode-block" id="PLMModule"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule">[docs]</a><span class="k">class</span> <span class="nc">PLMModule</span><span class="p">(</span><span class="n">LMModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pytorch lightning model for PLM training.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PLMModule.init_model"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.init_model">[docs]</a>    <span class="k">def</span> <span class="nf">init_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a PLM model. &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">XLNetLMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">],</span>  <span class="c1"># type:ignore</span>
+                <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">XLNetLMHeadModel</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training from scratch&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;tokenizer&quot;</span><span class="p">],</span> <span class="n">use_fast</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">))</span>  <span class="c1"># type: ignore</span></div></div>
+
+
+<span class="n">LM_MODULE_FACTORY</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">LMModule</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;lm&quot;</span><span class="p">:</span> <span class="n">LMModule</span><span class="p">,</span>
+    <span class="s2">&quot;mlm&quot;</span><span class="p">:</span> <span class="n">MLMModule</span><span class="p">,</span>
+    <span class="s2">&quot;clm&quot;</span><span class="p">:</span> <span class="n">CLMModule</span><span class="p">,</span>
+    <span class="s2">&quot;plm&quot;</span><span class="p">:</span> <span class="n">PLMModule</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

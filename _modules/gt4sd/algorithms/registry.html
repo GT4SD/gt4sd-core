@@ -1,0 +1,553 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.registry &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.registry</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.registry</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Collection of available methods.&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span> <span class="k">as</span> <span class="n">vanilla_dataclass</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">make_dataclass</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">WRAPPER_ASSIGNMENTS</span><span class="p">,</span> <span class="n">update_wrapper</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="kn">import</span> <span class="nn">pydantic</span>
+
+<span class="c1"># pyright (pylance in VSCode) does not support pydantic typechecking</span>
+<span class="c1"># if typing.TYPE_CHECKING:</span>
+<span class="c1">#     from dataclasses import dataclass</span>
+<span class="c1"># else:</span>
+<span class="c1">#     from pydantic.dataclasses import dataclass</span>
+<span class="kn">from</span> <span class="nn">pydantic.dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="kn">import</span> <span class="n">DuplicateApplicationRegistration</span>
+<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">GeneratorAlgorithm</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="ConfigurationTuple"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ConfigurationTuple">[docs]</a><span class="k">class</span> <span class="nc">ConfigurationTuple</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Attributes to uniquely describe an AlgorithmConfiguration.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+<div class="viewcode-block" id="AnnotationTuple"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.AnnotationTuple">[docs]</a><span class="k">class</span> <span class="nc">AnnotationTuple</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">annotation</span><span class="p">:</span> <span class="nb">type</span>
+    <span class="n">default_value</span><span class="p">:</span> <span class="n">Any</span>  <span class="c1"># TODO serializable type?</span></div>
+
+
+<div class="viewcode-block" id="AlgorithmApplication"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.AlgorithmApplication">[docs]</a><span class="nd">@vanilla_dataclass</span>
+<span class="k">class</span> <span class="nc">AlgorithmApplication</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Collect all needed to run an application.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">GeneratorAlgorithm</span><span class="p">]</span>
+    <span class="n">configuration_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AlgorithmConfiguration</span><span class="p">]</span>
+    <span class="n">parameters_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">AnnotationTuple</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+    <span class="c1"># includes algorithm_version: str</span>
+
+
+<div class="viewcode-block" id="RegistryDict"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.RegistryDict">[docs]</a><span class="k">class</span> <span class="nc">RegistryDict</span><span class="p">(</span><span class="n">Dict</span><span class="p">[</span><span class="n">ConfigurationTuple</span><span class="p">,</span> <span class="n">AlgorithmApplication</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Dict that raises when reassigning an existing key.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RegistryDict.__setitem__"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.RegistryDict.__setitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DuplicateApplicationRegistration</span><span class="p">(</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Applications exists&quot;</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;key </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> was already registered and would override another application.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># if it&#39;s really needed for some reason, delete the item first, then add it.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ApplicationsRegistry"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ApplicationsRegistry">[docs]</a><span class="k">class</span> <span class="nc">ApplicationsRegistry</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Registry to collect &quot;applications&quot; and make them accessible.</span>
+
+<span class="sd">    An application denotes the combination of an</span>
+<span class="sd">    :class:`AlgorithmConfiguration&lt;gt4sd.algorithms.core.AlgorithmConfiguration&gt;` and a</span>
+<span class="sd">    :class:`GeneratorAlgorithm&lt;gt4sd.algorithms.core.GeneratorAlgorithm&gt;`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># NOTE on import of registy also ensure import of modules to populate applications</span>
+    <span class="n">applications</span><span class="p">:</span> <span class="n">RegistryDict</span> <span class="o">=</span> <span class="n">RegistryDict</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ApplicationsRegistry._register_application"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ApplicationsRegistry._register_application">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_register_application</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">algorithm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">GeneratorAlgorithm</span><span class="p">],</span>
+        <span class="n">algorithm_configuration_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AlgorithmConfiguration</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="c1"># testing that configuration class is callable without arguments</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">algorithm_configuration_class</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">config_tuple</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">configuration_class_as_tuple</span><span class="p">(</span><span class="n">algorithm_configuration_class</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">applications</span><span class="p">[</span><span class="n">config_tuple</span><span class="p">]</span> <span class="o">=</span> <span class="n">AlgorithmApplication</span><span class="p">(</span>
+            <span class="n">algorithm_class</span><span class="o">=</span><span class="n">algorithm_class</span><span class="p">,</span>
+            <span class="n">configuration_class</span><span class="o">=</span><span class="n">algorithm_configuration_class</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ApplicationsRegistry.register_algorithm_application"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ApplicationsRegistry.register_algorithm_application">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">register_algorithm_application</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">algorithm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">GeneratorAlgorithm</span><span class="p">],</span>
+        <span class="n">as_algorithm_application</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Type</span><span class="p">[</span><span class="n">AlgorithmConfiguration</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">AlgorithmConfiguration</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Complete and register a configuration via decoration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            algorithm_class: The algorithm that uses the configuration.</span>
+<span class="sd">            as_algorithm_application: Optional application name to use instead of</span>
+<span class="sd">                the configurations class name.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A function to complete the configuration class&#39; attributes to reflect</span>
+<span class="sd">            the matching GeneratorAlgorithm and application. The final class is</span>
+<span class="sd">            registered and returned.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            as decorator::</span>
+
+<span class="sd">                from gt4sd.algorithms.registry import ApplicationsRegistry</span>
+
+
+<span class="sd">                @ApplicationsRegistry.register_algorithm_application(SomeAlgorithm)</span>
+<span class="sd">                class SomeApplication(AlgorithmConfiguration):</span>
+<span class="sd">                    algorithm_type: ClassVar[str] = &#39;conditional_generation&#39;</span>
+<span class="sd">                    domain: ClassVar[str] = &#39;materials&#39;</span>
+<span class="sd">                    algorithm_version: str = &#39;v0&#39;</span>
+
+<span class="sd">                    some_more_serializable_arguments_with_defaults: int = 42</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            directly, here for an additional algorithm application with the same</span>
+<span class="sd">            algorithm::</span>
+
+<span class="sd">                AnotherApplication = ApplicationsRegistry.register_algorithm_application(</span>
+<span class="sd">                    SomeAlgorithm, &#39;AnotherApplication&#39;</span>
+<span class="sd">                )(SomeApplication)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span>
+            <span class="n">configuration_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AlgorithmConfiguration</span><span class="p">],</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">AlgorithmConfiguration</span><span class="p">]:</span>
+            <span class="sd">&quot;&quot;&quot;Complete the configuration class&#39; attributes and register the class.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                configuration_class: class to complete.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                a completed class.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">VanillaConfiguration</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span>
+                <span class="n">cls_name</span><span class="o">=</span><span class="n">configuration_class</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="c1"># call `@dataclass` for users to avoid confusion</span>
+                <span class="n">bases</span><span class="o">=</span><span class="p">(</span><span class="n">vanilla_dataclass</span><span class="p">(</span><span class="n">configuration_class</span><span class="p">),),</span>
+                <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+                    <span class="p">(</span>
+                        <span class="s2">&quot;algorithm_name&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                        <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                        <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">algorithm_class</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>  <span class="c1"># type: ignore</span>
+                    <span class="p">),</span>
+                    <span class="p">(</span>
+                        <span class="s2">&quot;algorithm_application&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                        <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                        <span class="n">field</span><span class="p">(</span>
+                            <span class="n">default</span><span class="o">=</span><span class="p">(</span>
+                                <span class="n">as_algorithm_application</span> <span class="ow">or</span> <span class="n">configuration_class</span><span class="o">.</span><span class="vm">__name__</span>  <span class="c1"># type: ignore</span>
+                            <span class="p">)</span>
+                        <span class="p">),</span>
+                    <span class="p">),</span>
+                <span class="p">],</span>  <span class="c1"># type: ignore</span>
+            <span class="p">)</span>
+
+            <span class="n">PydanticConfiguration</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AlgorithmConfiguration</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataclass</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+                <span class="n">VanillaConfiguration</span>
+            <span class="p">)</span>
+            <span class="c1"># get missing entries</span>
+            <span class="n">missing_in__dict__</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">key</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">configuration_class</span><span class="o">.</span><span class="vm">__dict__</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PydanticConfiguration</span><span class="o">.</span><span class="vm">__dict__</span>
+            <span class="p">]</span>
+
+            <span class="n">update_wrapper</span><span class="p">(</span>
+                <span class="n">wrapper</span><span class="o">=</span><span class="n">PydanticConfiguration</span><span class="p">,</span>
+                <span class="n">wrapped</span><span class="o">=</span><span class="n">configuration_class</span><span class="p">,</span>
+                <span class="n">assigned</span><span class="o">=</span><span class="n">missing_in__dict__</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">WRAPPER_ASSIGNMENTS</span><span class="p">),</span>
+                <span class="n">updated</span><span class="o">=</span><span class="p">(),</span>  <span class="c1"># default of &#39;__dict__&#39; does not apply here, see missing_in__dict__</span>
+            <span class="p">)</span>
+
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_register_application</span><span class="p">(</span><span class="n">algorithm_class</span><span class="p">,</span> <span class="n">PydanticConfiguration</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">PydanticConfiguration</span>
+
+        <span class="k">return</span> <span class="n">decorator</span></div>
+
+<div class="viewcode-block" id="ApplicationsRegistry.configuration_class_as_tuple"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ApplicationsRegistry.configuration_class_as_tuple">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">configuration_class_as_tuple</span><span class="p">(</span>
+        <span class="n">algorithm_configuration_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AlgorithmConfiguration</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ConfigurationTuple&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get a hashable identifier per application.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ConfigurationTuple</span><span class="p">(</span>
+            <span class="n">algorithm_type</span><span class="o">=</span><span class="n">algorithm_configuration_class</span><span class="o">.</span><span class="n">algorithm_type</span><span class="p">,</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">algorithm_configuration_class</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">algorithm_name</span><span class="o">=</span><span class="n">algorithm_configuration_class</span><span class="o">.</span><span class="n">algorithm_name</span><span class="p">,</span>
+            <span class="n">algorithm_application</span><span class="o">=</span><span class="n">algorithm_configuration_class</span><span class="o">.</span><span class="n">algorithm_application</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ApplicationsRegistry.get_application"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ApplicationsRegistry.get_application">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_application</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">algorithm_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmApplication</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">applications</span><span class="p">[</span>
+            <span class="n">ConfigurationTuple</span><span class="p">(</span>
+                <span class="n">algorithm_type</span><span class="o">=</span><span class="n">algorithm_type</span><span class="p">,</span>
+                <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+                <span class="n">algorithm_name</span><span class="o">=</span><span class="n">algorithm_name</span><span class="p">,</span>
+                <span class="n">algorithm_application</span><span class="o">=</span><span class="n">algorithm_application</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="ApplicationsRegistry.get_matching_configuration_defaults"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ApplicationsRegistry.get_matching_configuration_defaults">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_matching_configuration_defaults</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">algorithm_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">AnnotationTuple</span><span class="p">]:</span>
+        <span class="n">Configuration</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_application</span><span class="p">(</span>
+            <span class="n">algorithm_type</span><span class="o">=</span><span class="n">algorithm_type</span><span class="p">,</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">algorithm_name</span><span class="o">=</span><span class="n">algorithm_name</span><span class="p">,</span>
+            <span class="n">algorithm_application</span><span class="o">=</span><span class="n">algorithm_application</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">configuration_class</span>
+
+        <span class="n">defaults_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="p">(</span>
+            <span class="n">argument</span><span class="p">,</span>
+            <span class="n">default_value</span><span class="p">,</span>
+        <span class="p">)</span> <span class="ow">in</span> <span class="n">Configuration</span><span class="p">()</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">defaults_dict</span><span class="p">[</span><span class="n">argument</span><span class="p">]</span> <span class="o">=</span> <span class="n">AnnotationTuple</span><span class="p">(</span>
+                <span class="n">annotation</span><span class="o">=</span><span class="n">Configuration</span><span class="o">.</span><span class="vm">__annotations__</span><span class="p">[</span><span class="n">argument</span><span class="p">],</span>
+                <span class="n">default_value</span><span class="o">=</span><span class="n">default_value</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">defaults_dict</span></div>
+
+<div class="viewcode-block" id="ApplicationsRegistry.get_matching_configuration_schema"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ApplicationsRegistry.get_matching_configuration_schema">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_matching_configuration_schema</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">algorithm_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">Configuration</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_application</span><span class="p">(</span>
+            <span class="n">algorithm_type</span><span class="o">=</span><span class="n">algorithm_type</span><span class="p">,</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">algorithm_name</span><span class="o">=</span><span class="n">algorithm_name</span><span class="p">,</span>
+            <span class="n">algorithm_application</span><span class="o">=</span><span class="n">algorithm_application</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">configuration_class</span>
+        <span class="k">return</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">__pydantic_model__</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span>  <span class="c1"># type: ignore</span></div>
+
+<div class="viewcode-block" id="ApplicationsRegistry.get_configuration_instance"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ApplicationsRegistry.get_configuration_instance">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_configuration_instance</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">algorithm_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfiguration</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create an instance of the matching AlgorithmConfiguration from the ApplicationsRegistry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            algorithm_type: general type of generative algorithm.</span>
+<span class="sd">            domain:  general application domain. Hints at input/output types.</span>
+<span class="sd">            algorithm_name: name of the algorithm to use with this configuration.</span>
+<span class="sd">            algorithm_application: unique name for the application that is the use of this</span>
+<span class="sd">                configuration together with a specific algorithm.</span>
+<span class="sd">            algorithm_version: to differentiate between different versions of an application.</span>
+<span class="sd">            *args: additional positional arguments passed to the configuration.</span>
+<span class="sd">            **kwargs: additional keyword arguments passed to the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            an instance of the configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Configuration</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_application</span><span class="p">(</span>
+            <span class="n">algorithm_type</span><span class="o">=</span><span class="n">algorithm_type</span><span class="p">,</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">algorithm_name</span><span class="o">=</span><span class="n">algorithm_name</span><span class="p">,</span>
+            <span class="n">algorithm_application</span><span class="o">=</span><span class="n">algorithm_application</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">configuration_class</span>
+        <span class="k">return</span> <span class="n">Configuration</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ApplicationsRegistry.get_application_instance"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ApplicationsRegistry.get_application_instance">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_application_instance</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">algorithm_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeneratorAlgorithm</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate an algorithm via a matching application from the ApplicationsRegistry.</span>
+
+<span class="sd">        Additional arguments are passed to the configuration and override any arguments</span>
+<span class="sd">        in the ApplicationsRegistry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            algorithm_type: general type of generative algorithm.</span>
+<span class="sd">            domain:  general application domain. Hints at input/output types.</span>
+<span class="sd">            algorithm_name: name of the algorithm to use with this configuration.</span>
+<span class="sd">            algorithm_application: unique name for the application that is the use of this</span>
+<span class="sd">                configuration together with a specific algorithm.</span>
+<span class="sd">            algorithm_version: to differentiate between different versions of an application.</span>
+<span class="sd">            target: optional context or condition for the generation.</span>
+<span class="sd">            **kwargs: additional keyword arguments passed to the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            an instance of a generative algorithm ready to sample from.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">application_tuple</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_application</span><span class="p">(</span>
+            <span class="n">algorithm_type</span><span class="o">=</span><span class="n">algorithm_type</span><span class="p">,</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">algorithm_name</span><span class="o">=</span><span class="n">algorithm_name</span><span class="p">,</span>
+            <span class="n">algorithm_application</span><span class="o">=</span><span class="n">algorithm_application</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">annotation_tuple</span><span class="o">.</span><span class="n">default_value</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">annotation_tuple</span> <span class="ow">in</span> <span class="n">application_tuple</span><span class="o">.</span><span class="n">parameters_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">application_tuple</span><span class="o">.</span><span class="n">algorithm_class</span><span class="p">(</span>
+            <span class="n">configuration</span><span class="o">=</span><span class="n">application_tuple</span><span class="o">.</span><span class="n">configuration_class</span><span class="p">(</span><span class="o">**</span><span class="n">parameters</span><span class="p">),</span>
+            <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ApplicationsRegistry.list_available"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.registry.html#gt4sd.algorithms.registry.ApplicationsRegistry.list_available">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_available</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="n">available</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">config_tuple</span><span class="p">,</span> <span class="n">application</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">applications</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">available</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">config_tuple</span><span class="o">.</span><span class="n">_asdict</span><span class="p">(),</span> <span class="n">algorithm_version</span><span class="o">=</span><span class="n">version</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">application</span><span class="o">.</span><span class="n">configuration_class</span><span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">available</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

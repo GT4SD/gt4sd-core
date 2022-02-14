@@ -1,0 +1,627 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.enzeptional.optimization &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.enzeptional.optimization</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.enzeptional.optimization</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Enzyme optimization.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">load</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">.processing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">HuggingFaceTransformerEmbedding</span><span class="p">,</span>
+    <span class="n">StringEmbedding</span><span class="p">,</span>
+    <span class="n">TAPEEmbedding</span><span class="p">,</span>
+    <span class="n">reconstruct_sequence_with_mutation_range</span><span class="p">,</span>
+    <span class="n">sanitize_intervals</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1">#: transition matrix representation</span>
+<span class="n">TransitionMatrix</span> <span class="o">=</span> <span class="n">MutableMapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
+<span class="c1">#: transition matrix configuration</span>
+<span class="n">TransitionConfiguration</span> <span class="o">=</span> <span class="n">MutableMapping</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">MutableMapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+<span class="p">]</span>
+
+<span class="c1">#: supported features</span>
+<span class="n">SUPPORTED_FEATURE_SET</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;substrate&quot;</span><span class="p">,</span> <span class="s2">&quot;product&quot;</span><span class="p">,</span> <span class="s2">&quot;sequence&quot;</span><span class="p">])</span>
+
+<span class="c1">#: IUPAC code mapping</span>
+<span class="n">IUPAC_CODES</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;Ala&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Asx&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>  <span class="c1"># Aspartate or Asparagine</span>
+        <span class="p">(</span><span class="s2">&quot;Cys&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Asp&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Glu&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Phe&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Gly&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;His&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Ile&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Lys&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Leu&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Met&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Asn&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Pyl&quot;</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">),</span>  <span class="c1"># Pyrrolysin</span>
+        <span class="p">(</span><span class="s2">&quot;Pro&quot;</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Gln&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Arg&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Ser&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Thr&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Sec&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">),</span>  <span class="c1"># Selenocysteine</span>
+        <span class="p">(</span><span class="s2">&quot;Val&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Trp&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Xaa&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">),</span>  <span class="c1"># Any AA</span>
+        <span class="p">(</span><span class="s2">&quot;Tyr&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Glx&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">),</span>  <span class="c1"># Glutamate or Glutamine</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="c1">#: IUPAC character set</span>
+<span class="n">IUPAC_CHARACTER_SET</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">IUPAC_CODES</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="c1">#: IUPAC uniform mutation mapping, we exclude &#39;X&#39; from the mapping values because it denotes a generic AA</span>
+<span class="n">IUPAC_MUTATION_MAPPING</span><span class="p">:</span> <span class="n">TransitionConfiguration</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">iupac_character</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">IUPAC_CHARACTER_SET</span> <span class="o">-</span> <span class="p">{</span><span class="n">iupac_character</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">}))</span>
+    <span class="k">for</span> <span class="n">iupac_character</span> <span class="ow">in</span> <span class="n">IUPAC_CHARACTER_SET</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="Mutations"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.Mutations">[docs]</a><span class="k">class</span> <span class="nc">Mutations</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Mutations definition class.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Mutations.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.Mutations.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transition_configuration</span><span class="p">:</span> <span class="n">TransitionConfiguration</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generate the mutation given the configuration for the transitions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transition_configuration: transition configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transition_matrix</span> <span class="o">=</span> <span class="n">Mutations</span><span class="o">.</span><span class="n">transition_configuration_to_matrix</span><span class="p">(</span>
+            <span class="n">transition_configuration</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mutations.transition_configuration_to_matrix"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.Mutations.transition_configuration_to_matrix">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">transition_configuration_to_matrix</span><span class="p">(</span>
+        <span class="n">transition_configuration</span><span class="p">:</span> <span class="n">TransitionConfiguration</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TransitionMatrix</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Transform a configuration into a valid transition matrix.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transition_configuration: transition configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a transition matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transition_matrix</span><span class="p">:</span> <span class="n">TransitionMatrix</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">transition_source</span><span class="p">,</span> <span class="n">transition_targets</span> <span class="ow">in</span> <span class="n">transition_configuration</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transition_targets</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">total</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">transition_targets</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+                <span class="n">transition_matrix</span><span class="p">[</span><span class="n">transition_source</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">transition_target</span><span class="p">:</span> <span class="n">transtion_element</span> <span class="o">/</span> <span class="n">total</span>
+                    <span class="k">for</span> <span class="n">transition_target</span><span class="p">,</span> <span class="n">transtion_element</span> <span class="ow">in</span> <span class="n">transition_targets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">transition_matrix</span><span class="p">[</span><span class="n">transition_source</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">transition_target</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">transition_targets</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">transition_target</span> <span class="ow">in</span> <span class="n">transition_targets</span>
+                <span class="p">}</span>
+        <span class="k">return</span> <span class="n">transition_matrix</span></div>
+
+<div class="viewcode-block" id="Mutations.from_json"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.Mutations.from_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Mutations&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Parse the mutation from a JSON containing the transition configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the mutations object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Mutations</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Mutations.mutate"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.Mutations.mutate">[docs]</a>    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Mutate a source string.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            source: source string.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the mutated target.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">targets</span><span class="p">,</span> <span class="n">probabilities</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">transition_matrix</span><span class="p">[</span><span class="n">source</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probabilities</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="AASequence"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.AASequence">[docs]</a><span class="k">class</span> <span class="nc">AASequence</span><span class="p">:</span>
+<div class="viewcode-block" id="AASequence.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.AASequence.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mutations</span><span class="p">:</span> <span class="n">Mutations</span> <span class="o">=</span> <span class="n">Mutations</span><span class="p">(</span><span class="n">IUPAC_MUTATION_MAPPING</span><span class="p">)</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize an AA sequence representation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence: AA sequence.</span>
+<span class="sd">            mutations: mutations definition. Defaults to uniform sampling of IUPAC AAs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutations</span> <span class="o">=</span> <span class="n">mutations</span></div>
+
+<div class="viewcode-block" id="AASequence.mutate"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.AASequence.mutate">[docs]</a>    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maximum_number_of_mutations</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Mutate the sequence in multiple positions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            maximum_number_of_mutations: maximum number of mutations.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the mutated sequence.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">maximum_number_of_mutations</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;resetting maximum number of mutations (</span><span class="si">{</span><span class="n">maximum_number_of_mutations</span><span class="si">}</span><span class="s2">), since it is higher than sequence length: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">maximum_number_of_mutations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span>
+        <span class="k">if</span> <span class="n">maximum_number_of_mutations</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;maximum number of mutations can&#39;t be lower than 1 (</span><span class="si">{</span><span class="n">maximum_number_of_mutations</span><span class="si">}</span><span class="s2">), resetting to 1&quot;</span>
+            <span class="p">)</span>
+            <span class="n">maximum_number_of_mutations</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">number_of_mutations</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">maximum_number_of_mutations</span><span class="p">)</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">),</span> <span class="n">number_of_mutations</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">mutated_sequence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">start_position</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
+            <span class="n">mutated_sequence</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">[(</span><span class="n">start_position</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="p">:</span> <span class="n">position</span><span class="p">]</span>
+            <span class="n">mutated_sequence</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutations</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">[</span><span class="n">position</span><span class="p">])</span>
+            <span class="n">start_position</span> <span class="o">=</span> <span class="n">position</span>
+        <span class="n">mutated_sequence</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">[(</span><span class="n">start_position</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="p">:]</span>
+        <span class="k">return</span> <span class="n">mutated_sequence</span></div></div>
+
+
+<div class="viewcode-block" id="EnzymeOptimizer"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.EnzymeOptimizer">[docs]</a><span class="k">class</span> <span class="nc">EnzymeOptimizer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Optimize an enzyme to catalyze a reaction from substrate to product.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EnzymeOptimizer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.EnzymeOptimizer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">scorer_filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">substrate</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">product</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">protein_embedding</span><span class="p">:</span> <span class="n">StringEmbedding</span> <span class="o">=</span> <span class="n">TAPEEmbedding</span><span class="p">(),</span>
+        <span class="n">molecule_embedding</span><span class="p">:</span> <span class="n">StringEmbedding</span> <span class="o">=</span> <span class="n">HuggingFaceTransformerEmbedding</span><span class="p">(),</span>
+        <span class="n">ordering</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;substrate&quot;</span><span class="p">,</span> <span class="s2">&quot;product&quot;</span><span class="p">,</span> <span class="s2">&quot;sequence&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the enzyme designer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scorer_filepath: pickled scorer filepath.</span>
+<span class="sd">            substrate: substrate SMILES.</span>
+<span class="sd">            product: product SMILES.</span>
+<span class="sd">            sequence: AA sequence representing the enzyme to optimize.</span>
+<span class="sd">            protein_embedding: protein embedding class. Defaults to TAPE bert-base.</span>
+<span class="sd">            molecule_embedding: molecule embedding class. Defaults to ChemBERTa version 1.</span>
+<span class="sd">            ordering: ordering of the features for the scorer. Defaults to [&quot;substrate&quot;, &quot;product&quot;, &quot;sequence&quot;].</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: ordering provided is not feasible.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            An example optimizing a specific reaction::</span>
+
+<span class="sd">                filepath = f&quot;/path/to/model/scoring_model.pkl&quot;</span>
+<span class="sd">                substrate = &quot;NC1=CC=C(N)C=C1&quot;</span>
+<span class="sd">                product = &quot;CNC1=CC=C(NC(=O)C2=CC=C(C=C2)C(C)=O)C=C1&quot;</span>
+<span class="sd">                sequence = (</span>
+<span class="sd">                    &quot;MSIQIKQSTMVRPAEETPNKSLWLSNIDMILRTPYSHTGAVLIYKQPDNNEDNIHPSSSMYFDANILIEALSKA&quot;</span>
+<span class="sd">                    &quot;LVPFYPMAGRLKINGDRYEIDCNAEGALFVEAESSHVLEDFGDFRPNDELHRVMVPTCDYSKGISSFPLLMVQLT&quot;</span>
+<span class="sd">                    &quot;RFRCGGVSIGFAQHHHVCDGMAHFEFNNSWARIAKGLLPALEPVHDRYLHLRPRNPPQIKYSHSQFEPFVPSLPN&quot;</span>
+<span class="sd">                    &quot;ELLDGKTNKSQTLFILSREQINTLKQKLDLSNNTTRLSTYEVVAAHVWRSVSKARGLSDHEEIKLIMPVDGRSRIN&quot;</span>
+<span class="sd">                    &quot;NPSLPKGYCGNVVFLAVCTATVGDLSCNPLTDTAGKVQEALKGLDDDYLRSAIDHTESKPGLPVPYMGSPEKTLYPN&quot;</span>
+<span class="sd">                    &quot;VLVNSWGRIPYQAMDFGWGSPTFFGISNIFYDGQCFLIPSRDGDGSMTLAINLFSSHLSRFKKYFYDF&quot;</span>
+<span class="sd">                )</span>
+<span class="sd">                # instantiate the designer</span>
+<span class="sd">                designer = EnzymeOptimizer(</span>
+<span class="sd">                    scorer_filepath=filepath, substrate=substrate, product=product, sequence=sequence</span>
+<span class="sd">                )</span>
+
+
+<span class="sd">                # with this sequence length every steps takes ~5s</span>
+<span class="sd">                # optimize between positions 150 and 405 allowing for a maximum of 5 mutations.</span>
+<span class="sd">                results = designer.optimize(</span>
+<span class="sd">                    number_of_mutations=5, number_of_steps=10, number_of_samples_per_step=8,</span>
+<span class="sd">                    intervals=[(150, 405)]</span>
+<span class="sd">                )</span>
+<span class="sd">                best_score = results[0][&quot;score&quot;]</span>
+<span class="sd">                best_sequence = results[0][&quot;sequence&quot;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ordering</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">SUPPORTED_FEATURE_SET</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;ordering=</span><span class="si">{</span><span class="n">ordering</span><span class="si">}</span><span class="s2"> should contain only the three admissible values: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">SUPPORTED_FEATURE_SET</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ordering</span> <span class="o">=</span> <span class="n">ordering</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scorer_filepath</span> <span class="o">=</span> <span class="n">scorer_filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">scorer_filepath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">substrate</span> <span class="o">=</span> <span class="n">substrate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">product</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding</span> <span class="o">=</span> <span class="n">protein_embedding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molecule_embedding</span> <span class="o">=</span> <span class="n">molecule_embedding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedded_vectors</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;substrate&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_embedding</span><span class="o">.</span><span class="n">embed_one</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">substrate</span><span class="p">),</span>
+            <span class="s2">&quot;product&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_embedding</span><span class="o">.</span><span class="n">embed_one</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EnzymeOptimizer.score_sequence"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.EnzymeOptimizer.score_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">score_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Score a given sequence.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence: a sequence to score.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            score for the sequence.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">embedded_vectors</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding</span><span class="o">.</span><span class="n">embed_one</span><span class="p">(</span><span class="n">sequence</span><span class="p">)}</span>
+        <span class="n">embedded_vectors</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embedded_vectors</span><span class="p">)</span>
+        <span class="n">feature_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">embedded_vectors</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ordering</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">feature_vector</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="EnzymeOptimizer.score_sequences"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.EnzymeOptimizer.score_sequences">[docs]</a>    <span class="k">def</span> <span class="nf">score_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Score a given sequence list.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequences: a list of sequences to score.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a list of dictionaries of sequences and related scores.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">number_of_sequences</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
+        <span class="n">embedded_matrices</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;substrate&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">embedded_vectors</span><span class="p">[</span><span class="s2">&quot;substrate&quot;</span><span class="p">],</span> <span class="n">number_of_sequences</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;product&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">embedded_vectors</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">],</span> <span class="n">number_of_sequences</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">embedded_matrices</span><span class="p">[</span><span class="s2">&quot;sequence&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
+        <span class="n">feature_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">embedded_matrices</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ordering</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">,</span> <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">score</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">sequences</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">feature_vector</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="EnzymeOptimizer.optimize"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.optimization.html#gt4sd.frameworks.enzeptional.optimization.EnzymeOptimizer.optimize">[docs]</a>    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">number_of_mutations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">intervals</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">number_of_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">number_of_samples_per_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="n">number_of_sequences</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
+        <span class="n">time_budget</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mutations</span><span class="p">:</span> <span class="n">Mutations</span> <span class="o">=</span> <span class="n">Mutations</span><span class="p">(</span><span class="n">IUPAC_MUTATION_MAPPING</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Optimize the enzyme given a number of mutations and a range.</span>
+
+<span class="sd">        If the range limits are not provided the full sequence is optimized, this might be inefficient.</span>
+<span class="sd">        The sampling is performing by exploring mutations with a slightly smart random sampling.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            number_of_mutations: number of allowed mutations.</span>
+<span class="sd">            intervals: list of ranges in the sequence, zero-based. Defaults to None, a.k.a. use optimize the full sequence.</span>
+<span class="sd">            number_of_steps: number of optimization steps. Defaults to 100.</span>
+<span class="sd">            number_of_samples_per_step: number of samples sequences per optimization step. Defaults to 32.</span>
+<span class="sd">            number_of_sequences: number of optimal seuqence returned. Defaults to None, a.k.a, returns all.</span>
+<span class="sd">            seed: seed for random number generation. Defaults to 42.</span>
+<span class="sd">            time_budget: maximum allowed runtime in seconds. Defaults to None, a.k.a., no time limit, running for number_of_steps steps.</span>
+<span class="sd">            mutations: mutations definition. Defaults to uniform sampling of IUPAC AAs.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: in case an invalid range is provided.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a list of dictionaries containing a candidate optimal sequence and the related score. Sorted from best to worst.</span>
+<span class="sd">            Note that, when no limit on the returned number of sequences is set, the worst sequence is the original unmutated sequence.</span>
+<span class="sd">            If the optimization fails, only the original sequence is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="c1"># check if interval is None. In case it is, take as interval the whole sequence</span>
+        <span class="k">if</span> <span class="n">intervals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">intervals</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">intervals</span> <span class="o">=</span> <span class="n">sanitize_intervals</span><span class="p">(</span>
+                <span class="n">intervals</span>
+            <span class="p">)</span>  <span class="c1"># here we merged and sorted the intervals</span>
+
+        <span class="c1"># check that the intervals are in the range of the sequence length</span>
+        <span class="k">if</span> <span class="n">intervals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;check provided intervals, at least an interval is larger than the sequence length&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># create a sequence from based on the intervals</span>
+        <span class="n">sequence_from_intervals</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">intervals</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># mutate the sequence from intervals</span>
+        <span class="n">aa_sequence_range</span> <span class="o">=</span> <span class="n">AASequence</span><span class="p">(</span><span class="n">sequence_from_intervals</span><span class="p">,</span> <span class="n">mutations</span><span class="o">=</span><span class="n">mutations</span><span class="p">)</span>
+        <span class="n">maximum_number_of_mutations</span> <span class="o">=</span> <span class="n">number_of_mutations</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;maximum number of mutations for the intervals: </span><span class="si">{</span><span class="n">maximum_number_of_mutations</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">scored_original_sequence</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">score_sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">),</span>
+            <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">original_sequence_score</span> <span class="o">=</span> <span class="n">scored_original_sequence</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;original sequence score: </span><span class="si">{</span><span class="n">original_sequence_score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">scored_original_sequence</span><span class="p">]</span>
+        <span class="c1"># slightly smart random sampling</span>
+        <span class="n">visited_sequences</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_steps</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;optimization step=</span><span class="si">{</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">mutated_sequences</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_samples_per_step</span><span class="p">):</span>
+                <span class="n">mutated_sequence_range</span> <span class="o">=</span> <span class="n">aa_sequence_range</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span>
+                    <span class="n">maximum_number_of_mutations</span><span class="o">=</span><span class="n">maximum_number_of_mutations</span>
+                <span class="p">)</span>
+
+                <span class="n">mutated_sequence</span> <span class="o">=</span> <span class="n">reconstruct_sequence_with_mutation_range</span><span class="p">(</span>
+                    <span class="n">sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
+                    <span class="n">mutated_sequence_range</span><span class="o">=</span><span class="n">mutated_sequence_range</span><span class="p">,</span>
+                    <span class="n">intervals</span><span class="o">=</span><span class="n">intervals</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="c1"># make sure we do not revisit</span>
+                <span class="k">if</span> <span class="n">mutated_sequence</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited_sequences</span><span class="p">:</span>
+                    <span class="n">visited_sequences</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mutated_sequence</span><span class="p">)</span>
+                    <span class="n">mutated_sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mutated_sequence</span><span class="p">)</span>
+
+            <span class="c1"># add only mutated sequences that are more optimal than the original</span>
+            <span class="n">results</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">scored_sequence</span>
+                <span class="k">for</span> <span class="n">scored_sequence</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">score_sequences</span><span class="p">(</span><span class="n">mutated_sequences</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">scored_sequence</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">original_sequence_score</span>
+            <span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;best score at step=</span><span class="si">{</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">max</span><span class="p">([</span><span class="n">scored_sequence</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">scored_sequence</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">elapsed_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">time_budget</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">elapsed_time</span> <span class="o">&gt;</span> <span class="n">time_budget</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;used all the given time budget of </span><span class="si">{</span><span class="n">time_budget</span><span class="si">}</span><span class="s2">s, exting optimization loop&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">break</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;optimization completed visiting </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">visited_sequences</span><span class="p">)</span><span class="si">}</span><span class="s2"> mutated sequences&quot;</span>
+        <span class="p">)</span>
+        <span class="n">sorted_results</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">result</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)[:</span><span class="n">number_of_sequences</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_results</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;optimization failed, could not find a mutated sequence more optimal than the original&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sorted_results</span><span class="p">)</span> <span class="o">-</span>  <span class="mi">1</span><span class="si">}</span><span class="s2"> optimal mutated sequences, best score: </span><span class="si">{</span><span class="n">sorted_results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">sorted_results</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
