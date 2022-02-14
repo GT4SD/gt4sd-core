@@ -120,7 +120,7 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
         pytest.param(
             HuggingFaceXLMGenerator,
             HuggingFaceGenerationAlgorithm,
-            pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             HuggingFaceCTRLGenerator,
@@ -130,22 +130,22 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
         pytest.param(
             HuggingFaceGPT2Generator,
             HuggingFaceGenerationAlgorithm,
-            pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             HuggingFaceOpenAIGPTGenerator,
             HuggingFaceGenerationAlgorithm,
-            pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             HuggingFaceXLNetGenerator,
             HuggingFaceGenerationAlgorithm,
-            pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             HuggingFaceTransfoXLGenerator,
             HuggingFaceGenerationAlgorithm,
-            pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
     ],
 )
