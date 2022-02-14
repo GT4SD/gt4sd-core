@@ -18,7 +18,10 @@ jobs:
           auto-activate-base: false
       - uses: ammaraskar/sphinx-action@master
         with:
-          pre-build-command: pip install -r requirements.txt && pip install -r dev_requirements.txt && pip install -e .
+          pre-build-command: |
+            apt-get update -y && apt-get install -y git
+            pip install -r requirements.txt && pip install -e .
+            pip install -r dev_requirements.txt
           docs-folder: "docs/"
       - name: Commit documentation changes
         run: |
