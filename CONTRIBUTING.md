@@ -1,6 +1,24 @@
 # Contributing
 
-<!-- add missing CLA -->
+## Contribution Terms and License
+
+The documentation and benchmarking of GT4SD is contained in this repository. To contribute
+to this project or any of the elements of GT4SD we recomend you start by reading this
+[contributing guide](https://github.com/GT4SD/gt4sd-core/CONTRIBUTING.md).
+
+## Contributor License Agreement
+
+Before you can submit any code we need all contributors to sign a
+contributor license agreement. By signing a contributor license
+agreement (CLA) you're basically just attesting to the fact
+that you are the author of the contribution and that you're freely
+contributing it under the terms of the MIT License.
+
+When you contribute to the GT4SD project with a new pull request,
+a bot will evaluate whether you have signed the CLA. If required, the
+bot will comment on the pull request, including a link to accept the
+agreement. The [individual CLA](https://github.com/GT4SD/gt4sd-core/iCLA.md)
+document is available for review in this repo.
 
 ## Contributing to GT4SD codebase
 
@@ -123,3 +141,8 @@ Yields:
 {{/yields}}
 {{/yieldsExist}}
 ```
+
+
+
+
+
