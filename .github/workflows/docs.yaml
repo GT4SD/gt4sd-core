@@ -9,13 +9,26 @@ on:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}  # for conda command
+    env:
+      # Increase this value to reset cache if conda.yml and requirements.txt
+      # have not changed
+      CACHE_NUMBER: 0
     steps:
       - uses: actions/checkout@v2
+      - name: Cache conda environment
+        uses: actions/cache@v2
+        with:
+          path: ~/conda_pkgs_dir  # from: conda-incubator/setup-miniconda@v2
+          key: conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('conda.yml', 'requirements.txt', 'dev_requirements.txt') }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: gt4sd
           environment-file: conda.yml
           auto-activate-base: false
+          use-only-tar-bz2: true
       - uses: ammaraskar/sphinx-action@master
         with:
           pre-build-command: conda activate gt4sd && pip install --no-deps .
