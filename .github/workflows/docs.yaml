@@ -27,10 +27,10 @@ jobs:
           cd docs && make html && cd ..
       - name: Commit documentation changes
         run: |
-          git clone https://github.com/GT4SD/gt4sd-core --branch gh_pages --single-branch gh_pages
-          cp -r docs/_build/html/* gh_pages/
-          touch gh_pages/.nojekyll
-          cd gh_pages
+          git clone https://github.com/GT4SD/gt4sd-core --branch gh-pages --single-branch gh-pages
+          cp -r docs/_build/html/* gh-pages/
+          touch gh-pages/.nojekyll
+          cd gh-pages
           git config --local user.email "gt4sd-actions@github.com"
           git config --local user.name "GitHub Action"
           git add .
@@ -38,6 +38,6 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          branch: gh_pages
-          directory: gh_pages
+          branch: gh-pages
+          directory: gh-pages
           github_token: ${{ secrets.GH_TOKEN }}
