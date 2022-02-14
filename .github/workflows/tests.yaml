@@ -24,13 +24,6 @@ jobs:
         run: |
           conda activate gt4sd
           pip install --no-deps .
-  style:
-    needs: setup
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}  # for conda command
-    steps:
       - name: Check black
         run: |
           conda activate gt4sd
@@ -47,24 +40,10 @@ jobs:
         run: |
           conda activate gt4sd
           python -m mypy src/gt4sd
-  pytest:
-    needs: setup
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}  # for conda command
-    steps:
-      - name: Run style checks
+      - name: Run pytests
         run: |
           conda activate gt4sd
           python -m pytest -sv --cov=src/gt4sd --cov-fail-under=65
-  entry-points:
-    needs: setup
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}  # for conda command
-    steps:
       - name: Test entry-points
         run: |
           conda activate gt4sd
