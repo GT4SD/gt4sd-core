@@ -4,7 +4,7 @@
 
 The documentation and benchmarking of GT4SD is contained in this repository. To contribute
 to this project or any of the elements of GT4SD we recomend you start by reading this
-[contributing guide](https://github.com/GT4SD/gt4sd-core/CONTRIBUTING.md).
+[contributing guide](#contributing-to-gt4sd-codebase).
 
 ## Contributor License Agreement
 
