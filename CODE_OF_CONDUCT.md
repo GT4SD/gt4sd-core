@@ -60,7 +60,8 @@ representative at an online or offline event.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement using
-https://github.com/GT4SD/gt4sd-core/discussions/categories/q-a.
+[drugilsberg+gt4sd-core@gmail.com
+](mailto:drugilsberg+gt4sd-core@gmail.com).
 
 All complaints will be reviewed and investigated promptly and fairly.
 
