@@ -1,0 +1,292 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.granular.train.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.granular.train.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.granular.train.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Train module implementation.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">Namespace</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning.callbacks</span> <span class="kn">import</span> <span class="n">ModelCheckpoint</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning.loggers</span> <span class="kn">import</span> <span class="n">TensorBoardLogger</span>
+
+<span class="kn">from</span> <span class="nn">..arg_parser.parser</span> <span class="kn">import</span> <span class="n">parse_arguments_from_config</span>
+<span class="kn">from</span> <span class="nn">..dataloader.data_module</span> <span class="kn">import</span> <span class="n">GranularDataModule</span>
+<span class="kn">from</span> <span class="nn">..dataloader.dataset</span> <span class="kn">import</span> <span class="n">build_dataset_and_architecture</span>
+<span class="kn">from</span> <span class="nn">..ml.models</span> <span class="kn">import</span> <span class="n">AUTOENCODER_ARCHITECTURES</span>
+<span class="kn">from</span> <span class="nn">..ml.module</span> <span class="kn">import</span> <span class="n">GranularModule</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="train_granular"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.train.core.html#gt4sd.frameworks.granular.train.core.train_granular">[docs]</a><span class="k">def</span> <span class="nf">train_granular</span><span class="p">(</span><span class="n">configuration</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Train a granular given a configuration.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        configuration: a configuration dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="o">**</span><span class="n">configuration</span><span class="p">)</span>
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">architecture_autoencoders</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">architecture_latent_models</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">arguments</span><span class="o">.</span><span class="n">model_list</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dataset preparation for model=</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">hparams</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="n">model</span><span class="p">]</span>
+        <span class="n">model_type</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">dataset</span><span class="p">,</span> <span class="n">architecture</span> <span class="o">=</span> <span class="n">build_dataset_and_architecture</span><span class="p">(</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;data_path&quot;</span><span class="p">],</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;data_file&quot;</span><span class="p">],</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;dataset_type&quot;</span><span class="p">],</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
+            <span class="n">hparams</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="n">AUTOENCODER_ARCHITECTURES</span><span class="p">:</span>
+            <span class="n">architecture_autoencoders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">architecture</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">architecture_latent_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">architecture</span><span class="p">)</span>
+    <span class="n">dm</span> <span class="o">=</span> <span class="n">GranularDataModule</span><span class="p">(</span>
+        <span class="n">datasets</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+        <span class="n">validation_split</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;validation_split&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">validation_indices_file</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;validation_indices_file&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">stratified_batch_file</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;stratified_batch_file&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">stratified_value_name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;stratified_value_name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;num_workers&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">dm</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">()</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">GranularModule</span><span class="p">(</span>
+        <span class="n">architecture_autoencoders</span><span class="o">=</span><span class="n">architecture_autoencoders</span><span class="p">,</span>
+        <span class="n">architecture_latent_models</span><span class="o">=</span><span class="n">architecture_latent_models</span><span class="p">,</span>
+        <span class="n">lr</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;lr&quot;</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">),</span>
+        <span class="n">test_output_path</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;test_output_path&quot;</span><span class="p">,</span> <span class="s2">&quot;./test&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">tensorboard_logger</span> <span class="o">=</span> <span class="n">TensorBoardLogger</span><span class="p">(</span>
+        <span class="s2">&quot;logs&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;basename&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">checkpoint_callback</span> <span class="o">=</span> <span class="n">ModelCheckpoint</span><span class="p">(</span>
+        <span class="n">every_n_val_epochs</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;checkpoint_every_n_val_epochs&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="n">save_top_k</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="o">.</span><span class="n">from_argparse_args</span><span class="p">(</span>
+        <span class="n">arguments</span><span class="p">,</span>
+        <span class="n">profiler</span><span class="o">=</span><span class="s2">&quot;simple&quot;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">=</span><span class="n">tensorboard_logger</span><span class="p">,</span>
+        <span class="n">auto_lr_find</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">log_every_n_steps</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;trainer_log_every_n_steps&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">checkpoint_callback</span><span class="p">],</span>
+        <span class="n">max_epochs</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;epoch&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">flush_logs_every_n_steps</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span>
+            <span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;trainer_flush_logs_every_n_steps&quot;</span><span class="p">,</span> <span class="mi">100</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">dm</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="train_granular_main"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.train.core.html#gt4sd.frameworks.granular.train.core.train_granular_main">[docs]</a><span class="k">def</span> <span class="nf">train_granular_main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Train a granular module parsing arguments from config and standard input.&quot;&quot;&quot;</span>
+    <span class="n">train_granular</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="nb">vars</span><span class="p">(</span><span class="n">parse_arguments_from_config</span><span class="p">()))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
