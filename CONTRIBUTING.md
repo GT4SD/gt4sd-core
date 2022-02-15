@@ -32,27 +32,32 @@ If you would like to contribute to the package, we recommend the following devel
     git clone git@github.com:${GH_ACCOUNT_OR_ORG}/gt4sd-core.git
     ```
 
-3. Create a dedicated branch:
+3. Add remote gt4sd-core repo as an "upstream" in your local repo, so you can check/update remote changes.
+   ```sh
+   git remote add upstream git@github.com:GT4SD/gt4sd-core.git
+   ```
+
+4. Create a dedicated branch:
 
     ```sh
     cd gt4sd-core
     git checkout -b a-super-nice-feature-we-all-need
     ```
 
-4. Create and activate a dedicated conda environment:
+5. Create and activate a dedicated conda environment:
 
     ```sh
     conda env create -f conda.yml
     conda activate gt4sd
     ```
 
-5. Install `gt4sd` in editable mode:
+6. Install `gt4sd` in editable mode:
 
     ```sh
     pip install -e.
     ```
 
-6. Implement your changes and once you are ready run the tests:
+7. Implement your changes and once you are ready run the tests:
 
     ```sh
     python -m pytest -sv
@@ -69,7 +74,7 @@ If you would like to contribute to the package, we recommend the following devel
     python -m mypy src/gt4sd
     ```
 
-7. Once the tests and checks passes, but most importantly you are happy with the implemented feature commit your changes.
+8. Once the tests and checks passes, but most importantly you are happy with the implemented feature commit your changes.
 
     ```sh
     # add the changes
@@ -83,7 +88,7 @@ If you would like to contribute to the package, we recommend the following devel
     git push -u origin a-super-nice-feature-we-all-need
     ```
 
-8. From your fork, open a pull request via the "_Contribute_" button, the maintainers will be happy to review it.
+9. From your fork, open a pull request via the "_Contribute_" button, the maintainers will be happy to review it.
 
 ## Contributing to GT4SD documentation
 
