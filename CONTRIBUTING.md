@@ -17,7 +17,7 @@ contributing it under the terms of the MIT License.
 When you contribute to the GT4SD project with a new pull request,
 a bot will evaluate whether you have signed the CLA. If required, the
 bot will comment on the pull request, including a link to accept the
-agreement. The [individual CLA](https://github.com/GT4SD/gt4sd-core/iCLA.md)
+agreement. The [individual CLA](./iCLA.md)
 document is available for review in this repo.
 
 ## Contributing to GT4SD codebase
