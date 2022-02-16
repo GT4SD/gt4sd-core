@@ -15,7 +15,7 @@ jobs:
           echo Signature by ${{ github.event.issue.user.login }}
           git clone https://github.com/GT4SD/gt4sd-core --branch main --single-branch gt4sd-core-main
           cd gt4sd-core-main
-          echo $(jq '.contributors |= (. + ["test"] | unique)' .clabot) > .clabot
+          echo $(jq '.contributors |= (. + ["${{ github.event.issue.user.login }}"] | unique)' .clabot) > .clabot
           echo Updated .clabot:
           echo $(cat .clabot)
           git config --local user.email "gt4sd-actions@github.com"
