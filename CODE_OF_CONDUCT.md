@@ -60,7 +60,7 @@ representative at an online or offline event.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement using
-[drugilsberg+gt4sd-core@gmail.com](mailto:drugilsberg+gt4sd-core@gmail.com).
+[gt4sd-core@zurich.ibm.com](mailto:gt4sd-core@zurich.ibm.com).
 
 All complaints will be reviewed and investigated promptly and fairly.
 
