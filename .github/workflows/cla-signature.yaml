@@ -10,24 +10,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Print GitHub context
-      run: echo "$GITHUB_CONTEXT"
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
     - name: Adding user to contributors
       run: |
           echo Signature by ${{ github.event.issue.user.login }}
           git clone https://github.com/GT4SD/gt4sd-core --branch main --single-branch gt4sd-core-main
           cd gt4sd-core-main
-          cat .clabot | jq '.contributors |= (. + ["${{ github.event.issue.user.login }}"] | unique)' > .clabot
-          cat .clabot
+          echo $(jq '.contributors |= (. + ["test"] | unique)' .clabot) > .clabot
+          echo Updated .clabot:
+          echo $(cat .clabot)
           git config --local user.email "gt4sd-actions@github.com"
           git config --local user.name "GitHub Action"
           git add .clabot
           git commit -m "chore: adding ${{ github.event.issue.user.login }} as contributor." -a || true
-    # - name: Push changes
-    #   uses: ad-m/github-push-action@master
-    #   with:
-    #     branch: main
-    #     directory: gt4sd-core-main
-    #     github_token: ${{ secrets.GH_TOKEN }}
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        branch: main
+        directory: gt4sd-core-main
+        github_token: ${{ secrets.GH_TOKEN }}
+    - name: Mark signature in the issue
+      uses: andymckay/labeler@e6c4322d0397f3240f0e7e30a33b5c5df2d39e90
+      with:
+        add-labels: cla-signed
+        repo-token: ${{ secrets.GH_TOKEN }}
