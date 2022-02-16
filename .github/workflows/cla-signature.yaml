@@ -10,19 +10,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Print GitHub context
+      run: echo "$GITHUB_CONTEXT"
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
     - name: Adding user to contributors
       run: |
-          echo Signature by ${{ github.event.issues.user.login }}
-          git clone https://github.com/GT4SD/gt4sd-core --branch main --single-branch gt4sd-core
-          cat .clabot | jq '.contributors |= (. + ["${{ github.event.issues.user.login }}"] | unique)' > .clabot
+          echo Signature by ${{ github.event.issue.user.login }}
+          git clone https://github.com/GT4SD/gt4sd-core --branch main --single-branch gt4sd-core-main
+          cd gt4sd-core-main
+          cat .clabot | jq '.contributors |= (. + ["${{ github.event.issue.user.login }}"] | unique)' > .clabot
           cat .clabot
           git config --local user.email "gt4sd-actions@github.com"
           git config --local user.name "GitHub Action"
-          git add .
-          git commit -m "chore: adding ${{ github.event.issues.user.login }} as contributor." -a || true
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        branch: main
-        directory: main
-        github_token: ${{ secrets.GH_TOKEN }}
+          git add .clabot
+          git commit -m "chore: adding ${{ github.event.issue.user.login }} as contributor." -a || true
+    # - name: Push changes
+    #   uses: ad-m/github-push-action@master
+    #   with:
+    #     branch: main
+    #     directory: gt4sd-core-main
+    #     github_token: ${{ secrets.GH_TOKEN }}
