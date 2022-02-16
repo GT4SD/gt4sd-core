@@ -4,7 +4,7 @@
 
 The documentation and benchmarking of GT4SD is contained in this repository. To contribute
 to this project or any of the elements of GT4SD we recomend you start by reading this
-[contributing guide](#contributing-to-gt4sd-codebase).
+contributing guide.
 
 ## Contributor License Agreement
 
@@ -17,8 +17,8 @@ contributing it under the terms of the MIT License.
 When you contribute to the GT4SD project with a new pull request,
 a bot will evaluate whether you have signed the CLA. If required, the
 bot will comment on the pull request, including a link to accept the
-agreement. The [individual CLA](./iCLA.md)
-document is available for review in this repo.
+agreement. The [individual CLA](./iCLA.md) document is available for review in this repo.
+You can sign the agreement right away [here](https://github.com/GT4SD/gt4sd-core/issues/new?assignees=C-nit%2C+christofid%2C+drugilsberg%2C+jannisborn%2C+kwehden&labels=cla-signing&template=cla-signature.md&title=CLA+signature+by+%24%7BGH_USERNAME%7D).
 
 ## Contributing to GT4SD codebase
 
@@ -33,6 +33,7 @@ If you would like to contribute to the package, we recommend the following devel
     ```
 
 3. Add remote gt4sd-core repo as an "upstream" in your local repo, so you can check/update remote changes.
+
    ```sh
    git remote add upstream git@github.com:GT4SD/gt4sd-core.git
    ```
@@ -146,8 +147,3 @@ Yields:
 {{/yields}}
 {{/yieldsExist}}
 ```
-
-
-
-
-
