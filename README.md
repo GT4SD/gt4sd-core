@@ -37,7 +37,7 @@ If you would like to contribute to the package, we recommend the following devel
 
 ```sh
 git clone git@github.com:GT4SD/gt4sd-core.git
-cd gt4ds-core
+cd gt4sd-core
 conda env create -f conda.yml
 conda activate gt4sd
 pip install -e .
