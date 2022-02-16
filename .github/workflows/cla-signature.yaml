@@ -8,8 +8,21 @@ jobs:
   build:
     if: ${{ github.event.label.name == 'cla-signing' }}
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
-    - name: Testing action
-      run: echo Build triggered
+    - name: Adding user to contributors
+      run: |
+          echo Signature by ${{ github.event.issues.user.login }}
+          git clone https://github.com/GT4SD/gt4sd-core --branch main --single-branch gt4sd-core
+          cat .clabot | jq '.contributors |= (. + ["${{ github.event.issues.user.login }}"] | unique)' > .clabot
+          cat .clabot
+          git config --local user.email "gt4sd-actions@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "chore: adding ${{ github.event.issues.user.login }} as contributor." -a || true
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        branch: main
+        directory: main
+        github_token: ${{ secrets.GH_TOKEN }}
