@@ -40,7 +40,7 @@ git clone git@github.com:GT4SD/gt4sd-core.git
 cd gt4sd-core
 conda env create -f conda.yml
 conda activate gt4sd
-pip install -e .
+pip install --no-deps -e .
 ```
 
 Learn more in [CONTRIBUTING.md](./CONTRIBUTING.md)
