@@ -17,6 +17,15 @@ For full details on the library API and examples see the [docs](https://gt4sd.gi
 
 ## Installation
 
+### requirements
+
+Currently `gt4sd` relies on:
+
+- python>=3.7,<3.8
+- pip>=19.1,<20.3
+
+We are actively working on relaxing these, so stay tuned or help us with his by [contributing](./CONTRIBUTING.md) to the project.
+
 ### pip
 
 If you simply want to use `gt4sd` in your projects, install it via `pip` from [PyPI](https://pypi.org/project/gt4sd/):
@@ -31,7 +40,7 @@ You can also install `gt4sd` directly from GitHub:
 pip install git+https://github.com/GT4SD/gt4sd-core
 ```
 
-**NOTE:** Some dependencies require installation from GitHub, so for a complete setup install them with:
+**NOTE:** As of now (:eyes: on [issue](https://github.com/GT4SD/gt4sd-core/issues/31) for changes), some dependencies require installation from GitHub, so for a complete setup install them with:
 
 ```sh
 pip install -r vcs_requirements.txt
@@ -51,17 +60,9 @@ pip install --no-deps -e .
 
 Learn more in [CONTRIBUTING.md](./CONTRIBUTING.md)
 
-## Supported packages
+## Getting started
 
-Beyond implementing various generative modeling inference and training pipelines GT4SD is designed to provide a high-level API that implement an harmonized interface for several existing packages:
-
-- [GuacaMol](https://github.com/BenevolentAI/guacamol): inference pipelines for the baselines models.
-- [MOSES](https://github.com/molecularsets/moses): inference pipelines for the baselines models.
-- [TAPE](https://github.com/songlab-cal/tape): encoder modules compatible with the protein language models.
-- [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as traiing pipelines for the generative VAEs.
-- [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from the [HuggingFace Models](https://huggingface.co/models)
-
-## Using GT4SD
+After install you can use `gt4sd` right away in your discovery workflows.
 
 ### Running inference pipelines
 
@@ -143,6 +144,16 @@ gt4sd-trainer --training_pipeline_name ${TRAINING_PIPELINE_NAME} --help
 <!-- Adding examples and notebooks is a must here -->
 
 <!-- Having a list of all supported algorithms wouldn be nice! -->
+
+## Supported packages
+
+Beyond implementing various generative modeling inference and training pipelines GT4SD is designed to provide a high-level API that implement an harmonized interface for several existing packages:
+
+- [GuacaMol](https://github.com/BenevolentAI/guacamol): inference pipelines for the baselines models.
+- [MOSES](https://github.com/molecularsets/moses): inference pipelines for the baselines models.
+- [TAPE](https://github.com/songlab-cal/tape): encoder modules compatible with the protein language models.
+- [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as traiing pipelines for the generative VAEs.
+- [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from the [HuggingFace Models](https://huggingface.co/models)
 
 ## References
 
