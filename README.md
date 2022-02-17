@@ -31,7 +31,7 @@ You can also install `gt4sd` directly from GitHub:
 pip install git+https://github.com/GT4SD/gt4sd-core
 ```
 
-**NOTE:** Some dependencies require installation from GitHub, so after having `gt4sd` installed install them with:
+**NOTE:** Some dependencies require installation from GitHub, so for a complete setup install them with:
 
 ```sh
 pip install -r vcs_requirements.txt
