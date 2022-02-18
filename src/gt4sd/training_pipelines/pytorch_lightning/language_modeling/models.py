@@ -240,7 +240,7 @@ class PLMModule(LMModule):
     """Pytorch lightning model for PLM training."""
 
     def init_model(self) -> None:
-        """Initialize a PLM model. """
+        """Initialize a PLM model."""
 
         if self.model_args["model_name_or_path"] is not None:
             self.model = XLNetLMHeadModel.from_pretrained(
