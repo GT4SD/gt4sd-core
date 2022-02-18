@@ -193,7 +193,7 @@ class GPConditionalGenerator:
             a list of molecules as SMILES string.
         """
         # make sure the seed is transformed to avoid redundancy over multiple calls (using Knuth multiplicative hashing)
-        self.seed = self.seed * 2654435761 % 2**32
+        self.seed = self.seed * 2654435761 % 2 ** 32
         logger.info(f"configuring optimization for target: {target}")
         # target configuration
         self.target = target
@@ -229,7 +229,7 @@ class GPConditionalGenerator:
                     + torch.cat(
                         (
                             torch.zeros(1, 1, self.latent_dim),
-                            (self.sampling_variance**0.5)
+                            (self.sampling_variance ** 0.5)
                             * torch.randn(1, self.batch_size - 1, self.latent_dim),
                         ),
                         dim=1,
