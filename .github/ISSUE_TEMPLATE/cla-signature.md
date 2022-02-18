@@ -7,4 +7,5 @@ assignees: C-nit, christofid, drugilsberg, jannisborn, kwehden
 
 ---
 
-I accept and sign the CLA to contribute to GT4SD.
+I accept and sign the contributor license agreement ([CLA](../../CONTRIBUTING.md#contributor-license-agreement)) to contribute to GT4SD.
+
