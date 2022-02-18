@@ -7,6 +7,7 @@ from typing import List, Union, cast
 
 import torch
 
+from ......domains.materials import validate_molecules
 from ......frameworks.granular.ml.models import (
     GranularEncoderDecoderModel,
     MlpPredictor,
@@ -213,10 +214,13 @@ class CatalystGenerator(Generator):
                 )
             },
         )
-        return [
+        smiles_list = [
             sample["smiles"]
             for sample in sampler.optimize(
                 number_of_points=self.number_of_points,
                 number_of_steps=self.number_of_steps,
             )
+            if len(sample["smiles"])
         ]
+        _, valid_indexes = validate_molecules(smiles_list=smiles_list)
+        return [smiles_list[index] for index in valid_indexes]
