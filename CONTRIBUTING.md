@@ -3,7 +3,7 @@
 ## Contribution Terms and License
 
 The documentation and benchmarking of GT4SD is contained in this repository. To contribute
-to this project or any of the elements of GT4SD we recomend you start by reading this
+to this project or any of the elements of GT4SD we recommend you start by reading this
 contributing guide.
 
 ## Contributor License Agreement
