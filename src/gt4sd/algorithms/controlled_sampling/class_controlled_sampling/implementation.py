@@ -241,5 +241,6 @@ if EXTRAS_ENABLED:
             samples = filter_heuristic(samples)
             return samples[samples.accept_z & samples.accept].smiles.tolist()
 
+
 else:
     logger.warning("install cogmol-inference extras to use CLaSS")

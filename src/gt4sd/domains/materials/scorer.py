@@ -63,7 +63,7 @@ def distance_to_score(distance: float, beta: float) -> float:
     Returns:
         An exponential score value for a given SMILES
     """
-    return np.exp(-beta * distance**2)
+    return np.exp(-beta * distance ** 2)
 
 
 class DistanceScorer(ScoringFunction):
