@@ -141,7 +141,9 @@ To get more info on a specific training pipeleins argument simply type:
 gt4sd-trainer --training_pipeline_name ${TRAINING_PIPELINE_NAME} --help
 ```
 
-<!-- Adding examples and notebooks is a must here -->
+### Additional examples
+
+Find more examples in [notebooks](./notebooks)
 
 <!-- Having a list of all supported algorithms wouldn be nice! -->
 
