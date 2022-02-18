@@ -404,7 +404,7 @@ class ListModule(torch.nn.Module):
 
 
 class MultiHeadedAttention(nn.Module):
-    """"Multihead attention implementation (based on Vaswani et al.)."""
+    """Multihead attention implementation (based on Vaswani et al.)."""
 
     def __init__(self, h, d_model, dropout=0.1) -> None:
         """Construct MultiHeadedAttention.

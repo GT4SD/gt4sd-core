@@ -192,6 +192,5 @@ if EXTRAS_ENABLED:
                 max_len=self.max_length,
             )
 
-
 else:
     logger.warning("install cogmol-inference extras to use CLaSS")

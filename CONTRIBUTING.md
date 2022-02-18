@@ -67,7 +67,7 @@ If you would like to contribute to the package, we recommend the following devel
     And the style checks:
 
     ```sh
-    # blacking and sorting imports
+    # blacking and sorting imports (this might change your files)
     python -m black src/gt4sd
     python -m isort src/gt4sd
     # checking flake8 and mypy
@@ -75,7 +75,7 @@ If you would like to contribute to the package, we recommend the following devel
     python -m mypy src/gt4sd
     ```
 
-8. Once the tests and checks passes, but most importantly you are happy with the implemented feature commit your changes.
+8. Once the tests and checks passes, but most importantly you are happy with the implemented feature, commit your changes.
 
     ```sh
     # add the changes
