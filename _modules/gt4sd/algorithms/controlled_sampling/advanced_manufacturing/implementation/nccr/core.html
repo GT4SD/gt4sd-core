@@ -166,6 +166,7 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 
+<span class="kn">from</span> <span class="nn">......domains.materials</span> <span class="kn">import</span> <span class="n">validate_molecules</span>
 <span class="kn">from</span> <span class="nn">......frameworks.granular.ml.models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">GranularEncoderDecoderModel</span><span class="p">,</span>
     <span class="n">MlpPredictor</span><span class="p">,</span>
@@ -372,13 +373,16 @@
                 <span class="p">)</span>
             <span class="p">},</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span>
+        <span class="n">smiles_list</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;smiles&quot;</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">sampler</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span>
                 <span class="n">number_of_points</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_points</span><span class="p">,</span>
                 <span class="n">number_of_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_steps</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="p">]</span></div></div>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;smiles&quot;</span><span class="p">])</span>
+        <span class="p">]</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">valid_indexes</span> <span class="o">=</span> <span class="n">validate_molecules</span><span class="p">(</span><span class="n">smiles_list</span><span class="o">=</span><span class="n">smiles_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">smiles_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">valid_indexes</span><span class="p">]</span></div></div>
 </pre></div>
 
            </div>
