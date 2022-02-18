@@ -222,6 +222,5 @@ if EXTRAS_ENABLED:
                 )
             return SmallMolecule(item)
 
-
 else:
     logger.warning("install AMD_analytcs extras to use MolGX")

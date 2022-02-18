@@ -234,6 +234,5 @@ if EXTRAS_ENABLED:
             logger.info("MolGX run completed")
             return molecules_df["SMILES"].tolist()
 
-
 else:
     logger.warning("install AMD_analytcs extras to use MolGX")
