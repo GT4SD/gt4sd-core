@@ -352,7 +352,7 @@
 <span class="sd">            a list of molecules as SMILES string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># make sure the seed is transformed to avoid redundancy over multiple calls (using Knuth multiplicative hashing)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">*</span> <span class="mi">2654435761</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">32</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">*</span> <span class="mi">2654435761</span> <span class="o">%</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;configuring optimization for target: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># target configuration</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
@@ -388,7 +388,7 @@
                     <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
                         <span class="p">(</span>
                             <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">),</span>
-                            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_variance</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+                            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_variance</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
                             <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">),</span>
                         <span class="p">),</span>
                         <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
