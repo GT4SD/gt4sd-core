@@ -1,4 +1,4 @@
-"""Algortihms for topic modelling using zero-shot learning via MLNI models."""
+"""Prediction algorithms based on Paccmann"""
 
 import logging
 from dataclasses import field
