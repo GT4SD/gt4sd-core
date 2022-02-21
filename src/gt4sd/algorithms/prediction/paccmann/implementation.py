@@ -1,14 +1,11 @@
-
 """Implementation of the zero-shot classifier."""
 
 import json
 import logging
 import os
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 import torch
-from transformers import pipeline
-
 from paccmann_predictor.models import MODEL_FACTORY
 from pytoda.proteins.protein_language import ProteinLanguage
 from pytoda.smiles.smiles_language import SMILESLanguage
@@ -20,27 +17,58 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class BimodalMCAAffinityPredictor:
-    """
-    Bimodal MCA (Multiscale Convolutional Attention) affinity prediction model 
-    See https://pubs.acs.org/doi/10.1021/acs.molpharmaceut.9b00520
-    and https://iopscience.iop.org/article/10.1088/2632-2153/abe808    
+class MCAPredictor:
+    """Base implementation of an MCAPredictor."""
+
+    def predict(self) -> Any:
+        """Get prediction.
+
+        Returns:
+            predicted affinity
+        """
+        raise NotImplementedError("No prediction implemented for base MCAPredictor")
+
+    def predict_values(self) -> Any:
+        """Get prediction for algorithm sample method.
+
+        Returns:
+            predicted values as list.
+        """
+        raise NotImplementedError(
+            "No values prediction implemented for base MCAPredictor"
+        )
+
+
+class BimodalMCAAffinityPredictor(MCAPredictor):
+    """Bimodal MCA (Multiscale Convolutional Attention) affinity prediction model.
+
+    For details see: https://pubs.acs.org/doi/10.1021/acs.molpharmaceut.9b00520
+    and https://iopscience.iop.org/article/10.1088/2632-2153/abe808.
     """
 
     def __init__(
         self,
         resources_path: str,
+        protein_targets: List[str],
+        ligands: List[str],
+        confidence: bool,
         device: Optional[Union[torch.device, str]] = None,
     ):
         """Initialize BimodalMCAAffinityPredictor.
 
         Args:
-            resources_path: path where to load hypothesis, candidate labels and, optionally, the model.
+            resources_path: path where to load model weights and cofiguration.
+            protein_targets: list of protein targets as AA sequences.
+            ligands: list of ligands in SMILES format.
+            confidence: whether the confidence for the prediction should be returned.
             device: device where the inference
                 is running either as a dedicated class or a string. If not provided is inferred.
         """
-        self.device = device_claim(device)        
+        self.device = device_claim(device)
         self.resources_path = resources_path
+        self.protein_targets = protein_targets
+        self.ligands = ligands
+        self.confidence = confidence
 
         # setting affinity predictor parameters
         with open(os.path.join(resources_path, "mca_model_params.json")) as f:
@@ -61,9 +89,9 @@ class BimodalMCAAffinityPredictor:
         self.affinity_predictor.eval()
 
         self.pad_smiles_predictor = LeftPadding(
-		    self.affinity_predictor.smiles_padding_length,
-		    self.affinity_predictor.smiles_language.padding_index,
-	    )   
+            self.affinity_predictor.smiles_padding_length,
+            self.affinity_predictor.smiles_language.padding_index,
+        )
 
         self.pad_protein_predictor = LeftPadding(
             self.affinity_predictor.protein_padding_length,
@@ -72,86 +100,62 @@ class BimodalMCAAffinityPredictor:
 
         self.to_tensor = ToTensor()
 
-    #fixme: target seems to usually be part of the configuration (for most generative models...)
-    #todo: add batch support
-    def predict(self, target: str, ligand_smiles: str, confidence=False) -> List[str]:
+    def predict(self) -> Any:
         """Get predicted affinity.
 
-        Args:
-            target: target sequence
-            ligand_smiles: SMILES representation of the ligand
-            confidence: set True to calculate confidence in two ways - 
-                monte carl droput based
-                and test time augmentation based
-
         Returns:
-            predicted affinity
+            predicted affinity.
         """
-
-        if isinstance(target, str):
-            target = [target]
-
-        if isinstance(ligand_smiles, str):
-            ligand_smiles = [ligand_smiles]
-        assert isinstance(target, list)
-        assert isinstance(ligand_smiles, list)
-
-        assert len(target)>0
-        assert len(target) == len(ligand_smiles)
-
-        ### prepare ligand representation
+        # prepare ligand representation
         ligand_tensor = torch.cat(
             [
                 torch.unsqueeze(
                     self.to_tensor(
                         self.pad_smiles_predictor(
                             self.affinity_predictor.smiles_language.smiles_to_token_indexes(
-                                smile
+                                ligand_smiles
                             )
                         )
                     ),
                     0,
                 )
-                for smile in ligand_smiles
+                for ligand_smiles in self.ligands
             ],
             dim=0,
         )
-        
 
-        ### prepare target representation
-        # target_tensor = torch.unsqueeze(
-        #     self.to_tensor(
-        #         self.pad_protein_predictor(
-        #             self.affinity_predictor.protein_language.sequence_to_token_indexes(
-        #                 target
-        #             )
-        #         )
-        #     ),
-        #     0,
-        # )
-
+        # prepare target protein representation
         target_tensor = torch.cat(
             [
                 torch.unsqueeze(
                     self.to_tensor(
                         self.pad_protein_predictor(
                             self.affinity_predictor.protein_language.sequence_to_token_indexes(
-                                curr_target
+                                protein_target
                             )
                         )
                     ),
                     0,
                 )
-                for curr_target in target
+                for protein_target in self.protein_targets
             ],
             dim=0,
         )
 
         with torch.no_grad():
-            model_ans = self.affinity_predictor(
+            predictions, predictions_dict = self.affinity_predictor(
                 ligand_tensor,
                 target_tensor,
-                confidence=confidence,
+                confidence=self.confidence,
             )
 
-        return model_ans
+        return predictions, predictions_dict
+
+    def predict_values(self) -> List[float]:
+        """Get prediction for algorithm sample method.
+
+        Returns:
+            predicted values as list.
+        """
+        predictions, _ = self.predict()
+        return list(predictions[:, 0])
