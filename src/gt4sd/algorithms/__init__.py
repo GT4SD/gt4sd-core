@@ -32,6 +32,7 @@ from .generation.hugging_face.core import (  # noqa: F401
     HuggingFaceXLNetGenerator,
 )
 from .generation.polymer_blocks.core import PolymerBlocksGenerator  # noqa: F401
+from .prediction.paccmann.core import PaccMann  # noqa: F401
 from .prediction.topics_zero_shot.core import TopicsPredictor  # noqa: F401
 
 # extras requirements
