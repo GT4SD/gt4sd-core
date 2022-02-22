@@ -5,7 +5,17 @@ on:
     types: [opened]
 
 jobs:
-  build:
+  context:
+    runs-on: ubuntu-latest
+    steps:
+      - name: View issue information
+        run: |
+          echo "Issue: ${{ github.event.issue }}"
+      - name: View the github context
+        run: echo "$GITHUB_CONTEXT"
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+  cla:
     if: ${{ github.event.issue.name == 'CLA Signature' }}
     # This issue can only be opened if the CLA signing checkbox is ticked
     runs-on: ubuntu-latest
