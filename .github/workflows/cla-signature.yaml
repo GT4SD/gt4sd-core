@@ -2,45 +2,39 @@ name: CLA signature
 
 on:
   issues:
-    types: [labeled]
+    types: [opened]
 
 jobs:
-  job1:
+  build:
+    if: ${{ github.event.issue.name == 'CLA Signature' }}
     runs-on: ubuntu-latest
     steps:
-      - name: View issue information
+      - uses: actions/checkout@v2
+      - name: Adding user to contributors
         run: |
-          echo "Issue title: ${{ github.event.issue.title }}"
-          echo "Issue body: ${{ github.event.issue.body }}"
-      - name: View the github context
-        run: echo "$GITHUB_CONTEXT"
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-  # build:
-  #   if: ${{ github.event.label.name == 'cla-signing' }}
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Adding user to contributors
-  #       run: |
-  #         echo Signature by ${{ github.event.issue.user.login }}
-  #         git clone https://github.com/GT4SD/gt4sd-core --branch main --single-branch gt4sd-core-main
-  #         cd gt4sd-core-main
-  #         echo $(jq '.contributors |= (. + ["${{ github.event.issue.user.login }}"] | unique)' .clabot) > .clabot
-  #         echo Updated .clabot:
-  #         echo $(cat .clabot)
-  #         git config --local user.email "gt4sd-actions@github.com"
-  #         git config --local user.name "GitHub Action"
-  #         git add .clabot
-  #         git commit -m "chore: adding ${{ github.event.issue.user.login }} as contributor." -a || true
-  #     - name: Push changes
-  #       uses: ad-m/github-push-action@master
-  #       with:
-  #         branch: main
-  #         directory: gt4sd-core-main
-  #         github_token: ${{ secrets.GITHUB_TOKEN }}
-  #     - name: Mark signature in the issue
-  #       uses: andymckay/labeler@e6c4322d0397f3240f0e7e30a33b5c5df2d39e90
-  #       with:
-  #         add-labels: cla-signed
-  #         repo-token: ${{ secrets.GITHUB_TOKEN }}
+          echo Signature by ${{ github.event.issue.user.login }}
+          git clone https://github.com/GT4SD/gt4sd-core --branch main --single-branch gt4sd-core-main
+          cd gt4sd-core-main
+          echo $(jq '.contributors |= (. + ["${{ github.event.issue.user.login }}"] | unique)' .clabot) > .clabot
+          echo Updated .clabot:
+          echo $(cat .clabot)
+          git config --local user.email "gt4sd-actions@github.com"
+          git config --local user.name "GitHub Action"
+          git add .clabot
+          git commit -m "chore: adding ${{ github.event.issue.user.login }} as contributor." -a || true
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: main
+          directory: gt4sd-core-main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Mark signature in the issue
+        uses: andymckay/labeler@e6c4322d0397f3240f0e7e30a33b5c5df2d39e90
+        with:
+          add-labels: cla-signed
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Close issue
+        uses: ben-z/actions-comment-on-issue@1.0.2
+        with:
+          message: "TODO link to commit"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
