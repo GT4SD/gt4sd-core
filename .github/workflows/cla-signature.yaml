@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     if: ${{ github.event.issue.name == 'CLA Signature' }}
+    # This issue can only be opened if the CLA signing checkbox is ticked
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,13 +29,18 @@ jobs:
           branch: main
           directory: gt4sd-core-main
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Store commit hash
+        id: last_commit_hash
+        run: |
+          echo "last_commit_hash=$(git rev-parse HEAD | cut -c 1-8)" >> $GITHUB_ENV
       - name: Mark signature in the issue
         uses: andymckay/labeler@e6c4322d0397f3240f0e7e30a33b5c5df2d39e90
         with:
           add-labels: cla-signed
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Close issue
-        uses: ben-z/actions-comment-on-issue@1.0.2
+      - name: Close Issue
+        uses: peter-evans/close-issue@v1
         with:
-          message: "TODO link to commit"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          comment: |
+            Contributor was added: ${{ env.last_commit_hash }}.
+            Note that your PR may be still be blocked until this is merged into your branch.
