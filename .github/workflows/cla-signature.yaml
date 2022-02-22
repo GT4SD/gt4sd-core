@@ -2,19 +2,23 @@ name: CLA signature
 
 on:
   issues:
-    types: [labeled]
+    types: [opened]
 
 jobs:
-  build:
-    if: ${{ github.event.label.name == 'cla-signing' }}
+  cla:
+    if: ${{ contains(github.event.issue.body, '[X] I accept and sign the contributor license agreement') }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
     steps:
-    - uses: actions/checkout@v2
-    - name: Adding user to contributors
-      run: |
+      - uses: actions/checkout@v2
+      - name: Adding user to contributors
+        run: |
           echo Signature by ${{ github.event.issue.user.login }}
-          git clone https://github.com/GT4SD/gt4sd-core --branch main --single-branch gt4sd-core-main
+          git clone ${{ github.repositoryUrl }} --branch main --single-branch gt4sd-core-main
           cd gt4sd-core-main
+          previous_commit_hash=$(git rev-parse HEAD | cut -c 1-8)
           echo $(jq '.contributors |= (. + ["${{ github.event.issue.user.login }}"] | unique)' .clabot) > .clabot
           echo Updated .clabot:
           echo $(cat .clabot)
@@ -22,14 +26,33 @@ jobs:
           git config --local user.name "GitHub Action"
           git add .clabot
           git commit -m "chore: adding ${{ github.event.issue.user.login }} as contributor." -a || true
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        branch: main
-        directory: gt4sd-core-main
-        github_token: ${{ secrets.GH_TOKEN }}
-    - name: Mark signature in the issue
-      uses: andymckay/labeler@e6c4322d0397f3240f0e7e30a33b5c5df2d39e90
-      with:
-        add-labels: cla-signed
-        repo-token: ${{ secrets.GH_TOKEN }}
+          if [ "$previous_commit_hash" != "$(git rev-parse HEAD | cut -c 1-8)" ]; then
+            echo "signing_commit_hash=$(git rev-parse HEAD | cut -c 1-8)" >> $GITHUB_ENV
+          fi
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: main
+          directory: gt4sd-core-main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Mark signature in the issue
+        uses: andymckay/labeler@e6c4322d0397f3240f0e7e30a33b5c5df2d39e90
+        with:
+          add-labels: cla-signed
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Close issue (existing contributor)
+        uses: peter-evans/close-issue@v1
+        if: ${{ env.signing_commit_hash == '' }}
+        with:
+          comment: |
+            Contributor was added already.
+      - name: Close issue (new contributor)
+        uses: peter-evans/close-issue@v1
+        if: ${{ env.signing_commit_hash != '' }}
+        with:
+          comment: |
+            Contributor was added: ${{ env.signing_commit_hash }}.
+            Note that your PR may be still be blocked until this is merged into your branch.
+      - name: Show issue url
+        run: |
+          echo "Issue: ${{ github.event.issue.html_url }}"

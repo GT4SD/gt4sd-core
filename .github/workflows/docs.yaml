@@ -9,9 +9,11 @@ on:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     defaults:
       run:
-        shell: bash -l {0}  # for conda command
+        shell: bash -l {0} # for conda command
     steps:
       - uses: actions/checkout@v2
       - uses: conda-incubator/setup-miniconda@v2
@@ -27,7 +29,7 @@ jobs:
           cd docs && make html && cd ..
       - name: Commit documentation changes
         run: |
-          git clone https://github.com/GT4SD/gt4sd-core --branch gh-pages --single-branch gh-pages
+          git clone ${{ github.repositoryUrl }} --branch gh-pages --single-branch gh-pages
           cp -r docs/_build/html/* gh-pages/
           touch gh-pages/.nojekyll
           cd gh-pages
@@ -40,4 +42,4 @@ jobs:
         with:
           branch: gh-pages
           directory: gh-pages
-          github_token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

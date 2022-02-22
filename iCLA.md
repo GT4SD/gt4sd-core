@@ -1,4 +1,4 @@
-# Contribution License Agreement
+# Contributor License Agreement
 
 International Business Machines, Inc. (IBM) Individual Contributor License Agreement ("Agreement")
 Thank you for your interest in GT4SD ("the Project").
