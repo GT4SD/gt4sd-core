@@ -7,16 +7,18 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
   push:
-    branches:    
-      - '**'
-      - '!gh-pages'
+    branches:
+      - "**"
+      - "!gh-pages"
 
 jobs:
   tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     defaults:
       run:
-        shell: bash -l {0}  # for conda command
+        shell: bash -l {0} # for conda command
     steps:
       - uses: actions/checkout@v2
       - uses: conda-incubator/setup-miniconda@v2
