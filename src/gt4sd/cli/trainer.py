@@ -30,13 +30,13 @@ class TrainerArguments:
 
     training_pipeline_name: str = field(
         metadata={
-            "help": f"Training type of the converted model, supported types: {', '.join(SUPPORTED_TRAINING_PIPELINES)}."
+            "help": f"Training pipeline name, supported pipelines: {', '.join(SUPPORTED_TRAINING_PIPELINES)}."
         },
     )
     configuration_file: Optional[str] = field(
         default=None,
         metadata={
-            "help": "Configuration file for the trainining. It can be used to completely by-pass pipeline specific arguments."
+            "help": "Configuration file for the training in JSON format. It can be used to completely by-pass pipeline specific arguments."
         },
     )
 
