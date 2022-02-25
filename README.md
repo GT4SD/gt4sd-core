@@ -64,7 +64,7 @@ Learn more in [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 After install you can use `gt4sd` right away in your discovery workflows.
 
-### Running inference pipelines
+### Running inference pipelines in your python code
 
 Running an algorithm is as easy as typing:
 
@@ -98,6 +98,97 @@ algorithm = ApplicationsRegistry.get_application_instance(
 )
 items = list(algorithm.sample(10))
 print(items)
+```
+
+### Running inference pipelines via the CLI command
+
+GT4SD can run inference pipelines based on the `gt4sd-infrence` CLI command.
+It allows to run all inference algorithms directly from the command line.
+
+You can run inference pipelines simply typing:
+
+```console
+gt4sd-inference --algorithm_name PaccMannRL --algorithm_application PaccMannRLProteinBasedGenerator --target MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT --number_of_samples 10
+```
+
+The command supports multiple parameters to select an algorithm and configure it for inference:
+
+```console
+usage: gt4sd-inference [-h] [--algorithm_type ALGORITHM_TYPE]
+                       [--domain DOMAIN] [--algorithm_name ALGORITHM_NAME]
+                       [--algorithm_application ALGORITHM_APPLICATION]
+                       [--algorithm_version ALGORITHM_VERSION]
+                       [--target TARGET]
+                       [--number_of_samples NUMBER_OF_SAMPLES]
+                       [--configuration_file CONFIGURATION_FILE]
+                       [--print_info [PRINT_INFO]]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --algorithm_type ALGORITHM_TYPE
+                        Inference algorithm type, supported types:
+                        conditional_generation, controlled_sampling,
+                        generation, prediction. (default: None)
+  --domain DOMAIN       Domain of the inference algorithm, supported types:
+                        materials, nlp. (default: None)
+  --algorithm_name ALGORITHM_NAME
+                        Inference algorithm name. (default: None)
+  --algorithm_application ALGORITHM_APPLICATION
+                        Inference algorithm application. (default: None)
+  --algorithm_version ALGORITHM_VERSION
+                        Inference algorithm version. (default: None)
+  --target TARGET       Optional target for generation represented as a
+                        string. Defaults to None, it can be also provided in
+                        the configuration_file as an object, but the
+                        commandline takes precendence. (default: None)
+  --number_of_samples NUMBER_OF_SAMPLES
+                        Number of generated samples, defaults to 5. (default:
+                        5)
+  --configuration_file CONFIGURATION_FILE
+                        Configuration file for the inference pipeline in JSON
+                        format. (default: None)
+  --print_info [PRINT_INFO]
+                        Print info for the selected algorithm, preventing
+                        inference run. Defaults to False. (default: False)
+```
+
+You can use `gt4sd-inference` to directly get information on the configuration parameters for the selected algorithm:
+
+```console
+gt4sd-inference --algorithm_name PaccMannRL --algorithm_application PaccMannRLProteinBasedGenerator --print_info
+INFO:gt4sd.cli.inference:Selected algorithm: {'algorithm_type': 'conditional_generation', 'domain': 'materials', 'algorithm_name': 'PaccMannRL', 'algorithm_application': 'PaccMannRLProteinBasedGenerator', 'algorithm_version': 'v0'}
+INFO:gt4sd.cli.inference:Selected algorithm support the following configuration parameters:
+{
+ "batch_size": {
+  "description": "Batch size used for the generative model sampling.",
+  "title": "Batch Size",
+  "default": 32,
+  "type": "integer",
+  "optional": true
+ },
+ "temperature": {
+  "description": "Temperature parameter for the softmax sampling in decoding.",
+  "title": "Temperature",
+  "default": 1.4,
+  "type": "number",
+  "optional": true
+ },
+ "generated_length": {
+  "description": "Maximum length in tokens of the generated molcules (relates to the SMILES length).",
+  "title": "Generated Length",
+  "default": 100,
+  "type": "integer",
+  "optional": true
+ }
+}
+Target information:
+{
+ "target": {
+  "title": "Target protein sequence",
+  "description": "AA sequence of the protein target to generate non-toxic ligands against.",
+  "type": "string"
+ }
+}
 ```
 
 ### Running training pipelines via the CLI command
