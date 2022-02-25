@@ -114,6 +114,7 @@ gt4sd-inference --algorithm_name PaccMannRL --algorithm_application PaccMannRLPr
 The command supports multiple parameters to select an algorithm and configure it for inference:
 
 ```console
+$ gt4sd-inference --help
 usage: gt4sd-inference [-h] [--algorithm_type ALGORITHM_TYPE]
                        [--domain DOMAIN] [--algorithm_name ALGORITHM_NAME]
                        [--algorithm_application ALGORITHM_APPLICATION]
