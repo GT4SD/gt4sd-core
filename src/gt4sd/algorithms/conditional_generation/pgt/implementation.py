@@ -114,7 +114,9 @@ class Generator:
             self.length, self.model.config.max_position_embeddings
         )
 
-    def generate_case(self, input_text: Union[str, Tuple[str]]) -> List[str]:
+    def generate_case(
+        self, input_text: Union[str, Tuple[str]]
+    ) -> Union[List[str], List[Tuple[str, ...]]]:
         """Sample text snippets.
 
         Returns:
@@ -167,7 +169,16 @@ class Generator:
 
     def format_output(
         self, input_text: Union[str, Tuple[str]], generated_sequences: List[str]
-    ) -> List[str]:
+    ) -> Union[List[str], List[Tuple[str, ...]]]:
+        """Format output. In the general case just return the generated sequences.
+
+        Args:
+            input_text: generation input.
+            generated_sequences: generated sequences.
+
+        Returns:
+            formatted generated sequences
+        """
         return generated_sequences
 
 
@@ -175,8 +186,17 @@ class EditGenerator(Generator):
     """Implementation of edit generator."""
 
     def format_output(
-        self, input_text: str, generated_sequences: List[str]
-    ) -> List[str]:
+        self, input_text: Union[str, Tuple[str]], generated_sequences: List[str]
+    ) -> Union[List[str], List[Tuple[str, ...]]]:
+        """Format output for the patent editing task.
+
+        Args:
+           input_text: generation input.
+           generated_sequences: generated sequences.
+
+        Returns:
+           formatted generated sequences
+        """
 
         filtered_generated_sequences = []
 
@@ -202,8 +222,18 @@ class CoherenceCheckGenerator(Generator):
     """Implementation of coherence check generator."""
 
     def format_output(
-        self, input_text: str, generated_sequences: List[str]
-    ) -> List[str]:
+        self, input_text: Union[str, Tuple[str]], generated_sequences: List[str]
+    ) -> Union[List[str], List[Tuple[str, ...]]]:
+        """Format output for the patent coherence task.
+
+        Args:
+           input_text: generation input.
+           generated_sequences: generated sequences.
+
+        Returns:
+           formatted generated sequences
+        """
+
         if (
             "yes" in generated_sequences[0].lower()
             and "no" not in generated_sequences[0].lower()
