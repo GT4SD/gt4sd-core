@@ -102,7 +102,7 @@ print(items)
 
 ### Running inference pipelines via the CLI command
 
-GT4SD can run inference pipelines based on the `gt4sd-infrence` CLI command.
+GT4SD can run inference pipelines based on the `gt4sd-inference` CLI command.
 It allows to run all inference algorithms directly from the command line.
 
 You can run inference pipelines simply typing:
