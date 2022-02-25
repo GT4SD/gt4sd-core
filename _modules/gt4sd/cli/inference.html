@@ -1,0 +1,417 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.cli.inference &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.cli.inference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.cli.inference</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;Run inference pipelines for the GT4SD.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">from</span> <span class="nn">..algorithms.registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
+<span class="kn">from</span> <span class="nn">.argument_parser</span> <span class="kn">import</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">DataClassType</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">AVAILABLE_ALGORITHMS</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+    <span class="n">ApplicationsRegistry</span><span class="o">.</span><span class="n">list_available</span><span class="p">(),</span>
+    <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">algorithm</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;domain&quot;</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_type&quot;</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_name&quot;</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_application&quot;</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_version&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="n">AVAILABLE_ALGORITHMS_CATEGORIES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">algorithm</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="k">for</span> <span class="n">algorithm</span> <span class="ow">in</span> <span class="n">AVAILABLE_ALGORITHMS</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;domain&quot;</span><span class="p">,</span> <span class="s2">&quot;algorithm_type&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="filter_algorithm_applications"><a class="viewcode-back" href="../../../api/gt4sd.cli.inference.html#gt4sd.cli.inference.filter_algorithm_applications">[docs]</a><span class="k">def</span> <span class="nf">filter_algorithm_applications</span><span class="p">(</span>
+    <span class="n">algorithms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">filters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returning algorithms with given filters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        algorithm_applications (List[Dict[str, str]]): a list of algorithm applications as dictionaries.</span>
+<span class="sd">        filters (Dict[str, str]): the filters to apply.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the filtered algorithms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">application</span>
+        <span class="k">for</span> <span class="n">application</span> <span class="ow">in</span> <span class="n">algorithms</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">application</span><span class="p">[</span><span class="n">filter_type</span><span class="p">]</span> <span class="o">==</span> <span class="n">filter_value</span> <span class="k">if</span> <span class="n">filter_value</span> <span class="k">else</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">filter_type</span><span class="p">,</span> <span class="n">filter_value</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="AlgorithmApplicationArguments"><a class="viewcode-back" href="../../../api/gt4sd.cli.inference.html#gt4sd.cli.inference.AlgorithmApplicationArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">AlgorithmApplicationArguments</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Algorithm application arguments.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;algorithm_base_args&quot;</span>
+
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Inference algorithm type, supported types: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AVAILABLE_ALGORITHMS_CATEGORIES</span><span class="p">[</span><span class="s1">&#39;algorithm_type&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Domain of the inference algorithm, supported types: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AVAILABLE_ALGORITHMS_CATEGORIES</span><span class="p">[</span><span class="s1">&#39;domain&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">algorithm_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Inference algorithm name.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Inference algorithm application.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Inference algorithm version.&quot;</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InferenceArguments"><a class="viewcode-back" href="../../../api/gt4sd.cli.inference.html#gt4sd.cli.inference.InferenceArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">InferenceArguments</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Inference arguments.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;inference_base_args&quot;</span>
+
+    <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;Optional target for generation represented as a string. Defaults to None, it can be &quot;</span>
+                <span class="s2">&quot;also provided in the configuration_file as an object, but the commandline takes precendence.&quot;</span>
+            <span class="p">)</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">number_of_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of generated samples, defaults to 5.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">configuration_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Configuration file for the inference pipeline in JSON format.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">print_info</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Print info for the selected algorithm, preventing inference run. Defaults to False.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../api/gt4sd.cli.inference.html#gt4sd.cli.inference.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run an inference pipeline.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: isn case the provided training pipeline provided is not supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">cast</span><span class="p">(</span>
+            <span class="n">Iterable</span><span class="p">[</span><span class="n">DataClassType</span><span class="p">],</span> <span class="p">(</span><span class="n">AlgorithmApplicationArguments</span><span class="p">,</span> <span class="n">InferenceArguments</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">algorithm_args</span><span class="p">,</span> <span class="n">inference_args</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args_into_dataclasses</span><span class="p">(</span>
+        <span class="n">return_remaining_strings</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">filters</span> <span class="o">=</span> <span class="n">algorithm_args</span><span class="o">.</span><span class="vm">__dict__</span>
+    <span class="n">matching_algorithms</span> <span class="o">=</span> <span class="n">filter_algorithm_applications</span><span class="p">(</span>
+        <span class="n">algorithms</span><span class="o">=</span><span class="n">AVAILABLE_ALGORITHMS</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="n">algorithm_args</span><span class="o">.</span><span class="vm">__dict__</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matching_algorithms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Multiple algorithms matching the parameters:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">matching_algorithms</span><span class="p">))</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Select one by specifying additional algorithms parameters: </span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;--&#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">matching_algorithms</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">provided_filters</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span><span class="p">}</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;No algorithms matching the provided parameters, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;please review the supported algorithms:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">matching_algorithms</span><span class="p">))</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Please review the parameters provided:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">provided_filters</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">selected_algorithm</span> <span class="o">=</span> <span class="n">matching_algorithms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selected algorithm: </span><span class="si">{</span><span class="n">selected_algorithm</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">inference_args</span><span class="o">.</span><span class="n">target</span>
+    <span class="n">number_of_samples</span> <span class="o">=</span> <span class="n">inference_args</span><span class="o">.</span><span class="n">number_of_samples</span>
+    <span class="n">print_info</span> <span class="o">=</span> <span class="n">inference_args</span><span class="o">.</span><span class="n">print_info</span>
+    <span class="n">configuration_filepath</span> <span class="o">=</span> <span class="n">inference_args</span><span class="o">.</span><span class="n">configuration_file</span>
+
+    <span class="k">if</span> <span class="n">print_info</span><span class="p">:</span>
+        <span class="n">algorithm_configuration</span> <span class="o">=</span> <span class="n">ApplicationsRegistry</span><span class="o">.</span><span class="n">get_configuration_instance</span><span class="p">(</span>
+            <span class="o">**</span><span class="n">selected_algorithm</span>
+        <span class="p">)</span>
+        <span class="n">algorithm_configuration_dict</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">algorithm_configuration</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()}</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">algorithm_configuration_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Selected algorithm support the following configuration parameters:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">algorithm_configuration_dict</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Target information:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="n">algorithm_configuration</span><span class="o">.</span><span class="n">get_target_description</span><span class="p">()},</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">configuration</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="n">configuration_filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">configuration_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">configuration</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No configuration file provided, running using default parameters.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;target&quot;</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Target provided both via commandline and configuration file. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The commandline one will be used: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target</span>
+
+    <span class="n">algorithm</span> <span class="o">=</span> <span class="n">ApplicationsRegistry</span><span class="o">.</span><span class="n">get_application_instance</span><span class="p">(</span>
+        <span class="n">target</span><span class="o">=</span><span class="n">configuration</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="o">**</span><span class="n">selected_algorithm</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">configuration</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Starting generation with the following configuration:</span><span class="si">{</span><span class="n">algorithm</span><span class="o">.</span><span class="n">configuration</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">number_of_items</span><span class="o">=</span><span class="n">number_of_samples</span><span class="p">)))</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

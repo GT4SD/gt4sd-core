@@ -1,0 +1,503 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.cli.inference module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd.cli.load_arguments_from_dataclass module" href="gt4sd.cli.load_arguments_from_dataclass.html" />
+    <link rel="prev" title="gt4sd.cli.hf_to_st_converter module" href="gt4sd.cli.hf_to_st_converter.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.configuration.html">gt4sd.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.conftest.html">gt4sd.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.exceptions.html">gt4sd.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.s3.html">gt4sd.s3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.algorithms.html">gt4sd.algorithms package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="gt4sd.cli.html">gt4sd.cli package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.cli.argument_parser.html">gt4sd.cli.argument_parser module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.cli.hf_to_st_converter.html">gt4sd.cli.hf_to_st_converter module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">gt4sd.cli.inference module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.cli.load_arguments_from_dataclass.html">gt4sd.cli.load_arguments_from_dataclass module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.cli.pl_to_hf_converter.html">gt4sd.cli.pl_to_hf_converter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.cli.trainer.html">gt4sd.cli.trainer module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.domains.html">gt4sd.domains package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.extras.html">gt4sd.extras package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.tests.html">gt4sd.tests package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="gt4sd.html">gt4sd package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.cli.html">gt4sd.cli package</a> &raquo;</li>
+        
+      <li>gt4sd.cli.inference module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/gt4sd.cli.inference.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-gt4sd.cli.inference">
+<span id="gt4sd-cli-inference-module"></span><h1>gt4sd.cli.inference module<a class="headerlink" href="#module-gt4sd.cli.inference" title="Permalink to this headline">¶</a></h1>
+<p>Run inference pipelines for the GT4SD.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.cli.inference.AlgorithmApplicationArguments" title="gt4sd.cli.inference.AlgorithmApplicationArguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AlgorithmApplicationArguments</span></code></a></p></td>
+<td><p>Algorithm application arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.cli.inference.InferenceArguments" title="gt4sd.cli.inference.InferenceArguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InferenceArguments</span></code></a></p></td>
+<td><p>Inference arguments.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.cli.inference.filter_algorithm_applications" title="gt4sd.cli.inference.filter_algorithm_applications"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_algorithm_applications</span></code></a></p></td>
+<td><p>Returning algorithms with given filters.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.cli.inference.main" title="gt4sd.cli.inference.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a></p></td>
+<td><p>Run an inference pipeline.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="gt4sd.cli.inference.filter_algorithm_applications">
+<code class="sig-name descname">filter_algorithm_applications</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">algorithms</span></em>, <em class="sig-param"><span class="n">filters</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/cli/inference.html#filter_algorithm_applications"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.cli.inference.filter_algorithm_applications" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returning algorithms with given filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>algorithm_applications</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em>) – a list of algorithm applications as dictionaries.</p></li>
+<li><p><strong>filters</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – the filters to apply.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the filtered algorithms.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments">
+<em class="property">class </em><code class="sig-name descname">AlgorithmApplicationArguments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">algorithm_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">domain</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_application</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_version</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/cli/inference.html#AlgorithmApplicationArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Algorithm application arguments.</p>
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__name__">
+<code class="sig-name descname">__name__</code><em class="property"> = 'AlgorithmApplicationArguments'</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__name__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.algorithm_type">
+<code class="sig-name descname">algorithm_type</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.algorithm_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.domain">
+<code class="sig-name descname">domain</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.domain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.algorithm_name">
+<code class="sig-name descname">algorithm_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.algorithm_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.algorithm_application">
+<code class="sig-name descname">algorithm_application</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.algorithm_application" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.algorithm_version">
+<code class="sig-name descname">algorithm_version</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.algorithm_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'algorithm_application': typing.Union[str, NoneType], 'algorithm_name': typing.Union[str, NoneType], 'algorithm_type': typing.Union[str, NoneType], 'algorithm_version': typing.Union[str, NoneType], 'domain': typing.Union[str, NoneType]}</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__dataclass_fields__">
+<code class="sig-name descname">__dataclass_fields__</code><em class="property"> = {'algorithm_application': Field(name='algorithm_application',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Inference algorithm application.'}),_field_type=_FIELD), 'algorithm_name': Field(name='algorithm_name',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Inference algorithm name.'}),_field_type=_FIELD), 'algorithm_type': Field(name='algorithm_type',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Inference algorithm type, supported types: conditional_generation, controlled_sampling, generation, prediction.'}),_field_type=_FIELD), 'algorithm_version': Field(name='algorithm_version',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Inference algorithm version.'}),_field_type=_FIELD), 'domain': Field(name='domain',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Domain of the inference algorithm, supported types: materials, nlp.'}),_field_type=_FIELD)}</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__dataclass_fields__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__dataclass_params__">
+<code class="sig-name descname">__dataclass_params__</code><em class="property"> = _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False)</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__dataclass_params__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.cli.inference', '__annotations__': {'algorithm_type': typing.Union[str, NoneType], 'domain': typing.Union[str, NoneType], 'algorithm_name': typing.Union[str, NoneType], 'algorithm_application': typing.Union[str, NoneType], 'algorithm_version': typing.Union[str, NoneType]}, '__doc__': 'Algorithm application arguments.', '__name__': 'algorithm_base_args', 'algorithm_type': None, 'domain': None, 'algorithm_name': None, 'algorithm_application': None, 'algorithm_version': None, '__dict__': &lt;attribute '__dict__' of 'AlgorithmApplicationArguments' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'AlgorithmApplicationArguments' objects&gt;, '__dataclass_params__': _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False), '__dataclass_fields__': {'algorithm_type': Field(name='algorithm_type',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Inference algorithm type, supported types: conditional_generation, controlled_sampling, generation, prediction.'}),_field_type=_FIELD), 'domain': Field(name='domain',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Domain of the inference algorithm, supported types: materials, nlp.'}),_field_type=_FIELD), 'algorithm_name': Field(name='algorithm_name',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Inference algorithm name.'}),_field_type=_FIELD), 'algorithm_application': Field(name='algorithm_application',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Inference algorithm application.'}),_field_type=_FIELD), 'algorithm_version': Field(name='algorithm_version',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Inference algorithm version.'}),_field_type=_FIELD)}, '__init__': &lt;function __create_fn__.&lt;locals&gt;.__init__&gt;, '__repr__': &lt;function __create_fn__.&lt;locals&gt;.__repr__&gt;, '__eq__': &lt;function __create_fn__.&lt;locals&gt;.__eq__&gt;, '__hash__': None})</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Algorithm application arguments.'</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__hash__">
+<code class="sig-name descname">__hash__</code><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">algorithm_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">domain</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_application</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_version</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.cli.inference'</em><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.AlgorithmApplicationArguments.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.cli.inference.AlgorithmApplicationArguments.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.cli.inference.InferenceArguments">
+<em class="property">class </em><code class="sig-name descname">InferenceArguments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">number_of_samples</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">configuration_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">print_info</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/cli/inference.html#InferenceArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Inference arguments.</p>
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.__name__">
+<code class="sig-name descname">__name__</code><em class="property"> = 'InferenceArguments'</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__name__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.target">
+<code class="sig-name descname">target</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.target" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.number_of_samples">
+<code class="sig-name descname">number_of_samples</code><em class="property">: int</em><em class="property"> = 5</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.number_of_samples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.configuration_file">
+<code class="sig-name descname">configuration_file</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.configuration_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.print_info">
+<code class="sig-name descname">print_info</code><em class="property">: bool</em><em class="property"> = False</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.print_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'configuration_file': typing.Union[str, NoneType], 'number_of_samples': &lt;class 'int'&gt;, 'print_info': &lt;class 'bool'&gt;, 'target': typing.Union[str, NoneType]}</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.__dataclass_fields__">
+<code class="sig-name descname">__dataclass_fields__</code><em class="property"> = {'configuration_file': Field(name='configuration_file',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Configuration file for the inference pipeline in JSON format.'}),_field_type=_FIELD), 'number_of_samples': Field(name='number_of_samples',type=&lt;class 'int'&gt;,default=5,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Number of generated samples, defaults to 5.'}),_field_type=_FIELD), 'print_info': Field(name='print_info',type=&lt;class 'bool'&gt;,default=False,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Print info for the selected algorithm, preventing inference run. Defaults to False.'}),_field_type=_FIELD), 'target': Field(name='target',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Optional target for generation represented as a string. Defaults to None, it can be also provided in the configuration_file as an object, but the commandline takes precendence.'}),_field_type=_FIELD)}</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__dataclass_fields__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.__dataclass_params__">
+<code class="sig-name descname">__dataclass_params__</code><em class="property"> = _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False)</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__dataclass_params__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.cli.inference', '__annotations__': {'target': typing.Union[str, NoneType], 'number_of_samples': &lt;class 'int'&gt;, 'configuration_file': typing.Union[str, NoneType], 'print_info': &lt;class 'bool'&gt;}, '__doc__': 'Inference arguments.', '__name__': 'inference_base_args', 'target': None, 'number_of_samples': 5, 'configuration_file': None, 'print_info': False, '__dict__': &lt;attribute '__dict__' of 'InferenceArguments' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'InferenceArguments' objects&gt;, '__dataclass_params__': _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False), '__dataclass_fields__': {'target': Field(name='target',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Optional target for generation represented as a string. Defaults to None, it can be also provided in the configuration_file as an object, but the commandline takes precendence.'}),_field_type=_FIELD), 'number_of_samples': Field(name='number_of_samples',type=&lt;class 'int'&gt;,default=5,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Number of generated samples, defaults to 5.'}),_field_type=_FIELD), 'configuration_file': Field(name='configuration_file',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Configuration file for the inference pipeline in JSON format.'}),_field_type=_FIELD), 'print_info': Field(name='print_info',type=&lt;class 'bool'&gt;,default=False,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Print info for the selected algorithm, preventing inference run. Defaults to False.'}),_field_type=_FIELD)}, '__init__': &lt;function __create_fn__.&lt;locals&gt;.__init__&gt;, '__repr__': &lt;function __create_fn__.&lt;locals&gt;.__repr__&gt;, '__eq__': &lt;function __create_fn__.&lt;locals&gt;.__eq__&gt;, '__hash__': None})</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Inference arguments.'</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.cli.inference.InferenceArguments.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.__hash__">
+<code class="sig-name descname">__hash__</code><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.cli.inference.InferenceArguments.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">number_of_samples</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">configuration_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">print_info</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.cli.inference'</em><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.cli.inference.InferenceArguments.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.cli.inference.InferenceArguments.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.cli.inference.InferenceArguments.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="gt4sd.cli.inference.main">
+<code class="sig-name descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/cli/inference.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.cli.inference.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run an inference pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – isn case the provided training pipeline provided is not supported.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gt4sd.cli.load_arguments_from_dataclass.html" class="btn btn-neutral float-right" title="gt4sd.cli.load_arguments_from_dataclass module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd.cli.hf_to_st_converter.html" class="btn btn-neutral float-left" title="gt4sd.cli.hf_to_st_converter module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
