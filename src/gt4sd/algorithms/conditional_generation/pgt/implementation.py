@@ -177,7 +177,7 @@ class Generator:
             generated_sequences: generated sequences.
 
         Returns:
-            formatted generated sequences
+            formatted generated sequences.
         """
         return generated_sequences
 
@@ -195,7 +195,7 @@ class EditGenerator(Generator):
            generated_sequences: generated sequences.
 
         Returns:
-           formatted generated sequences
+           formatted generated sequences.
         """
 
         filtered_generated_sequences = []
@@ -231,7 +231,7 @@ class CoherenceCheckGenerator(Generator):
            generated_sequences: generated sequences.
 
         Returns:
-           formatted generated sequences
+           formatted generated sequences.
         """
 
         if (
