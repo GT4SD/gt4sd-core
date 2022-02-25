@@ -141,7 +141,9 @@ class PGTAlgorithm(AlgorithmConfiguration[str, None]):
                resources_path: local path to model files.
 
         Returns:
-               instance with :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>` method for targeted generation.
+               instance with
+                :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>`
+                 method for targeted generation.
         """
         return Generator(
             resources_path=resources_path,
@@ -175,7 +177,9 @@ class PGTGenerator(PGTAlgorithm):
            resources_path: local path to model files.
 
         Returns:
-           instance with :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>` method for targeted generation.
+           instance with
+            :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>`
+             method for targeted generation.
         """
 
         if self.task not in prompts:
@@ -204,7 +208,9 @@ class PGTEditor(PGTAlgorithm):
            resources_path: local path to model files.
 
         Returns:
-           instance with :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>` method for targeted generation.
+           instance with
+            :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>`
+             method for targeted generation.
         """
 
         self.prompt = prompts["text_infilling"]
@@ -252,7 +258,7 @@ class PGTCoherenceChecker(PGTAlgorithm):
         """Check the validity and extract coherence types of input text
 
         Returns:
-            Tuple containing the type of the input.
+            tuple containing the type of the input.
         """
 
         if self.coherence_type in self.valid_types:
@@ -270,7 +276,9 @@ class PGTCoherenceChecker(PGTAlgorithm):
            resources_path: local path to model files.
 
         Returns:
-           instance with :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>` method for targeted generation.
+           instance with
+            :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>`
+            method for targeted generation.
         """
 
         type_a, type_b = self.coherence_type.split("-")
