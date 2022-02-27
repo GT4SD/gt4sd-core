@@ -109,7 +109,7 @@ class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
 
     prompt: str = field(
         default="I am a interesting prompt",
-        metadata=dict(description="A prompt input for generation"),
+        metadata=dict(description="A prompt input for generation."),
     )
 
     model_type: str = field(
@@ -212,7 +212,7 @@ class PGTGenerator(PGTAlgorithmConfiguration):
 
 @ApplicationsRegistry.register_algorithm_application(PGT)
 class PGTEditor(PGTAlgorithmConfiguration):
-    """Configuration for a PGT Editor algorithm"""
+    """Configuration for a PGT Editor algorithm."""
 
     input_text: str = field(
         default="This is my input",

@@ -373,7 +373,7 @@ class CoherenceCheckGenerator(Generator):
         )
 
     def extract_coherence_types(self, coherence_type: str) -> Tuple[str, str]:
-        """Check the validity and extract coherence types of input text
+        """Check the validity and extract coherence types of input text.
 
         Args:
             coherence_type: Input types of the coherence check.
