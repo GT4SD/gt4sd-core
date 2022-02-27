@@ -2,29 +2,27 @@
 
 import logging
 from dataclasses import field
-from typing import Any, Callable, ClassVar, Iterable, Optional, Tuple, TypeVar
+from typing import Any, ClassVar, Dict, Optional, TypeVar
 
 from typing_extensions import Protocol, runtime_checkable
 
-from ...core import AlgorithmConfiguration, GeneratorAlgorithm
+from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
 from ...registry import ApplicationsRegistry
-from .implementation import CoherenceCheckGenerator, EditGenerator, Generator
+from .implementation import (
+    COHERENCE_TYPES,
+    EDITING_TYPES,
+    GENERATION_PROMPTS,
+    CoherenceCheckGenerator,
+    EditGenerator,
+    Generator,
+    PartGenerator,
+)
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-T = TypeVar("T", bound=Any)
-S = TypeVar("S", bound=Any)
-Targeted = Callable[[T], Iterable[Any]]
-
-prompts = {
-    "title_to_abstract": "{} <|sep|> Given the above title, suggest an abstract <|sep|>",
-    "abstract_to_claim": "{} <|sep|> Given the above abstract, suggest a claim <|sep|>",
-    "claim_to_abstract": "{} <|sep|> Given the above claim, suggest an abstract <|sep|>",
-    "abstract_to_title": "{} <|sep|> Given the above abstract, suggest a title <|sep|>",
-    "patent_provenance": "{} <|sep|> {} <|sep|> Do the above TYPE_A and TYPE_B belong to the same patent? <|sep|>",
-    "text_infilling": "{} <|sep|> Replace the [MASK] tokens in the above TYPE <|sep|>",
-}
+T = type(None)
+S = TypeVar("S", bound=str)
 
 
 class PGT(GeneratorAlgorithm[S, T]):
@@ -33,22 +31,21 @@ class PGT(GeneratorAlgorithm[S, T]):
     def __init__(
         self,
         configuration: AlgorithmConfiguration[S, T],
-        target: Optional[T],
+        target: Optional[T] = None,
     ) -> None:
         """Instantiate PGT ready to generate items.
 
         Args:
             configuration: domain and application
                 specification defining parameters, types and validations.
-            target: a target for which to generate items.
+            target: unused since it is not a conditional generator.
 
         Example:
             An example for generating abstract from a given claim:
 
-                config = PGTGenerator(task="claim_to_abstract")
-
-                generator = PGT(configuration=config, target="My amazing claim")
-                print(list(generator.sample()))
+                config = PGTGenerator(task="claim_to_abstract", input_text="My interesting claim")
+                generator = PGT(configuration=config)
+                print(list(generator.sample(1)))
         """
 
         configuration = self.validate_configuration(configuration)
@@ -65,20 +62,20 @@ class PGT(GeneratorAlgorithm[S, T]):
         self,
         configuration: AlgorithmConfiguration[S, T],
         target: Optional[T],
-    ) -> Targeted[T]:
+    ) -> Untargeted:
         """Get the function to sample with the given configuration.
 
         Args:
             configuration: helps to set up specific application of PGT.
-            target: context or condition for the generation.
+            target: context or condition for the generation. Unused in the algorithm.
 
         Returns:
             callable with target generating a batch of items.
         """
         logger.info("ensure artifacts for the application are present.")
         self.local_artifacts = configuration.ensure_artifacts()
-        implementation: Generator = configuration.get_conditional_generator(  # type: ignore
-            resources_path=self.local_artifacts, context=target
+        implementation: Generator = configuration.get_generator(  # type: ignore
+            self.local_artifacts
         )
 
         return implementation.generate_case  # type: ignore
@@ -90,7 +87,7 @@ class PGT(GeneratorAlgorithm[S, T]):
         class AnyPGTConfiguration(Protocol):
             """Protocol for PGT configurations."""
 
-            def get_conditional_generator(self, resources_path: str) -> Generator:
+            def get_generator(self, resources_path: str) -> Generator:
                 ...
 
             def validate_item(self, item: Any) -> S:
@@ -103,14 +100,17 @@ class PGT(GeneratorAlgorithm[S, T]):
 
 
 @ApplicationsRegistry.register_algorithm_application(PGT)
-class PGTAlgorithm(AlgorithmConfiguration[str, None]):
+class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
     """Basic configuration for a PGT algorithm"""
 
-    prompt: str = prompts["title_to_abstract"]  # default prompt
-
-    algorithm_type: ClassVar[str] = "conditional_generation"
+    algorithm_type: ClassVar[str] = "generation"
     domain: ClassVar[str] = "nlp"
     algorithm_version: str = "v0"
+
+    prompt: str = field(
+        default="I am a interesting prompt",
+        metadata=dict(description="A prompt input for generation"),
+    )
 
     model_type: str = field(
         default="",
@@ -133,8 +133,20 @@ class PGTAlgorithm(AlgorithmConfiguration[str, None]):
         default=3,
         metadata=dict(description="Number of alternatives to be generated."),
     )
+    no_repeat_ngram_size: int = field(
+        default=2,
+        metadata=dict(description="Size of n-gram to not appear twice."),
+    )
 
-    def get_conditional_generator(self, resources_path: str, **kwargs) -> Generator:
+    def get_target_description(self) -> Optional[Dict[str, str]]:
+        """Get description of the target for generation.
+
+        Returns:
+            target description, returns None in case no target is used.
+        """
+        return None
+
+    def get_generator(self, resources_path: str, **kwargs) -> Generator:
         """Instantiate the actual PGT implementation.
 
         Args:
@@ -142,7 +154,7 @@ class PGTAlgorithm(AlgorithmConfiguration[str, None]):
 
         Returns:
                instance with
-                :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>`
+                :meth:`generate_batch<gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case>`
                  method for targeted generation.
         """
         return Generator(
@@ -158,19 +170,21 @@ class PGTAlgorithm(AlgorithmConfiguration[str, None]):
 
 
 @ApplicationsRegistry.register_algorithm_application(PGT)
-class PGTGenerator(PGTAlgorithm):
+class PGTGenerator(PGTAlgorithmConfiguration):
     """Configuration for a PGT Generator algorithm"""
 
+    input_text: str = field(
+        default="This is my input",
+        metadata=dict(description="Input text."),
+    )
     task: str = field(
-        default="title_to_abstract",
+        default="title-to-abstract",
         metadata=dict(
-            description="Generation task. Options:"
-            "title_to_abstract, abstract_to_title,"
-            "abstract_to_claim and claim_to_abstract."
+            description=f"Generation tasks. Supported: {', '.join(GENERATION_PROMPTS.keys())}"
         ),
     )
 
-    def get_conditional_generator(self, resources_path: str, **kwargs) -> Generator:
+    def get_generator(self, resources_path: str, **kwargs) -> Generator:
         """Instantiate the actual PGT implementation for part of patent generation.
 
         Args:
@@ -178,30 +192,40 @@ class PGTGenerator(PGTAlgorithm):
 
         Returns:
            instance with
-            :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>`
+            :meth:`generate_batch<gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case>`
              method for targeted generation.
         """
 
-        if self.task not in prompts:
-            raise ValueError(f"{self.task} is not a valid option for task.")
-
-        self.prompt = prompts[self.task]
-
-        return super().get_conditional_generator(resources_path, **kwargs)
+        return PartGenerator(
+            resources_path=resources_path,
+            input_text=self.input_text,
+            model_type=self.model_type,
+            model_name=self.algorithm_version,
+            max_length=self.max_length,
+            top_k=self.top_k,
+            top_p=self.top_p,
+            num_return_sequences=self.num_return_sequences,
+            no_repeat_ngram_size=self.no_repeat_ngram_size,
+            task=self.task,
+        )
 
 
 @ApplicationsRegistry.register_algorithm_application(PGT)
-class PGTEditor(PGTAlgorithm):
+class PGTEditor(PGTAlgorithmConfiguration):
     """Configuration for a PGT Editor algorithm"""
 
-    type: str = field(
+    input_text: str = field(
+        default="This is my input",
+        metadata=dict(description="Input text."),
+    )
+    input_type: str = field(
         default="abstract",
         metadata=dict(
-            description="In which part of a patent the input text belongs. Options: abstract and title."
+            description=f"Part of a patent the input text belongs. Supported: {', '.join(EDITING_TYPES)}"
         ),
     )
 
-    def get_conditional_generator(self, resources_path: str, **kwargs) -> Generator:
+    def get_generator(self, resources_path: str, **kwargs) -> Generator:
         """Instantiate the actual PGT implementation for part of patent editing.
 
         Args:
@@ -209,30 +233,34 @@ class PGTEditor(PGTAlgorithm):
 
         Returns:
            instance with
-            :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>`
+            :meth:`generate_batch<gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case>`
              method for targeted generation.
         """
 
-        self.prompt = prompts["text_infilling"]
-        self.prompt = self.prompt.replace("TYPE", self.type)
-
         return EditGenerator(
             resources_path=resources_path,
+            input_text=self.input_text,
             model_type=self.model_type,
             model_name=self.algorithm_version,
-            prompt=self.prompt,
             max_length=self.max_length,
             top_k=self.top_k,
             top_p=self.top_p,
             num_return_sequences=self.num_return_sequences,
+            no_repeat_ngram_size=self.no_repeat_ngram_size,
+            input_type=self.input_type,
         )
 
 
 @ApplicationsRegistry.register_algorithm_application(PGT)
-class PGTCoherenceChecker(PGTAlgorithm):
+class PGTCoherenceChecker(PGTAlgorithmConfiguration):
     """Configuration for a PGT coherence check algorithm"""
 
-    num_return_sequences: int = 1
+    num_return_sequences: int = field(
+        default=1,
+        metadata=dict(
+            description="Number of alternatives should be always 1 for coherence check."
+        ),
+    )
 
     input_a: str = field(
         default="I'm a stochastic parrot.",
@@ -247,29 +275,11 @@ class PGTCoherenceChecker(PGTAlgorithm):
     coherence_type: str = field(
         default="title-abstract",
         metadata=dict(
-            description="Combination of inputs for the check. Options:"
-            "title-abstract, title-claim and abstract-claim."
+            description=f"Input types for the check. Supported: {', '.join(COHERENCE_TYPES)}"
         ),
     )
 
-    valid_types = ["title-abstract", "abstract-claim", "title-claim"]
-
-    def extract_coherence_types(self) -> Tuple[str, str]:
-        """Check the validity and extract coherence types of input text
-
-        Returns:
-            tuple containing the type of the input.
-        """
-
-        if self.coherence_type in self.valid_types:
-            type_a, type_b = self.coherence_type.split("-")
-
-            return type_a, type_b
-
-        else:
-            raise ValueError(f"{self.coherence_type} is not a valid coherence type")
-
-    def get_conditional_generator(self, resources_path: str, **kwargs) -> Generator:
+    def get_generator(self, resources_path: str, **kwargs) -> Generator:
         """Instantiate the actual PGT implementation for patent coherence check.
 
         Args:
@@ -277,23 +287,20 @@ class PGTCoherenceChecker(PGTAlgorithm):
 
         Returns:
            instance with
-            :meth:`generate_batch<gt4sd.algorithms.conditional_generation.pgt.implementation.Generator.generate_case>`
+            :meth:`generate_batch<gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case>`
             method for targeted generation.
         """
 
-        type_a, type_b = self.coherence_type.split("-")
-
-        self.prompt = prompts["patent_provenance"]
-        self.prompt = self.prompt.replace("TYPE_A", type_a)
-        self.prompt = self.prompt.replace("TYPE_B", type_b)
-
         return CoherenceCheckGenerator(
             resources_path=resources_path,
+            input_a=self.input_a,
+            input_b=self.input_b,
             model_type=self.model_type,
             model_name=self.algorithm_version,
-            prompt=self.prompt,
             max_length=self.max_length,
             top_k=self.top_k,
             top_p=self.top_p,
             num_return_sequences=self.num_return_sequences,
+            no_repeat_ngram_size=self.no_repeat_ngram_size,
+            coherence_type=self.coherence_type,
         )

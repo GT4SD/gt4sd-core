@@ -4,13 +4,13 @@ from typing import ClassVar, Type
 
 import pytest
 
-from gt4sd.algorithms.conditional_generation.pgt import (
+from gt4sd.algorithms.core import AlgorithmConfiguration
+from gt4sd.algorithms.generation.pgt import (
     PGT,
     PGTCoherenceChecker,
     PGTEditor,
     PGTGenerator,
 )
-from gt4sd.algorithms.core import AlgorithmConfiguration
 from gt4sd.algorithms.registry import ApplicationsRegistry
 
 
@@ -24,19 +24,19 @@ def get_classvar_type(class_var):
     [
         (
             PGTGenerator,
-            "conditional_generation",
+            "generation",
             "nlp",
             PGT.__name__,
         ),
         (
             PGTEditor,
-            "conditional_generation",
+            "generation",
             "nlp",
             PGT.__name__,
         ),
         (
             PGTCoherenceChecker,
-            "conditional_generation",
+            "generation",
             "nlp",
             PGT.__name__,
         ),
@@ -86,7 +86,7 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
 )
 def test_generation_via_import(config, algorithm):
     algorithm = algorithm(
-        configuration=config(), target="This is a text used for the tests."
+        configuration=config()
     )
     items = list(algorithm.sample(1))
     assert len(items) == 1
@@ -99,7 +99,7 @@ def test_generation_via_import(config, algorithm):
     ],
 )
 def test_coherence_via_import(config, algorithm):
-    algorithm = algorithm(configuration=config(), target=("first text", "second text"))
+    algorithm = algorithm(configuration=config())
     items = list(algorithm.sample(1))
     assert len(items) == 1
 
@@ -109,13 +109,13 @@ def test_coherence_via_import(config, algorithm):
     [
         (
             PGTGenerator.__name__,
-            "conditional_generation",
+            "generation",
             "nlp",
             PGT.__name__,
         ),
         (
             PGTEditor.__name__,
-            "conditional_generation",
+            "generation",
             "nlp",
             PGT.__name__,
         ),
@@ -125,7 +125,6 @@ def test_generation_via_registry(
     algorithm_type, domain, algorithm_name, algorithm_application
 ):
     algorithm = ApplicationsRegistry.get_application_instance(
-        target="This is a text used for the tests.",
         algorithm_type=algorithm_type,
         domain=domain,
         algorithm_name=algorithm_name,
@@ -140,7 +139,7 @@ def test_generation_via_registry(
     [
         (
             PGTCoherenceChecker.__name__,
-            "conditional_generation",
+            "generation",
             "nlp",
             PGT.__name__,
         ),
@@ -150,7 +149,6 @@ def test_coherence_via_registry(
     algorithm_type, domain, algorithm_name, algorithm_application
 ):
     algorithm = ApplicationsRegistry.get_application_instance(
-        target=("first text", "second text"),
         algorithm_type=algorithm_type,
         domain=domain,
         algorithm_name=algorithm_name,
