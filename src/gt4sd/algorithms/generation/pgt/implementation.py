@@ -1,6 +1,5 @@
 """
-Implementation details for HuggingFace generation algorithms.
-Parts of the implementation inspired by: https://github.com/huggingface/transformers/blob/v4.2.1/examples/text-generation/run_generation.py.
+Implementation details for PGT algorithms.
 """
 
 import logging
@@ -17,6 +16,16 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 MAXIMUM_LENGTH = int(10000)
+GENERATION_PROMPTS = {
+    "title-to-abstract": "{} <|sep|> Given the above title, suggest an abstract <|sep|>",
+    "abstract-to-claim": "{} <|sep|> Given the above abstract, suggest a claim <|sep|>",
+    "claim-to-abstract": "{} <|sep|> Given the above claim, suggest an abstract <|sep|>",
+    "abstract-to-title": "{} <|sep|> Given the above abstract, suggest a title <|sep|>",
+}
+EDITING_TYPES = ["abstract", "claim"]
+COHERENCE_TYPES = ["title-abstract", "abstract-claim", "title-claim"]
+
+STOPPING_PUNCTUATION_REGEX = re.compile(r"(.+(?=\.|!|;)(.|!|;)|(.*))")
 
 
 def adjust_length_to_model(length: int, maximum_sequence_length: int):
@@ -41,9 +50,6 @@ def adjust_length_to_model(length: int, maximum_sequence_length: int):
         logger.warning(f"negative length, adjusting to maximal length {MAXIMUM_LENGTH}")
         length = MAXIMUM_LENGTH
     return length
-
-
-STOPPING_PUNCTUATION_REGEX = re.compile(r"(.+(?=\.|!|;)(.|!|;)|(.*))")
 
 
 class Generator:
@@ -114,21 +120,14 @@ class Generator:
             self.length, self.model.config.max_position_embeddings
         )
 
-    def generate_case(
-        self, input_text: Union[str, Tuple[str]]
-    ) -> Union[List[str], List[Tuple[str, ...]]]:
+    def generate_case(self) -> Union[List[str], List[Tuple[str, ...]]]:
         """Sample text snippets.
 
         Returns:
             generated text snippets.
         """
 
-        if isinstance(input_text, tuple):
-            input_prompt = self.prompt.format(*input_text)
-        else:
-            input_prompt = self.prompt.format(input_text)
-
-        encoded_prompt = self.tokenizer.encode(input_prompt, return_tensors="pt")
+        encoded_prompt = self.tokenizer.encode(self.prompt, return_tensors="pt")
         encoded_prompt = encoded_prompt.to(self.device)
 
         if encoded_prompt.size()[-1] == 0:
@@ -155,7 +154,7 @@ class Generator:
         for generated_sequence in output_sequences:
             generated_sequence = generated_sequence.tolist()
             text = self.tokenizer.decode(generated_sequence)
-            text = text.replace(input_prompt, "")
+            text = text.replace(self.prompt, "")
             text = text.split("<|endoftext|>")[0]
             text = text.replace("<|pad|>", "")
             text = text.strip()
@@ -165,7 +164,7 @@ class Generator:
 
             generated_sequences.append(text)
 
-        return self.format_output(input_text, generated_sequences)
+        return self.format_output(self.prompt, generated_sequences)
 
     def format_output(
         self, input_text: Union[str, Tuple[str]], generated_sequences: List[str]
@@ -182,8 +181,111 @@ class Generator:
         return generated_sequences
 
 
+class PartGenerator(Generator):
+    """Implementation of edit generator."""
+
+    def __init__(
+        self,
+        resources_path: str,
+        input_text: str,
+        model_type: str,
+        model_name: str,
+        task: str,
+        max_length: int,
+        top_k: int,
+        top_p: float,
+        num_return_sequences: int,
+        no_repeat_ngram_size: int = 2,
+        device: Optional[Union[torch.device, str]] = None,
+    ):
+        """PGT generation algorithm.
+        Args:
+            resources_path: path to the cache.
+            input_text: input text for generation.
+            task: generation task.
+            model_type: type of the model.
+            model_name: name of the model weights/version.
+            max_length: max length of the generated text.
+            top_k: number of top-k probability token to keep.
+            top_p: only tokens with cumulative probabilities summing up to this value are kept.
+            num_return_sequences: number of generated sequences.
+            no_repeat_ngram_size: size of n-gram to not appear twice.
+            device: device where the inference
+                is running either as a dedicated class or a string. If not provided is inferred.
+        """
+
+        if task not in GENERATION_PROMPTS:
+            raise ValueError(f"{task} is not a valid option for task.")
+
+        prompt = GENERATION_PROMPTS[task]
+        prompt = prompt.format(input_text)
+
+        super().__init__(
+            resources_path=resources_path,
+            model_type=model_type,
+            model_name=model_name,
+            prompt=prompt,
+            max_length=max_length,
+            top_k=top_k,
+            top_p=top_p,
+            num_return_sequences=num_return_sequences,
+            no_repeat_ngram_size=no_repeat_ngram_size,
+            device=device,
+        )
+
+
 class EditGenerator(Generator):
     """Implementation of edit generator."""
+
+    def __init__(
+        self,
+        resources_path: str,
+        input_text: str,
+        model_type: str,
+        model_name: str,
+        max_length: int,
+        top_k: int,
+        top_p: float,
+        num_return_sequences: int,
+        no_repeat_ngram_size: int = 2,
+        device: Optional[Union[torch.device, str]] = None,
+        input_type: str = "abstract",
+    ):
+        """PGT generation algorithm.
+        Args:
+            resources_path: path to the cache.
+            input_text: input text for generation.
+            model_type: type of the model.
+            model_name: name of the model weights/version.
+            max_length: max length of the generated text.
+            top_k: number of top-k probability token to keep.
+            top_p: only tokens with cumulative probabilities summing up to this value are kept.
+            num_return_sequences: number of generated sequences.
+            no_repeat_ngram_size: size of n-gram to not appear twice.
+            device: device where the inference
+                is running either as a dedicated class or a string. If not provided is inferred.
+            input_type: part of a patent the input text belongs.
+        """
+
+        if input_type not in EDITING_TYPES:
+            raise ValueError(
+                f"{input_type} is not a valid option for editing input type."
+            )
+
+        prompt = f"{input_text} <|sep|> Replace the [MASK] tokens in the above {input_type} <|sep|>"
+
+        super().__init__(
+            resources_path=resources_path,
+            model_type=model_type,
+            model_name=model_name,
+            prompt=prompt,
+            max_length=max_length,
+            top_k=top_k,
+            top_p=top_p,
+            num_return_sequences=num_return_sequences,
+            no_repeat_ngram_size=no_repeat_ngram_size,
+            device=device,
+        )
 
     def format_output(
         self, input_text: Union[str, Tuple[str]], generated_sequences: List[str]
@@ -200,8 +302,8 @@ class EditGenerator(Generator):
 
         filtered_generated_sequences = []
 
-        number_of_masks = input_text.count("[MASK]")
-        print(generated_sequences)
+        number_of_masks = input_text.count("[MASK]") - 1
+
         for seq in generated_sequences:
             generated_masked_tokens = seq.split("<|mask_sep|>")
 
@@ -220,6 +322,72 @@ class EditGenerator(Generator):
 
 class CoherenceCheckGenerator(Generator):
     """Implementation of coherence check generator."""
+
+    def __init__(
+        self,
+        resources_path: str,
+        input_a: str,
+        input_b: str,
+        model_type: str,
+        model_name: str,
+        max_length: int,
+        top_k: int,
+        top_p: float,
+        num_return_sequences: int,
+        no_repeat_ngram_size: int = 2,
+        device: Optional[Union[torch.device, str]] = None,
+        coherence_type: str = "title-abstract",
+    ):
+        """PGT generation algorithm.
+        Args:
+            resources_path: path to the cache.
+            input_a: first input for coherence check.
+            input_b: second input for coherence check.
+            model_type: type of the model.
+            model_name: name of the model weights/version.
+            max_length: max length of the generated text.
+            top_k: number of top-k probability token to keep.
+            top_p: only tokens with cumulative probabilities summing up to this value are kept.
+            num_return_sequences: number of generated sequences.
+            no_repeat_ngram_size: size of n-gram to not appear twice.
+            device: device where the inference
+                is running either as a dedicated class or a string. If not provided is inferred.
+            coherence_type: input types for the check.
+        """
+
+        type_a, type_b = self.extract_coherence_types(coherence_type)
+
+        prompt = f"{input_a} <|sep|> {input_b} <|sep|> Do the above {type_a} and {type_b} belong to the same patent? <|sep|>"
+
+        super().__init__(
+            resources_path=resources_path,
+            model_type=model_type,
+            model_name=model_name,
+            prompt=prompt,
+            max_length=max_length,
+            top_k=top_k,
+            top_p=top_p,
+            num_return_sequences=num_return_sequences,
+            no_repeat_ngram_size=no_repeat_ngram_size,
+            device=device,
+        )
+
+    def extract_coherence_types(self, coherence_type: str) -> Tuple[str, str]:
+        """Check the validity and extract coherence types of input text
+
+        Args:
+            coherence_type: Input types of the coherence check.
+        Returns:
+            tuple containing the type of the input.
+        """
+
+        if coherence_type in COHERENCE_TYPES:
+            type_a, type_b = coherence_type.split("-")
+
+            return type_a, type_b
+
+        else:
+            raise ValueError(f"{coherence_type} is not a valid coherence type.")
 
     def format_output(
         self, input_text: Union[str, Tuple[str]], generated_sequences: List[str]
