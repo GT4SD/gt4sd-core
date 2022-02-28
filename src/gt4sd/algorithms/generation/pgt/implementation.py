@@ -127,6 +127,9 @@ class Generator:
             generated text snippets.
         """
 
+        self.prompt = re.sub(" +", " ", self.prompt)
+        self.prompt = re.sub(r'\s([?.!,:;·"](?:\s|$))', r"\1", self.prompt)
+
         encoded_prompt = self.tokenizer.encode(self.prompt, return_tensors="pt")
         encoded_prompt = encoded_prompt.to(self.device)
 
