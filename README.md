@@ -24,23 +24,24 @@ Currently `gt4sd` relies on:
 - python>=3.7,<3.8
 - pip>=19.1,<20.3
 
-We are actively working on relaxing these, so stay tuned or help us with his by [contributing](./CONTRIBUTING.md) to the project.
+We are actively working on relaxing these, so stay tuned or help us with this by [contributing](./CONTRIBUTING.md) to the project.
 
-### pip
+### conda
 
-If you simply want to use `gt4sd` in your projects, install it via `pip` from [PyPI](https://pypi.org/project/gt4sd/):
+The recommended way to install the `gt4sd` is to create a dedicated conda environment, this will ensure all requirements are satisfied:
+
+```sh
+conda env create -f conda.yml
+conda activate gt4sd
+```
+
+And install the package via `pip` from [PyPI](https://pypi.org/project/gt4sd/)s:
 
 ```sh
 pip install gt4sd
 ```
 
-You can also install `gt4sd` directly from GitHub:
-
-```sh
-pip install git+https://github.com/GT4SD/gt4sd-core
-```
-
-**NOTE:** As of now (:eyes: on [issue](https://github.com/GT4SD/gt4sd-core/issues/31) for changes), some dependencies require installation from GitHub, so for a complete setup install them with:
+**NOTE:** In case you want to reuse an existing compatible environment (see [requirements](#requirements)), you can use `pip`, but as of now (:eyes: on [issue](https://github.com/GT4SD/gt4sd-core/issues/31) for changes), some dependencies require installation from GitHub, so for a complete setup install them with:
 
 ```sh
 pip install -r vcs_requirements.txt
@@ -51,10 +52,9 @@ pip install -r vcs_requirements.txt
 If you would like to contribute to the package, we recommend the following development setup:
 
 ```sh
-git clone git@github.com:GT4SD/gt4sd-core.git
-cd gt4sd-core
 conda env create -f conda.yml
 conda activate gt4sd
+# install gt4sd in editable mode
 pip install --no-deps -e .
 ```
 
@@ -81,8 +81,7 @@ items = list(algorithm.sample(10))
 print(items)
 ```
 
-Or you can use the `ApplicationRegistry` to run an algorithm instance using a
-serialized representation of the algorithm:
+Or you can use the `ApplicationRegistry` to run an algorithm instance using a serialized representation of the algorithm:
 
 ```python
 from gt4sd.algorithms.registry import ApplicationsRegistry
