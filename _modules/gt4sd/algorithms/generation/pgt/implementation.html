@@ -1,0 +1,624 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.generation.pgt.implementation &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.generation.pgt.implementation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.generation.pgt.implementation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Implementation details for PGT algorithms.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GPT2LMHeadModel</span><span class="p">,</span> <span class="n">GPT2Tokenizer</span>
+
+<span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="n">MAXIMUM_LENGTH</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">GENERATION_PROMPTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;title-to-abstract&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> &lt;|sep|&gt; Given the above title, suggest an abstract &lt;|sep|&gt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;abstract-to-claim&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> &lt;|sep|&gt; Given the above abstract, suggest a claim &lt;|sep|&gt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;claim-to-abstract&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> &lt;|sep|&gt; Given the above claim, suggest an abstract &lt;|sep|&gt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;abstract-to-title&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> &lt;|sep|&gt; Given the above abstract, suggest a title &lt;|sep|&gt;&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">EDITING_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;abstract&quot;</span><span class="p">,</span> <span class="s2">&quot;claim&quot;</span><span class="p">]</span>
+<span class="n">COHERENCE_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;title-abstract&quot;</span><span class="p">,</span> <span class="s2">&quot;abstract-claim&quot;</span><span class="p">,</span> <span class="s2">&quot;title-claim&quot;</span><span class="p">]</span>
+
+<span class="n">STOPPING_PUNCTUATION_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(.+(?=\.|!|;)(.|!|;)|(.*))&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="adjust_length_to_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.adjust_length_to_model">[docs]</a><span class="k">def</span> <span class="nf">adjust_length_to_model</span><span class="p">(</span><span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">maximum_sequence_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adjust sequence length.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        length: target length.</span>
+<span class="sd">        maximum_sequence_length: maximum sequence length.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        the adjusted length.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">maximum_sequence_length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;negative length, adjusting to model supported length </span><span class="si">{</span><span class="n">maximum_sequence_length</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">maximum_sequence_length</span>
+    <span class="k">elif</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">maximum_sequence_length</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;longer then model supported length, adjusting to </span><span class="si">{</span><span class="n">maximum_sequence_length</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">maximum_sequence_length</span>
+    <span class="k">elif</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;negative length, adjusting to maximal length </span><span class="si">{</span><span class="n">MAXIMUM_LENGTH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">MAXIMUM_LENGTH</span>
+    <span class="k">return</span> <span class="n">length</span></div>
+
+
+<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator">[docs]</a><span class="k">class</span> <span class="nc">Generator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Implementation of a generator.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Generator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">top_p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">num_return_sequences</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">no_repeat_ngram_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;PGT generation algorithm.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: path to the cache.</span>
+<span class="sd">            model_type: type of the model.</span>
+<span class="sd">            model_name: name of the model weights/version.</span>
+<span class="sd">            prompt: prompt for text generation.</span>
+<span class="sd">            max_length: max length of the generated text.</span>
+<span class="sd">            top_k: number of top-k probability token to keep.</span>
+<span class="sd">            top_p: only tokens with cumulative probabilities summing up to this value are kept.</span>
+<span class="sd">            num_return_sequences: number of generated sequences.</span>
+<span class="sd">            no_repeat_ngram_size: size of n-gram to not appear twice.</span>
+<span class="sd">            device: device where the inference</span>
+<span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span> <span class="o">=</span> <span class="n">resources_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="n">model_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="n">prompt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">max_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">top_k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">top_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_repeat_ngram_size</span> <span class="o">=</span> <span class="n">no_repeat_ngram_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_sequences</span> <span class="o">=</span> <span class="n">num_return_sequences</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Generator.load_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Load a pretrained PGT model.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">):</span>
+            <span class="n">model_name_or_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">GPT2Tokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>  <span class="c1"># type:ignore</span>
+            <span class="n">model_name_or_path</span><span class="p">,</span>
+            <span class="n">sep_token</span><span class="o">=</span><span class="s2">&quot;&lt;|sep|&gt;&quot;</span><span class="p">,</span>
+            <span class="n">mask_token</span><span class="o">=</span><span class="s2">&quot;[MASK]&quot;</span><span class="p">,</span>
+            <span class="n">pad_token</span><span class="o">=</span><span class="s2">&quot;&lt;|pad|&gt;&quot;</span><span class="p">,</span>
+            <span class="n">additional_special_tokens</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;|mask_sep|&gt;&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name_or_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># adjusting length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">adjust_length_to_model</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_position_embeddings</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Generator.generate_case"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case">[docs]</a>    <span class="k">def</span> <span class="nf">generate_case</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]:</span>
+        <span class="sd">&quot;&quot;&quot;Sample text snippets.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            generated text snippets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot; +&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s([?.!,:;·&quot;](?:\s|$))&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">)</span>
+
+        <span class="n">encoded_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span>
+        <span class="n">encoded_prompt</span> <span class="o">=</span> <span class="n">encoded_prompt</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">encoded_prompt</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">input_ids</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">input_ids</span> <span class="o">=</span> <span class="n">encoded_prompt</span>
+
+        <span class="n">output_sequences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+            <span class="n">input_ids</span><span class="o">=</span><span class="n">input_ids</span><span class="p">,</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span>
+            <span class="n">top_k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
+            <span class="n">top_p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+            <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">no_repeat_ngram_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">no_repeat_ngram_size</span><span class="p">,</span>
+            <span class="n">num_return_sequences</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_sequences</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># NOTE: remove the batch dimension when returning multiple sequences</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_sequences</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">output_sequences</span><span class="o">.</span><span class="n">squeeze_</span><span class="p">()</span>
+
+        <span class="n">generated_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">generated_sequence</span> <span class="ow">in</span> <span class="n">output_sequences</span><span class="p">:</span>
+            <span class="n">generated_sequence</span> <span class="o">=</span> <span class="n">generated_sequence</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">generated_sequence</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&lt;|endoftext|&gt;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&lt;|pad|&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">STOPPING_PUNCTUATION_REGEX</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>  <span class="c1"># type:ignore</span>
+                <span class="n">text</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+
+            <span class="n">generated_sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span> <span class="n">generated_sequences</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Generator.format_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.format_output">[docs]</a>    <span class="k">def</span> <span class="nf">format_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">input_text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">generated_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]:</span>
+        <span class="sd">&quot;&quot;&quot;Format output. In the general case just return the generated sequences.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_text: generation input.</span>
+<span class="sd">            generated_sequences: generated sequences.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            formatted generated sequences.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">generated_sequences</span></div></div>
+
+
+<div class="viewcode-block" id="PartGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.PartGenerator">[docs]</a><span class="k">class</span> <span class="nc">PartGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implementation of edit generator.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PartGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.PartGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">input_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">top_p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">num_return_sequences</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">no_repeat_ngram_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;PGT generation algorithm.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: path to the cache.</span>
+<span class="sd">            input_text: input text for generation.</span>
+<span class="sd">            task: generation task.</span>
+<span class="sd">            model_type: type of the model.</span>
+<span class="sd">            model_name: name of the model weights/version.</span>
+<span class="sd">            max_length: max length of the generated text.</span>
+<span class="sd">            top_k: number of top-k probability token to keep.</span>
+<span class="sd">            top_p: only tokens with cumulative probabilities summing up to this value are kept.</span>
+<span class="sd">            num_return_sequences: number of generated sequences.</span>
+<span class="sd">            no_repeat_ngram_size: size of n-gram to not appear twice.</span>
+<span class="sd">            device: device where the inference</span>
+<span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">GENERATION_PROMPTS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2"> is not a valid option for task.&quot;</span><span class="p">)</span>
+
+        <span class="n">prompt</span> <span class="o">=</span> <span class="n">GENERATION_PROMPTS</span><span class="p">[</span><span class="n">task</span><span class="p">]</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="n">prompt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">input_text</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+            <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+            <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
+            <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
+            <span class="n">num_return_sequences</span><span class="o">=</span><span class="n">num_return_sequences</span><span class="p">,</span>
+            <span class="n">no_repeat_ngram_size</span><span class="o">=</span><span class="n">no_repeat_ngram_size</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="EditGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.EditGenerator">[docs]</a><span class="k">class</span> <span class="nc">EditGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implementation of edit generator.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EditGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.EditGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">input_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">top_p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">num_return_sequences</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">no_repeat_ngram_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">input_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;abstract&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;PGT generation algorithm.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: path to the cache.</span>
+<span class="sd">            input_text: input text for generation.</span>
+<span class="sd">            model_type: type of the model.</span>
+<span class="sd">            model_name: name of the model weights/version.</span>
+<span class="sd">            max_length: max length of the generated text.</span>
+<span class="sd">            top_k: number of top-k probability token to keep.</span>
+<span class="sd">            top_p: only tokens with cumulative probabilities summing up to this value are kept.</span>
+<span class="sd">            num_return_sequences: number of generated sequences.</span>
+<span class="sd">            no_repeat_ngram_size: size of n-gram to not appear twice.</span>
+<span class="sd">            device: device where the inference</span>
+<span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
+<span class="sd">            input_type: part of a patent the input text belongs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">input_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">EDITING_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">input_type</span><span class="si">}</span><span class="s2"> is not a valid option for editing input type.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">input_text</span><span class="si">}</span><span class="s2"> &lt;|sep|&gt; Replace the [MASK] tokens in the above </span><span class="si">{</span><span class="n">input_type</span><span class="si">}</span><span class="s2"> &lt;|sep|&gt;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+            <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+            <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
+            <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
+            <span class="n">num_return_sequences</span><span class="o">=</span><span class="n">num_return_sequences</span><span class="p">,</span>
+            <span class="n">no_repeat_ngram_size</span><span class="o">=</span><span class="n">no_repeat_ngram_size</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="EditGenerator.format_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.EditGenerator.format_output">[docs]</a>    <span class="k">def</span> <span class="nf">format_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">input_text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">generated_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]:</span>
+        <span class="sd">&quot;&quot;&quot;Format output for the patent editing task.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           input_text: generation input.</span>
+<span class="sd">           generated_sequences: generated sequences.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           formatted generated sequences.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">filtered_generated_sequences</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">number_of_masks</span> <span class="o">=</span> <span class="n">input_text</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;[MASK]&quot;</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">generated_sequences</span><span class="p">:</span>
+            <span class="n">generated_masked_tokens</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&lt;|mask_sep|&gt;&quot;</span><span class="p">)</span>
+
+            <span class="n">filtered_generated_sequence</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_masks</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">generated_masked_tokens</span><span class="p">):</span>
+                    <span class="n">gen_token</span> <span class="o">=</span> <span class="n">generated_masked_tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">gen_token</span> <span class="o">=</span> <span class="s2">&quot;[MASK NOT PREDICTED]&quot;</span>
+                <span class="n">filtered_generated_sequence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gen_token</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+            <span class="n">filtered_generated_sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">filtered_generated_sequence</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">filtered_generated_sequences</span></div></div>
+
+
+<div class="viewcode-block" id="CoherenceCheckGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator">[docs]</a><span class="k">class</span> <span class="nc">CoherenceCheckGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implementation of coherence check generator.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CoherenceCheckGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">input_a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">input_b</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">top_p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">num_return_sequences</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">no_repeat_ngram_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">coherence_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;title-abstract&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;PGT generation algorithm.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: path to the cache.</span>
+<span class="sd">            input_a: first input for coherence check.</span>
+<span class="sd">            input_b: second input for coherence check.</span>
+<span class="sd">            model_type: type of the model.</span>
+<span class="sd">            model_name: name of the model weights/version.</span>
+<span class="sd">            max_length: max length of the generated text.</span>
+<span class="sd">            top_k: number of top-k probability token to keep.</span>
+<span class="sd">            top_p: only tokens with cumulative probabilities summing up to this value are kept.</span>
+<span class="sd">            num_return_sequences: number of generated sequences.</span>
+<span class="sd">            no_repeat_ngram_size: size of n-gram to not appear twice.</span>
+<span class="sd">            device: device where the inference</span>
+<span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
+<span class="sd">            coherence_type: input types for the check.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">type_a</span><span class="p">,</span> <span class="n">type_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_coherence_types</span><span class="p">(</span><span class="n">coherence_type</span><span class="p">)</span>
+
+        <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">input_a</span><span class="si">}</span><span class="s2"> &lt;|sep|&gt; </span><span class="si">{</span><span class="n">input_b</span><span class="si">}</span><span class="s2"> &lt;|sep|&gt; Do the above </span><span class="si">{</span><span class="n">type_a</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">type_b</span><span class="si">}</span><span class="s2"> belong to the same patent? &lt;|sep|&gt;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+            <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+            <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
+            <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
+            <span class="n">num_return_sequences</span><span class="o">=</span><span class="n">num_return_sequences</span><span class="p">,</span>
+            <span class="n">no_repeat_ngram_size</span><span class="o">=</span><span class="n">no_repeat_ngram_size</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="CoherenceCheckGenerator.extract_coherence_types"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator.extract_coherence_types">[docs]</a>    <span class="k">def</span> <span class="nf">extract_coherence_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Check the validity and extract coherence types of input text.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coherence_type: Input types of the coherence check.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple containing the type of the input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">coherence_type</span> <span class="ow">in</span> <span class="n">COHERENCE_TYPES</span><span class="p">:</span>
+            <span class="n">type_a</span><span class="p">,</span> <span class="n">type_b</span> <span class="o">=</span> <span class="n">coherence_type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">type_a</span><span class="p">,</span> <span class="n">type_b</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">coherence_type</span><span class="si">}</span><span class="s2"> is not a valid coherence type.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CoherenceCheckGenerator.format_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator.format_output">[docs]</a>    <span class="k">def</span> <span class="nf">format_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">input_text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">generated_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]:</span>
+        <span class="sd">&quot;&quot;&quot;Format output for the patent coherence task.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           input_text: generation input.</span>
+<span class="sd">           generated_sequences: generated sequences.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           formatted generated sequences.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="s2">&quot;yes&quot;</span> <span class="ow">in</span> <span class="n">generated_sequences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="s2">&quot;no&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">generated_sequences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;yes&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="s2">&quot;no&quot;</span> <span class="ow">in</span> <span class="n">generated_sequences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="s2">&quot;yes&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">generated_sequences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;no&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;NA&quot;</span><span class="p">]</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
