@@ -35,7 +35,7 @@ conda env create -f conda.yml
 conda activate gt4sd
 ```
 
-And install the package via `pip` from [PyPI](https://pypi.org/project/gt4sd/)s:
+And install the package via `pip` from [PyPI](https://pypi.org/project/gt4sd/):
 
 ```sh
 pip install gt4sd
