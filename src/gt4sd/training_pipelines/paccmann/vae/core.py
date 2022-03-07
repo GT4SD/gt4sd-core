@@ -46,11 +46,8 @@ class PaccMannVAETrainingPipeline(PaccMannTrainingPipeline):
             params = {**training_args, **dataset_args, **model_args}
             train_smiles_filepath = params["train_smiles_filepath"]
             test_smiles_filepath = params["test_smiles_filepath"]
-            smiles_language_filepath = (
-                params["smiles_language_filepath"]
-                if params.get("smiles_language_filepath", "none").lower() != "none"
-                else None
-            )
+            smiles_language_filepath = params.get("smiles_language_filepath", None)
+            params["batch_mode"] = "Padded"
 
             model_path = params["model_path"]
             training_name = params["training_name"]
@@ -224,8 +221,7 @@ class PaccMannVAETrainingPipeline(PaccMannTrainingPipeline):
                     eval_interval=params["eval_interval"],
                     loss_tracker=loss_tracker,
                     logger=logger,
-                    # writer=writer,
-                    batch_mode=params.get("batch_mode"),
+                    batch_mode=params["batch_mode"],
                 )
                 logger.info(f"Epoch {epoch}, took {time() - t:.1f}.")
 
@@ -292,9 +288,6 @@ class PaccMannVAEModelArguments(TrainingPipelineArguments):
         metadata={
             "help": "Embedding technique for the tokens. 'one_hot' or 'learned'."
         },
-    )
-    batch_mode: str = field(
-        default="packed", metadata={"help": "Batch mode. 'packed' or 'padded'."}
     )
     vocab_size: int = field(
         default=380, metadata={"help": "Size of the vocabulary of chemical tokens."}

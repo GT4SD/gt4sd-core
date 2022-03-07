@@ -25,7 +25,6 @@ template_config = {
         "test_input_keep": 1.0,
         "temperature": 0.8,
         "embedding": "one_hot",
-        "batch_mode": "packed",
         "vocab_size": 380,
         "pad_index": 0,
         "embedding_size": 380,
