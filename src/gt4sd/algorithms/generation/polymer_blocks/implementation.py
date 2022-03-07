@@ -122,5 +122,5 @@ class Generator:
                 )
             )
             mol = [self.smiles_language.token_indexes_to_smiles(m) for m in indexes]
-            mol = [m for m in mol if Chem.MolFromSmiles(m) is not None]
+            mol = [m for m in mol if Chem.MolFromSmiles(m) is not None and m != ""]
         return mol
