@@ -282,7 +282,7 @@ class PaccMannGPGenerator(AlgorithmConfiguration[SmallMolecule, Any]):
                     training_pipeline_arguments.model_path,
                     training_pipeline_arguments.training_name,
                     "weights",
-                    "best_loss.pt",
+                    "best_rec.pt",
                 ),
                 "mca_model_params.json": "",
                 "protein_language.pkl": "",

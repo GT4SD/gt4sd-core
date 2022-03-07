@@ -151,7 +151,7 @@ class PolymerBlocksGenerator(AlgorithmConfiguration[SmallMolecule, None]):
                     training_pipeline_arguments.model_path,
                     training_pipeline_arguments.training_name,
                     "weights",
-                    "best_loss.pt",
+                    "best_rec.pt",
                 ),
             }
         else:
