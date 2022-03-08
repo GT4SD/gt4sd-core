@@ -38,6 +38,7 @@ class CatalystVAE(Representation):
         padding_length: int = 127,
         maximum_length: int = 100,
         primer_smiles: str = "",
+        checkpoint_filename: str = "epoch=199-step=5799.ckpt",
     ) -> None:
         """Constructs a CatalystVAE.
 
@@ -46,6 +47,7 @@ class CatalystVAE(Representation):
             pading_length: size of the padded sequence. Defaults to 127.
             maximum_length: maximum length of the synthesis.
             primer_smiles: primer SMILES representation. Default to "", a.k.a., no primer.
+            checkpoint_filename: checkpoint filename. Defaults to "epoch=199-step=5799.ckpt".
         """
         self.vocabulary_filepath = os.path.join(resources_path, "vocab_combined.csv")
         self.checkpoint_filepath = os.path.join(
@@ -123,16 +125,17 @@ class CatalystBindingEnergyPredictor(PropertyPredictor):
 
     model: MlpPredictor
 
-    def __init__(self, resources_path: str) -> None:
+    def __init__(
+        self, resources_path: str, checkpoint_filename: str = "epoch=199-step=5799.ckpt"
+    ) -> None:
         """Constructs a CatalystBindingEnergyPredictor.
 
         Args:
             resources_path: directory where to find models and configurations.
+            checkpoint_filename: checkpoint filename. Defaults to "epoch=199-step=5799.ckpt".
         """
         self.vocabulary_filepath = os.path.join(resources_path, "vocab_combined.csv")
-        self.checkpoint_filepath = os.path.join(
-            resources_path, "epoch=199-step=5799.ckpt"
-        )
+        self.checkpoint_filepath = os.path.join(resources_path, checkpoint_filename)
         self.tokenizer = SmilesTokenizer(self.vocabulary_filepath)
         self.model = cast(
             MlpPredictor,
@@ -165,6 +168,7 @@ class CatalystGenerator(Generator):
         number_of_points: int = 10,
         number_of_steps: int = 50,
         primer_smiles: str = "",
+        checkpoint_filename: str = "epoch=199-step=5799.ckpt",
     ):
         """Constructs catalyst generator.
 
@@ -174,8 +178,10 @@ class CatalystGenerator(Generator):
             number_of_points: number of optimal points to return. Defaults to 10.
             number_of_steps: number of optimization steps. Defaults to 50.
             primer_smiles: primer SMILES representation. Default to "", a.k.a., no primer.
+            checkpoint_filename: checkpoint filename. Defaults to "epoch=199-step=5799.ckpt".
         """
         self.resources_path = resources_path
+        self.checkpoint_filename = checkpoint_filename
         self.generated_length = generated_length
         self.number_of_points = number_of_points
         self.number_of_steps = max(self.number_of_points, number_of_steps)
@@ -184,8 +190,11 @@ class CatalystGenerator(Generator):
             resources_path,
             maximum_length=self.generated_length,
             primer_smiles=primer_smiles,
+            checkpoint_filename=checkpoint_filename,
         )
-        self.predictor = CatalystBindingEnergyPredictor(resources_path)
+        self.predictor = CatalystBindingEnergyPredictor(
+            resources_path, checkpoint_filename=checkpoint_filename
+        )
         self.minimum_latent_coordinate = -100.0
         self.maximum_latent_coordinate = 100.0
 

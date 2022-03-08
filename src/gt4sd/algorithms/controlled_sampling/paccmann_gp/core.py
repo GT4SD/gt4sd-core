@@ -13,7 +13,7 @@ from typing_extensions import Protocol, runtime_checkable
 from ....domains.materials import SmallMolecule, validate_molecules
 from ....exceptions import InvalidItem
 from ....training_pipelines.core import TrainingPipelineArguments
-from ....training_pipelines.paccmann.core import PaccMannTrainingArguments
+from ....training_pipelines.paccmann.core import PaccMannSavingArguments
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
 from .implementation import GPConditionalGenerator
@@ -267,7 +267,7 @@ class PaccMannGPGenerator(AlgorithmConfiguration[SmallMolecule, Any]):
         Returns:
             a mapping between artifacts' files and training pipeline's output files.
         """
-        if isinstance(training_pipeline_arguments, PaccMannTrainingArguments):
+        if isinstance(training_pipeline_arguments, PaccMannSavingArguments):
             return {
                 "selfies_language.pkl": os.path.join(
                     training_pipeline_arguments.model_path,

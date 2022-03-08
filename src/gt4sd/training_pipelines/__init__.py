@@ -7,12 +7,17 @@ from typing import Any, Dict
 import pkg_resources
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
-from .paccmann.core import PaccMannDataArguments, PaccMannTrainingArguments
+from .paccmann.core import (
+    PaccMannDataArguments,
+    PaccMannSavingArguments,
+    PaccMannTrainingArguments,
+)
 from .paccmann.vae.core import PaccMannVAEModelArguments, PaccMannVAETrainingPipeline
 from .pytorch_lightning.core import PytorchLightningTrainingArguments
 from .pytorch_lightning.granular.core import (
     GranularDataArguments,
     GranularModelArguments,
+    GranularSavingArguments,
     GranularTrainingPipeline,
 )
 from .pytorch_lightning.language_modeling.core import (
@@ -51,6 +56,11 @@ TRAINING_PIPELINE_MAPPING = {
     "language-modeling-trainer": LanguageModelingTrainingPipeline,
     "paccmann-vae-trainer": PaccMannVAETrainingPipeline,
     "granular-trainer": GranularTrainingPipeline,
+}
+
+TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
+    "paccmann-vae-trainer": PaccMannSavingArguments,
+    "granular-trainer": GranularSavingArguments,
 }
 
 

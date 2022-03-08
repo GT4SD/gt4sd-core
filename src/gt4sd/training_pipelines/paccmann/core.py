@@ -105,3 +105,15 @@ class PaccMannDataArguments(TrainingPipelineArguments):
     remove_chirality: bool = field(
         default=False, metadata={"help": "Remove chirality."}
     )
+
+
+@dataclass
+class PaccMannSavingArguments(TrainingPipelineArguments):
+    """Saving arguments related to PaccMann trainer."""
+
+    __name__ = "saving_args"
+
+    model_path: str = field(
+        metadata={"help": "Path where the model artifacts are stored."}
+    )
+    training_name: str = field(metadata={"help": "Name used to identify the training."})
