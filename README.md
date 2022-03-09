@@ -238,7 +238,7 @@ Once a training pipeline has been run via the `gt4sd-trainer`, it's possible to 
 
 Here a small example for `PaccmannGP` algorithm ([paper](https://doi.org/10.1021/acs.jcim.1c00889)).
 
-You can train a model with `gt4sd-trainer` (quick training using few data, not really recommended for a relistic model :warning:):
+You can train a model with `gt4sd-trainer` (quick training using few data, not really recommended for a realistic model :warning:):
 
 ```sh
 gt4sd-trainer  --training_pipeline_name paccmann-vae-trainer --epochs 250 --batch_size 4 --n_layers 1 --rnn_cell_size 16 --latent_dim 16 --train_smiles_filepath src/gt4sd/training_pipelines/tests/molecules.smi --test_smiles_filepath src/gt4sd/training_pipelines/tests/molecules.smi --model_path /tmp/gt4sd-paccmann-gp/ --training_name fast-example --eval_interval 15 --save_interval 15 --selfies
