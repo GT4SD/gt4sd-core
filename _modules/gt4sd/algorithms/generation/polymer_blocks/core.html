@@ -160,11 +160,14 @@
 <span></span><span class="sd">&quot;&quot;&quot;PaccMann vanilla generator trained on polymer building blocks (catalysts/monomers).&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">SmallMolecule</span><span class="p">,</span> <span class="n">validate_molecules</span>
 <span class="kn">from</span> <span class="nn">....exceptions</span> <span class="kn">import</span> <span class="n">InvalidItem</span>
+<span class="kn">from</span> <span class="nn">....training_pipelines.core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span> <span class="nn">....training_pipelines.paccmann.core</span> <span class="kn">import</span> <span class="n">PaccMannSavingArguments</span>
 <span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">GeneratorAlgorithm</span><span class="p">,</span> <span class="n">Untargeted</span>
 <span class="kn">from</span> <span class="nn">...registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
 <span class="kn">from</span> <span class="nn">.implementation</span> <span class="kn">import</span> <span class="n">Generator</span>
@@ -278,7 +281,42 @@
                 <span class="n">title</span><span class="o">=</span><span class="s2">&quot;InvalidSMILES&quot;</span><span class="p">,</span>
                 <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;rdkit.Chem.MolFromSmiles returned None for &quot;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="n">SmallMolecule</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">SmallMolecule</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PolymerBlocksGenerator.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.polymer_blocks.core.html#gt4sd.algorithms.generation.polymer_blocks.core.PolymerBlocksGenerator.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Ger filepath mappings for the given training pipeline arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a mapping between artifacts&#39; files and training pipeline&#39;s output files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">PaccMannSavingArguments</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;smiles_language.pkl&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">training_name</span><span class="si">}</span><span class="s2">.lang&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;params.json&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">training_name</span><span class="p">,</span>
+                    <span class="s2">&quot;model_params.json&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;weights.pt&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">training_name</span><span class="p">,</span>
+                    <span class="s2">&quot;weights&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;best_rec.pt&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+                <span class="n">training_pipeline_arguments</span>
+            <span class="p">)</span></div></div>
 </pre></div>
 
            </div>

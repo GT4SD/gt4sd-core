@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.cli.saving &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.cli.saving</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.cli.saving</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;Run model saving for the GT4SD.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">from</span> <span class="nn">..algorithms.registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
+<span class="kn">from</span> <span class="nn">..training_pipelines</span> <span class="kn">import</span> <span class="n">TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING</span>
+<span class="kn">from</span> <span class="nn">..training_pipelines.core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span> <span class="nn">.algorithms</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AVAILABLE_ALGORITHMS</span><span class="p">,</span>
+    <span class="n">AVAILABLE_ALGORITHMS_CATEGORIES</span><span class="p">,</span>
+    <span class="n">filter_algorithm_applications</span><span class="p">,</span>
+    <span class="n">get_configuration_tuples</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.argument_parser</span> <span class="kn">import</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">DataClassType</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">SUPPORTED_TRAINING_PIPELINES</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+    <span class="n">TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="SavingArguments"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.SavingArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SavingArguments</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Algorithm saving arguments.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_base_args&quot;</span>
+
+    <span class="n">training_pipeline_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Training pipeline name, supported pipelines: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUPPORTED_TRAINING_PIPELINES</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">target_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Target algorithm version to save.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Inference algorithm type, supported types: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AVAILABLE_ALGORITHMS_CATEGORIES</span><span class="p">[</span><span class="s1">&#39;algorithm_type&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Domain of the inference algorithm, supported types: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AVAILABLE_ALGORITHMS_CATEGORIES</span><span class="p">[</span><span class="s1">&#39;domain&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">algorithm_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Inference algorithm name.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Inference algorithm application.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">source_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Source algorithm version to use for missing artifacts.&quot;</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SavingArgumentParser"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.SavingArgumentParser">[docs]</a><span class="k">class</span> <span class="nc">SavingArgumentParser</span><span class="p">(</span><span class="n">ArgumentParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Argument parser using a custom help logic.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SavingArgumentParser.print_help"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.SavingArgumentParser.print_help">[docs]</a>    <span class="k">def</span> <span class="nf">print_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IO</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Print help checking dynamically whether a specific pipeline is passed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file: an optional I/O stream. Defaults to None, a.k.a., stdout and stderr.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">help_args_set</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;-h&quot;</span><span class="p">,</span> <span class="s2">&quot;--help&quot;</span><span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">help_args_set</span><span class="p">))</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">help_args_set</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+            <span class="p">):</span>  <span class="c1"># considering filename</span>
+                <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span>
+                <span class="k">return</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">help_args_set</span><span class="p">]</span>
+            <span class="n">parsed_arguments</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">parse_args_into_dataclasses</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">return_remaining_strings</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">trainer_arguments</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">arguments</span> <span class="ow">in</span> <span class="n">parsed_arguments</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;trainer_base_args&quot;</span><span class="p">:</span>
+                    <span class="n">trainer_arguments</span> <span class="o">=</span> <span class="n">arguments</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">trainer_arguments</span><span class="p">:</span>
+                <span class="n">trainer_arguments</span><span class="o">.</span><span class="n">training_pipeline_name</span>
+                <span class="n">training_pipeline_arguments</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="n">trainer_arguments</span><span class="o">.</span><span class="n">training_pipeline_name</span><span class="p">,</span>
+                        <span class="n">TrainingPipelineArguments</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span>
+                    <span class="nb">tuple</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">SavingArguments</span><span class="p">,</span> <span class="o">*</span><span class="n">training_pipeline_arguments</span><span class="p">]</span>  <span class="c1"># type:ignore</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">parser</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run an algorithm saving pipeline.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: in case the provided training pipeline provided is not supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+    <span class="n">base_args</span> <span class="o">=</span> <span class="n">SavingArgumentParser</span><span class="p">(</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">DataClassType</span><span class="p">,</span> <span class="n">SavingArguments</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">parse_args_into_dataclasses</span><span class="p">(</span><span class="n">return_remaining_strings</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">training_pipeline_name</span> <span class="o">=</span> <span class="n">base_args</span><span class="o">.</span><span class="n">training_pipeline_name</span>
+    <span class="k">if</span> <span class="n">training_pipeline_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">SUPPORTED_TRAINING_PIPELINES</span><span class="p">):</span>
+        <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Training pipeline </span><span class="si">{</span><span class="n">training_pipeline_name</span><span class="si">}</span><span class="s2"> is not supported. Supported types: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUPPORTED_TRAINING_PIPELINES</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">training_pipeline_saving_arguments</span> <span class="o">=</span> <span class="n">TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING</span><span class="p">[</span>
+        <span class="n">training_pipeline_name</span>
+    <span class="p">]</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">SavingArgumentParser</span><span class="p">(</span>
+        <span class="n">cast</span><span class="p">(</span>
+            <span class="n">Iterable</span><span class="p">[</span><span class="n">DataClassType</span><span class="p">],</span>
+            <span class="nb">tuple</span><span class="p">([</span><span class="n">SavingArguments</span><span class="p">,</span> <span class="n">training_pipeline_saving_arguments</span><span class="p">]),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">saving_args</span><span class="p">,</span> <span class="n">training_pipeline_saving_args</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args_into_dataclasses</span><span class="p">(</span>
+        <span class="n">return_remaining_strings</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">filters</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">key</span><span class="p">:</span> <span class="n">saving_args</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s2">&quot;algorithm_type&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;algorithm_application&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;domain&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;algorithm_name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;source_version&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+    <span class="n">configuration_tuples</span> <span class="o">=</span> <span class="n">get_configuration_tuples</span><span class="p">(</span>
+        <span class="n">filter_algorithm_applications</span><span class="p">(</span><span class="n">algorithms</span><span class="o">=</span><span class="n">AVAILABLE_ALGORITHMS</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">configuration_tuples</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Multiple configurations matching the parameters:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">configuration_tuples</span><span class="p">))</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Select one by specifying additional algorithms parameters: </span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;--&#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">configuration_tuples</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">provided_filters</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span><span class="p">}</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;No configurations matching the provided parameters, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;please review the supported configurations:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">configuration_tuples</span><span class="p">))</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Please review the parameters provided:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">provided_filters</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">configuration_tuple</span> <span class="o">=</span> <span class="n">configuration_tuples</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selected configuration: </span><span class="si">{</span><span class="n">configuration_tuple</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">algorithm_application</span> <span class="o">=</span> <span class="n">ApplicationsRegistry</span><span class="o">.</span><span class="n">applications</span><span class="p">[</span><span class="n">configuration_tuple</span><span class="p">]</span>
+    <span class="n">configuration_class</span> <span class="o">=</span> <span class="n">algorithm_application</span><span class="o">.</span><span class="n">configuration_class</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;Saving model version &quot;</span><span class="si">{</span><span class="n">saving_args</span><span class="o">.</span><span class="n">target_version</span><span class="si">}</span><span class="s1">&quot; with the following configuration: </span><span class="si">{</span><span class="n">configuration_class</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="p">)</span>
+    <span class="n">configuration_class</span><span class="o">.</span><span class="n">save_version_from_training_pipeline_arguments</span><span class="p">(</span>
+        <span class="n">training_pipeline_arguments</span><span class="o">=</span><span class="n">training_pipeline_saving_args</span><span class="p">,</span>
+        <span class="n">target_version</span><span class="o">=</span><span class="n">saving_args</span><span class="o">.</span><span class="n">target_version</span><span class="p">,</span>
+        <span class="n">source_version</span><span class="o">=</span><span class="n">saving_args</span><span class="o">.</span><span class="n">source_version</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

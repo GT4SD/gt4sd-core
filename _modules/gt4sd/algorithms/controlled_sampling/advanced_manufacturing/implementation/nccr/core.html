@@ -197,6 +197,7 @@
         <span class="n">padding_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">127</span><span class="p">,</span>
         <span class="n">maximum_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
         <span class="n">primer_smiles</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">checkpoint_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;epoch=199-step=5799.ckpt&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Constructs a CatalystVAE.</span>
 
@@ -205,6 +206,7 @@
 <span class="sd">            pading_length: size of the padded sequence. Defaults to 127.</span>
 <span class="sd">            maximum_length: maximum length of the synthesis.</span>
 <span class="sd">            primer_smiles: primer SMILES representation. Default to &quot;&quot;, a.k.a., no primer.</span>
+<span class="sd">            checkpoint_filename: checkpoint filename. Defaults to &quot;epoch=199-step=5799.ckpt&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vocabulary_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;vocab_combined.csv&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
@@ -282,16 +284,17 @@
 
     <span class="n">model</span><span class="p">:</span> <span class="n">MlpPredictor</span>
 
-<div class="viewcode-block" id="CatalystBindingEnergyPredictor.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="CatalystBindingEnergyPredictor.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">checkpoint_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;epoch=199-step=5799.ckpt&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Constructs a CatalystBindingEnergyPredictor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: directory where to find models and configurations.</span>
+<span class="sd">            checkpoint_filename: checkpoint filename. Defaults to &quot;epoch=199-step=5799.ckpt&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vocabulary_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;vocab_combined.csv&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;epoch=199-step=5799.ckpt&quot;</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="n">checkpoint_filename</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">SmilesTokenizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vocabulary_filepath</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
             <span class="n">MlpPredictor</span><span class="p">,</span>
@@ -324,6 +327,7 @@
         <span class="n">number_of_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">number_of_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
         <span class="n">primer_smiles</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">checkpoint_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;epoch=199-step=5799.ckpt&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructs catalyst generator.</span>
 
@@ -333,8 +337,10 @@
 <span class="sd">            number_of_points: number of optimal points to return. Defaults to 10.</span>
 <span class="sd">            number_of_steps: number of optimization steps. Defaults to 50.</span>
 <span class="sd">            primer_smiles: primer SMILES representation. Default to &quot;&quot;, a.k.a., no primer.</span>
+<span class="sd">            checkpoint_filename: checkpoint filename. Defaults to &quot;epoch=199-step=5799.ckpt&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span> <span class="o">=</span> <span class="n">resources_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_filename</span> <span class="o">=</span> <span class="n">checkpoint_filename</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">generated_length</span> <span class="o">=</span> <span class="n">generated_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">number_of_points</span> <span class="o">=</span> <span class="n">number_of_points</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">number_of_steps</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_points</span><span class="p">,</span> <span class="n">number_of_steps</span><span class="p">)</span>
@@ -343,8 +349,11 @@
             <span class="n">resources_path</span><span class="p">,</span>
             <span class="n">maximum_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">generated_length</span><span class="p">,</span>
             <span class="n">primer_smiles</span><span class="o">=</span><span class="n">primer_smiles</span><span class="p">,</span>
+            <span class="n">checkpoint_filename</span><span class="o">=</span><span class="n">checkpoint_filename</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span> <span class="o">=</span> <span class="n">CatalystBindingEnergyPredictor</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span> <span class="o">=</span> <span class="n">CatalystBindingEnergyPredictor</span><span class="p">(</span>
+            <span class="n">resources_path</span><span class="p">,</span> <span class="n">checkpoint_filename</span><span class="o">=</span><span class="n">checkpoint_filename</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minimum_latent_coordinate</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maximum_latent_coordinate</span> <span class="o">=</span> <span class="mf">100.0</span></div>
 

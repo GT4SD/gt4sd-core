@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.cli.algorithms &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.cli.algorithms</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.cli.algorithms</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Utilities for algorithms retrieval.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">..algorithms.registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span><span class="p">,</span> <span class="n">ConfigurationTuple</span>
+
+<span class="n">AVAILABLE_ALGORITHMS</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+    <span class="n">ApplicationsRegistry</span><span class="o">.</span><span class="n">list_available</span><span class="p">(),</span>
+    <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">algorithm</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;domain&quot;</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_type&quot;</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_name&quot;</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_application&quot;</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_version&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="n">AVAILABLE_ALGORITHMS_CATEGORIES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">algorithm</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="k">for</span> <span class="n">algorithm</span> <span class="ow">in</span> <span class="n">AVAILABLE_ALGORITHMS</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;domain&quot;</span><span class="p">,</span> <span class="s2">&quot;algorithm_type&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="filter_algorithm_applications"><a class="viewcode-back" href="../../../api/gt4sd.cli.algorithms.html#gt4sd.cli.algorithms.filter_algorithm_applications">[docs]</a><span class="k">def</span> <span class="nf">filter_algorithm_applications</span><span class="p">(</span>
+    <span class="n">algorithms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">filters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returning algorithms with given filters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        algorithms (List[Dict[str, str]]): a list of algorithm applications as dictionaries.</span>
+<span class="sd">        filters (Dict[str, str]): the filters to apply.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the filtered algorithms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">application</span>
+        <span class="k">for</span> <span class="n">application</span> <span class="ow">in</span> <span class="n">algorithms</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">application</span><span class="p">[</span><span class="n">filter_type</span><span class="p">]</span> <span class="o">==</span> <span class="n">filter_value</span> <span class="k">if</span> <span class="n">filter_value</span> <span class="k">else</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">filter_type</span><span class="p">,</span> <span class="n">filter_value</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_configuration_tuples"><a class="viewcode-back" href="../../../api/gt4sd.cli.algorithms.html#gt4sd.cli.algorithms.get_configuration_tuples">[docs]</a><span class="k">def</span> <span class="nf">get_configuration_tuples</span><span class="p">(</span>
+    <span class="n">algorithms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ConfigurationTuple</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returning configuration tuples from a list of applications.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        algorithms (List[Dict[str, str]]): a list of algorithm applications as dictionaries.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the configuration tuples.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="n">ConfigurationTuple</span><span class="p">(</span>
+                    <span class="o">**</span><span class="p">{</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">value</span>
+                        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">ConfigurationTuple</span><span class="o">.</span><span class="vm">__annotations__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">algorithm</span> <span class="ow">in</span> <span class="n">algorithms</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

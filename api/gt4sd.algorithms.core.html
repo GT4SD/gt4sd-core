@@ -571,17 +571,15 @@ but can be given by direct registration (See <a class="reference internal" href=
 </dd></dl>
 
 <dl class="py method">
-<dt id="gt4sd.algorithms.core.AlgorithmConfiguration.ensure_artifacts">
-<code class="sig-name descname">ensure_artifacts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#AlgorithmConfiguration.ensure_artifacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.AlgorithmConfiguration.ensure_artifacts" title="Permalink to this definition">¶</a></dt>
-<dd><p>The artifacts matching the path defined by class attributes are downloaded.</p>
-<p>That is all objects under <code class="docutils literal notranslate"><span class="pre">algorithm_type/algorithm_name/algorithm_application/algorithm_version</span></code>
-in the bucket are downloaded.</p>
+<dt id="gt4sd.algorithms.core.AlgorithmConfiguration.get_application_prefix">
+<em class="property">classmethod </em><code class="sig-name descname">get_application_prefix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#AlgorithmConfiguration.get_application_prefix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.AlgorithmConfiguration.get_application_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get prefix up to the specific application.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>the common local path of the matching artifacts.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the application prefix.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -597,6 +595,80 @@ in the bucket are downloaded.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>viable values as <a class="reference internal" href="#gt4sd.algorithms.core.AlgorithmConfiguration.algorithm_version" title="gt4sd.algorithms.core.AlgorithmConfiguration.algorithm_version"><code class="xref py py-attr docutils literal notranslate"><span class="pre">algorithm_version</span></code></a> for the environment.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.AlgorithmConfiguration.get_filepath_mappings_for_training_pipeline_arguments">
+<em class="property">classmethod </em><code class="sig-name descname">get_filepath_mappings_for_training_pipeline_arguments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">training_pipeline_arguments</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#AlgorithmConfiguration.get_filepath_mappings_for_training_pipeline_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.AlgorithmConfiguration.get_filepath_mappings_for_training_pipeline_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ger filepath mappings for the given training pipeline arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>training_pipeline_arguments</strong> (<a class="reference internal" href="gt4sd.training_pipelines.core.html#gt4sd.training_pipelines.core.TrainingPipelineArguments" title="gt4sd.training_pipelines.core.TrainingPipelineArguments"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainingPipelineArguments</span></code></a>) – training pipeline arguments.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – in case no mapping is available.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a mapping between artifacts’ files and training pipeline’s output files.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.AlgorithmConfiguration.save_version_from_training_pipeline_arguments">
+<em class="property">classmethod </em><code class="sig-name descname">save_version_from_training_pipeline_arguments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">training_pipeline_arguments</span></em>, <em class="sig-param"><span class="n">target_version</span></em>, <em class="sig-param"><span class="n">source_version</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#AlgorithmConfiguration.save_version_from_training_pipeline_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.AlgorithmConfiguration.save_version_from_training_pipeline_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a version using training pipeline arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>training_pipeline_arguments</strong> (<a class="reference internal" href="gt4sd.training_pipelines.core.html#gt4sd.training_pipelines.core.TrainingPipelineArguments" title="gt4sd.training_pipelines.core.TrainingPipelineArguments"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainingPipelineArguments</span></code></a>) – training pipeline arguments.</p></li>
+<li><p><strong>target_version</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – target version used to save the model in the cache.</p></li>
+<li><p><strong>source_version</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – source version to use for missing artifacts.
+Defaults to None, a.k.a., use the default version.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.AlgorithmConfiguration.ensure_artifacts_for_version">
+<em class="property">classmethod </em><code class="sig-name descname">ensure_artifacts_for_version</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">algorithm_version</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#AlgorithmConfiguration.ensure_artifacts_for_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.AlgorithmConfiguration.ensure_artifacts_for_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The artifacts matching the path defined by class attributes and the given version are downloaded.</p>
+<p>That is all objects under <code class="docutils literal notranslate"><span class="pre">algorithm_type/algorithm_name/algorithm_application/algorithm_version</span></code>
+in the bucket are downloaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>algorithm_version</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – version of the algorithm to ensure artifacts for.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the common local path of the matching artifacts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.AlgorithmConfiguration.ensure_artifacts">
+<code class="sig-name descname">ensure_artifacts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#AlgorithmConfiguration.ensure_artifacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.AlgorithmConfiguration.ensure_artifacts" title="Permalink to this definition">¶</a></dt>
+<dd><p>The artifacts matching the path defined by class attributes are downloaded.</p>
+<p>That is all objects under <code class="docutils literal notranslate"><span class="pre">algorithm_type/algorithm_name/algorithm_application/algorithm_version</span></code>
+in the bucket are downloaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the common local path of the matching artifacts.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -618,7 +690,7 @@ in the bucket are downloaded.</p>
 
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.core.AlgorithmConfiguration.__dict__">
-<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.core', '__annotations__': {'algorithm_type': 'ClassVar[str]', 'domain': 'ClassVar[str]', 'algorithm_name': 'ClassVar[str]', 'algorithm_application': 'ClassVar[str]', 'algorithm_version': 'str'}, '__doc__': &quot;Algorithm parameter definitions and implementation setup.\n\n    The signature of this class constructor (given by the instance attributes) is used\n    for the REST API and needs to be serializable.\n\n    Child classes will add additional instance attributes to configure their respective\n    algorithms. This will require setting default values for all of the attributes defined\n    here.\n    However, the values for :attr:`algorithm_name` and :attr:`algorithm_application`\n    are set the registering decorator.\n\n    This strict setup has the following desired effects:\n\n    - Ease child implementation. For example::\n\n        from typing import ClassVar\n\n        from gt4sd.algorithms.registry import ApplicationsRegistry\n        from gt4sd.algorithms.core import AlgorithmConfiguration\n\n        &#64;ApplicationsRegistry.register_algorithm_application(ChildOfGeneratorAlgorithm)\n        class ConfigurationForChildOfGeneratorAlgorithm(AlgorithmConfiguration):\n            algorithm_type: ClassVar[str] = 'generation'\n            domain: ClassVar[str] = 'materials'\n            algorithm_version: str = 'version3.14'\n            actual_parameter: float = 1.61\n\n            # no __init__ definition required\n\n\n    2. Retrieve the algorithm and configuration easily (via the four class attributes)\n    from the :class:`ApplicationsRegistry&lt;gt4sd.algorithms.registry.ApplicationsRegistry&gt;`.\n    For example::\n\n       from gt4sd.algorithms.registry import ApplicationsRegistry\n\n       application = ApplicationsRegistry.get_application(\n            algorithm_type='generation',\n            domain='materials',\n            algorithm_name='ChildOfGeneratorAlgorithm',\n            algorithm_application='ConfigurationForChildOfGeneratorAlgorithm',\n        )\n        Algorithm = application.algorithm_class\n        Configuration = application.configuration_class\n\n    3. An effortless validation at instantiation via :mod:`pydantic`.\n\n    4. An effortless mapping to artifacts on s3, see :meth:`ensure_artifacts`.\n\n    Todo:\n        show how to register a configuration manually (in case it applies to multiple\n        algorithms and/or applications)\n\n    &quot;, 'algorithm_version': 'transfo-xl-wt103', 'get_target_description': &lt;function AlgorithmConfiguration.get_target_description&gt;, 'to_dict': &lt;function AlgorithmConfiguration.to_dict&gt;, 'validate_item': &lt;function AlgorithmConfiguration.validate_item&gt;, 'ensure_artifacts': &lt;function AlgorithmConfiguration.ensure_artifacts&gt;, 'list_versions': &lt;classmethod object&gt;, '__orig_bases__': (typing.Generic[~S, ~T],), '__dict__': &lt;attribute '__dict__' of 'AlgorithmConfiguration' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'AlgorithmConfiguration' objects&gt;, '__parameters__': (~S, ~T), '__dataclass_params__': _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False), '__dataclass_fields__': {'algorithm_type': Field(name='algorithm_type',type='ClassVar[str]',default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD_CLASSVAR), 'domain': Field(name='domain',type='ClassVar[str]',default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD_CLASSVAR), 'algorithm_name': Field(name='algorithm_name',type='ClassVar[str]',default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD_CLASSVAR), 'algorithm_application': Field(name='algorithm_application',type='ClassVar[str]',default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD_CLASSVAR), 'algorithm_version': Field(name='algorithm_version',type='str',default='',default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD)}, '__init__': &lt;function __create_fn__.&lt;locals&gt;.__init__&gt;, '__repr__': &lt;function __create_fn__.&lt;locals&gt;.__repr__&gt;, '__eq__': &lt;function __create_fn__.&lt;locals&gt;.__eq__&gt;, '__hash__': None, 'algorithm_type': 'generation', 'algorithm_name': 'HuggingFaceGenerationAlgorithm', 'algorithm_application': 'HuggingFaceTransfoXLGenerator'})</em><a class="headerlink" href="#gt4sd.algorithms.core.AlgorithmConfiguration.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.core', '__annotations__': {'algorithm_type': 'ClassVar[str]', 'domain': 'ClassVar[str]', 'algorithm_name': 'ClassVar[str]', 'algorithm_application': 'ClassVar[str]', 'algorithm_version': 'str'}, '__doc__': &quot;Algorithm parameter definitions and implementation setup.\n\n    The signature of this class constructor (given by the instance attributes) is used\n    for the REST API and needs to be serializable.\n\n    Child classes will add additional instance attributes to configure their respective\n    algorithms. This will require setting default values for all of the attributes defined\n    here.\n    However, the values for :attr:`algorithm_name` and :attr:`algorithm_application`\n    are set the registering decorator.\n\n    This strict setup has the following desired effects:\n\n    - Ease child implementation. For example::\n\n        from typing import ClassVar\n\n        from gt4sd.algorithms.registry import ApplicationsRegistry\n        from gt4sd.algorithms.core import AlgorithmConfiguration\n\n        &#64;ApplicationsRegistry.register_algorithm_application(ChildOfGeneratorAlgorithm)\n        class ConfigurationForChildOfGeneratorAlgorithm(AlgorithmConfiguration):\n            algorithm_type: ClassVar[str] = 'generation'\n            domain: ClassVar[str] = 'materials'\n            algorithm_version: str = 'version3.14'\n            actual_parameter: float = 1.61\n\n            # no __init__ definition required\n\n\n    2. Retrieve the algorithm and configuration easily (via the four class attributes)\n    from the :class:`ApplicationsRegistry&lt;gt4sd.algorithms.registry.ApplicationsRegistry&gt;`.\n    For example::\n\n       from gt4sd.algorithms.registry import ApplicationsRegistry\n\n       application = ApplicationsRegistry.get_application(\n            algorithm_type='generation',\n            domain='materials',\n            algorithm_name='ChildOfGeneratorAlgorithm',\n            algorithm_application='ConfigurationForChildOfGeneratorAlgorithm',\n        )\n        Algorithm = application.algorithm_class\n        Configuration = application.configuration_class\n\n    3. An effortless validation at instantiation via :mod:`pydantic`.\n\n    4. An effortless mapping to artifacts on s3, see :meth:`ensure_artifacts`.\n\n    Todo:\n        show how to register a configuration manually (in case it applies to multiple\n        algorithms and/or applications)\n\n    &quot;, 'algorithm_version': 'transfo-xl-wt103', 'get_target_description': &lt;function AlgorithmConfiguration.get_target_description&gt;, 'to_dict': &lt;function AlgorithmConfiguration.to_dict&gt;, 'validate_item': &lt;function AlgorithmConfiguration.validate_item&gt;, 'get_application_prefix': &lt;classmethod object&gt;, 'list_versions': &lt;classmethod object&gt;, 'get_filepath_mappings_for_training_pipeline_arguments': &lt;classmethod object&gt;, 'save_version_from_training_pipeline_arguments': &lt;classmethod object&gt;, 'ensure_artifacts_for_version': &lt;classmethod object&gt;, 'ensure_artifacts': &lt;function AlgorithmConfiguration.ensure_artifacts&gt;, '__orig_bases__': (typing.Generic[~S, ~T],), '__dict__': &lt;attribute '__dict__' of 'AlgorithmConfiguration' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'AlgorithmConfiguration' objects&gt;, '__parameters__': (~S, ~T), '__dataclass_params__': _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False), '__dataclass_fields__': {'algorithm_type': Field(name='algorithm_type',type='ClassVar[str]',default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD_CLASSVAR), 'domain': Field(name='domain',type='ClassVar[str]',default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD_CLASSVAR), 'algorithm_name': Field(name='algorithm_name',type='ClassVar[str]',default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD_CLASSVAR), 'algorithm_application': Field(name='algorithm_application',type='ClassVar[str]',default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD_CLASSVAR), 'algorithm_version': Field(name='algorithm_version',type='str',default='',default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),_field_type=_FIELD)}, '__init__': &lt;function __create_fn__.&lt;locals&gt;.__init__&gt;, '__repr__': &lt;function __create_fn__.&lt;locals&gt;.__repr__&gt;, '__eq__': &lt;function __create_fn__.&lt;locals&gt;.__eq__&gt;, '__hash__': None, 'algorithm_type': 'generation', 'algorithm_name': 'HuggingFaceGenerationAlgorithm', 'algorithm_application': 'HuggingFaceTransfoXLGenerator'})</em><a class="headerlink" href="#gt4sd.algorithms.core.AlgorithmConfiguration.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

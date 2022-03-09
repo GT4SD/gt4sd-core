@@ -207,11 +207,8 @@
             <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">training_args</span><span class="p">,</span> <span class="o">**</span><span class="n">dataset_args</span><span class="p">,</span> <span class="o">**</span><span class="n">model_args</span><span class="p">}</span>
             <span class="n">train_smiles_filepath</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;train_smiles_filepath&quot;</span><span class="p">]</span>
             <span class="n">test_smiles_filepath</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;test_smiles_filepath&quot;</span><span class="p">]</span>
-            <span class="n">smiles_language_filepath</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;smiles_language_filepath&quot;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smiles_language_filepath&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span>
-                <span class="k">else</span> <span class="kc">None</span>
-            <span class="p">)</span>
+            <span class="n">smiles_language_filepath</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smiles_language_filepath&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;batch_mode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Padded&quot;</span>
 
             <span class="n">model_path</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]</span>
             <span class="n">training_name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;training_name&quot;</span><span class="p">]</span>
@@ -385,8 +382,7 @@
                     <span class="n">eval_interval</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;eval_interval&quot;</span><span class="p">],</span>
                     <span class="n">loss_tracker</span><span class="o">=</span><span class="n">loss_tracker</span><span class="p">,</span>
                     <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
-                    <span class="c1"># writer=writer,</span>
-                    <span class="n">batch_mode</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_mode&quot;</span><span class="p">),</span>
+                    <span class="n">batch_mode</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;batch_mode&quot;</span><span class="p">],</span>
                 <span class="p">)</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">, took </span><span class="si">{</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
@@ -453,9 +449,6 @@
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Embedding technique for the tokens. &#39;one_hot&#39; or &#39;learned&#39;.&quot;</span>
         <span class="p">},</span>
-    <span class="p">)</span>
-    <span class="n">batch_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;packed&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch mode. &#39;packed&#39; or &#39;padded&#39;.&quot;</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">vocab_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">380</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Size of the vocabulary of chemical tokens.&quot;</span><span class="p">}</span>
