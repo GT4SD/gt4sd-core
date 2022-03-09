@@ -43,7 +43,9 @@ def validate_molecules(
     ]
     # valid ids
     valid_ids = [
-        index for index, molecule in enumerate(molecules) if molecule is not None
+        index
+        for index, molecule in enumerate(molecules)
+        if molecule is not None and molecule != ""
     ]
     return molecules, valid_ids
 

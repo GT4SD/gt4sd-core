@@ -285,7 +285,7 @@ class Tokenizer:
             logger.info(f"load vocab from: {vocab_file}")
             self.vocab = load_vocab(vocab_file)
         else:
-            logger.info("build and vocabulary")
+            logger.info("build tokenizer and vocabulary")
             self.basic_tokenizer.build_vocab(smiles, vocab_file)
             logger.info(f"saved vocabulary: {vocab_file}")
         self.vocab = load_vocab(vocab_file)

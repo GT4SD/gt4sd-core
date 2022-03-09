@@ -5,6 +5,10 @@ from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
 from ....domains.materials import SmallMolecule
+from ....training_pipelines.core import TrainingPipelineArguments
+from ....training_pipelines.pytorch_lightning.granular.core import (
+    GranularSavingArguments,
+)
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
 from .implementation.core import Generator
@@ -133,3 +137,24 @@ class CatalystGenerator(AlgorithmConfiguration[SmallMolecule, float]):
             number_of_steps=self.number_of_steps,
             primer_smiles=self.primer_smiles,
         )
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, GranularSavingArguments):
+            return {
+                "epoch=199-step=5799.ckpt": training_pipeline_arguments.model_path,
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
