@@ -20,11 +20,11 @@ T = type(None)
 S = TypeVar("S", bound=str)
 
 
-class TorchDrugGCPN(GeneratorAlgorithm[S, T]):
+class TorchDrugGenerator(GeneratorAlgorithm[S, T]):
     def __init__(
         self, configuration: AlgorithmConfiguration, target: Optional[T] = None
     ):
-        """TorchDrug generation algorithm using a GCPN model.
+        """TorchDrug generation algorithm.
 
         Args:
             configuration: domain and application
@@ -34,15 +34,13 @@ class TorchDrugGCPN(GeneratorAlgorithm[S, T]):
         Example:
             An example for using a generative algorithm from HuggingFace::
 
-                configuration = HuggingFaceXLMGenerator()
-                algorithm = HuggingFaceGenerationAlgorithm(configuration=configuration)
+                configuration = TorchDrugZincGCPN()
+                algorithm = TorchDrugGenerator(configuration=configuration)
                 items = list(algorithm.sample(1))
                 print(items)
         """
 
         configuration = self.validate_configuration(configuration)
-        # TODO there might also be a validation/check on the target input
-
         super().__init__(
             configuration=configuration,
             target=None,  # type:ignore
@@ -72,69 +70,69 @@ class TorchDrugGCPN(GeneratorAlgorithm[S, T]):
     def validate_configuration(
         self, configuration: AlgorithmConfiguration
     ) -> AlgorithmConfiguration:
-        # TODO raise InvalidAlgorithmConfiguration
         assert isinstance(configuration, AlgorithmConfiguration)
         return configuration
 
 
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGCPN)
+@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
 class TorchDrugGCPNConfiguration(AlgorithmConfiguration[str, None]):
-    pass
 
+    algorithm_type: ClassVar[str] = "generation"
+    domain: ClassVar[str] = "materials"
 
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGCPN)
-class TorchDrugZincGCPN(TorchDrugGCPNConfiguration):
-    pass
-
-
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGCPN)
-class TorchDrugQedGCPN(TorchDrugGCPNConfiguration):
-    pass
-
-
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGCPN)
-class TorchDrugPlogpGCPN(TorchDrugGCPNConfiguration):
-    pass
-
-
-# GraphAF models
-class TorchDrugGAF(GeneratorAlgorithm[S, T]):
-    def __init__(
-        self, configuration: AlgorithmConfiguration, target: Optional[T] = None
-    ):
-        """TorchDrug generation algorithm using a GCPN model.
-
+    def get_conditional_generator(self, resources_path: str) -> GCPNGenerator:
+        """Instantiate the actual generator implementation.
         Args:
-            configuration: domain and application
-                specification, defining types and validations.
-            target: unused since it is not a conditional generator.
-
-        Example:
-            An example for using a generative algorithm from HuggingFace::
-
-                configuration = HuggingFaceXLMGenerator()
-                algorithm = HuggingFaceGenerationAlgorithm(configuration=configuration)
-                items = list(algorithm.sample(1))
-                print(items)
+            resources_path: local path to model files.
+        Returns:
+            instance with :meth:`sample<gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.sample>` method for generation.
         """
-        pass
+        self.generator = GCPNGenerator(resources_path=resources_path)
+        return self.generator
 
 
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGAF)
+@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
+class TorchDrugZincGCPN(TorchDrugGCPNConfiguration):
+    algorithm_version: str = "v0"
+
+
+@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
+class TorchDrugQedGCPN(TorchDrugGCPNConfiguration):
+    algorithm_version: str = "v0"
+
+
+@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
+class TorchDrugPlogpGCPN(TorchDrugGCPNConfiguration):
+    algorithm_version: str = "v0"
+
+
+@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
 class TorchDrugGAFConfiguration(AlgorithmConfiguration[str, None]):
-    pass
+
+    algorithm_type: ClassVar[str] = "generation"
+    domain: ClassVar[str] = "material"
+
+    def get_conditional_generator(self, resources_path: str) -> GCPNGenerator:
+        """Instantiate the actual generator implementation.
+        Args:
+            resources_path: local path to model files.
+        Returns:
+            instance with :meth:`samples<gt4sd.algorithms.generation.torchdrug.implementation.ChemicalLanguageRT.sample>` method for generation.
+        """
+        self.generator = GAFGenerator(resources_path=resources_path)
+        return self.generator
 
 
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGAF)
-class TorchDrugZincGCPN(TorchDrugGAFConfiguration):
-    pass
+@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
+class TorchDrugZincGAF(TorchDrugGAFConfiguration):
+    algorithm_version: str = "v0"
 
 
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGAF)
-class TorchDrugQedGCPN(TorchDrugGAFConfiguration):
-    pass
+@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
+class TorchDrugQedGAF(TorchDrugGAFConfiguration):
+    algorithm_version: str = "v0"
 
 
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGAF)
-class TorchDrugPlogpGCPN(TorchDrugGAFConfiguration):
-    pass
+@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
+class TorchDrugPlogpGAF(TorchDrugGAFConfiguration):
+    algorithm_version: str = "v0"

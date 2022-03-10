@@ -3,19 +3,17 @@ Implementation details for TorchDrug generation algorithms.
 
 Parts of the implementation inspired by: https://torchdrug.ai/docs/tutorials/generation.html.
 """
-
 import logging
-import os
+from pathlib import Path
 from typing import List, Optional, Union
 
-import numpy as np
 import torch
 
 # Disable openmp usage since this raises on MacOS when libomp has the wrong version.
 torch._C.has_openmp = False
-from torch import nn, optim
+from torch import optim
 
-from torchdrug import core, datasets, models, tasks
+from torchdrug import core, models, tasks
 from torchdrug.layers import distribution
 
 from ....frameworks.torch import device_claim
@@ -25,6 +23,8 @@ logger.addHandler(logging.NullHandler())
 
 
 class DummyDataset:
+    """A helper class to imitate a torchdrug dataset."""
+
     def __init__(self, atom_types: List[int]):
         self.atom_types = atom_types
         self.transform = None
@@ -38,9 +38,9 @@ class Generator:
         resources_path: str,
         atom_types: List[int],
         hidden_dims: List[int],
-        input_dim: int = 18,
-        num_relation: int = 3,
-        batch_norm: bool = False,
+        input_dim: int,
+        num_relation: int,
+        batch_norm: bool,
         device: Optional[Union[torch.device, str]] = None,
     ):
         """A TorchDrug generation algorithm.
@@ -68,13 +68,13 @@ class Generator:
 
     def load_model(self, resources_path: str):
         """Load a pretrained TorchDrug model."""
-        self.solver.load(resources_path)
+        self.solver.load(Path(resources_path).joinpath("weights.pkl"))
 
     def sample(self) -> List[str]:
-        """Sample a molecule
+        """Sample a molecule.
 
         Returns:
-            generated text snippets.
+            a generated SMILES string wrapped into a list.
         """
 
         results = self.task.generate(num_sample=16, max_resample=32)
@@ -82,6 +82,14 @@ class Generator:
 
 
 class GCPNGenerator(Generator):
+    """
+    Interface for the GCPN model as implemented in TorchDrug.
+
+    For details see:
+    You, J. et al. (2018). Graph convolutional policy network for goal-directed
+    molecular graph generation. Advances in neural information processing systems, 31.
+
+    """
 
     input_dim = 18
     num_relation = 3
@@ -90,6 +98,10 @@ class GCPNGenerator(Generator):
     hidden_dims = [256, 256, 256, 256]
 
     def __init__(self, resources_path: str):
+        """
+        Args:
+            resources_path: path to the cache.
+        """
 
         super().__init__(
             input_dim=self.input_dim,
@@ -108,19 +120,18 @@ class GCPNGenerator(Generator):
             criterion="nll",
         )
         optimizer = optim.Adam(self.task.parameters(), lr=1e-3)
-        self.solver = core.Engine(
-            self.task,
-            self.dataset,
-            None,
-            None,
-            optimizer,
-            batch_size=2,
-            log_interval=10,
-        )
+        self.solver = core.Engine(self.task, self.dataset, None, None, optimizer)
         self.load_model(resources_path)
 
 
 class GAFGenerator(Generator):
+    """
+    Interface for the GraphAF model as implemented in TorchDrug.
+
+    For details see:
+    Shi, Chence, et al. "GraphAF: a Flow-based Autoregressive Model for Molecular
+    Graph Generation" International Conference on Learning Representations (ICLR), 2020.
+    """
 
     input_dim = 9
     num_relations = 3
@@ -129,6 +140,10 @@ class GAFGenerator(Generator):
     hidden_dims = [256, 256, 256]
 
     def __init__(self, resources_path: str):
+        """
+        Args:
+            resources_path (str): path to the cache.
+        """
         super().__init__(
             input_dim=self.input_dim,
             num_relation=self.num_relations,
@@ -151,13 +166,5 @@ class GAFGenerator(Generator):
             node_flow, edge_flow, max_node=38, max_edge_unroll=12, criterion="nll"
         )
         optimizer = optim.Adam(self.task.parameters(), lr=1e-3)
-        self.solver = core.Engine(
-            self.task,
-            self.dataset,
-            None,
-            None,
-            optimizer,
-            batch_size=2,
-            log_interval=10,
-        )
+        self.solver = core.Engine(self.task, self.dataset, None, None, optimizer)
         self.load_model(resources_path)
