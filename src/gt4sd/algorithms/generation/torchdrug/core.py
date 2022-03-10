@@ -1,17 +1,11 @@
 """Torchdrug generation algorithm."""
 
 import logging
-from dataclasses import field
-from typing import ClassVar, Dict, Optional, Set, TypeVar
+from typing import ClassVar, Optional, TypeVar
 
-from ...core import (
-    AlgorithmConfiguration,
-    GeneratorAlgorithm,
-    Untargeted,
-    get_configuration_class_with_attributes,
-)
+from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
 from ...registry import ApplicationsRegistry
-from .implementation import Generator, GCPNGenerator, GAFGenerator
+from .implementation import GAFGenerator, GCPNGenerator, Generator
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -112,12 +106,12 @@ class TorchDrugGAFConfiguration(AlgorithmConfiguration[str, None]):
     algorithm_type: ClassVar[str] = "generation"
     domain: ClassVar[str] = "material"
 
-    def get_conditional_generator(self, resources_path: str) -> GCPNGenerator:
+    def get_conditional_generator(self, resources_path: str) -> GAFGenerator:
         """Instantiate the actual generator implementation.
         Args:
             resources_path: local path to model files.
         Returns:
-            instance with :meth:`samples<gt4sd.algorithms.generation.torchdrug.implementation.ChemicalLanguageRT.sample>` method for generation.
+            instance with :meth:`samples<gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.sample>` method for generation.
         """
         self.generator = GAFGenerator(resources_path=resources_path)
         return self.generator

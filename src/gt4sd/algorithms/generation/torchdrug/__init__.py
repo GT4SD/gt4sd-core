@@ -1,17 +1,17 @@
 """TorchDrugGenerationAlgorithm initialization."""
-
+from .abc import torch
 from .core import (
     TorchDrugGenerator,
-    TorchDrugZincGCPN,
-    TorchDrugQedGCPN,
-    TorchDrugPlogpGCPN,
-    TorchDrugZincGAF,
-    TorchDrugQedGAF,
     TorchDrugPlogpGAF,
+    TorchDrugPlogpGCPN,
+    TorchDrugQedGAF,
+    TorchDrugQedGCPN,
+    TorchDrugZincGAF,
+    TorchDrugZincGCPN,
 )
 
 __all__ = [
-    'TorchDrugGenerator',
+    "TorchDrugGenerator",
     "TorchDrugZincGCPN",
     "TorchDrugQedGCPN",
     "TorchDrugPlogpGCPN",

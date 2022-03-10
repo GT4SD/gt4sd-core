@@ -8,18 +8,21 @@ from pathlib import Path
 from typing import List, Optional, Union
 
 import torch
-
-# Disable openmp usage since this raises on MacOS when libomp has the wrong version.
-torch._C.has_openmp = False
 from torch import optim
-
-from torchdrug import core, models, tasks
-from torchdrug.layers import distribution
+from torchdrug import core, models, tasks  # type: ignore
+from torchdrug.core.engine import Engine  # type: ignore
+from torchdrug.layers import distribution  # type: ignore
+from torchdrug.tasks.generation import (  # type: ignore
+    AutoregressiveGeneration,
+    GCPNGeneration,
+)
 
 from ....frameworks.torch import device_claim
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
+
+Task = Union[GCPNGeneration, AutoregressiveGeneration]
 
 
 class DummyDataset:
@@ -32,6 +35,9 @@ class DummyDataset:
 
 class Generator:
     """Implementation of a TorchDrug generator."""
+
+    solver: Engine
+    task: Task
 
     def __init__(
         self,
@@ -76,7 +82,6 @@ class Generator:
         Returns:
             a generated SMILES string wrapped into a list.
         """
-
         results = self.task.generate(num_sample=16, max_resample=32)
         return [list(results.to_smiles())[-1]]
 
@@ -91,11 +96,13 @@ class GCPNGenerator(Generator):
 
     """
 
-    input_dim = 18
-    num_relation = 3
-    batch_norm = False
-    atom_types = [6, 7, 8, 9, 15, 16, 17, 35, 53]
-    hidden_dims = [256, 256, 256, 256]
+    task: GCPNGeneration
+
+    input_dim: int = 18
+    num_relation: int = 3
+    batch_norm: bool = False
+    atom_types: List[int] = [6, 7, 8, 9, 15, 16, 17, 35, 53]
+    hidden_dims: List[int] = [256, 256, 256, 256]
 
     def __init__(self, resources_path: str):
         """
@@ -133,11 +140,13 @@ class GAFGenerator(Generator):
     Graph Generation" International Conference on Learning Representations (ICLR), 2020.
     """
 
-    input_dim = 9
-    num_relations = 3
-    batch_norm = True
-    atom_types = [6, 7, 8, 9, 15, 16, 17, 35, 53]
-    hidden_dims = [256, 256, 256]
+    task: AutoregressiveGeneration
+
+    input_dim: int = 9
+    num_relations: int = 3
+    batch_norm: bool = True
+    atom_types: List[int] = [6, 7, 8, 9, 15, 16, 17, 35, 53]
+    hidden_dims: List[int] = [256, 256, 256]
 
     def __init__(self, resources_path: str):
         """
