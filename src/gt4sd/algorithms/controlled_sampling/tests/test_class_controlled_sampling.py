@@ -17,9 +17,7 @@ else:
         CLaSS,
         CogMol,
     )
-    from gt4sd.algorithms.controlled_sampling.class_controlled_sampling.implementation import (
-        UnsupportedTargetError,
-    )
+    from cog.errors import UnsupportedTargetError
 
 
 def get_classvar_type(class_var):
