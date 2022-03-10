@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 if EXTRAS_ENABLED:
+    from cog.core import CogMolGenerator
     from cog.sample_pipeline import CogMolFiles, read_artifacts_config
+    from pag.core import PAGGenerator
     from pag.sample_pipeline import PAGFiles
-
-    from .implementation import CogMolGenerator, PAGGenerator
 
     T = TypeVar("T")
     S = TypeVar("S")
