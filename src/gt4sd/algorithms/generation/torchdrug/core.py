@@ -104,7 +104,7 @@ class TorchDrugPlogpGCPN(TorchDrugGCPNConfiguration):
 class TorchDrugGAFConfiguration(AlgorithmConfiguration[str, None]):
 
     algorithm_type: ClassVar[str] = "generation"
-    domain: ClassVar[str] = "material"
+    domain: ClassVar[str] = "materials"
 
     def get_conditional_generator(self, resources_path: str) -> GAFGenerator:
         """Instantiate the actual generator implementation.
