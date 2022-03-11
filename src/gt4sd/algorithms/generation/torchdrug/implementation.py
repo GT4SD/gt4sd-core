@@ -9,13 +9,10 @@ from typing import List, Optional, Union
 
 import torch
 from torch import optim
-from torchdrug import core, models, tasks  # type: ignore
-from torchdrug.core.engine import Engine  # type: ignore
-from torchdrug.layers import distribution  # type: ignore
-from torchdrug.tasks.generation import (  # type: ignore
-    AutoregressiveGeneration,
-    GCPNGeneration,
-)
+from torchdrug import core, models, tasks
+from torchdrug.core.engine import Engine
+from torchdrug.layers import distribution
+from torchdrug.tasks.generation import AutoregressiveGeneration, GCPNGeneration
 
 from ....frameworks.torch import device_claim
 
@@ -38,6 +35,8 @@ class Generator:
 
     solver: Engine
     task: Task
+    num_sample: int = 32
+    max_resample: int = 16
 
     def __init__(
         self,
@@ -82,8 +81,10 @@ class Generator:
         Returns:
             a generated SMILES string wrapped into a list.
         """
-        results = self.task.generate(num_sample=16, max_resample=32)
-        return [list(results.to_smiles())[-1]]
+        results = self.task.generate(
+            num_sample=self.num_sample, max_resample=self.max_resample
+        )
+        return results.to_smiles()
 
 
 class GCPNGenerator(Generator):
