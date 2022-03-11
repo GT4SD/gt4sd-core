@@ -164,62 +164,43 @@
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">cast</span>
 
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">TrainingArguments</span>
 
+<span class="kn">from</span> <span class="nn">..training_pipelines.pytorch_lightning.language_modeling.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LanguageModelingSavingArguments</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">..training_pipelines.pytorch_lightning.language_modeling.models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">LM_MODULE_FACTORY</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.argument_parser</span> <span class="kn">import</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">DataClassType</span>
 
 
-<div class="viewcode-block" id="PyTorchLightningToTransformersArguments"><a class="viewcode-back" href="../../../api/gt4sd.cli.pl_to_hf_converter.html#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">PyTorchLightningToTransformersArguments</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;PyTorchLightning to Transformers converter arguments.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="convert_pl_to_hf"><a class="viewcode-back" href="../../../api/gt4sd.cli.pl_to_hf_converter.html#gt4sd.cli.pl_to_hf_converter.convert_pl_to_hf">[docs]</a><span class="k">def</span> <span class="nf">convert_pl_to_hf</span><span class="p">(</span><span class="n">arguments</span><span class="p">:</span> <span class="n">LanguageModelingSavingArguments</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Method to convert pytorch lightning checkpoint to HF transformers model.</span>
 
-    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;pl_to_hf_converter_args&quot;</span>
-
-    <span class="n">training_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Training type of the converted model, supported types: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">LM_MODULE_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="p">},</span>
-    <span class="p">)</span>
-    <span class="n">model_name_or_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Model name or path.&quot;</span><span class="p">},</span>
-    <span class="p">)</span>
-    <span class="n">ckpt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path to checkpoint.&quot;</span><span class="p">},</span>
-    <span class="p">)</span>
-    <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path to the converted model.&quot;</span><span class="p">},</span>
-    <span class="p">)</span>
-    <span class="n">tokenizer_name_or_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Tokenizer name or path. If not provided defaults to model_name_or_path.&quot;</span>
-        <span class="p">},</span>
-    <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../api/gt4sd.cli.pl_to_hf_converter.html#gt4sd.cli.pl_to_hf_converter.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Convert pytorch lightning checkpoint to HF transformers model.</span>
-
-<span class="sd">    Parsing from the command line the following parameters:</span>
-<span class="sd">        - training type of the given checkpoint.</span>
-<span class="sd">        - model name or path, a HF&#39;s model name.</span>
-<span class="sd">        - tokenizer name or path, a HF&#39;s tokenizer name.</span>
-<span class="sd">        - path of the checkpoint.</span>
-<span class="sd">        - path where the HF model will be saved.</span>
-
+<span class="sd">    Args:</span>
+<span class="sd">        arguments: a LanguageModelingSavingArguments instance that contains all the</span>
+<span class="sd">                   needed arguments for conversion.</span>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: in case the provided training type is not supported.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-    <span class="n">arguments</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span>
-        <span class="n">cast</span><span class="p">(</span><span class="n">DataClassType</span><span class="p">,</span> <span class="n">PyTorchLightningToTransformersArguments</span><span class="p">)</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">parse_args_into_dataclasses</span><span class="p">(</span><span class="n">return_remaining_strings</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">training_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;training_type is required for saving from pytorch lightning checkpoing.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">model_name_or_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;model_name_or_path is required for saving from pytorch lightning checkpoing.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">ckpt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;ckpt is required for saving from pytorch lightning checkpoing.&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">training_type</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">training_type</span>
     <span class="n">model_name_or_path</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">model_name_or_path</span>
@@ -227,7 +208,7 @@
     <span class="k">if</span> <span class="n">tokenizer_name_or_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">tokenizer_name_or_path</span> <span class="o">=</span> <span class="n">model_name_or_path</span>
     <span class="n">ckpt</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">ckpt</span>
-    <span class="n">output_path</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">output_path</span>
+    <span class="n">output_path</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">hf_model_path</span>
 
     <span class="k">if</span> <span class="n">training_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">LM_MODULE_FACTORY</span><span class="p">:</span>
         <span class="ne">ValueError</span><span class="p">(</span>
@@ -249,6 +230,27 @@
         <span class="n">args</span><span class="o">=</span><span class="n">TrainingArguments</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="n">output_path</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../api/gt4sd.cli.pl_to_hf_converter.html#gt4sd.cli.pl_to_hf_converter.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert pytorch lightning checkpoint to HF transformers model.</span>
+
+<span class="sd">    Parsing from the command line the following parameters:</span>
+<span class="sd">        - training type of the given checkpoint.</span>
+<span class="sd">        - model name or path, a HF&#39;s model name.</span>
+<span class="sd">        - tokenizer name or path, a HF&#39;s tokenizer name.</span>
+<span class="sd">        - path of the checkpoint.</span>
+<span class="sd">        - path where the HF model will be saved.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: in case the provided training type is not supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">DataClassType</span><span class="p">,</span> <span class="n">LanguageModelingSavingArguments</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">parse_args_into_dataclasses</span><span class="p">(</span><span class="n">return_remaining_strings</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">convert_pl_to_hf</span><span class="p">(</span><span class="n">arguments</span><span class="p">)</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>

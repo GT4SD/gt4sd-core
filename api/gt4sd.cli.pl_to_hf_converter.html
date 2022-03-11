@@ -197,18 +197,6 @@
 <p>Pytorch lightning checkpoint to HF transformers converter.</p>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>Classes:</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments" title="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTorchLightningToTransformersArguments</span></code></a></p></td>
-<td><p>PyTorchLightning to Transformers converter arguments.</p></td>
-</tr>
-</tbody>
-</table>
 <p>Functions:</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -216,7 +204,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.cli.pl_to_hf_converter.main" title="gt4sd.cli.pl_to_hf_converter.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.cli.pl_to_hf_converter.convert_pl_to_hf" title="gt4sd.cli.pl_to_hf_converter.convert_pl_to_hf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_pl_to_hf</span></code></a></p></td>
+<td><p>Method to convert pytorch lightning checkpoint to HF transformers model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.cli.pl_to_hf_converter.main" title="gt4sd.cli.pl_to_hf_converter.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a></p></td>
 <td><p>Convert pytorch lightning checkpoint to HF transformers model.</p></td>
 </tr>
 </tbody>
@@ -224,100 +215,22 @@
 </section>
 <section id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments">
-<em class="property">class </em><code class="sig-name descname">PyTorchLightningToTransformersArguments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">training_type</span></em>, <em class="sig-param"><span class="n">model_name_or_path</span></em>, <em class="sig-param"><span class="n">ckpt</span></em>, <em class="sig-param"><span class="n">output_path</span></em>, <em class="sig-param"><span class="n">tokenizer_name_or_path</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/cli/pl_to_hf_converter.html#PyTorchLightningToTransformersArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>PyTorchLightning to Transformers converter arguments.</p>
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__name__">
-<code class="sig-name descname">__name__</code><em class="property"> = 'PyTorchLightningToTransformersArguments'</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__name__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.training_type">
-<code class="sig-name descname">training_type</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.training_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.model_name_or_path">
-<code class="sig-name descname">model_name_or_path</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.model_name_or_path" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.ckpt">
-<code class="sig-name descname">ckpt</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.ckpt" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.output_path">
-<code class="sig-name descname">output_path</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.output_path" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.tokenizer_name_or_path">
-<code class="sig-name descname">tokenizer_name_or_path</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.tokenizer_name_or_path" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__annotations__">
-<code class="sig-name descname">__annotations__</code><em class="property"> = {'ckpt': &lt;class 'str'&gt;, 'model_name_or_path': &lt;class 'str'&gt;, 'output_path': &lt;class 'str'&gt;, 'tokenizer_name_or_path': typing.Union[str, NoneType], 'training_type': &lt;class 'str'&gt;}</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__annotations__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__dataclass_fields__">
-<code class="sig-name descname">__dataclass_fields__</code><em class="property"> = {'ckpt': Field(name='ckpt',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Path to checkpoint.'}),_field_type=_FIELD), 'model_name_or_path': Field(name='model_name_or_path',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Model name or path.'}),_field_type=_FIELD), 'output_path': Field(name='output_path',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Path to the converted model.'}),_field_type=_FIELD), 'tokenizer_name_or_path': Field(name='tokenizer_name_or_path',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Tokenizer name or path. If not provided defaults to model_name_or_path.'}),_field_type=_FIELD), 'training_type': Field(name='training_type',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Training type of the converted model, supported types: lm, mlm, clm, plm.'}),_field_type=_FIELD)}</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__dataclass_fields__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__dataclass_params__">
-<code class="sig-name descname">__dataclass_params__</code><em class="property"> = _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False)</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__dataclass_params__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__dict__">
-<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.cli.pl_to_hf_converter', '__annotations__': {'training_type': &lt;class 'str'&gt;, 'model_name_or_path': &lt;class 'str'&gt;, 'ckpt': &lt;class 'str'&gt;, 'output_path': &lt;class 'str'&gt;, 'tokenizer_name_or_path': typing.Union[str, NoneType]}, '__doc__': 'PyTorchLightning to Transformers converter arguments.', '__name__': 'pl_to_hf_converter_args', 'tokenizer_name_or_path': None, '__dict__': &lt;attribute '__dict__' of 'PyTorchLightningToTransformersArguments' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'PyTorchLightningToTransformersArguments' objects&gt;, '__dataclass_params__': _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False), '__dataclass_fields__': {'training_type': Field(name='training_type',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Training type of the converted model, supported types: lm, mlm, clm, plm.'}),_field_type=_FIELD), 'model_name_or_path': Field(name='model_name_or_path',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Model name or path.'}),_field_type=_FIELD), 'ckpt': Field(name='ckpt',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Path to checkpoint.'}),_field_type=_FIELD), 'output_path': Field(name='output_path',type=&lt;class 'str'&gt;,default=&lt;dataclasses._MISSING_TYPE object&gt;,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Path to the converted model.'}),_field_type=_FIELD), 'tokenizer_name_or_path': Field(name='tokenizer_name_or_path',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Tokenizer name or path. If not provided defaults to model_name_or_path.'}),_field_type=_FIELD)}, '__init__': &lt;function __create_fn__.&lt;locals&gt;.__init__&gt;, '__repr__': &lt;function __create_fn__.&lt;locals&gt;.__repr__&gt;, '__eq__': &lt;function __create_fn__.&lt;locals&gt;.__eq__&gt;, '__hash__': None})</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__dict__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__doc__">
-<code class="sig-name descname">__doc__</code><em class="property"> = 'PyTorchLightning to Transformers converter arguments.'</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__doc__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__eq__">
-<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__eq__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return self==value.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__hash__">
-<code class="sig-name descname">__hash__</code><em class="property"> = None</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__hash__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">training_type</span></em>, <em class="sig-param"><span class="n">model_name_or_path</span></em>, <em class="sig-param"><span class="n">ckpt</span></em>, <em class="sig-param"><span class="n">output_path</span></em>, <em class="sig-param"><span class="n">tokenizer_name_or_path</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__module__">
-<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.cli.pl_to_hf_converter'</em><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__repr__">
-<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__repr__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return repr(self).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__weakref__">
-<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.PyTorchLightningToTransformersArguments.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
+<dl class="py function">
+<dt id="gt4sd.cli.pl_to_hf_converter.convert_pl_to_hf">
+<code class="sig-name descname">convert_pl_to_hf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arguments</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/cli/pl_to_hf_converter.html#convert_pl_to_hf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.cli.pl_to_hf_converter.convert_pl_to_hf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to convert pytorch lightning checkpoint to HF transformers model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arguments</strong> (<a class="reference internal" href="gt4sd.training_pipelines.pytorch_lightning.language_modeling.core.html#gt4sd.training_pipelines.pytorch_lightning.language_modeling.core.LanguageModelingSavingArguments" title="gt4sd.training_pipelines.pytorch_lightning.language_modeling.core.LanguageModelingSavingArguments"><code class="xref py py-class docutils literal notranslate"><span class="pre">LanguageModelingSavingArguments</span></code></a>) – a LanguageModelingSavingArguments instance that contains all the
+needed arguments for conversion.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – in case the provided training type is not supported.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
