@@ -439,11 +439,11 @@ class AlgorithmConfiguration(Generic[S, T]):
         )
 
     @classmethod
-    def save_postprocess(
+    def save_version_from_training_pipeline_arguments_postprocess(
         cls,
         training_pipeline_arguments: TrainingPipelineArguments,
     ):
-        """Postprocess after saving
+        """Postprocess after saving.
 
         Args:
             training_pipeline_arguments: training pipeline arguments.
@@ -506,7 +506,9 @@ class AlgorithmConfiguration(Generic[S, T]):
                 )
                 shutil.copyfile(source_filepath, target_filepath)
 
-            cls.save_postprocess(training_pipeline_arguments)
+            cls.save_version_from_training_pipeline_arguments_postprocess(
+                training_pipeline_arguments
+            )
 
             logger.info(f"Artifacts saving completed into {target_path}")
 

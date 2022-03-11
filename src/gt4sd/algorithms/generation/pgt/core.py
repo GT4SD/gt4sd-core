@@ -170,7 +170,7 @@ class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
         )
 
     @classmethod
-    def save_postprocess(
+    def save_version_from_training_pipeline_arguments_postprocess(
         cls,
         training_pipeline_arguments: TrainingPipelineArguments,
     ):
@@ -189,7 +189,9 @@ class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
                     f"Cleaning up temporary files from {training_pipeline_arguments.hf_model_path}"
                 )
         else:
-            return super().save_postprocess(training_pipeline_arguments)
+            return super().save_version_from_training_pipeline_arguments_postprocess(
+                training_pipeline_arguments
+            )
 
     @classmethod
     def get_filepath_mappings_for_training_pipeline_arguments(
