@@ -23,6 +23,7 @@ from .pytorch_lightning.granular.core import (
 from .pytorch_lightning.language_modeling.core import (
     LanguageModelingDataArguments,
     LanguageModelingModelArguments,
+    LanguageModelingSavingArguments,
     LanguageModelingTrainingPipeline,
 )
 
@@ -61,6 +62,7 @@ TRAINING_PIPELINE_MAPPING = {
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "paccmann-vae-trainer": PaccMannSavingArguments,
     "granular-trainer": GranularSavingArguments,
+    "language-modeling-trainer": LanguageModelingSavingArguments,
 }
 
 

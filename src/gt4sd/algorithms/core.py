@@ -439,6 +439,18 @@ class AlgorithmConfiguration(Generic[S, T]):
         )
 
     @classmethod
+    def save_version_from_training_pipeline_arguments_postprocess(
+        cls,
+        training_pipeline_arguments: TrainingPipelineArguments,
+    ):
+        """Postprocess after saving.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+        """
+        pass
+
+    @classmethod
     def save_version_from_training_pipeline_arguments(
         cls,
         training_pipeline_arguments: TrainingPipelineArguments,
@@ -493,6 +505,11 @@ class AlgorithmConfiguration(Generic[S, T]):
                     f"Saving artifact {source_filepath} into {target_filepath}..."
                 )
                 shutil.copyfile(source_filepath, target_filepath)
+
+            cls.save_version_from_training_pipeline_arguments_postprocess(
+                training_pipeline_arguments
+            )
+
             logger.info(f"Artifacts saving completed into {target_path}")
 
     @classmethod
