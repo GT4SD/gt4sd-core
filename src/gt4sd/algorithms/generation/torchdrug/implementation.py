@@ -14,12 +14,24 @@ from torchdrug.core.engine import Engine
 from torchdrug.layers import distribution
 from torchdrug.tasks.generation import AutoregressiveGeneration, GCPNGeneration
 
+# isort: off
+from torch import nn
+
+# isort: on
+
 from ....frameworks.torch import device_claim
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 Task = Union[GCPNGeneration, AutoregressiveGeneration]
+
+"""
+Necessary because torchdrug silently overwrites the default nn.Module. This is quite
+invasive and causes significant side-effects in the rest of the code.
+See: https://github.com/DeepGraphLearning/torchdrug/issues/77
+"""
+nn.Module = nn._Module  # type: ignore
 
 
 class DummyDataset:
