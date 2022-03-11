@@ -35,6 +35,11 @@ from .generation.hugging_face.core import (  # noqa: F401
     HuggingFaceXLMGenerator,
     HuggingFaceXLNetGenerator,
 )
+from .generation.pgt.core import (  # noqa: F401
+    PGTCoherenceChecker,
+    PGTEditor,
+    PGTGenerator,
+)
 from .generation.polymer_blocks.core import PolymerBlocksGenerator  # noqa: F401
 from .generation.torchdrug.core import (
     TorchDrugPlogpGAF,

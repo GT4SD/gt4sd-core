@@ -267,5 +267,6 @@ LM_MODULE_FACTORY: Dict[str, Type[LMModule]] = {
     "lm": LMModule,
     "mlm": MLMModule,
     "clm": CLMModule,
+    "cgm": CGMModule,
     "plm": PLMModule,
 }
