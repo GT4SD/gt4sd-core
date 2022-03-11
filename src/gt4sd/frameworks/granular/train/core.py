@@ -4,6 +4,10 @@ import logging
 from argparse import Namespace
 from typing import Any, Dict
 
+# isort: off
+import sentencepiece as _sentencepiece
+
+# isort: on
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -85,3 +89,6 @@ def train_granular(configuration: Dict[str, Any]) -> None:
 def train_granular_main() -> None:
     """Train a granular module parsing arguments from config and standard input."""
     train_granular(configuration=vars(parse_arguments_from_config()))
+
+
+_sentencepiece

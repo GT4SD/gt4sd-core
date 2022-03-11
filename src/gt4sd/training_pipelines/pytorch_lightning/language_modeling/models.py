@@ -3,6 +3,10 @@
 import logging
 from typing import Dict, Type, Union
 
+# isort: off
+import sentencepiece as _sentencepiece
+
+# isort: on
 import pytorch_lightning as pl
 import torch.optim as optim
 from torch import Tensor
@@ -270,3 +274,5 @@ LM_MODULE_FACTORY: Dict[str, Type[LMModule]] = {
     "cgm": CGMModule,
     "plm": PLMModule,
 }
+
+_sentencepiece

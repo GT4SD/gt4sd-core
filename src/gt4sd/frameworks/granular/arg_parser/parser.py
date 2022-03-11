@@ -2,6 +2,10 @@ import argparse
 import configparser
 from typing import Any, Dict, Optional
 
+# isort: off
+import sentencepiece as _sentencepiece
+
+# isort: on
 from pytorch_lightning import Trainer
 
 from ..ml.models import ARCHITECTURE_FACTORY
@@ -94,3 +98,6 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     result_namespace = argparse.Namespace(**result)
 
     return result_namespace
+
+
+_sentencepiece

@@ -4,6 +4,11 @@ import os
 from typing import Any, Callable, Dict, List, Tuple, cast
 
 import pandas as pd
+
+# isort: off
+import sentencepiece as _sentencepiece
+
+# isort: on
 import pytorch_lightning as pl
 import torch
 
@@ -260,3 +265,6 @@ class GranularModule(pl.LightningModule):
             an optimizer, currently only Adam is supported.
         """
         return torch.optim.Adam(self.parameters(), lr=self.lr)
+
+
+_sentencepiece
