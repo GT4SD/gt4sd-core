@@ -2,6 +2,7 @@
 
 import logging
 import os
+import shutil
 from dataclasses import field
 from typing import Any, ClassVar, Dict, Optional, TypeVar
 
@@ -170,6 +171,28 @@ class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
             top_p=self.top_p,
             num_return_sequences=self.num_return_sequences,
         )
+
+    @classmethod
+    def save_postprocess(
+        cls,
+        training_pipeline_arguments: TrainingPipelineArguments,
+    ):
+        """Postprocess after saving. Remove temporarily converted hf model
+           if pytorch-lightning checkpoint is given.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+        """
+
+        if isinstance(training_pipeline_arguments, LanguageModelingSavingArguments):
+            if training_pipeline_arguments.ckpt is not None:
+                shutil.rmtree(training_pipeline_arguments.hf_model_path)
+
+                logger.info(
+                    f"Cleaning up temporary files from {training_pipeline_arguments.hf_model_path}"
+                )
+        else:
+            return super().save_postprocess(training_pipeline_arguments)
 
     @classmethod
     def get_filepath_mappings_for_training_pipeline_arguments(

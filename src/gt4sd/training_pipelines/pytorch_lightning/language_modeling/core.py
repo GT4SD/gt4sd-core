@@ -256,6 +256,7 @@ class LanguageModelingSavingArguments(TrainingPipelineArguments):
 
     hf_model_path: str = field(
         metadata={"help": "Path to the converted HF model."},
+        default="/tmp/gt4sd_lm_saving_tmp",
     )
     training_type: Optional[str] = field(
         metadata={
