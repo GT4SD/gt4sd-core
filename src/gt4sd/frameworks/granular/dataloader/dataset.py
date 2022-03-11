@@ -36,6 +36,11 @@ class GranularDataset(Dataset):
         """
         self.dataset: Dict[str, Any] = {"name": name, "data": data}
 
+        self.tokenizer: Tokenizer
+        self.set_seq_size: int
+        self.input_size: int
+        self.target_size: int
+
     def __len__(self) -> int:
         """Dataset length.
 
