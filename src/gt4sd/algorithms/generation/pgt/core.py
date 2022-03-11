@@ -1,11 +1,17 @@
 """Patent Generative Transformer (PGT) generation algorithm."""
 
 import logging
+import os
 from dataclasses import field
 from typing import Any, ClassVar, Dict, Optional, TypeVar
 
 from typing_extensions import Protocol, runtime_checkable
 
+from ....cli.pl_to_hf_converter import convert_pl_to_hf
+from ....training_pipelines.core import TrainingPipelineArguments
+from ....training_pipelines.pytorch_lightning.language_modeling.core import (
+    LanguageModelingSavingArguments,
+)
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
 from ...registry import ApplicationsRegistry
 from .implementation import (
@@ -107,10 +113,7 @@ class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
     domain: ClassVar[str] = "nlp"
     algorithm_version: str = "v0"
 
-    prompt: str = field(
-        default="I am a interesting prompt",
-        metadata=dict(description="A prompt input for generation."),
-    )
+    prompt: str = "Do not change me, I am an interesting prompt that is changed internally for each task."
 
     model_type: str = field(
         default="",
@@ -167,6 +170,38 @@ class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
             top_p=self.top_p,
             num_return_sequences=self.num_return_sequences,
         )
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+
+        if isinstance(training_pipeline_arguments, LanguageModelingSavingArguments):
+
+            if training_pipeline_arguments.ckpt is not None:
+
+                convert_pl_to_hf(training_pipeline_arguments)
+
+            model_files = os.listdir(training_pipeline_arguments.hf_model_path)
+
+            model_files_dict = {
+                file: os.path.join(training_pipeline_arguments.hf_model_path, file)
+                for file in model_files
+            }
+            return model_files_dict
+
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
 
 
 @ApplicationsRegistry.register_algorithm_application(PGT)
