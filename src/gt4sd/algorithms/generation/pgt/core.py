@@ -114,8 +114,6 @@ class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
     domain: ClassVar[str] = "nlp"
     algorithm_version: str = "v0"
 
-    prompt: str = "Do not change me, I am an interesting prompt that is changed internally for each task."
-
     model_type: str = field(
         default="",
         metadata=dict(description="Type of the model."),
@@ -165,7 +163,6 @@ class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
             resources_path=resources_path,
             model_type=self.model_type,
             model_name=self.algorithm_version,
-            prompt=self.prompt,
             max_length=self.max_length,
             top_k=self.top_k,
             top_p=self.top_p,
