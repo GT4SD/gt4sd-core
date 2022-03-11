@@ -17,6 +17,10 @@ from .conditional_generation.paccmann_rl.core import (  # noqa: F401
     PaccMannRLOmicBasedGenerator,
     PaccMannRLProteinBasedGenerator,
 )
+from .conditional_generation.regression_transformer.core import (
+    RegressionTransformerMolecules,
+    RegressionTransformerProteins,
+)
 from .conditional_generation.reinvent.core import ReinventGenerator  # noqa: F401
 from .conditional_generation.template.core import TemplateGenerator  # noqa: F401
 from .controlled_sampling.advanced_manufacturing.core import (  # noqa: F401
@@ -32,6 +36,14 @@ from .generation.hugging_face.core import (  # noqa: F401
     HuggingFaceXLNetGenerator,
 )
 from .generation.polymer_blocks.core import PolymerBlocksGenerator  # noqa: F401
+from .generation.torchdrug.core import (
+    TorchDrugPlogpGAF,
+    TorchDrugPlogpGCPN,
+    TorchDrugQedGAF,
+    TorchDrugQedGCPN,
+    TorchDrugZincGAF,
+    TorchDrugZincGCPN,
+)
 from .prediction.paccmann.core import PaccMann  # noqa: F401
 from .prediction.topics_zero_shot.core import TopicsPredictor  # noqa: F401
 

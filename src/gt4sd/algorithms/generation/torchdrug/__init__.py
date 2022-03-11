@@ -10,6 +10,8 @@ from .core import (
     TorchDrugZincGCPN,
 )
 
+torch._C.has_openmp = True
+
 __all__ = [
     "TorchDrugGenerator",
     "TorchDrugZincGCPN",
