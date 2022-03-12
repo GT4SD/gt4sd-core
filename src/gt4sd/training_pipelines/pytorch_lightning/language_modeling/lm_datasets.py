@@ -5,10 +5,7 @@ import os
 from functools import lru_cache
 from typing import Any, Callable, Dict, List, Union
 
-# isort: off
 import sentencepiece as _sentencepiece
-
-# isort: on
 import pytorch_lightning as pl
 from datasets import DatasetDict
 from loguru import logger

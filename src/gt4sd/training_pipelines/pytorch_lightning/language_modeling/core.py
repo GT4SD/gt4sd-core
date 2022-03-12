@@ -4,10 +4,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Tuple, Union
 
-# isort: off
 import sentencepiece as _sentencepiece
-
-# isort: on
 from pytorch_lightning import LightningDataModule, LightningModule
 
 from ...core import TrainingPipelineArguments

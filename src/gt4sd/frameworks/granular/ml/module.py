@@ -3,12 +3,8 @@
 import os
 from typing import Any, Callable, Dict, List, Tuple, cast
 
-import pandas as pd
-
-# isort: off
 import sentencepiece as _sentencepiece
-
-# isort: on
+import pandas as pd
 import pytorch_lightning as pl
 import torch
 

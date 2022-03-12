@@ -2,10 +2,7 @@ import argparse
 import configparser
 from typing import Any, Dict, Optional
 
-# isort: off
 import sentencepiece as _sentencepiece
-
-# isort: on
 from pytorch_lightning import Trainer
 
 from ..ml.models import ARCHITECTURE_FACTORY

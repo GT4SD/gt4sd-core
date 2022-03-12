@@ -3,12 +3,8 @@
 import logging
 from typing import Callable, List, Optional, cast
 
-import pandas as pd
-
-# isort: off
 import sentencepiece as _sentencepiece
-
-# isort: on
+import pandas as pd
 import pytorch_lightning as pl
 import torch
 from torch.utils.data import DataLoader, Sampler, Subset, random_split
