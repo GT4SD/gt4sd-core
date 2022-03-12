@@ -119,6 +119,8 @@ class GCPNGenerator(Generator):
 
     def __init__(self, resources_path: str):
         """
+        A TorchDrug Graph-convolutional policy network (GCPN) generation algorithm.
+
         Args:
             resources_path: path to the cache.
         """
@@ -163,6 +165,8 @@ class GAFGenerator(Generator):
 
     def __init__(self, resources_path: str):
         """
+        A TorchDrug flow-based autoregressive graph generation algorithm (GAF).
+
         Args:
             resources_path (str): path to the cache.
         """
