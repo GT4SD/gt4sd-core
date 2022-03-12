@@ -6,13 +6,9 @@ import pytest
 
 from gt4sd.algorithms.core import AlgorithmConfiguration
 from gt4sd.algorithms.generation.torchdrug import (
+    TorchDrugGCPN,
     TorchDrugGenerator,
-    TorchDrugPlogpGAF,
-    TorchDrugPlogpGCPN,
-    TorchDrugQedGAF,
-    TorchDrugQedGCPN,
-    TorchDrugZincGAF,
-    TorchDrugZincGCPN,
+    TorchDrugGraphAF,
 )
 from gt4sd.algorithms.registry import ApplicationsRegistry
 from gt4sd.tests.utils import GT4SDTestSettings
@@ -29,37 +25,13 @@ def get_classvar_type(class_var):
     "config_class, algorithm_type, domain, algorithm_name",
     [
         (
-            TorchDrugZincGCPN,
+            TorchDrugGCPN,
             "generation",
             "materials",
             TorchDrugGenerator.__name__,
         ),
         (
-            TorchDrugPlogpGCPN,
-            "generation",
-            "materials",
-            TorchDrugGenerator.__name__,
-        ),
-        (
-            TorchDrugQedGCPN,
-            "generation",
-            "materials",
-            TorchDrugGenerator.__name__,
-        ),
-        (
-            TorchDrugZincGAF,
-            "generation",
-            "materials",
-            TorchDrugGenerator.__name__,
-        ),
-        (
-            TorchDrugPlogpGAF,
-            "generation",
-            "materials",
-            TorchDrugGenerator.__name__,
-        ),
-        (
-            TorchDrugQedGAF,
+            TorchDrugGraphAF,
             "generation",
             "materials",
             TorchDrugGenerator.__name__,
@@ -84,14 +56,7 @@ def test_config_class(
 
 @pytest.mark.parametrize(
     "config_class",
-    [
-        (TorchDrugZincGCPN),
-        (TorchDrugPlogpGCPN),
-        (TorchDrugQedGCPN),
-        (TorchDrugZincGAF),
-        (TorchDrugPlogpGAF),
-        (TorchDrugQedGAF),
-    ],
+    [(TorchDrugGCPN), (TorchDrugGraphAF)],
 )
 def test_config_instance(config_class: Type[AlgorithmConfiguration]):
     config = config_class()  # type:ignore
@@ -100,14 +65,7 @@ def test_config_instance(config_class: Type[AlgorithmConfiguration]):
 
 @pytest.mark.parametrize(
     "config_class",
-    [
-        (TorchDrugZincGCPN),
-        (TorchDrugPlogpGCPN),
-        (TorchDrugQedGCPN),
-        (TorchDrugZincGAF),
-        (TorchDrugPlogpGAF),
-        (TorchDrugQedGAF),
-    ],
+    [(TorchDrugGCPN), (TorchDrugGraphAF)],
 )
 def test_available_versions(config_class: Type[AlgorithmConfiguration]):
     versions = config_class.list_versions()
@@ -115,95 +73,111 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
 
 
 @pytest.mark.parametrize(
-    "config, algorithm",
+    "config, algorithm, version",
     [
         pytest.param(
-            TorchDrugZincGCPN,
+            TorchDrugGCPN,
             TorchDrugGenerator,
+            "zinc250k_v0",
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
-            TorchDrugPlogpGCPN,
+            TorchDrugGraphAF,
             TorchDrugGenerator,
+            "zinc250k_v0",
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
-            TorchDrugQedGCPN,
+            TorchDrugGCPN,
             TorchDrugGenerator,
+            "qed_v0",
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
-            TorchDrugZincGAF,
+            TorchDrugGraphAF,
             TorchDrugGenerator,
+            "qed_v0",
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
-            TorchDrugPlogpGAF,
+            TorchDrugGCPN,
             TorchDrugGenerator,
+            "plogp_v0",
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
-            TorchDrugQedGAF,
+            TorchDrugGraphAF,
             TorchDrugGenerator,
+            "plogp_v0",
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
     ],
 )
-def test_generation_via_import(config, algorithm):
-    algorithm = algorithm(configuration=config())
+def test_generation_via_import(config, algorithm, version: str):
+    algorithm = algorithm(configuration=config(algorithm_version=version))
     items = list(algorithm.sample(1))
     assert len(items) == 1
 
 
 @pytest.mark.parametrize(
-    "algorithm_application, algorithm_type, domain, algorithm_name",
+    "algorithm_application, algorithm_type, domain, algorithm_version, algorithm_name",
     [
         pytest.param(
-            TorchDrugZincGCPN.__name__,
+            TorchDrugGCPN.__name__,
             "generation",
             "materials",
+            "zinc250k_v0",
             TorchDrugGenerator.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
-            TorchDrugPlogpGCPN.__name__,
+            TorchDrugGraphAF.__name__,
             "generation",
             "materials",
+            "zinc250k_v0",
             TorchDrugGenerator.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
-            TorchDrugQedGCPN.__name__,
+            TorchDrugGCPN.__name__,
             "generation",
             "materials",
+            "qed_v0",
             TorchDrugGenerator.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
-            TorchDrugZincGAF.__name__,
+            TorchDrugGraphAF.__name__,
             "generation",
             "materials",
+            "qed_v0",
             TorchDrugGenerator.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
-            TorchDrugPlogpGAF.__name__,
+            TorchDrugGCPN.__name__,
             "generation",
             "materials",
+            "plogp_v0",
             TorchDrugGenerator.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
-            TorchDrugQedGAF.__name__,
+            TorchDrugGraphAF.__name__,
             "generation",
             "materials",
+            "plogp_v0",
             TorchDrugGenerator.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
     ],
 )
 def test_generation_via_registry(
-    algorithm_type, domain, algorithm_name, algorithm_application
+    algorithm_type: str,
+    domain: str,
+    algorithm_name: str,
+    algorithm_version: str,
+    algorithm_application,
 ):
     algorithm = ApplicationsRegistry.get_application_instance(
         target=None,

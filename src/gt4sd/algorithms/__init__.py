@@ -41,14 +41,7 @@ from .generation.pgt.core import (  # noqa: F401
     PGTGenerator,
 )
 from .generation.polymer_blocks.core import PolymerBlocksGenerator  # noqa: F401
-from .generation.torchdrug.core import (
-    TorchDrugPlogpGAF,
-    TorchDrugPlogpGCPN,
-    TorchDrugQedGAF,
-    TorchDrugQedGCPN,
-    TorchDrugZincGAF,
-    TorchDrugZincGCPN,
-)
+from .generation.torchdrug.core import TorchDrugGCPN, TorchDrugGraphAF  # noqa: F401
 from .prediction.paccmann.core import PaccMann  # noqa: F401
 from .prediction.topics_zero_shot.core import TopicsPredictor  # noqa: F401
 

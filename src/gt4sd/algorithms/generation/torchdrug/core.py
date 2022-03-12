@@ -21,14 +21,15 @@ class TorchDrugGenerator(GeneratorAlgorithm[S, T]):
         """TorchDrug generation algorithm.
 
         Args:
-            configuration: domain and application
-                specification, defining types and validations.
+            configuration: domain and application specification, defining types
+                and validations.  Currently supported algorithm versions are:
+                "zinc250k_v0", "qed_v0" and "plogp_v0".
             target: unused since it is not a conditional generator.
 
         Example:
             An example for using a generative algorithm from HuggingFace::
 
-                configuration = TorchDrugZincGCPN()
+                configuration = TorchDrugGCPN(algorithm_version="qed_v0")
                 algorithm = TorchDrugGenerator(configuration=configuration)
                 items = list(algorithm.sample(1))
                 print(items)
@@ -69,10 +70,15 @@ class TorchDrugGenerator(GeneratorAlgorithm[S, T]):
 
 
 @ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
-class TorchDrugGCPNConfiguration(AlgorithmConfiguration[str, None]):
+class TorchDrugGCPN(AlgorithmConfiguration[str, None]):
+    """
+    Interface for TorchDrug Graph-convolutional policy network (GCPN) algorithm.
+    Currently supported algorithm versions are "zinc250k_v0", "qed_v0" and "plogp_v0".
+    """
 
     algorithm_type: ClassVar[str] = "generation"
     domain: ClassVar[str] = "materials"
+    algorithm_version: str = "zinc250k_v0"
 
     def get_conditional_generator(self, resources_path: str) -> GCPNGenerator:
         """Instantiate the actual generator implementation.
@@ -86,25 +92,15 @@ class TorchDrugGCPNConfiguration(AlgorithmConfiguration[str, None]):
 
 
 @ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
-class TorchDrugZincGCPN(TorchDrugGCPNConfiguration):
-    algorithm_version: str = "v0"
-
-
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
-class TorchDrugQedGCPN(TorchDrugGCPNConfiguration):
-    algorithm_version: str = "v0"
-
-
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
-class TorchDrugPlogpGCPN(TorchDrugGCPNConfiguration):
-    algorithm_version: str = "v0"
-
-
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
-class TorchDrugGAFConfiguration(AlgorithmConfiguration[str, None]):
+class TorchDrugGraphAF(AlgorithmConfiguration[str, None]):
+    """
+    Interface for TorchDrug flow-based autoregressive graph algorithm (GraphAF).
+    Currently supported algorithm versions are "zinc250k_v0", "qed_v0" and "plogp_v0".
+    """
 
     algorithm_type: ClassVar[str] = "generation"
     domain: ClassVar[str] = "materials"
+    algorithm_version: str = "zinc250k_v0"
 
     def get_conditional_generator(self, resources_path: str) -> GAFGenerator:
         """Instantiate the actual generator implementation.
@@ -115,18 +111,3 @@ class TorchDrugGAFConfiguration(AlgorithmConfiguration[str, None]):
         """
         self.generator = GAFGenerator(resources_path=resources_path)
         return self.generator
-
-
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
-class TorchDrugZincGAF(TorchDrugGAFConfiguration):
-    algorithm_version: str = "v0"
-
-
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
-class TorchDrugQedGAF(TorchDrugGAFConfiguration):
-    algorithm_version: str = "v0"
-
-
-@ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
-class TorchDrugPlogpGAF(TorchDrugGAFConfiguration):
-    algorithm_version: str = "v0"
