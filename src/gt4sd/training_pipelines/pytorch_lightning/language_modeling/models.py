@@ -20,7 +20,7 @@ from transformers import (
     XLNetLMHeadModel,
 )
 
-# Sentencepiece has to be loaded before lightning
+# sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
 
 logger = logging.getLogger(__name__)
