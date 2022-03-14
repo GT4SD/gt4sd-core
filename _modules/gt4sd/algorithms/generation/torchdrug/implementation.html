@@ -1,0 +1,402 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.generation.torchdrug.implementation &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.generation.torchdrug.implementation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.generation.torchdrug.implementation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Implementation details for TorchDrug generation algorithms.</span>
+
+<span class="sd">Parts of the implementation inspired by: https://torchdrug.ai/docs/tutorials/generation.html.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
+<span class="kn">from</span> <span class="nn">torchdrug</span> <span class="kn">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">tasks</span>
+<span class="kn">from</span> <span class="nn">torchdrug.core.engine</span> <span class="kn">import</span> <span class="n">Engine</span>
+<span class="kn">from</span> <span class="nn">torchdrug.layers</span> <span class="kn">import</span> <span class="n">distribution</span>
+<span class="kn">from</span> <span class="nn">torchdrug.tasks.generation</span> <span class="kn">import</span> <span class="n">AutoregressiveGeneration</span><span class="p">,</span> <span class="n">GCPNGeneration</span>
+
+<span class="c1"># isort: off</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+<span class="c1"># isort: on</span>
+
+<span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="n">Task</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">GCPNGeneration</span><span class="p">,</span> <span class="n">AutoregressiveGeneration</span><span class="p">]</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Necessary because torchdrug silently overwrites the default nn.Module. This is quite</span>
+<span class="sd">invasive and causes significant side-effects in the rest of the code.</span>
+<span class="sd">See: https://github.com/DeepGraphLearning/torchdrug/issues/77</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">_Module</span>  <span class="c1"># type: ignore</span>
+
+
+<div class="viewcode-block" id="DummyDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.implementation.html#gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset">[docs]</a><span class="k">class</span> <span class="nc">DummyDataset</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A helper class to imitate a torchdrug dataset.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DummyDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.implementation.html#gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="o">=</span> <span class="n">atom_types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.implementation.html#gt4sd.algorithms.generation.torchdrug.implementation.Generator">[docs]</a><span class="k">class</span> <span class="nc">Generator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Implementation of a TorchDrug generator.&quot;&quot;&quot;</span>
+
+    <span class="n">solver</span><span class="p">:</span> <span class="n">Engine</span>
+    <span class="n">task</span><span class="p">:</span> <span class="n">Task</span>
+    <span class="n">num_sample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">max_resample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span>
+
+<div class="viewcode-block" id="Generator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.implementation.html#gt4sd.algorithms.generation.torchdrug.implementation.Generator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">atom_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">hidden_dims</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_relation</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">batch_norm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A TorchDrug generation algorithm.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: path to the cache.</span>
+<span class="sd">            atom_types: list of atom types.</span>
+<span class="sd">            hidden_dims: list of hidden dimensions, one per layer.</span>
+<span class="sd">            num_relation: number of relations for the graph.</span>
+<span class="sd">            batch_norm: whether to use batch normalization.</span>
+<span class="sd">            device: device where the inference</span>
+<span class="sd">                is running either as a dedicated class or a string. If not provided,</span>
+<span class="sd">                it is inferred.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span> <span class="o">=</span> <span class="n">resources_path</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">RGCN</span><span class="p">(</span>
+            <span class="n">input_dim</span><span class="o">=</span><span class="n">input_dim</span><span class="p">,</span>
+            <span class="n">num_relation</span><span class="o">=</span><span class="n">num_relation</span><span class="p">,</span>
+            <span class="n">hidden_dims</span><span class="o">=</span><span class="n">hidden_dims</span><span class="p">,</span>
+            <span class="n">batch_norm</span><span class="o">=</span><span class="n">batch_norm</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">DummyDataset</span><span class="p">(</span><span class="n">atom_types</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Generator.load_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.implementation.html#gt4sd.algorithms.generation.torchdrug.implementation.Generator.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load a pretrained TorchDrug model.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;weights.pkl&quot;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Generator.sample"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.implementation.html#gt4sd.algorithms.generation.torchdrug.implementation.Generator.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Sample a molecule.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a generated SMILES string wrapped into a list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+            <span class="n">num_sample</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_sample</span><span class="p">,</span> <span class="n">max_resample</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_resample</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span><span class="o">.</span><span class="n">to_smiles</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="GCPNGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.implementation.html#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator">[docs]</a><span class="k">class</span> <span class="nc">GCPNGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interface for the GCPN model as implemented in TorchDrug.</span>
+
+<span class="sd">    For details see:</span>
+<span class="sd">    You, J. et al. (2018). Graph convolutional policy network for goal-directed</span>
+<span class="sd">    molecular graph generation. Advances in neural information processing systems, 31.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">task</span><span class="p">:</span> <span class="n">GCPNGeneration</span>
+
+    <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">18</span>
+    <span class="n">num_relation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">batch_norm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">atom_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">53</span><span class="p">]</span>
+    <span class="n">hidden_dims</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">]</span>
+
+<div class="viewcode-block" id="GCPNGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.implementation.html#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A TorchDrug Graph-convolutional policy network (GCPN) generation algorithm.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: path to the cache.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">input_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span><span class="p">,</span>
+            <span class="n">num_relation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_relation</span><span class="p">,</span>
+            <span class="n">batch_norm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_norm</span><span class="p">,</span>
+            <span class="n">atom_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">,</span>
+            <span class="n">hidden_dims</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dims</span><span class="p">,</span>
+            <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">GCPNGeneration</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">,</span>
+            <span class="n">max_edge_unroll</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+            <span class="n">max_node</span><span class="o">=</span><span class="mi">38</span><span class="p">,</span>
+            <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;nll&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Engine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GAFGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.implementation.html#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator">[docs]</a><span class="k">class</span> <span class="nc">GAFGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interface for the GraphAF model as implemented in TorchDrug.</span>
+
+<span class="sd">    For details see:</span>
+<span class="sd">    Shi, Chence, et al. &quot;GraphAF: a Flow-based Autoregressive Model for Molecular</span>
+<span class="sd">    Graph Generation&quot; International Conference on Learning Representations (ICLR), 2020.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">task</span><span class="p">:</span> <span class="n">AutoregressiveGeneration</span>
+
+    <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">9</span>
+    <span class="n">num_relations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">batch_norm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">atom_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">53</span><span class="p">]</span>
+    <span class="n">hidden_dims</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">]</span>
+
+<div class="viewcode-block" id="GAFGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.implementation.html#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A TorchDrug flow-based autoregressive graph generation algorithm (GAF).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path (str): path to the cache.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">input_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span><span class="p">,</span>
+            <span class="n">num_relation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_relations</span><span class="p">,</span>
+            <span class="n">batch_norm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_norm</span><span class="p">,</span>
+            <span class="n">atom_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">,</span>
+            <span class="n">hidden_dims</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dims</span><span class="p">,</span>
+            <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">node_prior</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">IndependentGaussian</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">edge_prior</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">IndependentGaussian</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_relations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_relations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">node_flow</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">GraphAF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">node_prior</span><span class="p">,</span> <span class="n">num_layer</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">edge_flow</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">GraphAF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">edge_prior</span><span class="p">,</span> <span class="n">use_edge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_layer</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">AutoregressiveGeneration</span><span class="p">(</span>
+            <span class="n">node_flow</span><span class="p">,</span> <span class="n">edge_flow</span><span class="p">,</span> <span class="n">max_node</span><span class="o">=</span><span class="mi">38</span><span class="p">,</span> <span class="n">max_edge_unroll</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;nll&quot;</span>
+        <span class="p">)</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Engine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

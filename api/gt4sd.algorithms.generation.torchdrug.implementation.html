@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.generation.torchdrug.implementation module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd.algorithms.prediction package" href="gt4sd.algorithms.prediction.html" />
+    <link rel="prev" title="gt4sd.algorithms.generation.torchdrug.core module" href="gt4sd.algorithms.generation.torchdrug.core.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.configuration.html">gt4sd.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.conftest.html">gt4sd.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.exceptions.html">gt4sd.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.s3.html">gt4sd.s3 module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="gt4sd.algorithms.html">gt4sd.algorithms package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.core.html">gt4sd.algorithms.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.registry.html">gt4sd.algorithms.registry module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.conditional_generation.html">gt4sd.algorithms.conditional_generation package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.controlled_sampling.html">gt4sd.algorithms.controlled_sampling package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="gt4sd.algorithms.generation.html">gt4sd.algorithms.generation package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.algorithms.generation.hugging_face.html">gt4sd.algorithms.generation.hugging_face package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.algorithms.generation.molgx.html">gt4sd.algorithms.generation.molgx package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.algorithms.generation.pgt.html">gt4sd.algorithms.generation.pgt package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.algorithms.generation.polymer_blocks.html">gt4sd.algorithms.generation.polymer_blocks package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="gt4sd.algorithms.generation.torchdrug.html">gt4sd.algorithms.generation.torchdrug package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.prediction.html">gt4sd.algorithms.prediction package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.html#summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.algorithms.html#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.cli.html">gt4sd.cli package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.domains.html">gt4sd.domains package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.extras.html">gt4sd.extras package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.tests.html">gt4sd.tests package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="gt4sd.html">gt4sd package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.algorithms.html">gt4sd.algorithms package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.algorithms.generation.html">gt4sd.algorithms.generation package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.algorithms.generation.torchdrug.html">gt4sd.algorithms.generation.torchdrug package</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.generation.torchdrug.implementation module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/gt4sd.algorithms.generation.torchdrug.implementation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-gt4sd.algorithms.generation.torchdrug.implementation">
+<span id="gt4sd-algorithms-generation-torchdrug-implementation-module"></span><h1>gt4sd.algorithms.generation.torchdrug.implementation module<a class="headerlink" href="#module-gt4sd.algorithms.generation.torchdrug.implementation" title="Permalink to this headline">¶</a></h1>
+<p>Implementation details for TorchDrug generation algorithms.</p>
+<p>Parts of the implementation inspired by: <a class="reference external" href="https://torchdrug.ai/docs/tutorials/generation.html">https://torchdrug.ai/docs/tutorials/generation.html</a>.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset" title="gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DummyDataset</span></code></a></p></td>
+<td><p>A helper class to imitate a torchdrug dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator" title="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GAFGenerator</span></code></a></p></td>
+<td><p>Interface for the GraphAF model as implemented in TorchDrug.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator" title="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GCPNGenerator</span></code></a></p></td>
+<td><p>Interface for the GCPN model as implemented in TorchDrug.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator" title="gt4sd.algorithms.generation.torchdrug.implementation.Generator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Generator</span></code></a></p></td>
+<td><p>Implementation of a TorchDrug generator.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset">
+<em class="property">class </em><code class="sig-name descname">DummyDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atom_types</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/generation/torchdrug/implementation.html#DummyDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A helper class to imitate a torchdrug dataset.</p>
+<dl class="py method">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atom_types</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/generation/torchdrug/implementation.html#DummyDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.generation.torchdrug.implementation', '__doc__': 'A helper class to imitate a torchdrug dataset.', '__init__': &lt;function DummyDataset.__init__&gt;, '__dict__': &lt;attribute '__dict__' of 'DummyDataset' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'DummyDataset' objects&gt;, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'A helper class to imitate a torchdrug dataset.'</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.generation.torchdrug.implementation'</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.DummyDataset.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator">
+<em class="property">class </em><code class="sig-name descname">Generator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">atom_types</span></em>, <em class="sig-param"><span class="n">hidden_dims</span></em>, <em class="sig-param"><span class="n">input_dim</span></em>, <em class="sig-param"><span class="n">num_relation</span></em>, <em class="sig-param"><span class="n">batch_norm</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/generation/torchdrug/implementation.html#Generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Implementation of a TorchDrug generator.</p>
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.solver">
+<code class="sig-name descname">solver</code><em class="property">: torchdrug.core.engine.Engine</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.solver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.task">
+<code class="sig-name descname">task</code><em class="property">: Union<span class="p">[</span>torchdrug.tasks.generation.GCPNGeneration<span class="p">, </span>torchdrug.tasks.generation.AutoregressiveGeneration<span class="p">]</span></em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.task" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.num_sample">
+<code class="sig-name descname">num_sample</code><em class="property">: int</em><em class="property"> = 32</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.num_sample" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.max_resample">
+<code class="sig-name descname">max_resample</code><em class="property">: int</em><em class="property"> = 16</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.max_resample" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">atom_types</span></em>, <em class="sig-param"><span class="n">hidden_dims</span></em>, <em class="sig-param"><span class="n">input_dim</span></em>, <em class="sig-param"><span class="n">num_relation</span></em>, <em class="sig-param"><span class="n">batch_norm</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/generation/torchdrug/implementation.html#Generator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>A TorchDrug generation algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resources_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the cache.</p></li>
+<li><p><strong>atom_types</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – list of atom types.</p></li>
+<li><p><strong>hidden_dims</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – list of hidden dimensions, one per layer.</p></li>
+<li><p><strong>num_relation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of relations for the graph.</p></li>
+<li><p><strong>batch_norm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether to use batch normalization.</p></li>
+<li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">device</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – device where the inference
+is running either as a dedicated class or a string. If not provided,
+it is inferred.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.load_model">
+<code class="sig-name descname">load_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/generation/torchdrug/implementation.html#Generator.load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.load_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a pretrained TorchDrug model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.sample">
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/generation/torchdrug/implementation.html#Generator.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample a molecule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a generated SMILES string wrapped into a list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'max_resample': &lt;class 'int'&gt;, 'num_sample': &lt;class 'int'&gt;, 'solver': &lt;class 'torchdrug.core.engine.Engine'&gt;, 'task': typing.Union[torchdrug.tasks.generation.GCPNGeneration, torchdrug.tasks.generation.AutoregressiveGeneration]}</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.generation.torchdrug.implementation', '__annotations__': {'solver': &lt;class 'torchdrug.core.engine.Engine'&gt;, 'task': typing.Union[torchdrug.tasks.generation.GCPNGeneration, torchdrug.tasks.generation.AutoregressiveGeneration], 'num_sample': &lt;class 'int'&gt;, 'max_resample': &lt;class 'int'&gt;}, '__doc__': 'Implementation of a TorchDrug generator.', 'num_sample': 32, 'max_resample': 16, '__init__': &lt;function Generator.__init__&gt;, 'load_model': &lt;function Generator.load_model&gt;, 'sample': &lt;function Generator.sample&gt;, '__dict__': &lt;attribute '__dict__' of 'Generator' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Generator' objects&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Implementation of a TorchDrug generator.'</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.generation.torchdrug.implementation'</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.Generator.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator">
+<em class="property">class </em><code class="sig-name descname">GCPNGenerator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/generation/torchdrug/implementation.html#GCPNGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator" title="gt4sd.algorithms.generation.torchdrug.implementation.Generator"><code class="xref py py-class docutils literal notranslate"><span class="pre">gt4sd.algorithms.generation.torchdrug.implementation.Generator</span></code></a></p>
+<p>Interface for the GCPN model as implemented in TorchDrug.</p>
+<p>For details see:
+You, J. et al. (2018). Graph convolutional policy network for goal-directed
+molecular graph generation. Advances in neural information processing systems, 31.</p>
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.input_dim">
+<code class="sig-name descname">input_dim</code><em class="property">: int</em><em class="property"> = 18</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.input_dim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.num_relation">
+<code class="sig-name descname">num_relation</code><em class="property">: int</em><em class="property"> = 3</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.num_relation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.batch_norm">
+<code class="sig-name descname">batch_norm</code><em class="property">: bool</em><em class="property"> = False</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.batch_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.atom_types">
+<code class="sig-name descname">atom_types</code><em class="property">: List<span class="p">[</span>int<span class="p">]</span></em><em class="property"> = [6, 7, 8, 9, 15, 16, 17, 35, 53]</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.atom_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.hidden_dims">
+<code class="sig-name descname">hidden_dims</code><em class="property">: List<span class="p">[</span>int<span class="p">]</span></em><em class="property"> = [256, 256, 256, 256]</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.hidden_dims" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/generation/torchdrug/implementation.html#GCPNGenerator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>A TorchDrug Graph-convolutional policy network (GCPN) generation algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>resources_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the cache.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.task">
+<code class="sig-name descname">task</code><em class="property">: torchdrug.tasks.generation.GCPNGeneration</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.task" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'atom_types': typing.List[int], 'batch_norm': &lt;class 'bool'&gt;, 'hidden_dims': typing.List[int], 'input_dim': &lt;class 'int'&gt;, 'max_resample': 'int', 'num_relation': &lt;class 'int'&gt;, 'num_sample': 'int', 'solver': 'Engine', 'task': &lt;class 'torchdrug.tasks.generation.GCPNGeneration'&gt;}</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = '\n    Interface for the GCPN model as implemented in TorchDrug.\n\n    For details see:\n    You, J. et al. (2018). Graph convolutional policy network for goal-directed\n    molecular graph generation. Advances in neural information processing systems, 31.\n\n    '</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.generation.torchdrug.implementation'</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator">
+<em class="property">class </em><code class="sig-name descname">GAFGenerator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/generation/torchdrug/implementation.html#GAFGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gt4sd.algorithms.generation.torchdrug.implementation.Generator" title="gt4sd.algorithms.generation.torchdrug.implementation.Generator"><code class="xref py py-class docutils literal notranslate"><span class="pre">gt4sd.algorithms.generation.torchdrug.implementation.Generator</span></code></a></p>
+<p>Interface for the GraphAF model as implemented in TorchDrug.</p>
+<p>For details see:
+Shi, Chence, et al. “GraphAF: a Flow-based Autoregressive Model for Molecular
+Graph Generation” International Conference on Learning Representations (ICLR), 2020.</p>
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.input_dim">
+<code class="sig-name descname">input_dim</code><em class="property">: int</em><em class="property"> = 9</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.input_dim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.num_relations">
+<code class="sig-name descname">num_relations</code><em class="property">: int</em><em class="property"> = 3</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.num_relations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.batch_norm">
+<code class="sig-name descname">batch_norm</code><em class="property">: bool</em><em class="property"> = True</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.batch_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.atom_types">
+<code class="sig-name descname">atom_types</code><em class="property">: List<span class="p">[</span>int<span class="p">]</span></em><em class="property"> = [6, 7, 8, 9, 15, 16, 17, 35, 53]</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.atom_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.hidden_dims">
+<code class="sig-name descname">hidden_dims</code><em class="property">: List<span class="p">[</span>int<span class="p">]</span></em><em class="property"> = [256, 256, 256]</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.hidden_dims" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'atom_types': typing.List[int], 'batch_norm': &lt;class 'bool'&gt;, 'hidden_dims': typing.List[int], 'input_dim': &lt;class 'int'&gt;, 'max_resample': 'int', 'num_relations': &lt;class 'int'&gt;, 'num_sample': 'int', 'solver': 'Engine', 'task': &lt;class 'torchdrug.tasks.generation.AutoregressiveGeneration'&gt;}</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = '\n    Interface for the GraphAF model as implemented in TorchDrug.\n\n    For details see:\n    Shi, Chence, et al. &quot;GraphAF: a Flow-based Autoregressive Model for Molecular\n    Graph Generation&quot; International Conference on Learning Representations (ICLR), 2020.\n    '</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/generation/torchdrug/implementation.html#GAFGenerator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>A TorchDrug flow-based autoregressive graph generation algorithm (GAF).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>resources_path</strong> (<em>str</em>) – path to the cache.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.generation.torchdrug.implementation'</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.task">
+<code class="sig-name descname">task</code><em class="property">: torchdrug.tasks.generation.AutoregressiveGeneration</em><a class="headerlink" href="#gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.task" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gt4sd.algorithms.prediction.html" class="btn btn-neutral float-right" title="gt4sd.algorithms.prediction package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd.algorithms.generation.torchdrug.core.html" class="btn btn-neutral float-left" title="gt4sd.algorithms.generation.torchdrug.core module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
