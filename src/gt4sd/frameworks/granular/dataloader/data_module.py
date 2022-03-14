@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader, Sampler, Subset, random_split
 from .dataset import CombinedGranularDataset, GranularDataset
 from .sampler import StratifiedSampler
 
-# Sentencepiece has to be loaded before lightning
+# sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
 
 logger = logging.getLogger(__name__)
