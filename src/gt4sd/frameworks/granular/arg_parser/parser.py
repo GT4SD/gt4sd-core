@@ -2,10 +2,14 @@ import argparse
 import configparser
 from typing import Any, Dict, Optional
 
+import sentencepiece as _sentencepiece
 from pytorch_lightning import Trainer
 
 from ..ml.models import ARCHITECTURE_FACTORY
 from .utils import convert_string_to_class
+
+# sentencepiece has to be loaded before lightning to avoid segfaults
+_sentencepiece
 
 
 def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Namespace:

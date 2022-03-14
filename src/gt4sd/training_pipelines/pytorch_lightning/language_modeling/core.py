@@ -4,12 +4,16 @@ import logging
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Tuple, Union
 
+import sentencepiece as _sentencepiece
 from pytorch_lightning import LightningDataModule, LightningModule
 
 from ...core import TrainingPipelineArguments
 from ..core import PyTorchLightningTrainingPipeline
 from .lm_datasets import CGMDataModule, CLMDataModule, MLMDataModule, PLMDataModule
 from .models import LM_MODULE_FACTORY, CGMModule, CLMModule, MLMModule, PLMModule
+
+# sentencepiece has to be loaded before lightning to avoid segfaults
+_sentencepiece
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

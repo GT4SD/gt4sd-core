@@ -3,12 +3,16 @@
 import os
 from typing import Any, Callable, Dict, List, Tuple, cast
 
+import sentencepiece as _sentencepiece
 import pandas as pd
 import pytorch_lightning as pl
 import torch
 
 from .models import GranularBaseModel, GranularEncoderDecoderModel
 from .models.model_builder import building_models, define_latent_models_input_size
+
+# sentencepiece has to be loaded before lightning to avoid segfaults
+_sentencepiece
 
 
 class GranularModule(pl.LightningModule):
