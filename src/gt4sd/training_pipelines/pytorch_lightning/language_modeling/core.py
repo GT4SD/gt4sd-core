@@ -12,7 +12,7 @@ from ..core import PyTorchLightningTrainingPipeline
 from .lm_datasets import CGMDataModule, CLMDataModule, MLMDataModule, PLMDataModule
 from .models import LM_MODULE_FACTORY, CGMModule, CLMModule, MLMModule, PLMModule
 
-# Sentencepiece has to be loaded before lightning
+# sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
 
 logger = logging.getLogger(__name__)
