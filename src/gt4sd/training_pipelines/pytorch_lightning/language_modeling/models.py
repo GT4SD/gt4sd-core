@@ -20,6 +20,9 @@ from transformers import (
     XLNetLMHeadModel,
 )
 
+# Sentencepiece has to be loaded before lightning
+_sentencepiece
+
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
@@ -271,5 +274,3 @@ LM_MODULE_FACTORY: Dict[str, Type[LMModule]] = {
     "cgm": CGMModule,
     "plm": PLMModule,
 }
-
-_sentencepiece

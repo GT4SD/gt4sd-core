@@ -12,6 +12,9 @@ from torch.utils.data import DataLoader, Sampler, Subset, random_split
 from .dataset import CombinedGranularDataset, GranularDataset
 from .sampler import StratifiedSampler
 
+# Sentencepiece has to be loaded before lightning
+_sentencepiece
+
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
@@ -199,6 +202,3 @@ class GranularDataModule(pl.LightningDataModule):
             num_workers=self.num_workers,
             pin_memory=False,
         )
-
-
-_sentencepiece

@@ -12,6 +12,9 @@ from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 
 from ..core import TrainingPipeline, TrainingPipelineArguments
 
+# Sentencepiece has to be loaded before lightning
+_sentencepiece
+
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
@@ -177,6 +180,3 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
         default=None,
         metadata={"help": "Number of training steps between checkpoints."},
     )
-
-
-_sentencepiece

@@ -18,6 +18,9 @@ from transformers import (
 )
 from transformers.tokenization_utils_base import BatchEncoding
 
+# Sentencepiece has to be loaded before lightning
+_sentencepiece
+
 
 class LMDataset(Dataset):
     """LM dataset class."""
@@ -343,6 +346,3 @@ class PLMDataModule(DataModule):
         )
 
         self.load()
-
-
-_sentencepiece

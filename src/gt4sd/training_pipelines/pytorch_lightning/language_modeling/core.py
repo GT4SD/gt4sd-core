@@ -12,6 +12,9 @@ from ..core import PyTorchLightningTrainingPipeline
 from .lm_datasets import CGMDataModule, CLMDataModule, MLMDataModule, PLMDataModule
 from .models import LM_MODULE_FACTORY, CGMModule, CLMModule, MLMModule, PLMModule
 
+# Sentencepiece has to be loaded before lightning
+_sentencepiece
+
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
@@ -278,6 +281,3 @@ class LanguageModelingSavingArguments(TrainingPipelineArguments):
             "help": "Tokenizer name or path. If not provided defaults to model_name_or_path."
         },
     )
-
-
-_sentencepiece

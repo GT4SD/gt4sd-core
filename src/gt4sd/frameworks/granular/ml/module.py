@@ -11,6 +11,9 @@ import torch
 from .models import GranularBaseModel, GranularEncoderDecoderModel
 from .models.model_builder import building_models, define_latent_models_input_size
 
+# Sentencepiece has to be loaded before lightning
+_sentencepiece
+
 
 class GranularModule(pl.LightningModule):
     """Module from granular."""
@@ -261,6 +264,3 @@ class GranularModule(pl.LightningModule):
             an optimizer, currently only Adam is supported.
         """
         return torch.optim.Adam(self.parameters(), lr=self.lr)
-
-
-_sentencepiece

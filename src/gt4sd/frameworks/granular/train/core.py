@@ -15,6 +15,9 @@ from ..dataloader.dataset import build_dataset_and_architecture
 from ..ml.models import AUTOENCODER_ARCHITECTURES
 from ..ml.module import GranularModule
 
+# Sentencepiece has to be loaded before lightning
+_sentencepiece
+
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
@@ -86,6 +89,3 @@ def train_granular(configuration: Dict[str, Any]) -> None:
 def train_granular_main() -> None:
     """Train a granular module parsing arguments from config and standard input."""
     train_granular(configuration=vars(parse_arguments_from_config()))
-
-
-_sentencepiece
