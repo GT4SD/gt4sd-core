@@ -69,7 +69,8 @@ class Generator:
             num_relation: number of relations for the graph.
             batch_norm: whether to use batch normalization.
             device: device where the inference
-                is running either as a dedicated class or a string. If not provided is inferred.
+                is running either as a dedicated class or a string. If not provided,
+                it is inferred.
         """
         self.device = device_claim(device)
         self.resources_path = resources_path
