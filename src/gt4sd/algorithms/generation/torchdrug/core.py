@@ -27,7 +27,7 @@ class TorchDrugGenerator(GeneratorAlgorithm[S, T]):
             target: unused since it is not a conditional generator.
 
         Example:
-            An example for using a generative algorithm from HuggingFace::
+            An example for using a generative algorithm from TorchDrug:
 
                 configuration = TorchDrugGCPN(algorithm_version="qed_v0")
                 algorithm = TorchDrugGenerator(configuration=configuration)
