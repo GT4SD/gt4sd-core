@@ -1,9 +1,9 @@
 """TorchDrugGenerationAlgorithm initialization."""
-from .abc import openmp, torch
+from .checks import TORCH_OPENMP_CHECK, torch
 from .core import TorchDrugGCPN, TorchDrugGenerator, TorchDrugGraphAF
 
-# Re-enable openMP after torchdrug imports if applicable
-if openmp:
+# re-enable openMP after torchdrug imports if applicable
+if TORCH_OPENMP_CHECK:
     torch._C.has_openmp = True
 
 __all__ = ["TorchDrugGenerator", "TorchDrugGCPN", "TorchDrugGraphAF"]
