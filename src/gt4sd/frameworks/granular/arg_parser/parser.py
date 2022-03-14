@@ -8,7 +8,7 @@ from pytorch_lightning import Trainer
 from ..ml.models import ARCHITECTURE_FACTORY
 from .utils import convert_string_to_class
 
-# Sentencepiece has to be loaded before lightning
+# sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
 
 
