@@ -15,7 +15,7 @@ from ..dataloader.dataset import build_dataset_and_architecture
 from ..ml.models import AUTOENCODER_ARCHITECTURES
 from ..ml.module import GranularModule
 
-# Sentencepiece has to be loaded before lightning
+# sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
 
 logger = logging.getLogger(__name__)
