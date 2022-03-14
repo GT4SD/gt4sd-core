@@ -11,7 +11,7 @@ import torch
 from .models import GranularBaseModel, GranularEncoderDecoderModel
 from .models.model_builder import building_models, define_latent_models_input_size
 
-# Sentencepiece has to be loaded before lightning
+# sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
 
 
