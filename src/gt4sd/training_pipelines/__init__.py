@@ -9,6 +9,30 @@ import pkg_resources
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
 from .paccmann.core import PaccMannDataArguments, PaccMannTrainingArguments
 from .paccmann.vae.core import PaccMannVAEModelArguments, PaccMannVAETrainingPipeline
+from .guacamol_baselines.smiles_lstm_hc.core import (
+    SMILESLSTMHCTrainingPipeline,
+    SMILESLSTMHCModelArguments,
+    SMILESLSTMHCDataArguments,
+)
+from .guacamol_baselines.smiles_lstm_ppo.core import (
+    SMILESLSTMPPOTrainingPipeline,
+    SMILESLSTMPPOModelArguments,
+)
+from .moses.core import MosesCommonArguments
+from .moses.aae.core import (
+    MosesAAETrainingPipeline,
+    MosesAAEModelArguments,
+    MosesAAETrainingArguments,
+)
+from .moses.vae.core import (
+    MosesVAETrainingPipeline,
+    MosesVAEModelArguments,
+    MosesVAETrainingArguments,
+)
+from .moses.organ.core import (
+    MosesOrganTrainingPipeline,
+    MosesOrganModelArguments,
+)
 from .pytorch_lightning.core import PytorchLightningTrainingArguments
 from .pytorch_lightning.granular.core import (
     GranularDataArguments,
@@ -45,12 +69,36 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         GranularDataArguments,
         GranularModelArguments,
     ),
+    "smiles-lstm-hc-trainer": (
+        SMILESLSTMHCModelArguments,
+        SMILESLSTMHCDataArguments,
+    ),
+    "smiles-lstm-ppo-trainer": (SMILESLSTMPPOModelArguments),
+    "moses-vae-trainer": (
+        MosesVAETrainingArguments,
+        MosesVAEModelArguments,
+        MosesCommonArguments,
+    ),
+    "moses-aae-trainer": (
+        MosesAAETrainingArguments,
+        MosesAAEModelArguments,
+        MosesCommonArguments,
+    ),
+    "moses-organ-trainer": (
+        MosesOrganModelArguments,
+        MosesCommonArguments,
+    ),
 }
 
 TRAINING_PIPELINE_MAPPING = {
     "language-modeling-trainer": LanguageModelingTrainingPipeline,
     "paccmann-vae-trainer": PaccMannVAETrainingPipeline,
     "granular-trainer": GranularTrainingPipeline,
+    "smiles-lstm-hc-trainer": SMILESLSTMHCTrainingPipeline,
+    "smiles-lstm-ppo-trainer": SMILESLSTMPPOTrainingPipeline,
+    "moses-aae-trainer": MosesAAETrainingPipeline,
+    "moses-vae-trainer": MosesVAETrainingPipeline,
+    "moses-organ-trainer": MosesOrganTrainingPipeline,
 }
 
 
