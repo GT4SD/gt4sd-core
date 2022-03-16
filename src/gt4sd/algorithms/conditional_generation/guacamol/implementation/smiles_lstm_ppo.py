@@ -43,7 +43,7 @@ class SMILESLSTMPPO:
             An instance of PPODirectedGenerator
         """
         optimiser = PPODirectedGenerator(
-            pretrained_model_path=None,
+            pretrained_model_path=self.model_path,
             num_epochs=self.num_epochs,
             episode_size=self.episode_size,
             batch_size=self.optimize_batch_size,
