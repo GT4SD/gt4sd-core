@@ -1,6 +1,5 @@
 """enzeptional - data processing utilities."""
 
-import random
 from abc import ABC
 from typing import Generic, List, Optional, Tuple, TypeVar, Union
 
@@ -9,7 +8,7 @@ import torch
 from tape.datasets import pad_sequences
 from tape.registry import registry
 from tape.tokenizers import TAPETokenizer
-from transformers import AutoModelWithLMHead, AutoTokenizer, T5EncoderModel, T5Tokenizer
+from transformers import AutoModelWithLMHead, AutoTokenizer
 
 from ..torch import device_claim
 
@@ -106,75 +105,6 @@ class TAPEEmbedding(StringEmbedding):
         }
         sequence_lenghts = input_data["input_mask"].sum(1)
         sequence_embeddings = self.model(**input_data)[0].cpu().detach().numpy()
-        # get average embedding
-        return np.array(
-            [
-                sequence_embedding[:sequence_length].mean(0)
-                for sequence_embedding, sequence_length in zip(  # type:ignore
-                    sequence_embeddings, sequence_lenghts
-                )
-            ]
-        )
-
-
-class ProtTransXL(StringEmbedding):
-    """Embed a string representation of a molecule using a ProtTrans_XLnet model"""
-
-    def __init__(
-        self,
-        model_name: str = "Rostlab/prot_t5_xl_uniref50",
-        device: Optional[Union[torch.device, str]] = None,
-    ) -> None:
-        """Initialize the ProtTrans embedding class.
-
-        Args:
-            model_name: ProtTrans model name.
-            device: device where the inference
-                is running either as a dedicated class or a string. If not provided is inferred.
-        """
-
-        self.model_name = model_name
-        # get device
-        self.device = device_claim(device)
-        # tokenizer and model definition
-        self.tokenizer = T5Tokenizer.from_pretrained(
-            self.model_name, do_lower_case=False
-        )
-        self.model = T5EncoderModel.from_pretrained(self.model_name)
-        self.model = self.model.to(self.device)
-        self.model.eval()
-
-    def __call__(self, samples: List[T]) -> np.ndarray:
-        """Embed multiple protein sequences using ProtTrans Xl model.
-
-        Args:
-            samples: a list of strings representing molecules.
-                        Words/characters in the string mush be separated by a white space
-
-        Returns:
-            a numpy array containing the embedding vectors.
-        """
-
-        if len(samples) > 1:
-            ids = self.tokenizer.batch_encode_plus(
-                samples, add_special_tokens=True, padding=True
-            )
-
-        else:
-            ids = self.tokenizer.encode_plus(
-                samples, add_special_tokens=True, padding=True
-            )
-
-        input_ids = torch.tensor(ids["input_ids"]).to(self.device)
-        attention_mask = torch.tensor(ids["attention_mask"]).to(self.device)
-
-        with torch.no_grad():
-            sequence_embeddings = self.model(
-                input_ids=input_ids, attention_mask=attention_mask
-            )
-
-        sequence_embeddings = sequence_embeddings.last_hidden_state.cpu().numpy()
-        sequence_lenghts = attention_mask.sum(1)
         # get average embedding
         return np.array(
             [
@@ -302,39 +232,3 @@ def reconstruct_sequence_with_mutation_range(
         mutated_sequence_offset = end + 1
     mutated_sequence += sequence[end + 1 :]
     return mutated_sequence
-
-
-def selection(scores, k=10):
-    """Selecte the top K mutated sequences based on the score
-
-    Args:
-        scores: dictionary containing sequences and scores.
-        K: number of top sequences to return
-
-    return:
-        retuen the top K sequences
-
-    """
-
-    res = list(sorted(scores, key=lambda d: d["score"], reverse=True))[:k]
-
-    return res
-
-
-def crossover(p1, p2):
-    """Given two sequences perform crossover
-
-    Args:
-        p1: a sequence.
-        p2: a sequence
-
-    Returns:
-        return two sequences that are the crossover of the input sequences
-
-    """
-
-    # select crossover point that is not at the end of the string
-    pt = random.randint(1, len(p1) - 2)
-    c1 = p1[:pt] + p2[pt:]
-    c2 = p2[:pt] + p1[pt:]
-    return c1, c2
