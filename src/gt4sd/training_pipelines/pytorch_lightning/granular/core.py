@@ -151,3 +151,14 @@ class GranularDataArguments(TrainingPipelineArguments):
         default=1,
         metadata={"help": "number of workers. Defaults to 1."},
     )
+
+
+@dataclass
+class GranularSavingArguments(TrainingPipelineArguments):
+    """Saving arguments related to Granular trainer."""
+
+    __name__ = "saving_args"
+
+    model_path: str = field(
+        metadata={"help": "Path to the checkpoint file to be used."}
+    )

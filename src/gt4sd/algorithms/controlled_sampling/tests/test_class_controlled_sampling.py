@@ -12,13 +12,12 @@ from gt4sd.extras import EXTRAS_ENABLED
 if not EXTRAS_ENABLED:
     pytest.skip("Extras from custom PyPI disabled", allow_module_level=True)
 else:
+    from cog.errors import UnsupportedTargetError
+
     from gt4sd.algorithms.controlled_sampling.class_controlled_sampling import (
         PAG,
         CLaSS,
         CogMol,
-    )
-    from gt4sd.algorithms.controlled_sampling.class_controlled_sampling.implementation import (
-        UnsupportedTargetError,
     )
 
 

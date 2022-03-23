@@ -4,12 +4,16 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import sentencepiece as _sentencepiece
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer
 from pytorch_lightning.callbacks.base import Callback
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 
 from ..core import TrainingPipeline, TrainingPipelineArguments
+
+# sentencepiece has to be loaded before lightning to avoid segfaults
+_sentencepiece
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

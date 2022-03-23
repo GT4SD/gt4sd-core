@@ -4,6 +4,7 @@ import logging
 from argparse import Namespace
 from typing import Any, Dict
 
+import sentencepiece as _sentencepiece
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -13,6 +14,9 @@ from ..dataloader.data_module import GranularDataModule
 from ..dataloader.dataset import build_dataset_and_architecture
 from ..ml.models import AUTOENCODER_ARCHITECTURES
 from ..ml.module import GranularModule
+
+# sentencepiece has to be loaded before lightning to avoid segfaults
+_sentencepiece
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

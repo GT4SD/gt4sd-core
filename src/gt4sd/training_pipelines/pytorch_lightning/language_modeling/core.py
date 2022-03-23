@@ -4,12 +4,16 @@ import logging
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Tuple, Union
 
+import sentencepiece as _sentencepiece
 from pytorch_lightning import LightningDataModule, LightningModule
 
 from ...core import TrainingPipelineArguments
 from ..core import PyTorchLightningTrainingPipeline
 from .lm_datasets import CGMDataModule, CLMDataModule, MLMDataModule, PLMDataModule
-from .models import CGMModule, CLMModule, MLMModule, PLMModule
+from .models import LM_MODULE_FACTORY, CGMModule, CLMModule, MLMModule, PLMModule
+
+# sentencepiece has to be loaded before lightning to avoid segfaults
+_sentencepiece
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -245,4 +249,35 @@ class LanguageModelingDataArguments(TrainingPipelineArguments):
     batch_size: int = field(
         default=8,
         metadata={"help": "Ratio of tokens to mask for masked language modeling loss."},
+    )
+
+
+@dataclass
+class LanguageModelingSavingArguments(TrainingPipelineArguments):
+    """Saving arguments related to LM trainer."""
+
+    __name__ = "saving_args"
+
+    hf_model_path: str = field(
+        metadata={"help": "Path to the converted HF model."},
+        default="/tmp/gt4sd_lm_saving_tmp",
+    )
+    training_type: Optional[str] = field(
+        metadata={
+            "help": f"Training type of the converted model, supported types: {', '.join(LM_MODULE_FACTORY.keys())}."
+        },
+        default=None,
+    )
+    model_name_or_path: Optional[str] = field(
+        metadata={
+            "help": "Model name or path.",
+        },
+        default=None,
+    )
+    ckpt: Optional[str] = field(metadata={"help": "Path to checkpoint."}, default=None)
+    tokenizer_name_or_path: Optional[str] = field(
+        default=None,
+        metadata={
+            "help": "Tokenizer name or path. If not provided defaults to model_name_or_path."
+        },
     )

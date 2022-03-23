@@ -1,11 +1,18 @@
 """Patent Generative Transformer (PGT) generation algorithm."""
 
 import logging
+import os
+import shutil
 from dataclasses import field
 from typing import Any, ClassVar, Dict, Optional, TypeVar
 
 from typing_extensions import Protocol, runtime_checkable
 
+from ....cli.pl_to_hf_converter import convert_pl_to_hf
+from ....training_pipelines.core import TrainingPipelineArguments
+from ....training_pipelines.pytorch_lightning.language_modeling.core import (
+    LanguageModelingSavingArguments,
+)
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
 from ...registry import ApplicationsRegistry
 from .implementation import (
@@ -107,11 +114,6 @@ class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
     domain: ClassVar[str] = "nlp"
     algorithm_version: str = "v0"
 
-    prompt: str = field(
-        default="I am a interesting prompt",
-        metadata=dict(description="A prompt input for generation."),
-    )
-
     model_type: str = field(
         default="",
         metadata=dict(description="Type of the model."),
@@ -161,12 +163,67 @@ class PGTAlgorithmConfiguration(AlgorithmConfiguration[str, None]):
             resources_path=resources_path,
             model_type=self.model_type,
             model_name=self.algorithm_version,
-            prompt=self.prompt,
             max_length=self.max_length,
             top_k=self.top_k,
             top_p=self.top_p,
             num_return_sequences=self.num_return_sequences,
         )
+
+    @classmethod
+    def save_version_from_training_pipeline_arguments_postprocess(
+        cls,
+        training_pipeline_arguments: TrainingPipelineArguments,
+    ):
+        """Postprocess after saving. Remove temporarily converted hf model
+           if pytorch-lightning checkpoint is given.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+        """
+
+        if isinstance(training_pipeline_arguments, LanguageModelingSavingArguments):
+            if training_pipeline_arguments.ckpt is not None:
+                shutil.rmtree(training_pipeline_arguments.hf_model_path)
+
+                logger.info(
+                    f"Cleaning up temporary files from {training_pipeline_arguments.hf_model_path}"
+                )
+        else:
+            return super().save_version_from_training_pipeline_arguments_postprocess(
+                training_pipeline_arguments
+            )
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+
+        if isinstance(training_pipeline_arguments, LanguageModelingSavingArguments):
+
+            if training_pipeline_arguments.ckpt is not None:
+
+                convert_pl_to_hf(training_pipeline_arguments)
+
+            model_files = os.listdir(training_pipeline_arguments.hf_model_path)
+
+            model_files_dict = {
+                file: os.path.join(training_pipeline_arguments.hf_model_path, file)
+                for file in model_files
+            }
+            return model_files_dict
+
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
 
 
 @ApplicationsRegistry.register_algorithm_application(PGT)

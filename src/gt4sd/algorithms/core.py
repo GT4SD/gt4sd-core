@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 import signal
 from abc import ABC, abstractmethod
 from copy import deepcopy
@@ -32,6 +33,7 @@ from ..configuration import (
     sync_algorithm_with_s3,
 )
 from ..exceptions import InvalidItem, S3SyncError, SamplingError
+from ..training_pipelines.core import TrainingPipelineArguments
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -384,20 +386,148 @@ class AlgorithmConfiguration(Generic[S, T]):
         # no item validation
         return item
 
-    def ensure_artifacts(self) -> str:
-        """The artifacts matching the path defined by class attributes are downloaded.
+    @classmethod
+    def get_application_prefix(cls) -> str:
+        """Get prefix up to the specific application.
+
+        Returns:
+            the application prefix.
+        """
+        return os.path.join(
+            cls.algorithm_type, cls.algorithm_name, cls.algorithm_application
+        )
+
+    @classmethod
+    def list_versions(cls) -> Set[str]:
+        """Get possible algorithm versions.
+
+        S3 is searched as well as the local cache is searched for matching versions.
+
+        Returns:
+            viable values as :attr:`algorithm_version` for the environment.
+        """
+
+        prefix = cls.get_application_prefix()
+        try:
+            versions = get_algorithm_subdirectories_with_s3(prefix)
+        except (KeyError, S3SyncError) as error:
+            logger.info(
+                f"searching S3 raised {error.__class__.__name__}, using local cache only."
+            )
+            logger.debug(error)
+            versions = set()
+        versions = versions.union(get_algorithm_subdirectories_in_cache(prefix))
+        return versions
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Raises:
+            ValueError: in case no mapping is available.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        raise ValueError(
+            f"{cls.__name__} artifacts not mapped for {training_pipeline_arguments}"
+        )
+
+    @classmethod
+    def save_version_from_training_pipeline_arguments_postprocess(
+        cls,
+        training_pipeline_arguments: TrainingPipelineArguments,
+    ):
+        """Postprocess after saving.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+        """
+        pass
+
+    @classmethod
+    def save_version_from_training_pipeline_arguments(
+        cls,
+        training_pipeline_arguments: TrainingPipelineArguments,
+        target_version: str,
+        source_version: Optional[str] = None,
+    ) -> None:
+        """Save a version using training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+            target_version: target version used to save the model in the cache.
+            source_version: source version to use for missing artifacts.
+                Defaults to None, a.k.a., use the default version.
+        """
+        filepaths_mapping: Dict[str, str] = {}
+        try:
+            filepaths_mapping = (
+                cls.get_filepath_mappings_for_training_pipeline_arguments(
+                    training_pipeline_arguments=training_pipeline_arguments
+                )
+            )
+        except ValueError:
+            logger.info(
+                f"{cls.__name__} can not save a version based on {training_pipeline_arguments}"
+            )
+        if len(filepaths_mapping) > 0:
+            if source_version is None:
+                source_version = cls.algorithm_version
+            source_missing_path = cls.ensure_artifacts_for_version(source_version)
+            target_path = os.path.join(
+                get_cached_algorithm_path(),
+                cls.get_application_prefix(),
+                target_version,
+            )
+            filepaths_mapping = {
+                filename: source_filepath
+                if os.path.exists(source_filepath)
+                else os.path.join(source_missing_path, filename)
+                for filename, source_filepath in filepaths_mapping.items()
+            }
+            logger.info(f"Saving artifacts into {target_path}...")
+            try:
+                os.makedirs(target_path)
+            except OSError:
+                logger.warning(
+                    f"Artifacts already existing in {target_path}, overwriting them..."
+                )
+                os.makedirs(target_path, exist_ok=True)
+            for target_filename, source_filepath in filepaths_mapping.items():
+                target_filepath = os.path.join(target_path, target_filename)
+                logger.info(
+                    f"Saving artifact {source_filepath} into {target_filepath}..."
+                )
+                shutil.copyfile(source_filepath, target_filepath)
+
+            cls.save_version_from_training_pipeline_arguments_postprocess(
+                training_pipeline_arguments
+            )
+
+            logger.info(f"Artifacts saving completed into {target_path}")
+
+    @classmethod
+    def ensure_artifacts_for_version(cls, algorithm_version: str) -> str:
+        """The artifacts matching the path defined by class attributes and the given version are downloaded.
 
         That is all objects under ``algorithm_type/algorithm_name/algorithm_application/algorithm_version``
         in the bucket are downloaded.
 
+        Args:
+            algorithm_version: version of the algorithm to ensure artifacts for.
+
         Returns:
-            str: the common local path of the matching artifacts.
+            the common local path of the matching artifacts.
         """
         prefix = os.path.join(
-            self.algorithm_type,
-            self.algorithm_name,
-            self.algorithm_application,
-            self.algorithm_version,
+            cls.get_application_prefix(),
+            algorithm_version,
         )
         try:
             local_path = sync_algorithm_with_s3(prefix)
@@ -414,29 +544,16 @@ class AlgorithmConfiguration(Generic[S, T]):
 
         return local_path
 
-    @classmethod
-    def list_versions(cls) -> Set[str]:
-        """Get possible algorithm versions.
+    def ensure_artifacts(self) -> str:
+        """The artifacts matching the path defined by class attributes are downloaded.
 
-        S3 is searched as well as the local cache is searched for matching versions.
+        That is all objects under ``algorithm_type/algorithm_name/algorithm_application/algorithm_version``
+        in the bucket are downloaded.
 
         Returns:
-            viable values as :attr:`algorithm_version` for the environment.
+            the common local path of the matching artifacts.
         """
-
-        prefix = os.path.join(
-            cls.algorithm_type, cls.algorithm_name, cls.algorithm_application
-        )
-        try:
-            versions = get_algorithm_subdirectories_with_s3(prefix)
-        except (KeyError, S3SyncError) as error:
-            logger.info(
-                f"searching S3 raised {error.__class__.__name__}, using local cache only."
-            )
-            logger.debug(error)
-            versions = set()
-        versions = versions.union(get_algorithm_subdirectories_in_cache(prefix))
-        return versions
+        return self.ensure_artifacts_for_version(self.algorithm_version)
 
 
 def get_configuration_class_with_attributes(

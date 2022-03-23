@@ -3,6 +3,7 @@
 import logging
 from typing import Callable, List, Optional, cast
 
+import sentencepiece as _sentencepiece
 import pandas as pd
 import pytorch_lightning as pl
 import torch
@@ -10,6 +11,9 @@ from torch.utils.data import DataLoader, Sampler, Subset, random_split
 
 from .dataset import CombinedGranularDataset, GranularDataset
 from .sampler import StratifiedSampler
+
+# sentencepiece has to be loaded before lightning to avoid segfaults
+_sentencepiece
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

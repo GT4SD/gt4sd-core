@@ -5,6 +5,7 @@ import os
 from functools import lru_cache
 from typing import Any, Callable, Dict, List, Union
 
+import sentencepiece as _sentencepiece
 import pytorch_lightning as pl
 from datasets import DatasetDict
 from loguru import logger
@@ -16,6 +17,9 @@ from transformers import (
     default_data_collator,
 )
 from transformers.tokenization_utils_base import BatchEncoding
+
+# Sentencepiece has to be loaded before lightning
+_sentencepiece
 
 
 class LMDataset(Dataset):

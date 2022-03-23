@@ -7,52 +7,17 @@ import logging
 import os
 import sys
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Optional, cast
+from typing import Any, Dict, Iterable, Optional, cast
 
 from ..algorithms.registry import ApplicationsRegistry
+from .algorithms import (
+    AVAILABLE_ALGORITHMS,
+    AVAILABLE_ALGORITHMS_CATEGORIES,
+    filter_algorithm_applications,
+)
 from .argument_parser import ArgumentParser, DataClassType
 
 logger = logging.getLogger(__name__)
-
-AVAILABLE_ALGORITHMS = sorted(
-    ApplicationsRegistry.list_available(),
-    key=lambda algorithm: (
-        algorithm["domain"],
-        algorithm["algorithm_type"],
-        algorithm["algorithm_name"],
-        algorithm["algorithm_application"],
-        algorithm["algorithm_version"],
-    ),
-)
-AVAILABLE_ALGORITHMS_CATEGORIES = {
-    category: sorted(set([algorithm[category] for algorithm in AVAILABLE_ALGORITHMS]))
-    for category in ["domain", "algorithm_type"]
-}
-
-
-def filter_algorithm_applications(
-    algorithms: List[Dict[str, str]], filters: Dict[str, str]
-) -> List[Dict[str, str]]:
-    """
-    Returning algorithms with given filters.
-
-    Args:
-        algorithm_applications (List[Dict[str, str]]): a list of algorithm applications as dictionaries.
-        filters (Dict[str, str]): the filters to apply.
-
-    Returns:
-        the filtered algorithms.
-    """
-    return [
-        application
-        for application in algorithms
-        if all(
-            [
-                application[filter_type] == filter_value if filter_value else True
-                for filter_type, filter_value in filters.items()
-            ]
-        )
-    ]
 
 
 @dataclass
@@ -121,12 +86,7 @@ class InferenceArguments:
 
 
 def main() -> None:
-    """
-    Run an inference pipeline.
-
-    Raises:
-        ValueError: isn case the provided training pipeline provided is not supported.
-    """
+    """Run an inference pipeline."""
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     parser = ArgumentParser(
@@ -140,7 +100,7 @@ def main() -> None:
 
     filters = algorithm_args.__dict__
     matching_algorithms = filter_algorithm_applications(
-        algorithms=AVAILABLE_ALGORITHMS, filters=algorithm_args.__dict__
+        algorithms=AVAILABLE_ALGORITHMS, filters=filters
     )
     if len(matching_algorithms) > 1:
         logger.info(

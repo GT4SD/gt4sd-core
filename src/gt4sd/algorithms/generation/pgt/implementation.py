@@ -60,11 +60,11 @@ class Generator:
         resources_path: str,
         model_type: str,
         model_name: str,
-        prompt: str,
         max_length: int,
         top_k: int,
         top_p: float,
         num_return_sequences: int,
+        prompt: str = "This is an interesting prompt",
         no_repeat_ngram_size: int = 2,
         device: Optional[Union[torch.device, str]] = None,
     ):

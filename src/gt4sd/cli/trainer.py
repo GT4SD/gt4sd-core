@@ -6,7 +6,7 @@
 import logging
 import sys
 from dataclasses import dataclass, field
-from typing import IO, Optional, Tuple, cast
+from typing import IO, Iterable, Optional, Tuple, cast
 
 from ..training_pipelines import (
     TRAINING_PIPELINE_ARGUMENTS_MAPPING,
@@ -127,7 +127,9 @@ def main() -> None:
             f"Training pipeline {training_pipeline_name} is not supported. Supported types: {', '.join(SUPPORTED_TRAINING_PIPELINES)}."
         )
     arguments = TRAINING_PIPELINE_ARGUMENTS_MAPPING[training_pipeline_name]
-    parser = TrainerArgumentParser(tuple([TrainerArguments, *arguments]))  # type:ignore
+    parser = TrainerArgumentParser(
+        cast(Iterable[DataClassType], tuple([TrainerArguments, *arguments]))
+    )
 
     configuration_filepath = base_args.configuration_file
     if configuration_filepath:

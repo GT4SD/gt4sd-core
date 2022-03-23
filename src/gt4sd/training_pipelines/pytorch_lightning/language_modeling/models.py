@@ -3,6 +3,7 @@
 import logging
 from typing import Dict, Type, Union
 
+import sentencepiece as _sentencepiece
 import pytorch_lightning as pl
 import torch.optim as optim
 from torch import Tensor
@@ -18,6 +19,9 @@ from transformers import (
     T5ForConditionalGeneration,
     XLNetLMHeadModel,
 )
+
+# sentencepiece has to be loaded before lightning to avoid segfaults
+_sentencepiece
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -267,5 +271,6 @@ LM_MODULE_FACTORY: Dict[str, Type[LMModule]] = {
     "lm": LMModule,
     "mlm": MLMModule,
     "clm": CLMModule,
+    "cgm": CGMModule,
     "plm": PLMModule,
 }

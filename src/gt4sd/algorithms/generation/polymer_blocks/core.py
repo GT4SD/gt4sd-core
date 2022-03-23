@@ -1,11 +1,14 @@
 """PaccMann vanilla generator trained on polymer building blocks (catalysts/monomers)."""
 
 import logging
+import os
 from dataclasses import field
 from typing import ClassVar, Dict, Optional, TypeVar
 
 from ....domains.materials import SmallMolecule, validate_molecules
 from ....exceptions import InvalidItem
+from ....training_pipelines.core import TrainingPipelineArguments
+from ....training_pipelines.paccmann.core import PaccMannSavingArguments
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
 from ...registry import ApplicationsRegistry
 from .implementation import Generator
@@ -120,3 +123,38 @@ class PolymerBlocksGenerator(AlgorithmConfiguration[SmallMolecule, None]):
                 detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
             )
         return SmallMolecule(item)
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, PaccMannSavingArguments):
+            return {
+                "smiles_language.pkl": os.path.join(
+                    training_pipeline_arguments.model_path,
+                    f"{training_pipeline_arguments.training_name}.lang",
+                ),
+                "params.json": os.path.join(
+                    training_pipeline_arguments.model_path,
+                    training_pipeline_arguments.training_name,
+                    "model_params.json",
+                ),
+                "weights.pt": os.path.join(
+                    training_pipeline_arguments.model_path,
+                    training_pipeline_arguments.training_name,
+                    "weights",
+                    "best_rec.pt",
+                ),
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )

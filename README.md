@@ -220,7 +220,7 @@ You can either specify the training pipeline and the path of a configuration fil
 gt4sd-trainer  --training_pipeline_name ${TRAINING_PIPELINE_NAME} --configuration_file ${CONFIGURATION_FILE}
 ```
 
-Or you can provide directly the needed parameters as argumentsL
+Or you can provide directly the needed parameters as arguments:
 
 ```sh
 gt4sd-trainer  --training_pipeline_name language-modeling-trainer --type mlm --model_name_or_path mlm --training_file /pah/to/train_file.jsonl --validation_file /path/to/valid_file.jsonl 
@@ -230,6 +230,30 @@ To get more info on a specific training pipeleins argument simply type:
 
 ```sh
 gt4sd-trainer --training_pipeline_name ${TRAINING_PIPELINE_NAME} --help
+```
+
+### Saving a trained algorithm for inference via the CLI command
+
+Once a training pipeline has been run via the `gt4sd-trainer`, it's possible to save the trained algorithm via `gt4sd-saving` for usage in compatible inference pipelines.
+
+Here a small example for `PaccmannGP` algorithm ([paper](https://doi.org/10.1021/acs.jcim.1c00889)).
+
+You can train a model with `gt4sd-trainer` (quick training using few data, not really recommended for a realistic model :warning:):
+
+```sh
+gt4sd-trainer  --training_pipeline_name paccmann-vae-trainer --epochs 250 --batch_size 4 --n_layers 1 --rnn_cell_size 16 --latent_dim 16 --train_smiles_filepath src/gt4sd/training_pipelines/tests/molecules.smi --test_smiles_filepath src/gt4sd/training_pipelines/tests/molecules.smi --model_path /tmp/gt4sd-paccmann-gp/ --training_name fast-example --eval_interval 15 --save_interval 15 --selfies
+```
+
+Save the model with the compatible inference pipeline using `gt4sd-saving`:
+
+```sh
+gt4sd-saving --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4sd-paccmann-gp/ --training_name fast-example --target_version fast-example-v0 --algorithm_application PaccMannGPGenerator
+```
+
+Run the algorithm via `gt4sd-inference` (again the model produced in the example is trained on dummy data and will give dummy outputs, do not use it as is :no_good:):
+
+```sh
+gt4sd-inference --algorithm_name PaccMannGP --algorithm_application PaccMannGPGenerator --algorithm_version fast-example-v0 --number_of_samples 5  --target '{"molwt": {"target": 60.0}}'
 ```
 
 ### Additional examples
@@ -244,9 +268,10 @@ Beyond implementing various generative modeling inference and training pipelines
 
 - [GuacaMol](https://github.com/BenevolentAI/guacamol): inference pipelines for the baselines models.
 - [MOSES](https://github.com/molecularsets/moses): inference pipelines for the baselines models.
+- [TorchDrug](https://github.com/DeepGraphLearning/torchdrug): inference pipelines for GCPN and GraphAF models.
 - [TAPE](https://github.com/songlab-cal/tape): encoder modules compatible with the protein language models.
 - [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as traiing pipelines for the generative VAEs.
-- [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from the [HuggingFace Models](https://huggingface.co/models)
+- [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from [HuggingFace Models](https://huggingface.co/models)
 
 ## References
 

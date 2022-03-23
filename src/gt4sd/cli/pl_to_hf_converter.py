@@ -5,62 +5,43 @@
 
 import logging
 import sys
-from dataclasses import dataclass, field
-from typing import Optional, cast
+from typing import cast
 
 from transformers import Trainer, TrainingArguments
 
+from ..training_pipelines.pytorch_lightning.language_modeling.core import (
+    LanguageModelingSavingArguments,
+)
 from ..training_pipelines.pytorch_lightning.language_modeling.models import (
     LM_MODULE_FACTORY,
 )
 from .argument_parser import ArgumentParser, DataClassType
 
 
-@dataclass
-class PyTorchLightningToTransformersArguments:
-    """PyTorchLightning to Transformers converter arguments."""
+def convert_pl_to_hf(arguments: LanguageModelingSavingArguments) -> None:
+    """Method to convert pytorch lightning checkpoint to HF transformers model.
 
-    __name__ = "pl_to_hf_converter_args"
-
-    training_type: str = field(
-        metadata={
-            "help": f"Training type of the converted model, supported types: {', '.join(LM_MODULE_FACTORY.keys())}."
-        },
-    )
-    model_name_or_path: str = field(
-        metadata={"help": "Model name or path."},
-    )
-    ckpt: str = field(
-        metadata={"help": "Path to checkpoint."},
-    )
-    output_path: str = field(
-        metadata={"help": "Path to the converted model."},
-    )
-    tokenizer_name_or_path: Optional[str] = field(
-        default=None,
-        metadata={
-            "help": "Tokenizer name or path. If not provided defaults to model_name_or_path."
-        },
-    )
-
-
-def main() -> None:
-    """Convert pytorch lightning checkpoint to HF transformers model.
-
-    Parsing from the command line the following parameters:
-        - training type of the given checkpoint.
-        - model name or path, a HF's model name.
-        - tokenizer name or path, a HF's tokenizer name.
-        - path of the checkpoint.
-        - path where the HF model will be saved.
-
+    Args:
+        arguments: a LanguageModelingSavingArguments instance that contains all the
+                   needed arguments for conversion.
     Raises:
         ValueError: in case the provided training type is not supported.
     """
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    arguments = ArgumentParser(
-        cast(DataClassType, PyTorchLightningToTransformersArguments)
-    ).parse_args_into_dataclasses(return_remaining_strings=True)[0]
+
+    if arguments.training_type is None:
+        raise ValueError(
+            "training_type is required for saving from pytorch lightning checkpoing."
+        )
+
+    if arguments.model_name_or_path is None:
+        raise ValueError(
+            "model_name_or_path is required for saving from pytorch lightning checkpoing."
+        )
+
+    if arguments.ckpt is None:
+        raise ValueError(
+            "ckpt is required for saving from pytorch lightning checkpoing."
+        )
 
     training_type = arguments.training_type
     model_name_or_path = arguments.model_name_or_path
@@ -68,7 +49,7 @@ def main() -> None:
     if tokenizer_name_or_path is None:
         tokenizer_name_or_path = model_name_or_path
     ckpt = arguments.ckpt
-    output_path = arguments.output_path
+    output_path = arguments.hf_model_path
 
     if training_type not in LM_MODULE_FACTORY:
         ValueError(
@@ -90,6 +71,27 @@ def main() -> None:
         args=TrainingArguments(output_dir=output_path),
     )
     trainer.save_model()
+
+
+def main() -> None:
+    """Convert pytorch lightning checkpoint to HF transformers model.
+
+    Parsing from the command line the following parameters:
+        - training type of the given checkpoint.
+        - model name or path, a HF's model name.
+        - tokenizer name or path, a HF's tokenizer name.
+        - path of the checkpoint.
+        - path where the HF model will be saved.
+
+    Raises:
+        ValueError: in case the provided training type is not supported.
+    """
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    arguments = ArgumentParser(
+        cast(DataClassType, LanguageModelingSavingArguments)
+    ).parse_args_into_dataclasses(return_remaining_strings=True)[0]
+
+    convert_pl_to_hf(arguments)
 
 
 if __name__ == "__main__":

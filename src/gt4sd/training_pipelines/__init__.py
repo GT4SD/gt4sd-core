@@ -7,7 +7,11 @@ from typing import Any, Dict
 import pkg_resources
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
-from .paccmann.core import PaccMannDataArguments, PaccMannTrainingArguments
+from .paccmann.core import (
+    PaccMannDataArguments,
+    PaccMannSavingArguments,
+    PaccMannTrainingArguments,
+)
 from .paccmann.vae.core import PaccMannVAEModelArguments, PaccMannVAETrainingPipeline
 from .guacamol_baselines.smiles_lstm_hc.core import (
     SMILESLSTMHCTrainingPipeline,
@@ -37,11 +41,13 @@ from .pytorch_lightning.core import PytorchLightningTrainingArguments
 from .pytorch_lightning.granular.core import (
     GranularDataArguments,
     GranularModelArguments,
+    GranularSavingArguments,
     GranularTrainingPipeline,
 )
 from .pytorch_lightning.language_modeling.core import (
     LanguageModelingDataArguments,
     LanguageModelingModelArguments,
+    LanguageModelingSavingArguments,
     LanguageModelingTrainingPipeline,
 )
 
@@ -99,6 +105,12 @@ TRAINING_PIPELINE_MAPPING = {
     "moses-aae-trainer": MosesAAETrainingPipeline,
     "moses-vae-trainer": MosesVAETrainingPipeline,
     "moses-organ-trainer": MosesOrganTrainingPipeline,
+}
+
+TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
+    "paccmann-vae-trainer": PaccMannSavingArguments,
+    "granular-trainer": GranularSavingArguments,
+    "language-modeling-trainer": LanguageModelingSavingArguments,
 }
 
 

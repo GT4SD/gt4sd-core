@@ -4,6 +4,7 @@ PaccMann\\ :superscript:`GP` generation is conditioned via gaussian processes.
 """
 
 import logging
+import os
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
@@ -11,6 +12,8 @@ from typing_extensions import Protocol, runtime_checkable
 
 from ....domains.materials import SmallMolecule, validate_molecules
 from ....exceptions import InvalidItem
+from ....training_pipelines.core import TrainingPipelineArguments
+from ....training_pipelines.paccmann.core import PaccMannSavingArguments
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
 from .implementation import GPConditionalGenerator
@@ -251,3 +254,42 @@ class PaccMannGPGenerator(AlgorithmConfiguration[SmallMolecule, Any]):
                 detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
             )
         return SmallMolecule(item)
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, PaccMannSavingArguments):
+            return {
+                "selfies_language.pkl": os.path.join(
+                    training_pipeline_arguments.model_path,
+                    f"{training_pipeline_arguments.training_name}.lang",
+                ),
+                "vae_model_params.json": os.path.join(
+                    training_pipeline_arguments.model_path,
+                    training_pipeline_arguments.training_name,
+                    "model_params.json",
+                ),
+                "vae_weights.pt": os.path.join(
+                    training_pipeline_arguments.model_path,
+                    training_pipeline_arguments.training_name,
+                    "weights",
+                    "best_rec.pt",
+                ),
+                "mca_model_params.json": "",
+                "protein_language.pkl": "",
+                "smiles_language.pkl": "",
+                "mca_weights.pt": "",
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
