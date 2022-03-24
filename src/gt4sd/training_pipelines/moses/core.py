@@ -47,3 +47,20 @@ class MosesCommonArguments(TrainingPipelineArguments):
         default="cpu",
         metadata={"help": 'Device to run: "cpu" or "cuda:<device number>"'},
     )
+
+
+@dataclass
+class MosesSavingArguments(TrainingPipelineArguments):
+    """Saving arguments related to PaccMann trainer."""
+
+    __name__ = "saving_args"
+
+    model_path: str = field(
+        metadata={"help": "Path where the model artifacts are stored."}
+    )
+    config_path: str = field(
+        metadata={"help": "Path where the config artifacts are stored."}
+    )
+    vocab_path: str = field(
+        metadata={"help": "Path where the vocab artifacts are stored."}
+    )
