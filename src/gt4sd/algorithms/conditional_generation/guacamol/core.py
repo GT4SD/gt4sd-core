@@ -1,8 +1,19 @@
 import logging
+import os
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
+from ....training_pipelines.core import TrainingPipelineArguments
+from ....training_pipelines.guacamol_baselines.smiles_lstm_hc.core import (
+    GuacamolLSTMHCSavingArguments,
+)
+from ....training_pipelines.guacamol_baselines.smiles_lstm_ppo.core import (
+    GuacamolLSTMPPOSavingArguments,
+)
+from ....training_pipelines.moses.core import (
+    MosesSavingArguments,
+)
 from ...registry import ApplicationsRegistry
 from .implementation import (
     AaeIterator,
@@ -424,6 +435,31 @@ class SMILESLSTMHCGenerator(AlgorithmConfiguration[str, str]):
             n_jobs=self.n_jobs,
         )
 
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, GuacamolLSTMHCSavingArguments):
+            model_files = os.listdir(training_pipeline_arguments.model_path)
+
+            model_files_dict = {
+                file: os.path.join(training_pipeline_arguments.model_path, file)
+                for file in model_files
+            }
+            return model_files_dict
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
+
 
 @ApplicationsRegistry.register_algorithm_application(GuacaMolGenerator)
 class SMILESLSTMPPOGenerator(AlgorithmConfiguration[str, str]):
@@ -500,6 +536,25 @@ class SMILESLSTMPPOGenerator(AlgorithmConfiguration[str, str]):
             kl_div_weight=self.kl_div_weight,
             clip_param=self.clip_param,
         )
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, GuacamolLSTMPPOSavingArguments):
+            return {"model.pt": training_pipeline_arguments.model_path}
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
 
 
 class MosesGenerator(GeneratorAlgorithm[S, T]):
@@ -633,6 +688,29 @@ class VaeGenerator(AlgorithmConfiguration[str, str]):
             max_len=self.max_len,
         )
 
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, MosesSavingArguments):
+            return {
+                "model_200.pt": training_pipeline_arguments.model_path,
+                "config.pt": training_pipeline_arguments.config_path,
+                "vocab.pt": training_pipeline_arguments.vocab_path,
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
+
 
 @ApplicationsRegistry.register_algorithm_application(MosesGenerator)
 class OrganGenerator(AlgorithmConfiguration[str, str]):
@@ -671,3 +749,26 @@ class OrganGenerator(AlgorithmConfiguration[str, str]):
             n_batch=self.n_batch,
             max_len=self.max_len,
         )
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, MosesSavingArguments):
+            return {
+                "model_200.pt": training_pipeline_arguments.model_path,
+                "config.pt": training_pipeline_arguments.config_path,
+                "vocab.pt": training_pipeline_arguments.vocab_path,
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
