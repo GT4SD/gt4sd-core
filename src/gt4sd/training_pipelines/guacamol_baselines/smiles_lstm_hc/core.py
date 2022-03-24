@@ -1,9 +1,11 @@
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict
+
 from guacamol_baselines.smiles_lstm_hc.smiles_rnn_distribution_learner import (
     SmilesRnnDistributionLearner,
 )
+
 from ...core import TrainingPipelineArguments
 from ..core import GuacamolBaselinesTrainingPipeline
 

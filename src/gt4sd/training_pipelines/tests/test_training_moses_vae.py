@@ -1,11 +1,10 @@
 """Moses VAE Trainer unit tests."""
 
 from typing import Any, Dict, cast
-from gt4sd.training_pipelines import (
-    TRAINING_PIPELINE_MAPPING,
-    MosesVAETrainingPipeline,
-)
+
 import pkg_resources
+
+from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, MosesVAETrainingPipeline
 
 MODEL_ARTIFACTS_LOAD = VALID_FILE_PATH = pkg_resources.resource_filename(
     "gt4sd",

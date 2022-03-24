@@ -7,36 +7,36 @@ from typing import Any, Dict
 import pkg_resources
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
+from .guacamol_baselines.smiles_lstm_hc.core import (
+    GuacamolLSTMHCDataArguments,
+    GuacamolLSTMHCModelArguments,
+    GuacamolLSTMHCSavingArguments,
+    GuacamolLSTMHCTrainingArguments,
+    GuacamolLSTMHCTrainingPipeline,
+)
+from .guacamol_baselines.smiles_lstm_ppo.core import (
+    GuacamolLSTMPPOModelArguments,
+    GuacamolLSTMPPOSavingArguments,
+    GuacamolLSTMPPOTrainingArguments,
+    GuacamolLSTMPPOTrainingPipeline,
+)
+from .moses.core import MosesCommonArguments, MosesSavingArguments
+from .moses.organ.core import (
+    MosesOrganModelArguments,
+    MosesOrganTrainingArguments,
+    MosesOrganTrainingPipeline,
+)
+from .moses.vae.core import (
+    MosesVAEModelArguments,
+    MosesVAETrainingArguments,
+    MosesVAETrainingPipeline,
+)
 from .paccmann.core import (
     PaccMannDataArguments,
     PaccMannSavingArguments,
     PaccMannTrainingArguments,
 )
 from .paccmann.vae.core import PaccMannVAEModelArguments, PaccMannVAETrainingPipeline
-from .guacamol_baselines.smiles_lstm_hc.core import (
-    GuacamolLSTMHCSavingArguments,
-    GuacamolLSTMHCTrainingArguments,
-    GuacamolLSTMHCTrainingPipeline,
-    GuacamolLSTMHCModelArguments,
-    GuacamolLSTMHCDataArguments,
-)
-from .guacamol_baselines.smiles_lstm_ppo.core import (
-    GuacamolLSTMPPOTrainingArguments,
-    GuacamolLSTMPPOTrainingPipeline,
-    GuacamolLSTMPPOModelArguments,
-    GuacamolLSTMPPOSavingArguments,
-)
-from .moses.core import MosesCommonArguments, MosesSavingArguments
-from .moses.organ.core import (
-    MosesOrganTrainingPipeline,
-    MosesOrganModelArguments,
-    MosesOrganTrainingArguments,
-)
-from .moses.vae.core import (
-    MosesVAETrainingPipeline,
-    MosesVAEModelArguments,
-    MosesVAETrainingArguments,
-)
 from .pytorch_lightning.core import PytorchLightningTrainingArguments
 from .pytorch_lightning.granular.core import (
     GranularDataArguments,

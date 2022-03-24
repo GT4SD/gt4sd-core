@@ -1,7 +1,8 @@
 """Guacamol Baselines training utilities."""
 
-from typing import Any, Dict
 from dataclasses import dataclass, field
+from typing import Any, Dict
+
 from ..core import TrainingPipeline, TrainingPipelineArguments
 
 

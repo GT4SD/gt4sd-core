@@ -1,12 +1,14 @@
 """Moses Organ Trainer unit tests."""
 
 from typing import Any, Dict, cast
+
+import pkg_resources
+from moses.script_utils import MetricsReward
+
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
     MosesOrganTrainingPipeline,
 )
-from moses.script_utils import MetricsReward
-import pkg_resources
 
 MODEL_ARTIFACTS_LOAD = VALID_FILE_PATH = pkg_resources.resource_filename(
     "gt4sd",

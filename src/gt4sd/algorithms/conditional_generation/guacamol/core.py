@@ -3,7 +3,6 @@ import os
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
-from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.guacamol_baselines.smiles_lstm_hc.core import (
     GuacamolLSTMHCSavingArguments,
@@ -11,9 +10,8 @@ from ....training_pipelines.guacamol_baselines.smiles_lstm_hc.core import (
 from ....training_pipelines.guacamol_baselines.smiles_lstm_ppo.core import (
     GuacamolLSTMPPOSavingArguments,
 )
-from ....training_pipelines.moses.core import (
-    MosesSavingArguments,
-)
+from ....training_pipelines.moses.core import MosesSavingArguments
+from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
 from .implementation import (
     AaeIterator,
