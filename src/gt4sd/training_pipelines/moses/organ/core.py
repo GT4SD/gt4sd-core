@@ -30,7 +30,7 @@ class MosesOrganTrainingPipeline(MosesTrainingPipeline):
 
 
 @dataclass
-class MosesOrganModelArguments(TrainingPipelineArguments):
+class MosesOrganTrainingArguments(TrainingPipelineArguments):
     """Arguments related to Organ Trainer."""
 
     __name__ = "model_args"
@@ -87,7 +87,6 @@ class MosesOrganModelArguments(TrainingPipelineArguments):
     lr: float = field(default=1e-4, metadata={"help": "Learning rate"})
     n_jobs: int = field(default=8, metadata={"help": "Number of threads"})
     n_workers: int = field(default=8, metadata={"help": "Number of workers"})
-    max_length: int = field(default=1, metadata={"help": "Maximum length for sequence"})
     clip_grad: int = field(
         default=5, metadata={"help": "Clip PG generator gradients to this value"}
     )
@@ -104,6 +103,15 @@ class MosesOrganModelArguments(TrainingPipelineArguments):
     pg_smooth_const: float = field(
         default=0.1, metadata={"help": "Smoothing factor for Policy Gradient logs"}
     )
+
+
+@dataclass
+class MosesOrganModelArguments(TrainingPipelineArguments):
+    """Arguments related to Organ Trainer."""
+
+    __name__ = "model_args"
+
+    max_length: int = field(default=1, metadata={"help": "Maximum length for sequence"})
     n_ref_subsample: int = field(
         default=500,
         metadata={
