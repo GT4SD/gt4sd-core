@@ -14,28 +14,28 @@ from .paccmann.core import (
 )
 from .paccmann.vae.core import PaccMannVAEModelArguments, PaccMannVAETrainingPipeline
 from .guacamol_baselines.smiles_lstm_hc.core import (
-    SMILESLSTMHCTrainingPipeline,
-    SMILESLSTMHCModelArguments,
-    SMILESLSTMHCDataArguments,
+    GuacamolLSTMHCSavingArguments,
+    GuacamolLSTMHCTrainingArguments,
+    GuacamolLSTMHCTrainingPipeline,
+    GuacamolLSTMHCModelArguments,
+    GuacamolLSTMHCDataArguments,
 )
 from .guacamol_baselines.smiles_lstm_ppo.core import (
-    SMILESLSTMPPOTrainingPipeline,
-    SMILESLSTMPPOModelArguments,
+    GuacamolLSTMPPOTrainingArguments,
+    GuacamolLSTMPPOTrainingPipeline,
+    GuacamolLSTMPPOModelArguments,
+    GuacamolLSTMPPOSavingArguments,
 )
-from .moses.core import MosesCommonArguments
-from .moses.aae.core import (
-    MosesAAETrainingPipeline,
-    MosesAAEModelArguments,
-    MosesAAETrainingArguments,
+from .moses.core import MosesCommonArguments, MosesSavingArguments
+from .moses.organ.core import (
+    MosesOrganTrainingPipeline,
+    MosesOrganModelArguments,
+    MosesOrganTrainingArguments,
 )
 from .moses.vae.core import (
     MosesVAETrainingPipeline,
     MosesVAEModelArguments,
     MosesVAETrainingArguments,
-)
-from .moses.organ.core import (
-    MosesOrganTrainingPipeline,
-    MosesOrganModelArguments,
 )
 from .pytorch_lightning.core import PytorchLightningTrainingArguments
 from .pytorch_lightning.granular.core import (
@@ -75,22 +75,22 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         GranularDataArguments,
         GranularModelArguments,
     ),
-    "smiles-lstm-hc-trainer": (
-        SMILESLSTMHCModelArguments,
-        SMILESLSTMHCDataArguments,
+    "guacamol-lstm-hc-trainer": (
+        GuacamolLSTMHCModelArguments,
+        GuacamolLSTMHCTrainingArguments,
+        GuacamolLSTMHCDataArguments,
     ),
-    "smiles-lstm-ppo-trainer": (SMILESLSTMPPOModelArguments),
+    "guacamol-lstm-ppo-trainer": (
+        GuacamolLSTMPPOModelArguments,
+        GuacamolLSTMPPOTrainingArguments,
+    ),
     "moses-vae-trainer": (
         MosesVAETrainingArguments,
         MosesVAEModelArguments,
         MosesCommonArguments,
     ),
-    "moses-aae-trainer": (
-        MosesAAETrainingArguments,
-        MosesAAEModelArguments,
-        MosesCommonArguments,
-    ),
     "moses-organ-trainer": (
+        MosesOrganTrainingArguments,
         MosesOrganModelArguments,
         MosesCommonArguments,
     ),
@@ -100,17 +100,20 @@ TRAINING_PIPELINE_MAPPING = {
     "language-modeling-trainer": LanguageModelingTrainingPipeline,
     "paccmann-vae-trainer": PaccMannVAETrainingPipeline,
     "granular-trainer": GranularTrainingPipeline,
-    "smiles-lstm-hc-trainer": SMILESLSTMHCTrainingPipeline,
-    "smiles-lstm-ppo-trainer": SMILESLSTMPPOTrainingPipeline,
-    "moses-aae-trainer": MosesAAETrainingPipeline,
-    "moses-vae-trainer": MosesVAETrainingPipeline,
+    "guacamol-lstm-hc-trainer": GuacamolLSTMHCTrainingPipeline,
+    "guacamol-lstm-ppo-trainer": GuacamolLSTMPPOTrainingPipeline,
     "moses-organ-trainer": MosesOrganTrainingPipeline,
+    "moses-vae-trainer": MosesVAETrainingPipeline,
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "paccmann-vae-trainer": PaccMannSavingArguments,
     "granular-trainer": GranularSavingArguments,
     "language-modeling-trainer": LanguageModelingSavingArguments,
+    "guacamol-lstm-hc-trainer": GuacamolLSTMHCSavingArguments,
+    "guacamol-lstm-ppo-trainer": GuacamolLSTMPPOSavingArguments,
+    "moses-organ-trainer": MosesSavingArguments,
+    "moses-vae-trainer": MosesSavingArguments,
 }
 
 
