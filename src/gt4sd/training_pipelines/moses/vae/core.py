@@ -1,11 +1,12 @@
-import logging
 import argparse
+import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict
+
 from guacamol_baselines.moses_baselines.vae_train import main
+
 from ...core import TrainingPipelineArguments
 from ..core import MosesTrainingPipeline
-
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

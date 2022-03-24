@@ -1,6 +1,7 @@
 """Language modeling trainer unit tests."""
 
 from typing import Any, Dict, cast
+
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
     GuacamolLSTMPPOTrainingPipeline,
