@@ -6,7 +6,12 @@ from gt4sd.training_pipelines import (
     MosesOrganTrainingPipeline,
 )
 from moses.script_utils import MetricsReward
+import pkg_resources
 
+MODEL_ARTIFACTS_LOAD = VALID_FILE_PATH = pkg_resources.resource_filename(
+    "gt4sd",
+    "training_pipelines/tests/guacamol_test_data/",
+)
 template_config = {
     "model_args": {
         "embedding_size": 32,
@@ -48,16 +53,15 @@ template_config = {
         "addition_rewards": MetricsReward.supported_metrics,
     },
     "common_args": {
-        "train_load": "/Users/ashishdave/Desktop/GT4SD/guacamol_baselines/guacamol_baselines/data/guacamol_v1_all.smiles",
-        "val_load": "/Users/ashishdave/Desktop/GT4SD/guacamol_baselines/guacamol_baselines/data/guacamol_v1_test.smiles",
-        "model_save": "/Users/ashishdave/desktop/GT4SD/gt4sd-core/",
-        "log_file": "/Users/ashishdave/desktop/GT4SD/gt4sd-core/log.txt",
-        "config_save": "/Users/ashishdave/desktop/GT4SD/gt4sd-core/config.pt",
-        "vocab_save": "/Users/ashishdave/desktop/GT4SD/gt4sd-core/vocab.pt",
-        "vocab_load": "/Users/ashishdave/.gt4sd/algorithms/conditional_generation/MosesGenerator/AaeGenerator/v0/vocab.pt",
+        "train_load": MODEL_ARTIFACTS_LOAD + "/guacamol_v1_train.smiles",
+        "val_load": MODEL_ARTIFACTS_LOAD + "/guacamol_v1_test.smiles",
+        "model_save": MODEL_ARTIFACTS_LOAD + "/model_artifacts",
+        "log_file": MODEL_ARTIFACTS_LOAD + "/model_artifacts",
+        "config_save": MODEL_ARTIFACTS_LOAD + "config.pt",
+        "vocab_save": MODEL_ARTIFACTS_LOAD + "/vocab.pt",
+        "vocab_load": MODEL_ARTIFACTS_LOAD + "/vocab.pt",
         "seed": 0,
         "device": "cpu",
-        "save_frequency": 1,
     },
 }
 
@@ -73,6 +77,3 @@ def test_train():
     config: Dict[str, Any] = template_config.copy()
 
     test_pipeline.train(**config)
-
-
-test_train()
