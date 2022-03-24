@@ -216,6 +216,17 @@ class RDKitDescriptorScorer(TargetValueScorer):
         )
         return scoring_function.score_mol(Chem.MolFromSmiles(smiles))
 
+    def score_list(self, smiles_list: List[str]) -> List[float]:
+        """Generates a list of scores for a given SMILES List
+
+        Args:
+            smiles_list: A List of SMILES.
+
+        Returns:
+            A List of scores
+        """
+        return [self.score(smiles) for smiles in smiles_list]
+
 
 class TanimotoScorer(TargetValueScorer):
     def __init__(
@@ -255,6 +266,17 @@ class TanimotoScorer(TargetValueScorer):
         )
         return scoring_function.score_mol(Chem.MolFromSmiles(smiles))
 
+    def score_list(self, smiles_list: List[str]) -> List[float]:
+        """Generates a list of scores for a given SMILES List
+
+        Args:
+            smiles_list: A List of SMILES.
+
+        Returns:
+            A List of scores
+        """
+        return [self.score(smiles) for smiles in smiles_list]
+
 
 class IsomerScorer(TargetValueScorer):
     def __init__(self, target: float, target_smile: str) -> None:
@@ -279,6 +301,17 @@ class IsomerScorer(TargetValueScorer):
         """
         scoring_function = IsomerScoringFunction(self.target_smile)
         return scoring_function.raw_score(smiles)
+
+    def score_list(self, smiles_list: List[str]) -> List[float]:
+        """Generates a list of scores for a given SMILES List
+
+        Args:
+            smiles_list: A List of SMILES.
+
+        Returns:
+            A List of scores
+        """
+        return [self.score(smiles) for smiles in smiles_list]
 
 
 class SMARTSScorer(TargetValueScorer):
@@ -307,6 +340,17 @@ class SMARTSScorer(TargetValueScorer):
         scoring_function = SMARTSScoringFunction(self.target_smile, self.inverse)
         return scoring_function.score_mol(Chem.MolFromSmiles(smiles))
 
+    def score_list(self, smiles_list: List[str]) -> List[float]:
+        """Generates a list of scores for a given SMILES List
+
+        Args:
+            smiles_list: A List of SMILES.
+
+        Returns:
+            A List of scores
+        """
+        return [self.score(smiles) for smiles in smiles_list]
+
 
 class QEDScorer(TargetValueScorer):
     def __init__(self, target: float) -> None:
@@ -327,7 +371,23 @@ class QEDScorer(TargetValueScorer):
         Returns:
             A score for the given SMILES
         """
+        print(Chem.QED.qed(Chem.MolFromSmiles(smiles)))
         return Chem.QED.qed(Chem.MolFromSmiles(smiles))
+
+    def score_list(self, smiles_list: List[str]) -> List[float]:
+        """Generates a list of scores for a given SMILES List
+
+        Args:
+            smiles_list: A List of SMILES.
+
+        Returns:
+            A List of scores
+        """
+        print(smiles_list)
+        for s in smiles_list:
+            print("SMILES -->" + s)
+            print("SCORE :" + str(self.score(s)))
+        return [self.score(smiles) for smiles in smiles_list]
 
 
 SCORING_FUNCTIONS = {
