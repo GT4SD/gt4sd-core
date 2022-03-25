@@ -46,7 +46,7 @@ def test_train():
     test_pipeline = cast(GuacamolLSTMHCTrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
-    file_path = os.path.join(MODEL_ARTIFACTS_LOAD, "guacamol_v1_train.smiles")
+    file_path = os.path.join(MODEL_ARTIFACTS_LOAD, "guacamol_v1_test.smiles")
 
     config["dataset_args"]["train_smiles_filepath"] = file_path
     config["dataset_args"]["test_smiles_filepath"] = file_path
