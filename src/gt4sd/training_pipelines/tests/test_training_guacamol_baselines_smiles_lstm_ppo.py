@@ -1,11 +1,15 @@
 """Language modeling trainer unit tests."""
-
+import os
 from typing import Any, Dict, cast
 
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
     GuacamolLSTMPPOTrainingPipeline,
 )
+
+OUTPUT_DIR = "/tmp/guacamol_lstm_ppo/"
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
 
 template_config = {
     "model_args": {
@@ -14,6 +18,7 @@ template_config = {
         },
         "max_seq_length": 100,
         "device": "cpu",
+        "output_dir": OUTPUT_DIR,
     },
     "train_args": {
         "num_epochs": 1,
