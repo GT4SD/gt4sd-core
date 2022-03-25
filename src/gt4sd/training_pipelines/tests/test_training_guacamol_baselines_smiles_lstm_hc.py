@@ -3,10 +3,19 @@
 from typing import Any, Dict, cast
 
 import pkg_resources
-
+import os
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
     GuacamolLSTMHCTrainingPipeline,
+)
+
+OUTPUT_DIR = "/tmp/guacamol_lstm_hc/"
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
+
+MODEL_ARTIFACTS_LOAD = VALID_FILE_PATH = pkg_resources.resource_filename(
+    "gt4sd",
+    "training_pipelines/tests/guacamol_test_data/",
 )
 
 template_config = {
@@ -21,7 +30,7 @@ template_config = {
     },
     "training_args": {
         "max_len": 100,
-        "output_dir": "/Users/ashishdave/Desktop/GT4SD/gt4sd-core/",
+        "output_dir": OUTPUT_DIR,
     },
     "dataset_args": {},
 }
@@ -36,11 +45,11 @@ def test_train():
     test_pipeline = cast(GuacamolLSTMHCTrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
-    file_path = pkg_resources.resource_filename(
-        "gt4sd",
-        "training_pipelines/tests/molecules.smi",
-    )
+    file_path = os.path.join(MODEL_ARTIFACTS_LOAD, "guacamol_v1_train.smiles")
 
     config["dataset_args"]["train_smiles_filepath"] = file_path
     config["dataset_args"]["test_smiles_filepath"] = file_path
     test_pipeline.train(**config)
+
+
+test_train()
