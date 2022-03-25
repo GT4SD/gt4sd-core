@@ -26,7 +26,6 @@ class MosesOrganTrainingPipeline(MosesTrainingPipeline):
         for k, v in params.items():
             parser.add_argument("--" + k, default=v)
         args = parser.parse_known_args()[0]
-        print(vars(args))
         main(args)
 
 
