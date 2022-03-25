@@ -37,7 +37,6 @@ template_config = {
             (100, 9),
             (100, 10),
             (160, 15),
-            (160, 20),
         ],
         "discriminator_dropout": 0,
         "reward_weight": 0.7,
@@ -87,3 +86,6 @@ def test_train():
     config: Dict[str, Any] = template_config.copy()
 
     test_pipeline.train(**config)
+
+
+test_train()
