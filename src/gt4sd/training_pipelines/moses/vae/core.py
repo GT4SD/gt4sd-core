@@ -13,7 +13,7 @@ logger.addHandler(logging.NullHandler())
 
 
 class MosesVAETrainingPipeline(MosesTrainingPipeline):
-    """Moses AAE training pipelines."""
+    """Moses VAE training pipelines."""
 
     def train(  # type: ignore
         self,

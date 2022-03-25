@@ -14,7 +14,7 @@ logger.addHandler(logging.NullHandler())
 
 
 class MosesOrganTrainingPipeline(MosesTrainingPipeline):
-    """Moses Organ training pipelines."""
+    """Moses ORGAN training pipelines."""
 
     def train(  # type: ignore
         self,
@@ -31,7 +31,7 @@ class MosesOrganTrainingPipeline(MosesTrainingPipeline):
 
 @dataclass
 class MosesOrganTrainingArguments(TrainingPipelineArguments):
-    """Arguments related to Organ Trainer."""
+    """Arguments related to ORGAN Trainer."""
 
     __name__ = "model_args"
 
@@ -107,7 +107,7 @@ class MosesOrganTrainingArguments(TrainingPipelineArguments):
 
 @dataclass
 class MosesOrganModelArguments(TrainingPipelineArguments):
-    """Arguments related to Organ Trainer."""
+    """Arguments related to ORGAN Trainer."""
 
     __name__ = "model_args"
 
