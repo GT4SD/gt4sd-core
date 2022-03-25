@@ -7,8 +7,8 @@ from guacamol_baselines.smiles_lstm_ppo.ppo_trainer import PPOTrainer
 from guacamol_baselines.smiles_lstm_ppo.rnn_model import SmilesRnnActorCritic
 
 from gt4sd.algorithms.conditional_generation.guacamol.implementation import (
-    get_target_parameters,
     CombinedScorer,
+    get_target_parameters,
 )
 
 from ...core import TrainingPipelineArguments
