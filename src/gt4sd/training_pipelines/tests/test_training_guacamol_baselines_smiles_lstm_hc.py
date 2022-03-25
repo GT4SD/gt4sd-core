@@ -1,9 +1,10 @@
 """Language modeling trainer unit tests."""
 
+import os
 from typing import Any, Dict, cast
 
 import pkg_resources
-import os
+
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
     GuacamolLSTMHCTrainingPipeline,

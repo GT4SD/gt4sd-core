@@ -1,9 +1,10 @@
 """Moses VAE Trainer unit tests."""
 
+import os
 from typing import Any, Dict, cast
 
 import pkg_resources
-import os
+
 from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, MosesVAETrainingPipeline
 
 MODEL_ARTIFACTS_LOAD = VALID_FILE_PATH = pkg_resources.resource_filename(
@@ -55,7 +56,7 @@ template_config = {
         "vocab_save": os.path.join(OUTPUT_DIR, "vocab.pt"),
         "seed": 0,
         "device": "cpu",
-        "save_frequency" : 1
+        "save_frequency": 1,
     },
 }
 
