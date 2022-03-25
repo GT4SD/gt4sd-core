@@ -8,6 +8,7 @@ from guacamol_baselines.smiles_lstm_ppo.rnn_model import SmilesRnnActorCritic
 
 from gt4sd.algorithms.conditional_generation.guacamol.implementation import (
     get_target_parameters,
+    CombinedScorer,
 )
 
 from ...core import TrainingPipelineArguments
@@ -22,12 +23,14 @@ class GuacamolLSTMPPOTrainingPipeline(GuacamolBaselinesTrainingPipeline):
 
     def train(self, model_args: Dict[str, Any], train_args: Dict[str, Any]) -> None:  # type: ignore
         params = {**model_args, **train_args}
-        params["optimization_objective"] = get_target_parameters(
-            params["optimization_objective"]
-        )[0][0]
+        score_list, weights = get_target_parameters(params["optimization_objective"])
+        params["optimization_objective"] = CombinedScorer(
+            scorer_list=score_list,
+            weights=weights,
+        )
         model_params = [
             params.pop("input_size"),
-            params.pop("input_size"),
+            params.pop("hidden_size"),
             params.pop("output_size"),
             params.pop("n_layers"),
             params.pop("rnn_dropout"),
