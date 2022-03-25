@@ -9,7 +9,7 @@ from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, MosesVAETraining
 
 MODEL_ARTIFACTS_LOAD = VALID_FILE_PATH = pkg_resources.resource_filename(
     "gt4sd",
-    "training_pipelines/tests/guacamol_test_data",
+    "training_pipelines/tests/",
 )
 OUTPUT_DIR = "/tmp/moses_vae"
 if not os.path.exists(OUTPUT_DIR):
@@ -47,9 +47,11 @@ template_config = {
         "save_frequency": 1,
     },
     "common_args": {
-        "train_load": os.path.join(MODEL_ARTIFACTS_LOAD, "guacamol_v1_train.smiles"),
-        "val_load": os.path.join(MODEL_ARTIFACTS_LOAD, "guacamol_v1_test.smiles"),
-        "vocab_load": os.path.join(MODEL_ARTIFACTS_LOAD, "vocab.pt"),
+        "train_load": os.path.join(MODEL_ARTIFACTS_LOAD, "molecules.smi"),
+        "val_load": os.path.join(MODEL_ARTIFACTS_LOAD, "molecules.smi"),
+        "vocab_load": os.path.join(
+            MODEL_ARTIFACTS_LOAD, "guacamol_test_data", "vocab.pt"
+        ),
         "log_file": os.path.join(OUTPUT_DIR, "log.txt"),
         "model_save": os.path.join(OUTPUT_DIR, "model.pt"),
         "config_save": os.path.join(OUTPUT_DIR, "config.pt"),
@@ -72,6 +74,3 @@ def test_train():
     config: Dict[str, Any] = template_config.copy()
 
     test_pipeline.train(**config)
-
-
-test_train()
