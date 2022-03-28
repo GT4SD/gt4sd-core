@@ -29,24 +29,36 @@ class MosesTrainingPipeline(TrainingPipeline):
 
 
 @dataclass
-class MosesCommonArguments(TrainingPipelineArguments):
-    """Arguments related to PaccMann trainer."""
+class MosesDataArguments(TrainingPipelineArguments):
+    """Arguments related to MOSES data loading."""
 
-    __name__ = "common_args"
-    train_load: str = field(metadata={"help": "Input data in csv format to train."})
-    val_load: str = field(metadata={"help": "Input data in csv format to validation."})
-    model_save: str = field(metadata={"help": "Path to where save the trained model."})
-    log_file: str = field(metadata={"help": "Log file path to where save the logs."})
-    config_save: str = field(metadata={"help": "Path for the config."})
-    vocab_save: str = field(metadata={"help": "Path to save the model vocabulary"})
-    vocab_load: str = field(metadata={"help": "Path to retrieve the model vocabulary"})
-    save_frequency: int = field(
-        default=1, metadata={"help": "How often to save the model"}
+    __name__ = "dataset_args"
+    train_load: str = field(
+        metadata={"help": "Input data in csv format used for training."}
     )
-    seed: int = field(default=0, metadata={"help": "Seed"})
+    val_load: str = field(
+        metadata={"help": "Input data in csv format used for validation."}
+    )
+
+
+@dataclass
+class MosesTrainingArguments(TrainingPipelineArguments):
+    """Arguments related to MOSES trainer."""
+
+    __name__ = "training_args"
+    model_save: str = field(metadata={"help": "Path where the trained model is saved."})
+    log_file: str = field(metadata={"help": "Path where to save the the logs."})
+    config_save: str = field(metadata={"help": "Path for the config."})
+    vocab_save: str = field(metadata={"help": "Path to save the model vocabulary."})
+    save_frequency: int = field(
+        default=1, metadata={"help": "How often to save the model."}
+    )
+    seed: int = field(
+        default=0, metadata={"help": "Seed used for random number generation."}
+    )
     device: str = field(
         default="cpu",
-        metadata={"help": 'Device to run: "cpu" or "cuda:<device number>"'},
+        metadata={"help": "Device to run: 'cpu' or 'cuda:<device number>'"},
     )
 
 

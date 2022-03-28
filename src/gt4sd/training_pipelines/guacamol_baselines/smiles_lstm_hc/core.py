@@ -40,16 +40,18 @@ class GuacamolLSTMHCTrainingArguments(TrainingPipelineArguments):
     __name__ = "training_args"
 
     batch_size: int = field(
-        default=512, metadata={"help": "Size of a mini-batch for gradient descent"}
+        default=512, metadata={"help": "Size of a mini-batch for gradient descent."}
     )
     valid_every: int = field(
-        default=1000, metadata={"help": "Validate every so many batches"}
+        default=1000, metadata={"help": "Validate every so many batches."}
     )
-    n_epochs: int = field(default=10, metadata={"help": "Number of training epochs"})
-    hidden_size: int = field(default=512, metadata={"help": "Size of hidden layer"})
-    n_layers: int = field(default=3, metadata={"help": "Number of layers for training"})
-    rnn_dropout: float = field(default=0.2, metadata={"help": "Dropout value for RNN"})
-    lr: float = field(default=1e-3, metadata={"help": "RNN learning rate"})
+    n_epochs: int = field(default=10, metadata={"help": "Number of training epochs."})
+    hidden_size: int = field(default=512, metadata={"help": "Size of hidden layer."})
+    n_layers: int = field(
+        default=3, metadata={"help": "Number of layers for training."}
+    )
+    rnn_dropout: float = field(default=0.2, metadata={"help": "Dropout value for RNN."})
+    lr: float = field(default=1e-3, metadata={"help": "RNN learning rate."})
 
 
 @dataclass
@@ -59,9 +61,9 @@ class GuacamolLSTMHCModelArguments(TrainingPipelineArguments):
     __name__ = "model_args"
 
     max_len: int = field(
-        default=100, metadata={"help": "Max length of a SMILES string"}
+        default=100, metadata={"help": "Max length of a SMILES string."}
     )
-    output_dir: str = field(default="", metadata={"help": "Output directory"})
+    output_dir: str = field(default="", metadata={"help": "Output directory."})
 
 
 @dataclass

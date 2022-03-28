@@ -6,7 +6,7 @@ from typing import Any, Dict
 from guacamol_baselines.moses_baselines.vae_train import main
 
 from ...core import TrainingPipelineArguments
-from ..core import MosesTrainingPipeline
+from ..core import MosesTrainingArguments, MosesTrainingPipeline
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -31,7 +31,7 @@ class MosesVAETrainingPipeline(MosesTrainingPipeline):
 
 @dataclass
 class MosesVAEModelArguments(TrainingPipelineArguments):
-    """Arguments related to VAE Trainer."""
+    """Arguments related to MOSES VAE model."""
 
     __name__ = "model_args"
 
@@ -53,10 +53,8 @@ class MosesVAEModelArguments(TrainingPipelineArguments):
 
 
 @dataclass
-class MosesVAETrainingArguments(TrainingPipelineArguments):
-    """Arguments related to VAE Trainer."""
-
-    __name__ = "training_args"
+class MosesVAETrainingArguments(MosesTrainingArguments):
+    """Arguments related to MOSES VAE training."""
 
     n_batch: int = field(default=512, metadata={"help": "Batch size."})
     grad_clipping: int = field(
@@ -84,4 +82,4 @@ class MosesVAETrainingArguments(TrainingPipelineArguments):
         default=1000, metadata={"help": "Number of iters to smooth loss calc."}
     )
     n_jobs: int = field(default=1, metadata={"help": "Number of threads."})
-    n_workers: int = field(default=1, metadata={"help": ""})
+    n_workers: int = field(default=1, metadata={"help": "Number of workers."})

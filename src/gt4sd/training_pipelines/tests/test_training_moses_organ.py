@@ -86,6 +86,3 @@ def test_train():
     config: Dict[str, Any] = template_config.copy()
 
     test_pipeline.train(**config)
-
-
-test_train()

@@ -20,8 +20,9 @@ from .guacamol_baselines.smiles_lstm_ppo.core import (
     GuacamolLSTMPPOTrainingArguments,
     GuacamolLSTMPPOTrainingPipeline,
 )
-from .moses.core import MosesCommonArguments, MosesSavingArguments
+from .moses.core import MosesDataArguments, MosesSavingArguments
 from .moses.organ.core import (
+    MosesOrganDataArguments,
     MosesOrganModelArguments,
     MosesOrganTrainingArguments,
     MosesOrganTrainingPipeline,
@@ -87,12 +88,12 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
     "moses-vae-trainer": (
         MosesVAETrainingArguments,
         MosesVAEModelArguments,
-        MosesCommonArguments,
+        MosesDataArguments,
     ),
     "moses-organ-trainer": (
         MosesOrganTrainingArguments,
         MosesOrganModelArguments,
-        MosesCommonArguments,
+        MosesOrganDataArguments,
     ),
 }
 

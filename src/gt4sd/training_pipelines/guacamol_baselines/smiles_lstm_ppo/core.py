@@ -47,7 +47,7 @@ class GuacamolLSTMPPOTrainingPipeline(GuacamolBaselinesTrainingPipeline):
 class GuacamolLSTMPPOModelArguments(TrainingPipelineArguments):
     """Arguments related to SMILES LSTM PPO trainer."""
 
-    __name__ = "training_args"
+    __name__ = "model_args"
 
     model: str = field(metadata={"help": "Model Path."})
     optimization_objective: Dict[str, Any] = field(
@@ -58,7 +58,7 @@ class GuacamolLSTMPPOModelArguments(TrainingPipelineArguments):
     )
     device: str = field(
         default="cpu",
-        metadata={"help": 'Device to run: "cpu" or "cuda:<device number>".'},
+        metadata={"help": "Device to run: 'cpu' or 'cuda:<device number>'."},
     )
 
 
