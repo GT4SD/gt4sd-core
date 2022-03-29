@@ -15,7 +15,6 @@ from .guacamol_baselines.smiles_lstm.core import (
 )
 from .moses.core import MosesDataArguments, MosesSavingArguments
 from .moses.organ.core import (
-    MosesOrganDataArguments,
     MosesOrganModelArguments,
     MosesOrganTrainingArguments,
     MosesOrganTrainingPipeline,
@@ -82,7 +81,7 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
     "moses-organ-trainer": (
         MosesOrganTrainingArguments,
         MosesOrganModelArguments,
-        MosesOrganDataArguments,
+        MosesDataArguments,
     ),
 }
 

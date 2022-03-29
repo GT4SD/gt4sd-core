@@ -22,12 +22,12 @@ class VAE:
         """Initialize VAE.
 
         Args:
-            model_path: path from where to load the model
-            model_config_path: path from where to load the model config
-            vocab_path: path from where to load the vocab
-            n_samples: Number of samples to sample
-            n_batch: Size of the batch
-            max_len: Max length of SMILES
+            model_path: path from where to load the model.
+            model_config_path: path from where to load the model config.
+            vocab_path: path from where to load the vocab.
+            n_samples: Number of samples to sample.
+            n_batch: Size of the batch.
+            max_len: Max length of SMILES.
         """
         self.parser = argparse.ArgumentParser()
         self.parser.add_argument("--model_load", default=model_path)
@@ -40,11 +40,10 @@ class VAE:
         self.config = self.parser.parse_known_args()[0]
 
     def get_generator(self) -> VaeGenerator:
-        """
-        used for creating an instance of the VaeGenerator
+        """Create an instance of the VaeGenerator.
 
         Returns:
-            An instance of VaeGenerator
+            an instance of VaeGenerator.
         """
         optimiser = VaeGenerator(self.config)
         logger.debug(self.config)

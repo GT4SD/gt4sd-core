@@ -1,5 +1,6 @@
 """Moses ORGAN training pipeline."""
 import argparse
+import ast
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict
@@ -8,7 +9,7 @@ from guacamol_baselines.moses_baselines.organ_train import main
 from moses.script_utils import MetricsReward
 
 from ...core import TrainingPipelineArguments
-from ..core import MosesDataArguments, MosesTrainingArguments, MosesTrainingPipeline
+from ..core import MosesTrainingArguments, MosesTrainingPipeline
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -31,25 +32,17 @@ class MosesOrganTrainingPipeline(MosesTrainingPipeline):
             dataset_args: dataset arguments passed to the configuration.
         """
         params = {**training_args, **model_args, **dataset_args}
+        params["addition_rewards"] = list(
+            map(str.strip, params["addition_rewards"].split(","))
+        )
+        params["discriminator_layers"] = ast.literal_eval(
+            params["discriminator_layers"]
+        )
         parser = argparse.ArgumentParser()
         for k, v in params.items():
             parser.add_argument("--" + k, default=v)
         args = parser.parse_known_args()[0]
         main(args)
-
-
-@dataclass
-class MosesOrganDataArguments(MosesDataArguments):
-    """Arguments related to Moses ORGAN data loading."""
-
-    __name__ = "dataset_args"
-
-    n_ref_subsample: int = field(
-        default=500,
-        metadata={
-            "help": "Number of reference molecules (sampling from training data)."
-        },
-    )
 
 
 @dataclass
@@ -64,7 +57,7 @@ class MosesOrganTrainingArguments(MosesTrainingArguments):
     )
     pg_iters: int = field(
         default=1000,
-        metadata={"help": "Number of inerations for policy gradient training."},
+        metadata={"help": "Number of iterations for policy gradient training."},
     )
     n_batch: int = field(default=64, metadata={"help": "Size of batch."})
     lr: float = field(default=1e-4, metadata={"help": "Learning rate."})
@@ -85,21 +78,23 @@ class MosesOrganTrainingArguments(MosesTrainingArguments):
         default=10,
         metadata={"help": "Number of epochs of discriminator per iteration."},
     )
-    pg_smooth_const: float = field(
-        default=0.1, metadata={"help": "Smoothing factor for Policy Gradient logs."}
-    )
     reward_weight: float = field(
         default=0.7, metadata={"help": "Reward weight for policy gradient training."}
     )
-    additional_rewards: list = field(
-        default_factory=lambda: [], metadata={"help": "Adding of addition rewards."}
-    )
-    addition_rewards: list = field(
-        default_factory=lambda: MetricsReward.supported_metrics,
-        metadata={"help": "Adding of addition rewards."},
+    addition_rewards: str = field(
+        default="sa",
+        metadata={
+            "help": f"Comma separated list of rewards. Feasible values from: {','.join(MetricsReward.supported_metrics)}. Defaults to optimization of SA."
+        },
     )
     max_length: int = field(
         default=1, metadata={"help": "Maximum length for sequence."}
+    )
+    n_ref_subsample: int = field(
+        default=500,
+        metadata={
+            "help": "Number of reference molecules (sampling from training data)."
+        },
     )
 
 
@@ -123,23 +118,10 @@ class MosesOrganModelArguments(TrainingPipelineArguments):
         default=0,
         metadata={"help": "Dropout probability for lstm layers in generator."},
     )
-    discriminator_layers: list = field(
-        default_factory=lambda: [
-            (100, 1),
-            (200, 2),
-            (200, 3),
-            (200, 4),
-            (200, 5),
-            (100, 6),
-            (100, 7),
-            (100, 8),
-            (100, 9),
-            (100, 10),
-            (160, 15),
-            (160, 20),
-        ],
+    discriminator_layers: str = field(
+        default="[(100, 1), (200, 2), (200, 3), (200, 4), (200, 5), (100, 6), (100, 7), (100, 8), (100, 9), (100, 10), (160, 15), (160, 20)]",
         metadata={
-            "help": "Numbers of features for convalution layers in discriminator."
+            "help": "String representation of numbers of features for convolutional layers in discriminator."
         },
     )
     discriminator_dropout: int = field(

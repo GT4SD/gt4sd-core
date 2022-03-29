@@ -20,12 +20,12 @@ class Organ:
         """Initialize Organ.
 
         Args:
-            model_path: path from where to load the model
-            model_config_path: path from where to load the model config
-            vocab_path: path from where to load the vocab
-            n_samples: Number of samples to sample
-            n_batch: Size of the batch
-            max_len: Max length of SMILES
+            model_path: path from where to load the model.
+            model_config_path: path from where to load the model config.
+            vocab_path: path from where to load the vocab.
+            n_samples: Number of samples to sample.
+            n_batch: Size of the batch.
+            max_len: Max length of SMILES.
         """
         self.parser = argparse.ArgumentParser()
         self.parser.add_argument("--model_load", default=model_path)
@@ -38,11 +38,10 @@ class Organ:
         self.config = self.parser.parse_known_args()[0]
 
     def get_generator(self) -> OrganGenerator:
-        """
-        used for creating an instance of the OrganGenerator
+        """Create an instance of the OrganGenerator.
 
         Returns:
-            An instance of OrganGenerator
+            an instance of OrganGenerator.
         """
         optimiser = OrganGenerator(self.config)
         return optimiser

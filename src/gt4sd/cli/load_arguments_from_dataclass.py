@@ -12,7 +12,7 @@ def find_type(input_type: Type) -> Optional[str]:
         input_type: Type to be converted to string.
 
     Returns:
-        String of the type or None if the given type is not supported.
+        string of the type or None in case the given type is not supported.
     """
     field_type = None
     if input_type is str:

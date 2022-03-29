@@ -64,18 +64,18 @@ class SMILESGAIterator(Generator):
         generations: int,
         patience: int,
     ):
-        """Initialize Generator.
+        """Initialize SMILESGAIterator.
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            batch_size: number of molecules to generate
-            population_size: used with n_mutations for the initial generation of smiles within the population
-            n_mutations: used with population size for the initial generation of smiles within the population
-            n_jobs: number of concurrently running jobs
-            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules
-            gene_size: size of the gene which is used in creation of genes
-            generations: number of evolutionary generations
-            patience: used for early stopping if population scores remains the same after generating molecules
+            batch_size: number of molecules to generate.
+            population_size: used with n_mutations for the initial generation of smiles within the population.
+            n_mutations: used with population size for the initial generation of smiles within the population.
+            n_jobs: number of concurrently running jobs.
+            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules.
+            gene_size: size of the gene which is used in creation of genes.
+            generations: number of evolutionary generations.
+            patience: used for early stopping if population scores remains the same after generating molecules.
         """
         self.resource_path = resource_path
         self.batch_size = batch_size
@@ -137,18 +137,18 @@ class GraphGAIterator(Generator):
         generations: int,
         patience: int,
     ):
-        """Initialize Generator.
+        """Initialize GraphGAIterator.
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            batch_size: number of molecules to generate
-            population_size: used for the initial generation of smiles within the population
-            n_jobs: number of concurrently running jobs
-            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules
-            offspring_size: number of molecules to select for new population
-            mutation_rate: frequency of the new mutations in a single gene or organism over time
-            generations: number of evolutionary generations
-            patience: used for early stopping if population scores remains the same after generating molecules
+            batch_size: number of molecules to generate.
+            population_size: used for the initial generation of smiles within the population.
+            n_jobs: number of concurrently running jobs.
+            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules.
+            offspring_size: number of molecules to select for new population.
+            mutation_rate: frequency of the new mutations in a single gene or organism over time.
+            generations: number of evolutionary generations.
+            patience: used for early stopping if population scores remains the same after generating molecules.
         """
         self.resource_path = resource_path
         self.batch_size = batch_size
@@ -210,18 +210,18 @@ class GraphMCTSIterator(Generator):
         generations: int,
         patience: int,
     ):
-        """Initialize Generator.
+        """Initialize GraphMCTSIterator.
 
         Args:
             init_smiles: path where to load hypothesis, candidate labels and, optionally, the smiles file.
-            batch_size: number of molecules to generate
-            population_size: used for the initial generation of smiles within the population
-            max_children: maximum number of childerns a node could have
-            n_jobs: number of concurrently running jobs
-            num_sims: number of times to traverse the tree
-            max_atoms: maximum number of atoms to explore to terminal the node state
-            generations: number of evolutionary generations
-            patience: used for early stopping if population scores remains the same after generating molecules
+            batch_size: number of molecules to generate.
+            population_size: used for the initial generation of smiles within the population.
+            max_children: maximum number of childerns a node could have.
+            n_jobs: number of concurrently running jobs.
+            num_sims: number of times to traverse the tree.
+            max_atoms: maximum number of atoms to explore to terminal the node state.
+            generations: number of evolutionary generations.
+            patience: used for early stopping if population scores remains the same after generating molecules.
         """
         self.init_smiles = init_smiles
         self.batch_size = batch_size
@@ -285,20 +285,20 @@ class SMILESLSTMHCIterator(Generator):
         max_len: int,
         optimize_batch_size: int,
     ):
-        """Initialize Generator.
+        """Initialize SMILESLSTMHCIterator.
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            batch_size: number of molecules to generate
-            n_epochs: number of epochs to sample
-            mols_to_sample: molecules sampled at each step
-            keep_top: molecules kept each step
-            optimize_n_epochs: number of epochs for the optimization
-            benchmark_num_samples: number of molecules to generate from final model for the benchmark
-            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules
-            n_jobs: number of concurrently running jobs
-            max_len: maximum length of a SMILES string
-            optimize_batch_size: batch size for the optimization
+            batch_size: number of molecules to generate.
+            n_epochs: number of epochs to sample.
+            mols_to_sample: molecules sampled at each step.
+            keep_top: molecules kept each step.
+            optimize_n_epochs: number of epochs for the optimization.
+            benchmark_num_samples: number of molecules to generate from final model for the benchmark.
+            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules.
+            n_jobs: number of concurrently running jobs.
+            max_len: maximum length of a SMILES string.
+            optimize_batch_size: batch size for the optimization.
         """
         self.resource_path = resource_path
         self.batch_size = batch_size
@@ -364,17 +364,17 @@ class SMILESLSTMPPOIterator(Generator):
         kl_div_weight: int,
         clip_param: float,
     ):
-        """Initialize Generator.
+        """Initialize SMILESLSTMPPOIterator.
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            batch_size: number of molecules to generate
-            episode_size: number of molecules sampled by the policy at the start of a series of ppo updates
-            num_epochs: number of epochs to sample
-            optimize_batch_size: batch size for the optimization
-            entropy_weight: used for calculating entropy loss
-            kl_div_weight: used for calculating Kullback-Leibler divergence loss
-            clip_param: used for determining how far the new policy is from the old one
+            batch_size: number of molecules to generate.
+            episode_size: number of molecules sampled by the policy at the start of a series of ppo updates.
+            num_epochs: number of epochs to sample.
+            optimize_batch_size: batch size for the optimization.
+            entropy_weight: used for calculating entropy loss.
+            kl_div_weight: used for calculating Kullback-Leibler divergence loss.
+            clip_param: used for determining how far the new policy is from the old one.
         """
         self.resource_path = resource_path
         self.batch_size = batch_size
@@ -433,9 +433,9 @@ class AaeIterator:
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            n_samples: Number of samples to sample
-            n_batch: Size of the batch
-            max_len: Max length of SMILES
+            n_samples: number of samples to sample.
+            n_batch: size of the batch.
+            max_len: max length of SMILES.
         """
         self.resource_path = resource_path
         self.model_path = os.path.join(self.resource_path, "model.pt")
@@ -482,9 +482,9 @@ class VaeIterator:
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            n_samples: Number of samples to sample
-            n_batch: Size of the batch
-            max_len: Max length of SMILES
+            n_samples: number of samples to sample.
+            n_batch: size of the batch.
+            max_len: max length of SMILES.
         """
         self.resource_path = resource_path
         self.model_path = os.path.join(self.resource_path, "model.pt")
@@ -531,9 +531,9 @@ class OrganIterator:
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            n_samples: Number of samples to sample
-            n_batch: Size of the batch
-            max_len: Max length of SMILES
+            n_samples: number of samples to sample.
+            n_batch: size of the batch.
+            max_len: max length of SMILES.
         """
         self.resource_path = resource_path
         self.model_path = os.path.join(self.resource_path, "model.pt")

@@ -19,13 +19,13 @@ class SMILESLSTMPPO:
         """Initialize SMILESLSTMPPO.
 
         Args:
-            model_path: path to load the model,
-            num_epochs: number of epochs to sample
-            episode_size: number of molecules sampled by the policy at the start of a series of ppo updates
-            optimize_batch_size: batch size for the optimization
-            entropy_weight: used for calculating entropy loss
-            kl_div_weight: used for calculating Kullback-Leibler divergence loss
-            clip_param: used for determining how far the new policy is from the old one
+            model_path: path to load the model.
+            num_epochs: number of epochs to sample.
+            episode_size: number of molecules sampled by the policy at the start of a series of ppo updates.
+            optimize_batch_size: batch size for the optimization.
+            entropy_weight: used for calculating entropy loss.
+            kl_div_weight: used for calculating Kullback-Leibler divergence loss.
+            clip_param: used for determining how far the new policy is from the old one.
         """
         self.model_path = model_path
         self.num_epochs = num_epochs
@@ -36,11 +36,10 @@ class SMILESLSTMPPO:
         self.clip_param = clip_param
 
     def get_generator(self) -> PPODirectedGenerator:
-        """
-        used for creating an instance of the PPODirectedGenerator
+        """Create an instance of the PPODirectedGenerator.
 
         Returns:
-            An instance of PPODirectedGenerator
+            an instance of PPODirectedGenerator.
         """
         optimiser = PPODirectedGenerator(
             pretrained_model_path=self.model_path,
