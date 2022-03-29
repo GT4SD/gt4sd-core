@@ -1,1 +1,1 @@
-"""Moses ORGAN training pipeline initialization."""
+"""Moses Organ training pipeline initialization."""
