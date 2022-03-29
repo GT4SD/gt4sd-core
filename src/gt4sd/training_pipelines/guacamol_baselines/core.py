@@ -1,8 +1,9 @@
 """GuacaMol baselines training utilities."""
 
+from dataclasses import dataclass, field
 from typing import Any, Dict
 
-from ..core import TrainingPipeline
+from ..core import TrainingPipeline, TrainingPipelineArguments
 
 
 class GuacaMolBaselinesTrainingPipeline(TrainingPipeline):
@@ -25,3 +26,29 @@ class GuacaMolBaselinesTrainingPipeline(TrainingPipeline):
             NotImplementedError: the generic trainer does not implement the pipeline.
         """
         raise NotImplementedError
+
+
+@dataclass
+class GuacaMolDataArguments(TrainingPipelineArguments):
+    """Arguments related to data loading."""
+
+    __name__ = "dataset_args"
+
+    train_smiles_filepath: str = field(
+        metadata={"help": "Path of SMILES file for Training."}
+    )
+    test_smiles_filepath: str = field(
+        metadata={"help": "Path of SMILES file for Validation."}
+    )
+
+
+@dataclass
+class GuacaMolSavingArguments(TrainingPipelineArguments):
+    """Saving arguments related to GuacaMol trainer."""
+
+    __name__ = "saving_args"
+
+    model_filepath: str = field(metadata={"help": "Path to the model file."})
+    model_config_filepath: str = field(
+        metadata={"help": "Path to the model config file."}
+    )

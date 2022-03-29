@@ -1,1 +1,1 @@
-"""MOSES baselines training pipelines initialization."""
+"""Moses baselines training pipelines initialization."""

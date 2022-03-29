@@ -7,18 +7,11 @@ from typing import Any, Dict
 import pkg_resources
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
+from .guacamol_baselines.core import GuacaMolDataArguments, GuacaMolSavingArguments
 from .guacamol_baselines.smiles_lstm.core import (
-    GuacaMolLSTMDataArguments,
     GuacaMolLSTMModelArguments,
-    GuacaMolLSTMSavingArguments,
     GuacaMolLSTMTrainingArguments,
     GuacaMolLSTMTrainingPipeline,
-)
-from .guacamol_baselines.smiles_lstm_ppo.core import (
-    GuacaMolLSTMPPOModelArguments,
-    GuacaMolLSTMPPOSavingArguments,
-    GuacaMolLSTMPPOTrainingArguments,
-    GuacaMolLSTMPPOTrainingPipeline,
 )
 from .moses.core import MosesDataArguments, MosesSavingArguments
 from .moses.organ.core import (
@@ -79,11 +72,7 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
     "guacamol-lstm-trainer": (
         GuacaMolLSTMModelArguments,
         GuacaMolLSTMTrainingArguments,
-        GuacaMolLSTMDataArguments,
-    ),
-    "guacamol-lstm-ppo-trainer": (
-        GuacaMolLSTMPPOModelArguments,
-        GuacaMolLSTMPPOTrainingArguments,
+        GuacaMolDataArguments,
     ),
     "moses-vae-trainer": (
         MosesVAETrainingArguments,
@@ -102,7 +91,6 @@ TRAINING_PIPELINE_MAPPING = {
     "paccmann-vae-trainer": PaccMannVAETrainingPipeline,
     "granular-trainer": GranularTrainingPipeline,
     "guacamol-lstm-trainer": GuacaMolLSTMTrainingPipeline,
-    "guacamol-lstm-ppo-trainer": GuacaMolLSTMPPOTrainingPipeline,
     "moses-organ-trainer": MosesOrganTrainingPipeline,
     "moses-vae-trainer": MosesVAETrainingPipeline,
 }
@@ -111,8 +99,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "paccmann-vae-trainer": PaccMannSavingArguments,
     "granular-trainer": GranularSavingArguments,
     "language-modeling-trainer": LanguageModelingSavingArguments,
-    "guacamol-lstm-trainer": GuacaMolLSTMSavingArguments,
-    "guacamol-lstm-ppo-trainer": GuacaMolLSTMPPOSavingArguments,
+    "guacamol-lstm-trainer": GuacaMolSavingArguments,
     "moses-organ-trainer": MosesSavingArguments,
     "moses-vae-trainer": MosesSavingArguments,
 }

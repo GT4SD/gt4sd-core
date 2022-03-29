@@ -15,7 +15,7 @@ logger.addHandler(logging.NullHandler())
 
 
 class GuacaMolLSTMTrainingPipeline(GuacaMolBaselinesTrainingPipeline):
-    """SMILES LSTM training pipeline."""
+    """GuacaMol SMILES LSTM training pipeline."""
 
     def train(  # type: ignore
         self,
@@ -36,7 +36,7 @@ class GuacaMolLSTMTrainingPipeline(GuacaMolBaselinesTrainingPipeline):
 
 @dataclass
 class GuacaMolLSTMTrainingArguments(TrainingPipelineArguments):
-    """Training Arguments related to SMILES LSTM HC trainer."""
+    """Training Arguments related to SMILES LSTM trainer."""
 
     __name__ = "training_args"
 
@@ -53,7 +53,7 @@ class GuacaMolLSTMTrainingArguments(TrainingPipelineArguments):
 
 @dataclass
 class GuacaMolLSTMModelArguments(TrainingPipelineArguments):
-    """Arguments related to SMILES LSTM HC trainer."""
+    """Arguments related to SMILES LSTM trainer."""
 
     __name__ = "model_args"
 
@@ -64,29 +64,4 @@ class GuacaMolLSTMModelArguments(TrainingPipelineArguments):
     rnn_dropout: float = field(default=0.2, metadata={"help": "Dropout value for RNN."})
     max_len: int = field(
         default=100, metadata={"help": "Max length of a SMILES string."}
-    )
-
-
-@dataclass
-class GuacaMolLSTMDataArguments(TrainingPipelineArguments):
-    """Arguments related to SMILES LSTM HC data loading."""
-
-    __name__ = "dataset_args"
-
-    train_smiles_filepath: str = field(
-        metadata={"help": "Path of SMILES file for Training."}
-    )
-    test_smiles_filepath: str = field(
-        metadata={"help": "Path of SMILES file for Validation."}
-    )
-
-
-@dataclass
-class GuacaMolLSTMSavingArguments(TrainingPipelineArguments):
-    """Saving arguments related to PaccMann trainer."""
-
-    __name__ = "saving_args"
-
-    model_path: str = field(
-        metadata={"help": "Path where the model artifacts are stored."}
     )

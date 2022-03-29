@@ -1,15 +1,9 @@
 import logging
-import os
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
 from ....training_pipelines.core import TrainingPipelineArguments
-from ....training_pipelines.guacamol_baselines.smiles_lstm.core import (
-    GuacaMolLSTMSavingArguments,
-)
-from ....training_pipelines.guacamol_baselines.smiles_lstm_ppo.core import (
-    GuacaMolLSTMPPOSavingArguments,
-)
+from ....training_pipelines.guacamol_baselines.core import GuacaMolSavingArguments
 from ....training_pipelines.moses.core import MosesSavingArguments
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
@@ -346,7 +340,7 @@ class GraphMCTSGenerator(AlgorithmConfiguration[str, str]):
 
 @ApplicationsRegistry.register_algorithm_application(GuacaMolGenerator)
 class SMILESLSTMHCGenerator(AlgorithmConfiguration[str, str]):
-    """Configuration to generate optimizied molecules using recurrent neural networks with hill climbing algorithm"""
+    """Configuration to generate optimized molecules using recurrent neural networks with hill climbing algorithm."""
 
     algorithm_name: ClassVar[str] = GuacaMolGenerator.__name__
     algorithm_type: ClassVar[str] = "conditional_generation"
@@ -445,14 +439,12 @@ class SMILESLSTMHCGenerator(AlgorithmConfiguration[str, str]):
         Returns:
             a mapping between artifacts' files and training pipeline's output files.
         """
-        if isinstance(training_pipeline_arguments, GuacaMolLSTMSavingArguments):
-            model_files = os.listdir(training_pipeline_arguments.model_path)
-
-            model_files_dict = {
-                file: os.path.join(training_pipeline_arguments.model_path, file)
-                for file in model_files
+        if isinstance(training_pipeline_arguments, GuacaMolSavingArguments):
+            return {
+                "model_final_0.473.pt": training_pipeline_arguments.model_filepath,
+                "model_final_0.473.json": training_pipeline_arguments.model_config_filepath,
+                "guacamol_v1_all.smiles": "",
             }
-            return model_files_dict
         else:
             return super().get_filepath_mappings_for_training_pipeline_arguments(
                 training_pipeline_arguments
@@ -547,8 +539,11 @@ class SMILESLSTMPPOGenerator(AlgorithmConfiguration[str, str]):
         Returns:
             a mapping between artifacts' files and training pipeline's output files.
         """
-        if isinstance(training_pipeline_arguments, GuacaMolLSTMPPOSavingArguments):
-            return {"model.pt": training_pipeline_arguments.model_path}
+        if isinstance(training_pipeline_arguments, GuacaMolSavingArguments):
+            return {
+                "model_final_0.473.pt": training_pipeline_arguments.model_filepath,
+                "model_final_0.473.json": training_pipeline_arguments.model_config_filepath,
+            }
         else:
             return super().get_filepath_mappings_for_training_pipeline_arguments(
                 training_pipeline_arguments
@@ -611,7 +606,7 @@ class MosesGenerator(GeneratorAlgorithm[S, T]):
 
 @ApplicationsRegistry.register_algorithm_application(MosesGenerator)
 class AaeGenerator(AlgorithmConfiguration[str, str]):
-    """Configuration to generate molecules using Variational autoencoder"""
+    """Configuration to generate molecules using an adversarial autoencoder."""
 
     algorithm_name: ClassVar[str] = MosesGenerator.__name__
     algorithm_type: ClassVar[str] = "conditional_generation"
@@ -650,7 +645,7 @@ class AaeGenerator(AlgorithmConfiguration[str, str]):
 
 @ApplicationsRegistry.register_algorithm_application(MosesGenerator)
 class VaeGenerator(AlgorithmConfiguration[str, str]):
-    """Configuration to generate molecules using Adversarial autoencoder"""
+    """Configuration to generate molecules using a variational autoencoder."""
 
     algorithm_name: ClassVar[str] = MosesGenerator.__name__
     algorithm_type: ClassVar[str] = "conditional_generation"
@@ -700,7 +695,7 @@ class VaeGenerator(AlgorithmConfiguration[str, str]):
         """
         if isinstance(training_pipeline_arguments, MosesSavingArguments):
             return {
-                "model_200.pt": training_pipeline_arguments.model_path,
+                "model.pt": training_pipeline_arguments.model_path,
                 "config.pt": training_pipeline_arguments.config_path,
                 "vocab.pt": training_pipeline_arguments.vocab_path,
             }
@@ -762,7 +757,7 @@ class OrganGenerator(AlgorithmConfiguration[str, str]):
         """
         if isinstance(training_pipeline_arguments, MosesSavingArguments):
             return {
-                "model_200.pt": training_pipeline_arguments.model_path,
+                "model.pt": training_pipeline_arguments.model_path,
                 "config.pt": training_pipeline_arguments.config_path,
                 "vocab.pt": training_pipeline_arguments.vocab_path,
             }

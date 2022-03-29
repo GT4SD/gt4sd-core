@@ -1,4 +1,4 @@
-"""Language modeling trainer unit tests."""
+"""GuacaMol LSTM trainer unit tests."""
 
 import os
 import shutil

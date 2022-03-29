@@ -1,4 +1,4 @@
-"""MOSES VAE training pipeline."""
+"""Moses VAE training pipeline."""
 import argparse
 import logging
 from dataclasses import dataclass, field
@@ -22,7 +22,7 @@ class MosesVAETrainingPipeline(MosesTrainingPipeline):
         model_args: Dict[str, Any],
         dataset_args: Dict[str, Any],
     ) -> None:
-        """Generic training function for MOSES VAE training.
+        """Generic training function for Moses VAE training.
 
         Args:
             training_args: training arguments passed to the configuration.
@@ -39,7 +39,7 @@ class MosesVAETrainingPipeline(MosesTrainingPipeline):
 
 @dataclass
 class MosesVAEModelArguments(TrainingPipelineArguments):
-    """Arguments related to MOSES VAE model."""
+    """Arguments related to Moses VAE model."""
 
     __name__ = "model_args"
 
@@ -62,7 +62,7 @@ class MosesVAEModelArguments(TrainingPipelineArguments):
 
 @dataclass
 class MosesVAETrainingArguments(MosesTrainingArguments):
-    """Arguments related to MOSES VAE training."""
+    """Arguments related to Moses VAE training."""
 
     n_batch: int = field(default=512, metadata={"help": "Batch size."})
     grad_clipping: int = field(

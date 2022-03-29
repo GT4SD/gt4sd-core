@@ -1,4 +1,4 @@
-"""MOSES ORGAN training pipeline."""
+"""Moses ORGAN training pipeline."""
 import argparse
 import logging
 from dataclasses import dataclass, field
@@ -23,7 +23,7 @@ class MosesOrganTrainingPipeline(MosesTrainingPipeline):
         model_args: Dict[str, Any],
         dataset_args: Dict[str, Any],
     ) -> None:
-        """Generic training function for MOSES ORGAN training.
+        """Generic training function for Moses ORGAN training.
 
         Args:
             training_args: training arguments passed to the configuration.
@@ -40,7 +40,7 @@ class MosesOrganTrainingPipeline(MosesTrainingPipeline):
 
 @dataclass
 class MosesOrganDataArguments(MosesDataArguments):
-    """Arguments related to MOSES ORGAN data loading."""
+    """Arguments related to Moses ORGAN data loading."""
 
     __name__ = "dataset_args"
 
@@ -54,7 +54,7 @@ class MosesOrganDataArguments(MosesDataArguments):
 
 @dataclass
 class MosesOrganTrainingArguments(MosesTrainingArguments):
-    """Arguments related to MOSES ORGAN training."""
+    """Arguments related to Moses ORGAN training."""
 
     generator_pretrain_epochs: int = field(
         default=50, metadata={"help": "Number of epochs for generator pretraining."}
@@ -105,7 +105,7 @@ class MosesOrganTrainingArguments(MosesTrainingArguments):
 
 @dataclass
 class MosesOrganModelArguments(TrainingPipelineArguments):
-    """Arguments related to MOSES ORGAN model."""
+    """Arguments related to Moses ORGAN model."""
 
     __name__ = "model_args"
 

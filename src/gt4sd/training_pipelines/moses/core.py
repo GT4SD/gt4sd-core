@@ -1,4 +1,4 @@
-"""MOSES baselines training utilities."""
+"""Moses baselines training utilities."""
 
 from dataclasses import dataclass, field
 from typing import Any, Dict
@@ -30,7 +30,7 @@ class MosesTrainingPipeline(TrainingPipeline):
 
 @dataclass
 class MosesDataArguments(TrainingPipelineArguments):
-    """Arguments related to MOSES data loading."""
+    """Arguments related to Moses data loading."""
 
     __name__ = "dataset_args"
     train_load: str = field(
@@ -43,7 +43,7 @@ class MosesDataArguments(TrainingPipelineArguments):
 
 @dataclass
 class MosesTrainingArguments(TrainingPipelineArguments):
-    """Arguments related to MOSES trainer."""
+    """Arguments related to Moses trainer."""
 
     __name__ = "training_args"
     model_save: str = field(metadata={"help": "Path where the trained model is saved."})

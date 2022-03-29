@@ -411,7 +411,7 @@ class SMILESLSTMPPOIterator(Generator):
                 kl_div_weight=self.kl_div_weight,
                 clip_param=self.clip_param,
             )
-            logger.info("Initialization of the Generator")
+            logger.info("initialization of the generator")
             self.smiles_lstm_ppo_generator = optimiser.get_generator()
 
         logger.info("generating molecules")

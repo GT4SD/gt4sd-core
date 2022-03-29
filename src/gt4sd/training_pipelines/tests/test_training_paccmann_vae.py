@@ -1,4 +1,4 @@
-"""Language modeling trainer unit tests."""
+"""PaccMann VAE trainer unit tests."""
 
 import shutil
 import tempfile
