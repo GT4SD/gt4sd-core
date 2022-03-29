@@ -1,8 +1,7 @@
-"""Implementation of Scorers"""
-
-
+"""Implementation of scorers."""
+import json
 from functools import partial
-from typing import Any, Callable, Dict, List, Type
+from typing import Any, Callable, Dict, List, Tuple, Type, Union
 
 import numpy as np
 from rdkit import Chem
@@ -328,6 +327,37 @@ class QEDScorer(TargetValueScorer):
             A score for the given SMILES
         """
         return Chem.QED.qed(Chem.MolFromSmiles(smiles))
+
+
+def get_target_parameters(
+    target: Union[str, Dict[str, Any]]
+) -> Tuple[List[Type[Any]], List[float]]:
+    """Generates a tuple of scorers and weight list
+
+    Args:
+        target: scoring functions and parameters related to it
+
+    Return:
+        A tuple containing scoring functions and weight list
+    """
+    score_list = []
+    weights = []
+    target_dictionary: Dict[str, Any] = {}
+    if isinstance(target, str):
+        target_dictionary = json.loads(target)
+    elif isinstance(target, dict):
+        target_dictionary = target
+    else:
+        raise ValueError(
+            f"{target} of type {type(target)} is not supported: provide 'str' or 'Dict[str, Any]'"
+        )
+    for scoring_function_name, parameters in target_dictionary.items():
+        weight = 1.0
+        if "weight" in parameters:
+            weight = parameters.pop("weight")
+        score_list.append(SCORING_FUNCTIONS[scoring_function_name](**parameters))
+        weights.append(weight)
+    return (score_list, weights)
 
 
 SCORING_FUNCTIONS = {

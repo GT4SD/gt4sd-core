@@ -1,6 +1,8 @@
 """Moses ORGAN Trainer unit tests."""
 
 import os
+import shutil
+import tempfile
 from typing import Any, Dict, cast
 
 import pkg_resources
@@ -10,14 +12,28 @@ from gt4sd.training_pipelines import (
     MosesOrganTrainingPipeline,
 )
 
-MODEL_ARTIFACTS_LOAD = VALID_FILE_PATH = pkg_resources.resource_filename(
+TEST_DATA_DIRECTORY = pkg_resources.resource_filename(
     "gt4sd",
     "training_pipelines/tests/",
 )
 
-OUTPUT_DIR = "/tmp/moses_organ"
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
+
+def _create_training_output_filepaths(directory: str) -> Dict[str, str]:
+    """Create output filepath from directory.
+
+    Args:
+        directory: output directory.
+
+    Returns:
+        a dictionary containing the output files.
+    """
+    return {
+        "log_file": os.path.join(directory, "log.txt"),
+        "model_save": os.path.join(directory, "model.pt"),
+        "config_save": os.path.join(directory, "config.pt"),
+        "vocab_save": os.path.join(directory, "vocab.pt"),
+    }
+
 
 template_config = {
     "model_args": {
@@ -39,17 +55,19 @@ template_config = {
             (160, 15),
         ],
         "discriminator_dropout": 0,
+    },
+    "training_args": {
         "reward_weight": 0.7,
-        "n_jobs": 8,
+        "n_jobs": 1,
         "generator_pretrain_epochs": 1,
         "discriminator_pretrain_epochs": 1,
         "pg_iters": 1,
         "n_batch": 4,
         "lr": 1e-4,
-        "n_workers": 8,
+        "n_workers": 1,
         "max_length": 50,
         "clip_grad": 5,
-        "rollouts": 4,
+        "rollouts": 1,
         "generator_updates": 1,
         "discriminator_updates": 1,
         "discriminator_epochs": 1,
@@ -57,20 +75,13 @@ template_config = {
         "n_ref_subsample": 1,
         "additional_rewards": [],
         "addition_rewards": [],
-    },
-    "common_args": {
-        "train_load": os.path.join(MODEL_ARTIFACTS_LOAD, "molecules.smi"),
-        "val_load": os.path.join(MODEL_ARTIFACTS_LOAD, "molecules.smi"),
-        "vocab_load": os.path.join(
-            MODEL_ARTIFACTS_LOAD, "guacamol_test_data", "vocab.pt"
-        ),
-        "log_file": os.path.join(OUTPUT_DIR, "log.txt"),
-        "model_save": os.path.join(OUTPUT_DIR, "model.pt"),
-        "config_save": os.path.join(OUTPUT_DIR, "config.pt"),
-        "vocab_save": os.path.join(OUTPUT_DIR, "vocab.pt"),
         "seed": 0,
         "device": "cpu",
         "save_frequency": 1,
+    },
+    "dataset_args": {
+        "train_load": os.path.join(TEST_DATA_DIRECTORY, "molecules.smiles"),
+        "val_load": os.path.join(TEST_DATA_DIRECTORY, "molecules.smiles"),
     },
 }
 
@@ -81,8 +92,14 @@ def test_train():
 
     assert pipeline is not None
 
+    TEMPORARY_DIRECTORY = tempfile.mkdtemp()
+
     test_pipeline = cast(MosesOrganTrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
+    for key, value in _create_training_output_filepaths(TEMPORARY_DIRECTORY).items():
+        config["training_args"][key] = value
 
     test_pipeline.train(**config)
+
+    shutil.rmtree(TEMPORARY_DIRECTORY)

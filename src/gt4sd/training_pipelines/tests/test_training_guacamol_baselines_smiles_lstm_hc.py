@@ -4,10 +4,11 @@ import os
 from typing import Any, Dict, cast
 
 import pkg_resources
+import pytest
 
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
-    GuacamolLSTMHCTrainingPipeline,
+    GuacaMolLSTMHCTrainingPipeline,
 )
 
 OUTPUT_DIR = "/tmp/guacamol_lstm_hc/"
@@ -37,13 +38,14 @@ template_config = {
 }
 
 
+@pytest.mark.skip(reason="not ready for testing")
 def test_train():
 
     pipeline = TRAINING_PIPELINE_MAPPING.get("guacamol-lstm-hc-trainer")
 
     assert pipeline is not None
 
-    test_pipeline = cast(GuacamolLSTMHCTrainingPipeline, pipeline())
+    test_pipeline = cast(GuacaMolLSTMHCTrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
     file_path = os.path.join(MODEL_ARTIFACTS_LOAD, "guacamol_v1_test.smiles")
@@ -51,6 +53,3 @@ def test_train():
     config["dataset_args"]["train_smiles_filepath"] = file_path
     config["dataset_args"]["test_smiles_filepath"] = file_path
     test_pipeline.train(**config)
-
-
-test_train()

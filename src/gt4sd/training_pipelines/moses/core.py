@@ -1,4 +1,4 @@
-"""Guacamol Baselines training utilities."""
+"""GuacaMol Baselines training utilities."""
 
 from dataclasses import dataclass, field
 from typing import Any, Dict
@@ -15,7 +15,7 @@ class MosesTrainingPipeline(TrainingPipeline):
         model_args: Dict[str, Any],
         common_args: Dict[str, Any],
     ) -> None:
-        """Generic training function for Guacamol Baselines training.
+        """Generic training function for GuacaMol Baselines training.
 
         Args:
             training_args: training arguments passed to the configuration.

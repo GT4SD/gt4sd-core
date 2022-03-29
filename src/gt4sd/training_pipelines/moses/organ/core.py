@@ -18,10 +18,18 @@ class MosesOrganTrainingPipeline(MosesTrainingPipeline):
 
     def train(  # type: ignore
         self,
+        training_args: Dict[str, Any],
         model_args: Dict[str, Any],
-        common_args: Dict[str, Any],
-    ) -> None:  # type: ignore
-        params = {**common_args, **model_args}
+        dataset_args: Dict[str, Any],
+    ) -> None:
+        """Generic training function for MOSES ORGAN training.
+
+        Args:
+            training_args: training arguments passed to the configuration.
+            model_args: model arguments passed to the configuration.
+            dataset_args: dataset arguments passed to the configuration.
+        """
+        params = {**training_args, **model_args, **dataset_args}
         parser = argparse.ArgumentParser()
         for k, v in params.items():
             parser.add_argument("--" + k, default=v)

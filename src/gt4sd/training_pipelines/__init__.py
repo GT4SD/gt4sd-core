@@ -8,17 +8,17 @@ import pkg_resources
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
 from .guacamol_baselines.smiles_lstm_hc.core import (
-    GuacamolLSTMHCDataArguments,
-    GuacamolLSTMHCModelArguments,
-    GuacamolLSTMHCSavingArguments,
-    GuacamolLSTMHCTrainingArguments,
-    GuacamolLSTMHCTrainingPipeline,
+    GuacaMolLSTMHCDataArguments,
+    GuacaMolLSTMHCModelArguments,
+    GuacaMolLSTMHCSavingArguments,
+    GuacaMolLSTMHCTrainingArguments,
+    GuacaMolLSTMHCTrainingPipeline,
 )
 from .guacamol_baselines.smiles_lstm_ppo.core import (
-    GuacamolLSTMPPOModelArguments,
-    GuacamolLSTMPPOSavingArguments,
-    GuacamolLSTMPPOTrainingArguments,
-    GuacamolLSTMPPOTrainingPipeline,
+    GuacaMolLSTMPPOModelArguments,
+    GuacaMolLSTMPPOSavingArguments,
+    GuacaMolLSTMPPOTrainingArguments,
+    GuacaMolLSTMPPOTrainingPipeline,
 )
 from .moses.core import MosesDataArguments, MosesSavingArguments
 from .moses.organ.core import (
@@ -77,13 +77,13 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         GranularModelArguments,
     ),
     "guacamol-lstm-hc-trainer": (
-        GuacamolLSTMHCModelArguments,
-        GuacamolLSTMHCTrainingArguments,
-        GuacamolLSTMHCDataArguments,
+        GuacaMolLSTMHCModelArguments,
+        GuacaMolLSTMHCTrainingArguments,
+        GuacaMolLSTMHCDataArguments,
     ),
     "guacamol-lstm-ppo-trainer": (
-        GuacamolLSTMPPOModelArguments,
-        GuacamolLSTMPPOTrainingArguments,
+        GuacaMolLSTMPPOModelArguments,
+        GuacaMolLSTMPPOTrainingArguments,
     ),
     "moses-vae-trainer": (
         MosesVAETrainingArguments,
@@ -101,8 +101,8 @@ TRAINING_PIPELINE_MAPPING = {
     "language-modeling-trainer": LanguageModelingTrainingPipeline,
     "paccmann-vae-trainer": PaccMannVAETrainingPipeline,
     "granular-trainer": GranularTrainingPipeline,
-    "guacamol-lstm-hc-trainer": GuacamolLSTMHCTrainingPipeline,
-    "guacamol-lstm-ppo-trainer": GuacamolLSTMPPOTrainingPipeline,
+    "guacamol-lstm-hc-trainer": GuacaMolLSTMHCTrainingPipeline,
+    "guacamol-lstm-ppo-trainer": GuacaMolLSTMPPOTrainingPipeline,
     "moses-organ-trainer": MosesOrganTrainingPipeline,
     "moses-vae-trainer": MosesVAETrainingPipeline,
 }
@@ -111,8 +111,8 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "paccmann-vae-trainer": PaccMannSavingArguments,
     "granular-trainer": GranularSavingArguments,
     "language-modeling-trainer": LanguageModelingSavingArguments,
-    "guacamol-lstm-hc-trainer": GuacamolLSTMHCSavingArguments,
-    "guacamol-lstm-ppo-trainer": GuacamolLSTMPPOSavingArguments,
+    "guacamol-lstm-hc-trainer": GuacaMolLSTMHCSavingArguments,
+    "guacamol-lstm-ppo-trainer": GuacaMolLSTMPPOSavingArguments,
     "moses-organ-trainer": MosesSavingArguments,
     "moses-vae-trainer": MosesSavingArguments,
 }

@@ -5,10 +5,10 @@ from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.guacamol_baselines.smiles_lstm_hc.core import (
-    GuacamolLSTMHCSavingArguments,
+    GuacaMolLSTMHCSavingArguments,
 )
 from ....training_pipelines.guacamol_baselines.smiles_lstm_ppo.core import (
-    GuacamolLSTMPPOSavingArguments,
+    GuacaMolLSTMPPOSavingArguments,
 )
 from ....training_pipelines.moses.core import MosesSavingArguments
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
@@ -72,10 +72,10 @@ class GuacaMolGenerator(GeneratorAlgorithm[S, T]):
         configuration: AlgorithmConfiguration[S, T],
         target: Optional[T],
     ) -> Targeted[T]:
-        """Get the function to perform the prediction via Guacamol's generator.
+        """Get the function to perform the prediction via GuacaMol's generator.
 
         Args:
-            configuration: helps to set up specific application of Guacamol.
+            configuration: helps to set up specific application of GuacaMol.
 
         Returns:
             callable with target generating samples.
@@ -445,7 +445,7 @@ class SMILESLSTMHCGenerator(AlgorithmConfiguration[str, str]):
         Returns:
             a mapping between artifacts' files and training pipeline's output files.
         """
-        if isinstance(training_pipeline_arguments, GuacamolLSTMHCSavingArguments):
+        if isinstance(training_pipeline_arguments, GuacaMolLSTMHCSavingArguments):
             model_files = os.listdir(training_pipeline_arguments.model_path)
 
             model_files_dict = {
@@ -547,7 +547,7 @@ class SMILESLSTMPPOGenerator(AlgorithmConfiguration[str, str]):
         Returns:
             a mapping between artifacts' files and training pipeline's output files.
         """
-        if isinstance(training_pipeline_arguments, GuacamolLSTMPPOSavingArguments):
+        if isinstance(training_pipeline_arguments, GuacaMolLSTMPPOSavingArguments):
             return {"model.pt": training_pipeline_arguments.model_path}
         else:
             return super().get_filepath_mappings_for_training_pipeline_arguments(
@@ -593,10 +593,10 @@ class MosesGenerator(GeneratorAlgorithm[S, T]):
         configuration: AlgorithmConfiguration[S, T],
         target: Optional[T],
     ) -> Targeted[T]:
-        """Get the function to perform the prediction via Guacamol's generator.
+        """Get the function to perform the prediction via GuacaMol's generator.
 
         Args:
-            configuration: helps to set up specific application of Guacamol.
+            configuration: helps to set up specific application of GuacaMol.
 
         Returns:
             callable with target generating samples.

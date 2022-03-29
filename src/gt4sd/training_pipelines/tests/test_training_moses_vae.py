@@ -84,7 +84,7 @@ def test_train():
     test_pipeline = cast(MosesVAETrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
-    for key, value in _create_training_output_filepaths(TEMPORARY_DIRECTORY):
+    for key, value in _create_training_output_filepaths(TEMPORARY_DIRECTORY).items():
         config["training_args"][key] = value
 
     test_pipeline.train(**config)

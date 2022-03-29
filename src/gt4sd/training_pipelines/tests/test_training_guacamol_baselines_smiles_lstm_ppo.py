@@ -2,9 +2,11 @@
 import os
 from typing import Any, Dict, cast
 
+import pytest
+
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
-    GuacamolLSTMPPOTrainingPipeline,
+    GuacaMolLSTMPPOTrainingPipeline,
 )
 
 OUTPUT_DIR = "/tmp/guacamol_lstm_ppo/"
@@ -36,13 +38,14 @@ template_config = {
 }
 
 
+@pytest.mark.skip(reason="not ready for testing")
 def test_train():
 
     pipeline = TRAINING_PIPELINE_MAPPING.get("guacamol-lstm-ppo-trainer")
 
     assert pipeline is not None
 
-    test_pipeline = cast(GuacamolLSTMPPOTrainingPipeline, pipeline())
+    test_pipeline = cast(GuacaMolLSTMPPOTrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
 

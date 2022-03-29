@@ -20,7 +20,7 @@ from guacamol_baselines.smiles_lstm_ppo.goal_directed_generation import (
     PPODirectedGenerator,
 )
 
-from .....domains.materials.scorer import SCORING_FUNCTIONS, CombinedScorer
+from .....domains.materials.scorer import CombinedScorer, get_target_parameters
 from .graph_ga import GraphGA
 from .graph_mcts import GraphMCTS
 from .moses_aae import AAE
@@ -32,37 +32,6 @@ from .smiles_lstm_ppo import SMILESLSTMPPO
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
-
-
-def get_target_parameters(
-    target: Union[str, Dict[str, Any]]
-) -> Tuple[List[Type[Any]], List[float]]:
-    """Generates a tuple of scorers and weight list
-
-    Args:
-        target: scoring functions and parameters related to it
-
-    Return:
-        A tuple containing scoring functions and weight list
-    """
-    score_list = []
-    weights = []
-    target_dictionary: Dict[str, Any] = {}
-    if isinstance(target, str):
-        target_dictionary = json.loads(target)
-    elif isinstance(target, dict):
-        target_dictionary = target
-    else:
-        raise ValueError(
-            f"{target} of type {type(target)} is not supported: provide 'str' or 'Dict[str, Any]'"
-        )
-    for scoring_function_name, parameters in target_dictionary.items():
-        weight = 1.0
-        if "weight" in parameters:
-            weight = parameters.pop("weight")
-        score_list.append(SCORING_FUNCTIONS[scoring_function_name](**parameters))
-        weights.append(weight)
-    return (score_list, weights)
 
 
 class Generator:

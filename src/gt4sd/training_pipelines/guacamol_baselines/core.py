@@ -1,12 +1,12 @@
-"""Guacamol Baselines training utilities."""
+"""GuacaMol Baselines training utilities."""
 
 from typing import Any, Dict
 
 from ..core import TrainingPipeline
 
 
-class GuacamolBaselinesTrainingPipeline(TrainingPipeline):
-    """Guacamol Baselines training pipelines."""
+class GuacaMolBaselinesTrainingPipeline(TrainingPipeline):
+    """GuacaMol Baselines training pipelines."""
 
     def train(  # type: ignore
         self,
@@ -14,7 +14,7 @@ class GuacamolBaselinesTrainingPipeline(TrainingPipeline):
         model_args: Dict[str, Any],
         dataset_args: Dict[str, Any],
     ) -> None:
-        """Generic training function for Guacamol Baselines training.
+        """Generic training function for GuacaMol Baselines training.
 
         Args:
             training_args: training arguments passed to the configuration.

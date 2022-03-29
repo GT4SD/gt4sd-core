@@ -7,13 +7,13 @@ from guacamol_baselines.smiles_lstm_hc.smiles_rnn_distribution_learner import (
 )
 
 from ...core import TrainingPipelineArguments
-from ..core import GuacamolBaselinesTrainingPipeline
+from ..core import GuacaMolBaselinesTrainingPipeline
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class GuacamolLSTMHCTrainingPipeline(GuacamolBaselinesTrainingPipeline):
+class GuacaMolLSTMHCTrainingPipeline(GuacaMolBaselinesTrainingPipeline):
     """SMILES LSTM HC training pipelines."""
 
     def train(  # type: ignore
@@ -34,13 +34,12 @@ class GuacamolLSTMHCTrainingPipeline(GuacamolBaselinesTrainingPipeline):
 
 
 @dataclass
-class GuacamolLSTMHCTrainingArguments(TrainingPipelineArguments):
+class GuacaMolLSTMHCTrainingArguments(TrainingPipelineArguments):
     """Training Arguments related to SMILES LSTM HC trainer."""
 
     __name__ = "training_args"
 
     batch_size: int = field(
-<<<<<<< HEAD
         default=512, metadata={"help": "Size of a mini-batch for gradient descent."}
     )
     valid_every: int = field(
@@ -53,40 +52,22 @@ class GuacamolLSTMHCTrainingArguments(TrainingPipelineArguments):
     )
     rnn_dropout: float = field(default=0.2, metadata={"help": "Dropout value for RNN."})
     lr: float = field(default=1e-3, metadata={"help": "RNN learning rate."})
-=======
-        default=512, metadata={"help": "Size of a mini-batch for gradient descent"}
-    )
-    valid_every: int = field(
-        default=1000, metadata={"help": "Validate every so many batches"}
-    )
-    n_epochs: int = field(default=10, metadata={"help": "Number of training epochs"})
-    hidden_size: int = field(default=512, metadata={"help": "Size of hidden layer"})
-    n_layers: int = field(default=3, metadata={"help": "Number of layers for training"})
-    rnn_dropout: float = field(default=0.2, metadata={"help": "Dropout value for RNN"})
-    lr: float = field(default=1e-3, metadata={"help": "RNN learning rate"})
->>>>>>> refs/rewritten/chore-merging-with-remote-
 
 
 @dataclass
-class GuacamolLSTMHCModelArguments(TrainingPipelineArguments):
+class GuacaMolLSTMHCModelArguments(TrainingPipelineArguments):
     """Arguments related to SMILES LSTM HC trainer."""
 
     __name__ = "model_args"
 
     max_len: int = field(
-<<<<<<< HEAD
         default=100, metadata={"help": "Max length of a SMILES string."}
     )
     output_dir: str = field(default="", metadata={"help": "Output directory."})
-=======
-        default=100, metadata={"help": "Max length of a SMILES string"}
-    )
-    output_dir: str = field(default="", metadata={"help": "Output directory"})
->>>>>>> refs/rewritten/chore-merging-with-remote-
 
 
 @dataclass
-class GuacamolLSTMHCDataArguments(TrainingPipelineArguments):
+class GuacaMolLSTMHCDataArguments(TrainingPipelineArguments):
     """Arguments related to SMILES LSTM HC data loading."""
 
     __name__ = "dataset_args"
@@ -100,7 +81,7 @@ class GuacamolLSTMHCDataArguments(TrainingPipelineArguments):
 
 
 @dataclass
-class GuacamolLSTMHCSavingArguments(TrainingPipelineArguments):
+class GuacaMolLSTMHCSavingArguments(TrainingPipelineArguments):
     """Saving arguments related to PaccMann trainer."""
 
     __name__ = "saving_args"

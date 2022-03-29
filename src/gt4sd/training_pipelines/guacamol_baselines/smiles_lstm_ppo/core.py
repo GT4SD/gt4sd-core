@@ -1,3 +1,4 @@
+"""SMILES PPO training pipeline from GuacaMol."""
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict
@@ -6,19 +7,15 @@ from guacamol_baselines.smiles_lstm_hc.rnn_model import SmilesRnn
 from guacamol_baselines.smiles_lstm_ppo.ppo_trainer import PPOTrainer
 from guacamol_baselines.smiles_lstm_ppo.rnn_model import SmilesRnnActorCritic
 
-from gt4sd.algorithms.conditional_generation.guacamol.implementation import (
-    CombinedScorer,
-    get_target_parameters,
-)
-
+from ....domains.materials.scorer import CombinedScorer, get_target_parameters
 from ...core import TrainingPipelineArguments
-from ..core import GuacamolBaselinesTrainingPipeline
+from ..core import GuacaMolBaselinesTrainingPipeline
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class GuacamolLSTMPPOTrainingPipeline(GuacamolBaselinesTrainingPipeline):
+class GuacaMolLSTMPPOTrainingPipeline(GuacaMolBaselinesTrainingPipeline):
     """SMILES LSTM PPO training pipelines."""
 
     def train(self, model_args: Dict[str, Any], train_args: Dict[str, Any]) -> None:  # type: ignore
@@ -44,7 +41,7 @@ class GuacamolLSTMPPOTrainingPipeline(GuacamolBaselinesTrainingPipeline):
 
 
 @dataclass
-class GuacamolLSTMPPOModelArguments(TrainingPipelineArguments):
+class GuacaMolLSTMPPOModelArguments(TrainingPipelineArguments):
     """Arguments related to SMILES LSTM PPO trainer."""
 
     __name__ = "model_args"
@@ -63,7 +60,7 @@ class GuacamolLSTMPPOModelArguments(TrainingPipelineArguments):
 
 
 @dataclass
-class GuacamolLSTMPPOTrainingArguments(TrainingPipelineArguments):
+class GuacaMolLSTMPPOTrainingArguments(TrainingPipelineArguments):
     """Arguments related to SMILES LSTM PPO trainer."""
 
     __name__ = "training_args"
@@ -116,7 +113,7 @@ class GuacamolLSTMPPOTrainingArguments(TrainingPipelineArguments):
 
 
 @dataclass
-class GuacamolLSTMPPOSavingArguments(TrainingPipelineArguments):
+class GuacaMolLSTMPPOSavingArguments(TrainingPipelineArguments):
     """Saving arguments related to PaccMann trainer."""
 
     __name__ = "saving_args"
