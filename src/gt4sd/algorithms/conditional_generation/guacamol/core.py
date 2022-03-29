@@ -4,8 +4,8 @@ from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
 from ....training_pipelines.core import TrainingPipelineArguments
-from ....training_pipelines.guacamol_baselines.smiles_lstm_hc.core import (
-    GuacaMolLSTMHCSavingArguments,
+from ....training_pipelines.guacamol_baselines.smiles_lstm.core import (
+    GuacaMolLSTMSavingArguments,
 )
 from ....training_pipelines.guacamol_baselines.smiles_lstm_ppo.core import (
     GuacaMolLSTMPPOSavingArguments,
@@ -445,7 +445,7 @@ class SMILESLSTMHCGenerator(AlgorithmConfiguration[str, str]):
         Returns:
             a mapping between artifacts' files and training pipeline's output files.
         """
-        if isinstance(training_pipeline_arguments, GuacaMolLSTMHCSavingArguments):
+        if isinstance(training_pipeline_arguments, GuacaMolLSTMSavingArguments):
             model_files = os.listdir(training_pipeline_arguments.model_path)
 
             model_files_dict = {

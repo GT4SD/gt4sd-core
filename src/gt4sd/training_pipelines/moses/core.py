@@ -1,4 +1,4 @@
-"""GuacaMol Baselines training utilities."""
+"""MOSES baselines training utilities."""
 
 from dataclasses import dataclass, field
 from typing import Any, Dict

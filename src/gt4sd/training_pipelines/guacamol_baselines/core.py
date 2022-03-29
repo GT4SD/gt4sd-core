@@ -1,4 +1,4 @@
-"""GuacaMol Baselines training utilities."""
+"""GuacaMol baselines training utilities."""
 
 from typing import Any, Dict
 

@@ -1,3 +1,4 @@
+"""SMILES LSTM training pipeline from GuacaMol."""
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict
@@ -13,8 +14,8 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class GuacaMolLSTMHCTrainingPipeline(GuacaMolBaselinesTrainingPipeline):
-    """SMILES LSTM HC training pipelines."""
+class GuacaMolLSTMTrainingPipeline(GuacaMolBaselinesTrainingPipeline):
+    """SMILES LSTM training pipeline."""
 
     def train(  # type: ignore
         self,
@@ -34,7 +35,7 @@ class GuacaMolLSTMHCTrainingPipeline(GuacaMolBaselinesTrainingPipeline):
 
 
 @dataclass
-class GuacaMolLSTMHCTrainingArguments(TrainingPipelineArguments):
+class GuacaMolLSTMTrainingArguments(TrainingPipelineArguments):
     """Training Arguments related to SMILES LSTM HC trainer."""
 
     __name__ = "training_args"
@@ -46,28 +47,28 @@ class GuacaMolLSTMHCTrainingArguments(TrainingPipelineArguments):
         default=1000, metadata={"help": "Validate every so many batches."}
     )
     n_epochs: int = field(default=10, metadata={"help": "Number of training epochs."})
+    lr: float = field(default=1e-3, metadata={"help": "RNN learning rate."})
+    output_dir: str = field(default="", metadata={"help": "Output directory."})
+
+
+@dataclass
+class GuacaMolLSTMModelArguments(TrainingPipelineArguments):
+    """Arguments related to SMILES LSTM HC trainer."""
+
+    __name__ = "model_args"
+
     hidden_size: int = field(default=512, metadata={"help": "Size of hidden layer."})
     n_layers: int = field(
         default=3, metadata={"help": "Number of layers for training."}
     )
     rnn_dropout: float = field(default=0.2, metadata={"help": "Dropout value for RNN."})
-    lr: float = field(default=1e-3, metadata={"help": "RNN learning rate."})
-
-
-@dataclass
-class GuacaMolLSTMHCModelArguments(TrainingPipelineArguments):
-    """Arguments related to SMILES LSTM HC trainer."""
-
-    __name__ = "model_args"
-
     max_len: int = field(
         default=100, metadata={"help": "Max length of a SMILES string."}
     )
-    output_dir: str = field(default="", metadata={"help": "Output directory."})
 
 
 @dataclass
-class GuacaMolLSTMHCDataArguments(TrainingPipelineArguments):
+class GuacaMolLSTMDataArguments(TrainingPipelineArguments):
     """Arguments related to SMILES LSTM HC data loading."""
 
     __name__ = "dataset_args"
@@ -81,7 +82,7 @@ class GuacaMolLSTMHCDataArguments(TrainingPipelineArguments):
 
 
 @dataclass
-class GuacaMolLSTMHCSavingArguments(TrainingPipelineArguments):
+class GuacaMolLSTMSavingArguments(TrainingPipelineArguments):
     """Saving arguments related to PaccMann trainer."""
 
     __name__ = "saving_args"

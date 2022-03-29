@@ -7,12 +7,12 @@ from typing import Any, Dict
 import pkg_resources
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
-from .guacamol_baselines.smiles_lstm_hc.core import (
-    GuacaMolLSTMHCDataArguments,
-    GuacaMolLSTMHCModelArguments,
-    GuacaMolLSTMHCSavingArguments,
-    GuacaMolLSTMHCTrainingArguments,
-    GuacaMolLSTMHCTrainingPipeline,
+from .guacamol_baselines.smiles_lstm.core import (
+    GuacaMolLSTMDataArguments,
+    GuacaMolLSTMModelArguments,
+    GuacaMolLSTMSavingArguments,
+    GuacaMolLSTMTrainingArguments,
+    GuacaMolLSTMTrainingPipeline,
 )
 from .guacamol_baselines.smiles_lstm_ppo.core import (
     GuacaMolLSTMPPOModelArguments,
@@ -76,10 +76,10 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         GranularDataArguments,
         GranularModelArguments,
     ),
-    "guacamol-lstm-hc-trainer": (
-        GuacaMolLSTMHCModelArguments,
-        GuacaMolLSTMHCTrainingArguments,
-        GuacaMolLSTMHCDataArguments,
+    "guacamol-lstm-trainer": (
+        GuacaMolLSTMModelArguments,
+        GuacaMolLSTMTrainingArguments,
+        GuacaMolLSTMDataArguments,
     ),
     "guacamol-lstm-ppo-trainer": (
         GuacaMolLSTMPPOModelArguments,
@@ -101,7 +101,7 @@ TRAINING_PIPELINE_MAPPING = {
     "language-modeling-trainer": LanguageModelingTrainingPipeline,
     "paccmann-vae-trainer": PaccMannVAETrainingPipeline,
     "granular-trainer": GranularTrainingPipeline,
-    "guacamol-lstm-hc-trainer": GuacaMolLSTMHCTrainingPipeline,
+    "guacamol-lstm-trainer": GuacaMolLSTMTrainingPipeline,
     "guacamol-lstm-ppo-trainer": GuacaMolLSTMPPOTrainingPipeline,
     "moses-organ-trainer": MosesOrganTrainingPipeline,
     "moses-vae-trainer": MosesVAETrainingPipeline,
@@ -111,7 +111,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "paccmann-vae-trainer": PaccMannSavingArguments,
     "granular-trainer": GranularSavingArguments,
     "language-modeling-trainer": LanguageModelingSavingArguments,
-    "guacamol-lstm-hc-trainer": GuacaMolLSTMHCSavingArguments,
+    "guacamol-lstm-trainer": GuacaMolLSTMSavingArguments,
     "guacamol-lstm-ppo-trainer": GuacaMolLSTMPPOSavingArguments,
     "moses-organ-trainer": MosesSavingArguments,
     "moses-vae-trainer": MosesSavingArguments,

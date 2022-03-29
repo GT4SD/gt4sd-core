@@ -1,3 +1,4 @@
+"""MOSES ORGAN training pipeline."""
 import argparse
 import logging
 from dataclasses import dataclass, field
