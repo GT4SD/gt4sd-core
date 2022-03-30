@@ -68,12 +68,6 @@ class MosesSavingArguments(TrainingPipelineArguments):
 
     __name__ = "saving_args"
 
-    model_path: str = field(
-        metadata={"help": "Path where the model artifacts are stored."}
-    )
-    config_path: str = field(
-        metadata={"help": "Path where the config artifacts are stored."}
-    )
-    vocab_path: str = field(
-        metadata={"help": "Path where the vocab artifacts are stored."}
-    )
+    model_path: str = field(metadata={"help": "Path where the model is stored."})
+    config_path: str = field(metadata={"help": "Path where the config is stored."})
+    vocab_path: str = field(metadata={"help": "Path where the vocab is stored."})

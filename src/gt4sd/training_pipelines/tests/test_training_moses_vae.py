@@ -1,4 +1,4 @@
-"""Moses VAE Trainer unit tests."""
+"""Moses VAE trainer unit tests."""
 
 import os
 import shutil

@@ -1,5 +1,6 @@
 """SMILES LSTM training pipeline from GuacaMol."""
 import logging
+import os
 from dataclasses import dataclass, field
 from typing import Any, Dict
 
@@ -24,6 +25,9 @@ class GuacaMolLSTMTrainingPipeline(GuacaMolBaselinesTrainingPipeline):
         dataset_args: Dict[str, Any],
     ) -> None:
         params = {**training_args, **model_args, **dataset_args}
+
+        os.makedirs(params["output_dir"], exist_ok=True)
+
         with open(params.pop("train_smiles_filepath")) as f:
             train_list = f.readlines()
 
@@ -40,6 +44,7 @@ class GuacaMolLSTMTrainingArguments(TrainingPipelineArguments):
 
     __name__ = "training_args"
 
+    output_dir: str = field(metadata={"help": "Output directory."})
     batch_size: int = field(
         default=512, metadata={"help": "Size of a mini-batch for gradient descent."}
     )
@@ -48,7 +53,6 @@ class GuacaMolLSTMTrainingArguments(TrainingPipelineArguments):
     )
     n_epochs: int = field(default=10, metadata={"help": "Number of training epochs."})
     lr: float = field(default=1e-3, metadata={"help": "RNN learning rate."})
-    output_dir: str = field(default="", metadata={"help": "Output directory."})
 
 
 @dataclass

@@ -1,9 +1,8 @@
 """GuacaMol algorithms implementation module."""
 
-import json
 import logging
 import os
-from typing import Any, Dict, List, Tuple, Type, Union
+from typing import Any, List
 
 from guacamol_baselines.graph_ga.goal_directed_generation import GB_GA_Generator
 from guacamol_baselines.graph_mcts.goal_directed_generation import GB_MCTS_Generator
@@ -21,6 +20,7 @@ from guacamol_baselines.smiles_lstm_ppo.goal_directed_generation import (
 )
 
 from .....domains.materials.scorer import CombinedScorer, get_target_parameters
+from .....frameworks.torch import claim_device_name
 from .graph_ga import GraphGA
 from .graph_mcts import GraphMCTS
 from .moses_aae import AAE
@@ -445,6 +445,7 @@ class AaeIterator:
         self.n_batch = n_batch
         self.max_len = max_len
         self.aae_generator: AaeGenerator = None
+        self.device_name = claim_device_name()
 
     def generate_batch(self, target=None) -> List[Any]:
         """Generate a batch of molecules.
@@ -463,6 +464,7 @@ class AaeIterator:
                 n_samples=self.n_samples,
                 n_batch=self.n_batch,
                 max_len=self.max_len,
+                device=self.device_name,
             )
             logger.info("Initialization of the Generator")
             self.aae_generator = optimiser.get_generator()
@@ -494,6 +496,7 @@ class VaeIterator:
         self.n_batch = n_batch
         self.max_len = max_len
         self.vae_generator: VaeGenerator = None
+        self.device_name = claim_device_name()
 
     def generate_batch(self, target=None) -> List[Any]:
         """Generate a batch of molecules.
@@ -512,6 +515,7 @@ class VaeIterator:
                 n_samples=self.n_samples,
                 n_batch=self.n_batch,
                 max_len=self.max_len,
+                device=self.device_name,
             )
             logger.info("Initialization of the Generator")
             self.vae_generator = optimiser.get_generator()
@@ -543,6 +547,7 @@ class OrganIterator:
         self.n_batch = n_batch
         self.max_len = max_len
         self.organ_generator: OrganGenerator = None
+        self.device_name = claim_device_name()
 
     def generate_batch(self, target=None) -> List[Any]:
         """Generate a batch of molecules.
@@ -561,6 +566,7 @@ class OrganIterator:
                 n_samples=self.n_samples,
                 n_batch=self.n_batch,
                 max_len=self.max_len,
+                device=self.device_name,
             )
             logger.info("Initialization of the Generator")
             self.organ_generator = optimiser.get_generator()

@@ -2,6 +2,7 @@
 import argparse
 import ast
 import logging
+import os
 from dataclasses import dataclass, field
 from typing import Any, Dict
 
@@ -32,16 +33,19 @@ class MosesOrganTrainingPipeline(MosesTrainingPipeline):
             dataset_args: dataset arguments passed to the configuration.
         """
         params = {**training_args, **model_args, **dataset_args}
+
+        os.makedirs(os.path.dirname(params["model_save"]), exist_ok=True)
+        os.makedirs(os.path.dirname(params["log_file"]), exist_ok=True)
+        os.makedirs(os.path.dirname(params["config_save"]), exist_ok=True)
+        os.makedirs(os.path.dirname(params["vocab_save"]), exist_ok=True)
         params["addition_rewards"] = list(
             map(str.strip, params["addition_rewards"].split(","))
         )
         params["discriminator_layers"] = ast.literal_eval(
             params["discriminator_layers"]
         )
-        parser = argparse.ArgumentParser()
-        for k, v in params.items():
-            parser.add_argument("--" + k, default=v)
-        args = parser.parse_known_args()[0]
+
+        args = argparse.Namespace(**params)
         main(args)
 
 
@@ -52,7 +56,7 @@ class MosesOrganTrainingArguments(MosesTrainingArguments):
     generator_pretrain_epochs: int = field(
         default=50, metadata={"help": "Number of epochs for generator pretraining."}
     )
-    discriminator_pretrain_epochs: float = field(
+    discriminator_pretrain_epochs: int = field(
         default=50, metadata={"help": "Number of epochs for discriminator pretraining."}
     )
     pg_iters: int = field(
@@ -88,7 +92,7 @@ class MosesOrganTrainingArguments(MosesTrainingArguments):
         },
     )
     max_length: int = field(
-        default=1, metadata={"help": "Maximum length for sequence."}
+        default=100, metadata={"help": "Maximum length for sequence."}
     )
     n_ref_subsample: int = field(
         default=500,
@@ -114,8 +118,8 @@ class MosesOrganModelArguments(TrainingPipelineArguments):
     num_layers: int = field(
         default=2, metadata={"help": "Number of lstm layers in generator."}
     )
-    dropout: int = field(
-        default=0,
+    dropout: float = field(
+        default=0.0,
         metadata={"help": "Dropout probability for lstm layers in generator."},
     )
     discriminator_layers: str = field(
@@ -124,6 +128,6 @@ class MosesOrganModelArguments(TrainingPipelineArguments):
             "help": "String representation of numbers of features for convolutional layers in discriminator."
         },
     )
-    discriminator_dropout: int = field(
-        default=0, metadata={"help": "Dropout probability for discriminator."}
+    discriminator_dropout: float = field(
+        default=0.0, metadata={"help": "Dropout probability for discriminator."}
     )

@@ -1,6 +1,7 @@
 """Moses VAE training pipeline."""
 import argparse
 import logging
+import os
 from dataclasses import dataclass, field
 from typing import Any, Dict
 
@@ -30,10 +31,13 @@ class MosesVAETrainingPipeline(MosesTrainingPipeline):
             dataset_args: dataset arguments passed to the configuration.
         """
         params = {**training_args, **model_args, **dataset_args}
-        parser = argparse.ArgumentParser()
-        for k, v in params.items():
-            parser.add_argument("--" + k, default=v)
-        args = parser.parse_known_args()[0]
+
+        os.makedirs(os.path.dirname(params["model_save"]), exist_ok=True)
+        os.makedirs(os.path.dirname(params["log_file"]), exist_ok=True)
+        os.makedirs(os.path.dirname(params["config_save"]), exist_ok=True)
+        os.makedirs(os.path.dirname(params["vocab_save"]), exist_ok=True)
+
+        args = argparse.Namespace(**params)
         main(args)
 
 
@@ -44,8 +48,9 @@ class MosesVAEModelArguments(TrainingPipelineArguments):
     __name__ = "model_args"
 
     q_cell: str = field(default="gru", metadata={"help": "Encoder rnn cell type."})
-    q_bidir: int = field(
-        default=1, metadata={"help": "If to add second direction to encoder."}
+    q_bidir: bool = field(
+        default=True,
+        metadata={"help": "Whether to add second direction in the encoder."},
     )
     q_d_h: int = field(default=256, metadata={"help": "Encoder h dimensionality."})
     q_n_layers: int = field(default=1, metadata={"help": "Encoder number of layers."})

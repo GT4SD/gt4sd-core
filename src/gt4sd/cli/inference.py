@@ -87,7 +87,9 @@ class InferenceArguments:
 
 def main() -> None:
     """Run an inference pipeline."""
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    logger.handlers = []
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+    logger.setLevel(logging.INFO)
 
     parser = ArgumentParser(
         cast(

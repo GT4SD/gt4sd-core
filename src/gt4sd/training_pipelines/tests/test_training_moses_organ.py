@@ -1,4 +1,4 @@
-"""Moses ORGAN trainer unit tests."""
+"""Moses Organ trainer unit tests."""
 
 import os
 import shutil
@@ -40,9 +40,9 @@ template_config = {
         "embedding_size": 32,
         "hidden_size": 512,
         "num_layers": 2,
-        "dropout": 0,
+        "dropout": 0.0,
         "discriminator_layers": "[(100, 1), (200, 2), (200, 3), (200, 4), (200, 5), (100, 6), (100, 7), (100, 8), (100, 9), (100, 10), (160, 15), (160, 20)]",
-        "discriminator_dropout": 0,
+        "discriminator_dropout": 0.0,
     },
     "training_args": {
         "reward_weight": 0.7,
