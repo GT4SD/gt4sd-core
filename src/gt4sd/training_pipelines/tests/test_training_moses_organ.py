@@ -55,7 +55,7 @@ template_config = {
         "n_workers": 1,
         "max_length": 50,
         "clip_grad": 5,
-        "rollouts": 1,
+        "rollouts": 16,
         "generator_updates": 1,
         "discriminator_updates": 1,
         "discriminator_epochs": 1,

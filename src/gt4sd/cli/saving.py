@@ -116,9 +116,7 @@ def main() -> None:
     Raises:
         ValueError: in case the provided training pipeline provided is not supported.
     """
-    logger.handlers = []
-    logger.addHandler(logging.StreamHandler(sys.stdout))
-    logger.setLevel(logging.INFO)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     base_args = SavingArgumentParser(
         cast(DataClassType, SavingArguments)
