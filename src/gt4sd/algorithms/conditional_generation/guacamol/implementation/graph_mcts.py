@@ -25,14 +25,14 @@ class GraphMCTS:
 
         Args:
             init_smiles: path where to load hypothesis, candidate labels and, optionally, the smiles file.
-            population_size: used with n_mutations for the initial generation of smiles within the population
-            n_jobs: number of concurrently running jobs
-            generations: number of evolutionary generations
-            patience: used for early stopping if population scores remains the same after generating molecules
-            num_sims: number of times to traverse the tree,
-            max_children: maximum number of childerns a node could have ,
-            max_atoms: maximum number of atoms to explore to terminal the node state,
-            pickle_directory: path from where to load pickle files
+            population_size: used with n_mutations for the initial generation of smiles within the population.
+            n_jobs: number of concurrently running jobs.
+            generations: number of evolutionary generations.
+            patience: used for early stopping if population scores remains the same after generating molecules.
+            num_sims: number of times to traverse the tree.
+            max_children: maximum number of childerns a node could have.
+            max_atoms: maximum number of atoms to explore to terminal the node state.
+            pickle_directory: path from where to load pickle files.
         """
         self.init_smiles = init_smiles
         self.pickle_directory = pickle_directory
@@ -45,11 +45,10 @@ class GraphMCTS:
         self.max_atoms = max_atoms
 
     def get_generator(self) -> GB_MCTS_Generator:
-        """
-        used for creating an instance of the GB_MCTS_Generator
+        """Create an instance of the GB_MCTS_Generator.
 
         Returns:
-            An instance of GB_MCTS_Generator
+            an instance of GB_MCTS_Generator.
         """
         optimiser = GB_MCTS_Generator(
             pickle_directory=self.pickle_directory,

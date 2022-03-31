@@ -2,6 +2,9 @@ import logging
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
+from ....training_pipelines.core import TrainingPipelineArguments
+from ....training_pipelines.guacamol_baselines.core import GuacaMolSavingArguments
+from ....training_pipelines.moses.core import MosesSavingArguments
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
 from .implementation import (
@@ -63,10 +66,10 @@ class GuacaMolGenerator(GeneratorAlgorithm[S, T]):
         configuration: AlgorithmConfiguration[S, T],
         target: Optional[T],
     ) -> Targeted[T]:
-        """Get the function to perform the prediction via Guacamol's generator.
+        """Get the function to perform the prediction via GuacaMol's generator.
 
         Args:
-            configuration: helps to set up specific application of Guacamol.
+            configuration: helps to set up specific application of GuacaMol.
 
         Returns:
             callable with target generating samples.
@@ -337,7 +340,7 @@ class GraphMCTSGenerator(AlgorithmConfiguration[str, str]):
 
 @ApplicationsRegistry.register_algorithm_application(GuacaMolGenerator)
 class SMILESLSTMHCGenerator(AlgorithmConfiguration[str, str]):
-    """Configuration to generate optimizied molecules using recurrent neural networks with hill climbing algorithm"""
+    """Configuration to generate optimized molecules using recurrent neural networks with hill climbing algorithm."""
 
     algorithm_name: ClassVar[str] = GuacaMolGenerator.__name__
     algorithm_type: ClassVar[str] = "conditional_generation"
@@ -424,6 +427,29 @@ class SMILESLSTMHCGenerator(AlgorithmConfiguration[str, str]):
             n_jobs=self.n_jobs,
         )
 
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, GuacaMolSavingArguments):
+            return {
+                "model_final_0.473.pt": training_pipeline_arguments.model_filepath,
+                "model_final_0.473.json": training_pipeline_arguments.model_config_filepath,
+                "guacamol_v1_all.smiles": "",
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
+
 
 @ApplicationsRegistry.register_algorithm_application(GuacaMolGenerator)
 class SMILESLSTMPPOGenerator(AlgorithmConfiguration[str, str]):
@@ -501,6 +527,28 @@ class SMILESLSTMPPOGenerator(AlgorithmConfiguration[str, str]):
             clip_param=self.clip_param,
         )
 
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, GuacaMolSavingArguments):
+            return {
+                "model_final_0.473.pt": training_pipeline_arguments.model_filepath,
+                "model_final_0.473.json": training_pipeline_arguments.model_config_filepath,
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
+
 
 class MosesGenerator(GeneratorAlgorithm[S, T]):
     """Moses generation algorithm."""
@@ -540,10 +588,10 @@ class MosesGenerator(GeneratorAlgorithm[S, T]):
         configuration: AlgorithmConfiguration[S, T],
         target: Optional[T],
     ) -> Targeted[T]:
-        """Get the function to perform the prediction via Guacamol's generator.
+        """Get the function to perform the prediction via GuacaMol's generator.
 
         Args:
-            configuration: helps to set up specific application of Guacamol.
+            configuration: helps to set up specific application of GuacaMol.
 
         Returns:
             callable with target generating samples.
@@ -558,7 +606,7 @@ class MosesGenerator(GeneratorAlgorithm[S, T]):
 
 @ApplicationsRegistry.register_algorithm_application(MosesGenerator)
 class AaeGenerator(AlgorithmConfiguration[str, str]):
-    """Configuration to generate molecules using Variational autoencoder"""
+    """Configuration to generate molecules using an adversarial autoencoder."""
 
     algorithm_name: ClassVar[str] = MosesGenerator.__name__
     algorithm_type: ClassVar[str] = "conditional_generation"
@@ -597,7 +645,7 @@ class AaeGenerator(AlgorithmConfiguration[str, str]):
 
 @ApplicationsRegistry.register_algorithm_application(MosesGenerator)
 class VaeGenerator(AlgorithmConfiguration[str, str]):
-    """Configuration to generate molecules using Adversarial autoencoder"""
+    """Configuration to generate molecules using a variational autoencoder."""
 
     algorithm_name: ClassVar[str] = MosesGenerator.__name__
     algorithm_type: ClassVar[str] = "conditional_generation"
@@ -632,6 +680,29 @@ class VaeGenerator(AlgorithmConfiguration[str, str]):
             n_batch=self.n_batch,
             max_len=self.max_len,
         )
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, MosesSavingArguments):
+            return {
+                "model.pt": training_pipeline_arguments.model_path,
+                "config.pt": training_pipeline_arguments.config_path,
+                "vocab.pt": training_pipeline_arguments.vocab_path,
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
 
 
 @ApplicationsRegistry.register_algorithm_application(MosesGenerator)
@@ -671,3 +742,26 @@ class OrganGenerator(AlgorithmConfiguration[str, str]):
             n_batch=self.n_batch,
             max_len=self.max_len,
         )
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Ger filepath mappings for the given training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, MosesSavingArguments):
+            return {
+                "model.pt": training_pipeline_arguments.model_path,
+                "config.pt": training_pipeline_arguments.config_path,
+                "vocab.pt": training_pipeline_arguments.vocab_path,
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )

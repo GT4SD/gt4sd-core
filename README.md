@@ -193,7 +193,16 @@ Target information:
 
 ### Running training pipelines via the CLI command
 
-GT4SD provides a trainer client based on the `gt4sd-trainer` CLI command. The trainer currently supports training pipelines for language modeling (`language-modeling-trainer`), PaccMann (`paccmann-vae-trainer`) and Granular (`granular-trainer`, multimodal compositional autoencoders).
+GT4SD provides a trainer client based on the `gt4sd-trainer` CLI command.
+
+The trainer currently supports the following training pipelines:
+
+- `language-modeling-trainer`: language modelling via HuggingFace transfomers and PyTorch Lightning.
+- `paccmann-vae-trainer`: PaccMann VAE models.
+- `granular-trainer`: multimodal compositional autoencoders supporting MLP, RNN and Transformer layers.
+- `guacamol-lstm-trainer`: GuacaMol LSTM models.
+- `moses-organ-trainer`: Moses Organ implementation.
+- `moses-vae-trainer`: Moses VAE models.
 
 ```console
 $ gt4sd-trainer --help
@@ -266,8 +275,8 @@ Find more examples in [notebooks](./notebooks)
 
 Beyond implementing various generative modeling inference and training pipelines GT4SD is designed to provide a high-level API that implement an harmonized interface for several existing packages:
 
-- [GuacaMol](https://github.com/BenevolentAI/guacamol): inference pipelines for the baselines models.
-- [MOSES](https://github.com/molecularsets/moses): inference pipelines for the baselines models.
+- [GuacaMol](https://github.com/BenevolentAI/guacamol): inference pipelines for the baselines models and training pipelines for LSTM models.
+- [Moses](https://github.com/molecularsets/moses): inference pipelines for the baselines models and training pipelines for VAEs and Organ.
 - [TorchDrug](https://github.com/DeepGraphLearning/torchdrug): inference pipelines for GCPN and GraphAF models.
 - [TAPE](https://github.com/songlab-cal/tape): encoder modules compatible with the protein language models.
 - [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as traiing pipelines for the generative VAEs.

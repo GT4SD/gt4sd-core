@@ -14,33 +14,34 @@ class AAE:
         n_samples: int,
         n_batch: int,
         max_len: int,
+        device: str = "cpu",
     ):
         """Initialize AAE.
 
         Args:
-            model_path: path from where to load the model
-            model_config_path: path from where to load the model config
-            vocab_path: path from where to load the vocab
-            n_samples: Number of samples to sample
-            n_batch: Size of the batch
-            max_len: Max length of SMILES
+            model_path: path from where to load the model.
+            model_config_path: path from where to load the model config.
+            vocab_path: path from where to load the vocab.
+            n_samples: number of samples to sample.
+            n_batch: size of the batch.
+            max_len: max length of SMILES.
+            device: device used for computation. Defaults to cpu.
         """
-        self.parser = argparse.ArgumentParser()
-        self.parser.add_argument("--model_load", default=model_path)
-        self.parser.add_argument("--config_load", default=model_config_path)
-        self.parser.add_argument("--vocab_load", default=vocab_path)
-        self.parser.add_argument("--n_samples", default=n_samples)
-        self.parser.add_argument("--n_batch", default=n_batch)
-        self.parser.add_argument("--max_len", default=max_len)
-        self.parser.add_argument("--device", default="cpu")
-        self.config = self.parser.parse_known_args()[0]
+        self.config = argparse.Namespace(
+            model_load=model_path,
+            config_load=model_config_path,
+            vocab_load=vocab_path,
+            n_samples=n_samples,
+            n_batch=n_batch,
+            max_len=max_len,
+            device=device,
+        )
 
     def get_generator(self) -> AaeGenerator:
-        """
-        used for creating an instance of the AaeGenerator
+        """Create an instance of the AaeGenerator.
 
         Returns:
-            An instance of AaeGenerator
+            an instance of AaeGenerator.
         """
         optimiser = AaeGenerator(self.config)
         return optimiser

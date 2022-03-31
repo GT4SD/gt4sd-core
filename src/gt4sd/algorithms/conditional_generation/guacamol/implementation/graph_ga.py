@@ -1,4 +1,4 @@
-"""GRAPH GA implementation."""
+"""Graph GA implementation."""
 
 from guacamol_baselines.graph_ga.goal_directed_generation import GB_GA_Generator
 
@@ -19,13 +19,13 @@ class GraphGA:
 
         Args:
             smi_file: path where to load hypothesis, candidate labels and, optionally, the smiles file.
-            population_size: used with n_mutations for the initial generation of smiles within the population
-            n_jobs: number of concurrently running jobs
-            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules
-            generations: number of evolutionary generations
-            patience: used for early stopping if population scores remains the same after generating molecules
-            mutation_rate: frequency of the new mutations in a single gene or organism over time
-            offspring_size: number of molecules to select for new population
+            population_size: used with n_mutations for the initial generation of smiles within the population.
+            n_jobs: number of concurrently running jobs.
+            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules.
+            generations: number of evolutionary generations.
+            patience: used for early stopping if population scores remains the same after generating molecules.
+            mutation_rate: frequency of the new mutations in a single gene or organism over time.
+            offspring_size: number of molecules to select for new population.
         """
         self.smi_file = smi_file
         self.mutation_rate = mutation_rate
@@ -37,11 +37,10 @@ class GraphGA:
         self.patience = patience
 
     def get_generator(self) -> GB_GA_Generator:
-        """
-        used for creating an instance of the GB_GA_Generator
+        """Create an instance of the GB_GA_Generator.
 
         Returns:
-            An instance of GB_GA_Generator
+            an instance of GB_GA_Generator.
         """
         optimiser = GB_GA_Generator(
             smi_file=self.smi_file,

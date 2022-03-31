@@ -21,19 +21,19 @@ class SMILESLSTMHC:
         random_start: bool,
     ):
         """Initialize SMILESLSTMHC.
+
         Args:
-            model_path: path to load the model,
-            smi_file: path to load the hypothesis, candidate labels and, optionally, the smiles file,
-            max_len: maximum length of a SMILES string,
-            n_jobs: number of concurrently running jobs,
-            keep_top: molecules kept each step,
-            n_epochs: number of epochs to sample,
-            mols_to_sample: molecules sampled at each step,
-            optimize_n_epochs: number of epochs for the optimization,
-            benchmark_num_samples: number of molecules to generate from final model for the benchmark,
-            optimize_batch_size: batch size for the optimization,
-            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules
-            ,
+            model_path: path to load the model.
+            smi_file: path to load the hypothesis, candidate labels and, optionally, the smiles file.
+            max_len: maximum length of a SMILES string.
+            n_jobs: number of concurrently running jobs.
+            keep_top: molecules kept each step.
+            n_epochs: number of epochs to sample.
+            mols_to_sample: molecules sampled at each step.
+            optimize_n_epochs: number of epochs for the optimization.
+            benchmark_num_samples: number of molecules to generate from final model for the benchmark.
+            optimize_batch_size: batch size for the optimization.
+            random_start: set to True to randomly choose list of SMILES for generating optimized molecules.
         """
         self.model_path = model_path
         self.n_epochs = n_epochs
@@ -48,11 +48,10 @@ class SMILESLSTMHC:
         self.n_jobs = n_jobs
 
     def get_generator(self) -> SmilesRnnDirectedGenerator:
-        """
-        used for creating an instance of the SmilesRnnDirectedGenerator
+        """Create an instance of the SmilesRnnDirectedGenerator.
 
         Returns:
-            An instance of SmilesRnnDirectedGenerator
+            an instance of SmilesRnnDirectedGenerator.
         """
         optimiser = SmilesRnnDirectedGenerator(
             pretrained_model_path=self.model_path,

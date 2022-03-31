@@ -19,13 +19,13 @@ class SMILESGA:
 
         Args:
             smi_file: path where to load hypothesis, candidate labels and, optionally, the smiles file.
-            population_size: used with n_mutations for the initial generation of smiles within the population
-            n_mutations: used with population size for the initial generation of smiles within the population
-            n_jobs: number of concurrently running jobs
-            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules
-            gene_size: size of the gene which is used in creation of genes
-            generations: number of evolutionary generations
-            patience: used for early stopping if population scores remains the same after generating molecules
+            population_size: used with n_mutations for the initial generation of smiles within the population.
+            n_mutations: used with population size for the initial generation of smiles within the population.
+            n_jobs: number of concurrently running jobs.
+            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules.
+            gene_size: size of the gene which is used in creation of genes.
+            generations: number of evolutionary generations.
+            patience: used for early stopping if population scores remains the same after generating molecules.
         """
         self.smi_file = smi_file
         self.population_size = population_size
@@ -37,11 +37,10 @@ class SMILESGA:
         self.patience = patience
 
     def get_generator(self) -> ChemGEGenerator:
-        """
-        used for creating an instance of ChemGEGenerator
+        """Create an instance of ChemGEGenerator.
 
         Returns:
-            An instance of ChemGEGenerator
+            an instance of ChemGEGenerator.
         """
         optimiser = ChemGEGenerator(
             smi_file=self.smi_file,

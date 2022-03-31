@@ -33,8 +33,17 @@ class PaccMann(GeneratorAlgorithm[S, T]):
         Example:
             An example for predicting affinity for a given ligand and target protein pair::
 
-                config = AffinityPredictor()
-                algorithm = TopicsZeroShot(configuration=config, target="This is a text I want to understand better")
+                config = AffinityPredictor(
+                    protein_targets=[
+                        "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT",
+                        "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT",
+                    ],
+                    ligands=[
+                        "CONN=COc1cc2ccccc2c11Occncc(Cl)c1N(O)O",
+                        "ClCCC(O1)C(C(N=C1C(=O)Nc1cccc(F)c1F)SO)C",
+                    ]
+                )
+                algorithm = PaccMann(configuration=config)
                 items = list(algorithm.sample(1))
                 print(items)
         """
