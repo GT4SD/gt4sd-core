@@ -161,6 +161,9 @@
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span>
 
+<span class="kn">from</span> <span class="nn">....training_pipelines.core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span> <span class="nn">....training_pipelines.guacamol_baselines.core</span> <span class="kn">import</span> <span class="n">GuacaMolSavingArguments</span>
+<span class="kn">from</span> <span class="nn">....training_pipelines.moses.core</span> <span class="kn">import</span> <span class="n">MosesSavingArguments</span>
 <span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">GeneratorAlgorithm</span>
 <span class="kn">from</span> <span class="nn">...registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
 <span class="kn">from</span> <span class="nn">.implementation</span> <span class="kn">import</span> <span class="p">(</span>
@@ -222,10 +225,10 @@
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Targeted</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Get the function to perform the prediction via Guacamol&#39;s generator.</span>
+        <span class="sd">&quot;&quot;&quot;Get the function to perform the prediction via GuacaMol&#39;s generator.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            configuration: helps to set up specific application of Guacamol.</span>
+<span class="sd">            configuration: helps to set up specific application of GuacaMol.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            callable with target generating samples.</span>
@@ -496,7 +499,7 @@
 
 <div class="viewcode-block" id="SMILESLSTMHCGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.core.html#gt4sd.algorithms.conditional_generation.guacamol.core.SMILESLSTMHCGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">GuacaMolGenerator</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">SMILESLSTMHCGenerator</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;Configuration to generate optimizied molecules using recurrent neural networks with hill climbing algorithm&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Configuration to generate optimized molecules using recurrent neural networks with hill climbing algorithm.&quot;&quot;&quot;</span>
 
     <span class="n">algorithm_name</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">GuacaMolGenerator</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;conditional_generation&quot;</span>
@@ -581,7 +584,30 @@
             <span class="n">benchmark_num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark_num_samples</span><span class="p">,</span>
             <span class="n">random_start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_start</span><span class="p">,</span>
             <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SMILESLSTMHCGenerator.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.core.html#gt4sd.algorithms.conditional_generation.guacamol.core.SMILESLSTMHCGenerator.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Ger filepath mappings for the given training pipeline arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a mapping between artifacts&#39; files and training pipeline&#39;s output files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">GuacaMolSavingArguments</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;model_final_0.473.pt&quot;</span><span class="p">:</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_filepath</span><span class="p">,</span>
+                <span class="s2">&quot;model_final_0.473.json&quot;</span><span class="p">:</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_config_filepath</span><span class="p">,</span>
+                <span class="s2">&quot;guacamol_v1_all.smiles&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+                <span class="n">training_pipeline_arguments</span>
+            <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="SMILESLSTMPPOGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.core.html#gt4sd.algorithms.conditional_generation.guacamol.core.SMILESLSTMPPOGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">GuacaMolGenerator</span><span class="p">)</span>
@@ -658,7 +684,29 @@
             <span class="n">entropy_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">entropy_weight</span><span class="p">,</span>
             <span class="n">kl_div_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kl_div_weight</span><span class="p">,</span>
             <span class="n">clip_param</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clip_param</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SMILESLSTMPPOGenerator.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.core.html#gt4sd.algorithms.conditional_generation.guacamol.core.SMILESLSTMPPOGenerator.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Ger filepath mappings for the given training pipeline arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a mapping between artifacts&#39; files and training pipeline&#39;s output files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">GuacaMolSavingArguments</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;model_final_0.473.pt&quot;</span><span class="p">:</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_filepath</span><span class="p">,</span>
+                <span class="s2">&quot;model_final_0.473.json&quot;</span><span class="p">:</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_config_filepath</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+                <span class="n">training_pipeline_arguments</span>
+            <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="MosesGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.core.html#gt4sd.algorithms.conditional_generation.guacamol.core.MosesGenerator">[docs]</a><span class="k">class</span> <span class="nc">MosesGenerator</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
@@ -699,10 +747,10 @@
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Targeted</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Get the function to perform the prediction via Guacamol&#39;s generator.</span>
+        <span class="sd">&quot;&quot;&quot;Get the function to perform the prediction via GuacaMol&#39;s generator.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            configuration: helps to set up specific application of Guacamol.</span>
+<span class="sd">            configuration: helps to set up specific application of GuacaMol.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            callable with target generating samples.</span>
@@ -717,7 +765,7 @@
 
 <div class="viewcode-block" id="AaeGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.core.html#gt4sd.algorithms.conditional_generation.guacamol.core.AaeGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">MosesGenerator</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">AaeGenerator</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;Configuration to generate molecules using Variational autoencoder&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Configuration to generate molecules using an adversarial autoencoder.&quot;&quot;&quot;</span>
 
     <span class="n">algorithm_name</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">MosesGenerator</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;conditional_generation&quot;</span>
@@ -756,7 +804,7 @@
 
 <div class="viewcode-block" id="VaeGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.core.html#gt4sd.algorithms.conditional_generation.guacamol.core.VaeGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">MosesGenerator</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">VaeGenerator</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;Configuration to generate molecules using Adversarial autoencoder&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Configuration to generate molecules using a variational autoencoder.&quot;&quot;&quot;</span>
 
     <span class="n">algorithm_name</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">MosesGenerator</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;conditional_generation&quot;</span>
@@ -790,7 +838,30 @@
             <span class="n">n_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">,</span>
             <span class="n">n_batch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_batch</span><span class="p">,</span>
             <span class="n">max_len</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_len</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="VaeGenerator.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.core.html#gt4sd.algorithms.conditional_generation.guacamol.core.VaeGenerator.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Ger filepath mappings for the given training pipeline arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a mapping between artifacts&#39; files and training pipeline&#39;s output files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">MosesSavingArguments</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;model.pt&quot;</span><span class="p">:</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
+                <span class="s2">&quot;config.pt&quot;</span><span class="p">:</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">config_path</span><span class="p">,</span>
+                <span class="s2">&quot;vocab.pt&quot;</span><span class="p">:</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">vocab_path</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+                <span class="n">training_pipeline_arguments</span>
+            <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="OrganGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.core.html#gt4sd.algorithms.conditional_generation.guacamol.core.OrganGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">MosesGenerator</span><span class="p">)</span>
@@ -829,7 +900,30 @@
             <span class="n">n_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">,</span>
             <span class="n">n_batch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_batch</span><span class="p">,</span>
             <span class="n">max_len</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_len</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="OrganGenerator.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.core.html#gt4sd.algorithms.conditional_generation.guacamol.core.OrganGenerator.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Ger filepath mappings for the given training pipeline arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a mapping between artifacts&#39; files and training pipeline&#39;s output files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">MosesSavingArguments</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;model.pt&quot;</span><span class="p">:</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
+                <span class="s2">&quot;config.pt&quot;</span><span class="p">:</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">config_path</span><span class="p">,</span>
+                <span class="s2">&quot;vocab.pt&quot;</span><span class="p">:</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">vocab_path</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+                <span class="n">training_pipeline_arguments</span>
+            <span class="p">)</span></div></div>
 </pre></div>
 
            </div>

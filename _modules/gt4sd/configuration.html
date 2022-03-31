@@ -274,12 +274,27 @@
 
 
 <div class="viewcode-block" id="get_algorithm_subdirectories_in_cache"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_in_cache">[docs]</a><span class="k">def</span> <span class="nf">get_algorithm_subdirectories_in_cache</span><span class="p">(</span><span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Get algorithm subdirectories from the cache.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix: prefix matching cache subdirectories. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a set of subdirectories.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">get_cached_algorithm_path</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">dirs</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="reset_logging_root_logger"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.reset_logging_root_logger">[docs]</a><span class="k">def</span> <span class="nf">reset_logging_root_logger</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Reset the root logger from logging library.&quot;&quot;&quot;</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">filters</span> <span class="o">=</span> <span class="p">[]</span></div>
 </pre></div>
 
            </div>

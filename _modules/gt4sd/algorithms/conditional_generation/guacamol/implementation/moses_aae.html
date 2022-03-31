@@ -175,33 +175,34 @@
         <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">n_batch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize AAE.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model_path: path from where to load the model</span>
-<span class="sd">            model_config_path: path from where to load the model config</span>
-<span class="sd">            vocab_path: path from where to load the vocab</span>
-<span class="sd">            n_samples: Number of samples to sample</span>
-<span class="sd">            n_batch: Size of the batch</span>
-<span class="sd">            max_len: Max length of SMILES</span>
+<span class="sd">            model_path: path from where to load the model.</span>
+<span class="sd">            model_config_path: path from where to load the model config.</span>
+<span class="sd">            vocab_path: path from where to load the vocab.</span>
+<span class="sd">            n_samples: number of samples to sample.</span>
+<span class="sd">            n_batch: size of the batch.</span>
+<span class="sd">            max_len: max length of SMILES.</span>
+<span class="sd">            device: device used for computation. Defaults to cpu.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--model_load&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">model_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--config_load&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">model_config_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--vocab_load&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">vocab_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--n_samples&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">n_samples</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--n_batch&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">n_batch</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--max_len&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">max_len</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--device&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">(</span>
+            <span class="n">model_load</span><span class="o">=</span><span class="n">model_path</span><span class="p">,</span>
+            <span class="n">config_load</span><span class="o">=</span><span class="n">model_config_path</span><span class="p">,</span>
+            <span class="n">vocab_load</span><span class="o">=</span><span class="n">vocab_path</span><span class="p">,</span>
+            <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span>
+            <span class="n">n_batch</span><span class="o">=</span><span class="n">n_batch</span><span class="p">,</span>
+            <span class="n">max_len</span><span class="o">=</span><span class="n">max_len</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="AAE.get_generator"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.moses_aae.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.moses_aae.AAE.get_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AaeGenerator</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        used for creating an instance of the AaeGenerator</span>
+        <span class="sd">&quot;&quot;&quot;Create an instance of the AaeGenerator.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            An instance of AaeGenerator</span>
+<span class="sd">            an instance of AaeGenerator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">optimiser</span> <span class="o">=</span> <span class="n">AaeGenerator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">optimiser</span></div></div>

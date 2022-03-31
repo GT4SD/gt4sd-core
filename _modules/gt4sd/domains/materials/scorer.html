@@ -159,11 +159,10 @@
            <div itemprop="articleBody">
             
   <h1>Source code for gt4sd.domains.materials.scorer</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Implementation of Scorers&quot;&quot;&quot;</span>
-
-
+<span></span><span class="sd">&quot;&quot;&quot;Implementation of scorers.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
@@ -489,6 +488,37 @@
 <span class="sd">            A score for the given SMILES</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Chem</span><span class="o">.</span><span class="n">QED</span><span class="o">.</span><span class="n">qed</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="get_target_parameters"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.scorer.html#gt4sd.domains.materials.scorer.get_target_parameters">[docs]</a><span class="k">def</span> <span class="nf">get_target_parameters</span><span class="p">(</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Generates a tuple of scorers and weight list</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        target: scoring functions and parameters related to it</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">        A tuple containing scoring functions and weight list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">score_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">target_dictionary</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">target_dictionary</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">target_dictionary</span> <span class="o">=</span> <span class="n">target</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> is not supported: provide &#39;str&#39; or &#39;Dict[str, Any]&#39;&quot;</span>
+        <span class="p">)</span>
+    <span class="k">for</span> <span class="n">scoring_function_name</span><span class="p">,</span> <span class="n">parameters</span> <span class="ow">in</span> <span class="n">target_dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">if</span> <span class="s2">&quot;weight&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span>
+        <span class="n">score_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SCORING_FUNCTIONS</span><span class="p">[</span><span class="n">scoring_function_name</span><span class="p">](</span><span class="o">**</span><span class="n">parameters</span><span class="p">))</span>
+        <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">score_list</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span></div>
 
 
 <span class="n">SCORING_FUNCTIONS</span> <span class="o">=</span> <span class="p">{</span>

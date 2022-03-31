@@ -159,9 +159,36 @@
   <h1>Source code for gt4sd.frameworks.torch</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Generic utils for pytorch.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
+
+
+<div class="viewcode-block" id="get_gpu_device_names"><a class="viewcode-back" href="../../../api/gt4sd.frameworks.torch.html#gt4sd.frameworks.torch.get_gpu_device_names">[docs]</a><span class="k">def</span> <span class="nf">get_gpu_device_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Get GPU device names as a list.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        names of available GPU devices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gpu_device_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+        <span class="n">gpu_device_names</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;cuda:</span><span class="si">{index}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">())</span>
+        <span class="p">]</span>
+    <span class="k">return</span> <span class="n">gpu_device_names</span></div>
+
+
+<div class="viewcode-block" id="claim_device_name"><a class="viewcode-back" href="../../../api/gt4sd.frameworks.torch.html#gt4sd.frameworks.torch.claim_device_name">[docs]</a><span class="k">def</span> <span class="nf">claim_device_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Claim a device name.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        device name, if on GPU is available returns CPU.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device_name</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+    <span class="n">gpu_device_names</span> <span class="o">=</span> <span class="n">get_gpu_device_names</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gpu_device_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">device_name</span> <span class="o">=</span> <span class="n">gpu_device_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">device_name</span></div>
 
 
 <div class="viewcode-block" id="get_device"><a class="viewcode-back" href="../../../api/gt4sd.frameworks.torch.html#gt4sd.frameworks.torch.get_device">[docs]</a><span class="k">def</span> <span class="nf">get_device</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>

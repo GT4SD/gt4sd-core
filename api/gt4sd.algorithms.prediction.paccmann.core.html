@@ -239,8 +239,17 @@ specification defining parameters, types and validations.</p></li>
 </dl>
 <p class="rubric">Example</p>
 <p>An example for predicting affinity for a given ligand and target protein pair:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">AffinityPredictor</span><span class="p">()</span>
-<span class="n">algorithm</span> <span class="o">=</span> <span class="n">TopicsZeroShot</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">&quot;This is a text I want to understand better&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">AffinityPredictor</span><span class="p">(</span>
+    <span class="n">protein_targets</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="n">ligands</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;CONN=COc1cc2ccccc2c11Occncc(Cl)c1N(O)O&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ClCCC(O1)C(C(N=C1C(=O)Nc1cccc(F)c1F)SO)C&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">algorithm</span> <span class="o">=</span> <span class="n">PaccMann</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
 <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
 </pre></div>

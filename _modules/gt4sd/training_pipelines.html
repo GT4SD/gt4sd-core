@@ -166,6 +166,23 @@
 <span class="kn">import</span> <span class="nn">pkg_resources</span>
 
 <span class="kn">from</span> <span class="nn">..cli.load_arguments_from_dataclass</span> <span class="kn">import</span> <span class="n">extract_fields_from_class</span>
+<span class="kn">from</span> <span class="nn">.guacamol_baselines.core</span> <span class="kn">import</span> <span class="n">GuacaMolDataArguments</span><span class="p">,</span> <span class="n">GuacaMolSavingArguments</span>
+<span class="kn">from</span> <span class="nn">.guacamol_baselines.smiles_lstm.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GuacaMolLSTMModelArguments</span><span class="p">,</span>
+    <span class="n">GuacaMolLSTMTrainingArguments</span><span class="p">,</span>
+    <span class="n">GuacaMolLSTMTrainingPipeline</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.moses.core</span> <span class="kn">import</span> <span class="n">MosesDataArguments</span><span class="p">,</span> <span class="n">MosesSavingArguments</span>
+<span class="kn">from</span> <span class="nn">.moses.organ.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MosesOrganModelArguments</span><span class="p">,</span>
+    <span class="n">MosesOrganTrainingArguments</span><span class="p">,</span>
+    <span class="n">MosesOrganTrainingPipeline</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.moses.vae.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MosesVAEModelArguments</span><span class="p">,</span>
+    <span class="n">MosesVAETrainingArguments</span><span class="p">,</span>
+    <span class="n">MosesVAETrainingPipeline</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.paccmann.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">PaccMannDataArguments</span><span class="p">,</span>
     <span class="n">PaccMannSavingArguments</span><span class="p">,</span>
@@ -210,18 +227,39 @@
         <span class="n">GranularDataArguments</span><span class="p">,</span>
         <span class="n">GranularModelArguments</span><span class="p">,</span>
     <span class="p">),</span>
+    <span class="s2">&quot;guacamol-lstm-trainer&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">GuacaMolLSTMModelArguments</span><span class="p">,</span>
+        <span class="n">GuacaMolLSTMTrainingArguments</span><span class="p">,</span>
+        <span class="n">GuacaMolDataArguments</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;moses-vae-trainer&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">MosesVAETrainingArguments</span><span class="p">,</span>
+        <span class="n">MosesVAEModelArguments</span><span class="p">,</span>
+        <span class="n">MosesDataArguments</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;moses-organ-trainer&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">MosesOrganTrainingArguments</span><span class="p">,</span>
+        <span class="n">MosesOrganModelArguments</span><span class="p">,</span>
+        <span class="n">MosesDataArguments</span><span class="p">,</span>
+    <span class="p">),</span>
 <span class="p">}</span>
 
 <span class="n">TRAINING_PIPELINE_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;language-modeling-trainer&quot;</span><span class="p">:</span> <span class="n">LanguageModelingTrainingPipeline</span><span class="p">,</span>
     <span class="s2">&quot;paccmann-vae-trainer&quot;</span><span class="p">:</span> <span class="n">PaccMannVAETrainingPipeline</span><span class="p">,</span>
     <span class="s2">&quot;granular-trainer&quot;</span><span class="p">:</span> <span class="n">GranularTrainingPipeline</span><span class="p">,</span>
+    <span class="s2">&quot;guacamol-lstm-trainer&quot;</span><span class="p">:</span> <span class="n">GuacaMolLSTMTrainingPipeline</span><span class="p">,</span>
+    <span class="s2">&quot;moses-organ-trainer&quot;</span><span class="p">:</span> <span class="n">MosesOrganTrainingPipeline</span><span class="p">,</span>
+    <span class="s2">&quot;moses-vae-trainer&quot;</span><span class="p">:</span> <span class="n">MosesVAETrainingPipeline</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;paccmann-vae-trainer&quot;</span><span class="p">:</span> <span class="n">PaccMannSavingArguments</span><span class="p">,</span>
     <span class="s2">&quot;granular-trainer&quot;</span><span class="p">:</span> <span class="n">GranularSavingArguments</span><span class="p">,</span>
     <span class="s2">&quot;language-modeling-trainer&quot;</span><span class="p">:</span> <span class="n">LanguageModelingSavingArguments</span><span class="p">,</span>
+    <span class="s2">&quot;guacamol-lstm-trainer&quot;</span><span class="p">:</span> <span class="n">GuacaMolSavingArguments</span><span class="p">,</span>
+    <span class="s2">&quot;moses-organ-trainer&quot;</span><span class="p">:</span> <span class="n">MosesSavingArguments</span><span class="p">,</span>
+    <span class="s2">&quot;moses-vae-trainer&quot;</span><span class="p">:</span> <span class="n">MosesSavingArguments</span><span class="p">,</span>
 <span class="p">}</span>
 
 
