@@ -1,8 +1,35 @@
 """Generic utils for pytorch."""
 
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import torch
+
+
+def get_gpu_device_names() -> List[str]:
+    """Get GPU device names as a list.
+
+    Returns:
+        names of available GPU devices.
+    """
+    gpu_device_names = []
+    if torch.cuda.is_available():
+        gpu_device_names = [
+            "cuda:{index}" for index in range(torch.cuda.device_count())
+        ]
+    return gpu_device_names
+
+
+def claim_device_name() -> str:
+    """Claim a device name.
+
+    Returns:
+        device name, if on GPU is available returns CPU.
+    """
+    device_name = "cpu"
+    gpu_device_names = get_gpu_device_names()
+    if len(gpu_device_names) > 0:
+        device_name = gpu_device_names[0]
+    return device_name
 
 
 def get_device() -> torch.device:

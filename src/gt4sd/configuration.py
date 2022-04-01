@@ -115,9 +115,24 @@ def get_algorithm_subdirectories_with_s3(prefix: Optional[str] = None) -> Set[st
 
 
 def get_algorithm_subdirectories_in_cache(prefix: Optional[str] = None) -> Set[str]:
+    """Get algorithm subdirectories from the cache.
+
+    Args:
+        prefix: prefix matching cache subdirectories. Defaults to None.
+
+    Returns:
+        a set of subdirectories.
+    """
     path = get_cached_algorithm_path(prefix=prefix)
     try:
         _, dirs, _ = next(iter(os.walk(path)))
         return set(dirs)
     except StopIteration:
         return set()
+
+
+def reset_logging_root_logger():
+    """Reset the root logger from logging library."""
+    root = logging.getLogger()
+    root.handlers = []
+    root.filters = []

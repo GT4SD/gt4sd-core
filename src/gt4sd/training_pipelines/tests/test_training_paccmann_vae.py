@@ -1,5 +1,7 @@
-"""Language modeling trainer unit tests."""
+"""PaccMann VAE trainer unit tests."""
 
+import shutil
+import tempfile
 from typing import Any, Dict, cast
 
 import pkg_resources
@@ -55,9 +57,13 @@ def test_train():
 
     assert pipeline is not None
 
+    TEMPORARY_DIRECTORY = tempfile.mkdtemp()
+
     test_pipeline = cast(PaccMannVAETrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
+
+    config["training_args"]["model_path"] = TEMPORARY_DIRECTORY
 
     file_path = pkg_resources.resource_filename(
         "gt4sd",
@@ -67,3 +73,5 @@ def test_train():
     config["dataset_args"]["train_smiles_filepath"] = file_path
     config["dataset_args"]["test_smiles_filepath"] = file_path
     test_pipeline.train(**config)
+
+    shutil.rmtree(TEMPORARY_DIRECTORY)

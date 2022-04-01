@@ -3,6 +3,9 @@
 from typing import Dict, List
 
 from ..algorithms.registry import ApplicationsRegistry, ConfigurationTuple
+from ..configuration import reset_logging_root_logger
+
+reset_logging_root_logger()
 
 AVAILABLE_ALGORITHMS = sorted(
     ApplicationsRegistry.list_available(),

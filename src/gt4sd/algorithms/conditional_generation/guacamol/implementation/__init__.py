@@ -1,9 +1,8 @@
 """GuacaMol algorithms implementation module."""
 
-import json
 import logging
 import os
-from typing import Any, Dict, List, Tuple, Type, Union
+from typing import Any, List
 
 from guacamol_baselines.graph_ga.goal_directed_generation import GB_GA_Generator
 from guacamol_baselines.graph_mcts.goal_directed_generation import GB_MCTS_Generator
@@ -20,7 +19,8 @@ from guacamol_baselines.smiles_lstm_ppo.goal_directed_generation import (
     PPODirectedGenerator,
 )
 
-from .....domains.materials.scorer import SCORING_FUNCTIONS, CombinedScorer
+from .....domains.materials.scorer import CombinedScorer, get_target_parameters
+from .....frameworks.torch import claim_device_name
 from .graph_ga import GraphGA
 from .graph_mcts import GraphMCTS
 from .moses_aae import AAE
@@ -32,37 +32,6 @@ from .smiles_lstm_ppo import SMILESLSTMPPO
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
-
-
-def get_target_parameters(
-    target: Union[str, Dict[str, Any]]
-) -> Tuple[List[Type[Any]], List[float]]:
-    """Generates a tuple of scorers and weight list
-
-    Args:
-        target: scoring functions and parameters related to it
-
-    Return:
-        A tuple containing scoring functions and weight list
-    """
-    score_list = []
-    weights = []
-    target_dictionary: Dict[str, Any] = {}
-    if isinstance(target, str):
-        target_dictionary = json.loads(target)
-    elif isinstance(target, dict):
-        target_dictionary = target
-    else:
-        raise ValueError(
-            f"{target} of type {type(target)} is not supported: provide 'str' or 'Dict[str, Any]'"
-        )
-    for scoring_function_name, parameters in target_dictionary.items():
-        weight = 1.0
-        if "weight" in parameters:
-            weight = parameters.pop("weight")
-        score_list.append(SCORING_FUNCTIONS[scoring_function_name](**parameters))
-        weights.append(weight)
-    return (score_list, weights)
 
 
 class Generator:
@@ -95,18 +64,18 @@ class SMILESGAIterator(Generator):
         generations: int,
         patience: int,
     ):
-        """Initialize Generator.
+        """Initialize SMILESGAIterator.
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            batch_size: number of molecules to generate
-            population_size: used with n_mutations for the initial generation of smiles within the population
-            n_mutations: used with population size for the initial generation of smiles within the population
-            n_jobs: number of concurrently running jobs
-            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules
-            gene_size: size of the gene which is used in creation of genes
-            generations: number of evolutionary generations
-            patience: used for early stopping if population scores remains the same after generating molecules
+            batch_size: number of molecules to generate.
+            population_size: used with n_mutations for the initial generation of smiles within the population.
+            n_mutations: used with population size for the initial generation of smiles within the population.
+            n_jobs: number of concurrently running jobs.
+            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules.
+            gene_size: size of the gene which is used in creation of genes.
+            generations: number of evolutionary generations.
+            patience: used for early stopping if population scores remains the same after generating molecules.
         """
         self.resource_path = resource_path
         self.batch_size = batch_size
@@ -168,18 +137,18 @@ class GraphGAIterator(Generator):
         generations: int,
         patience: int,
     ):
-        """Initialize Generator.
+        """Initialize GraphGAIterator.
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            batch_size: number of molecules to generate
-            population_size: used for the initial generation of smiles within the population
-            n_jobs: number of concurrently running jobs
-            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules
-            offspring_size: number of molecules to select for new population
-            mutation_rate: frequency of the new mutations in a single gene or organism over time
-            generations: number of evolutionary generations
-            patience: used for early stopping if population scores remains the same after generating molecules
+            batch_size: number of molecules to generate.
+            population_size: used for the initial generation of smiles within the population.
+            n_jobs: number of concurrently running jobs.
+            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules.
+            offspring_size: number of molecules to select for new population.
+            mutation_rate: frequency of the new mutations in a single gene or organism over time.
+            generations: number of evolutionary generations.
+            patience: used for early stopping if population scores remains the same after generating molecules.
         """
         self.resource_path = resource_path
         self.batch_size = batch_size
@@ -241,18 +210,18 @@ class GraphMCTSIterator(Generator):
         generations: int,
         patience: int,
     ):
-        """Initialize Generator.
+        """Initialize GraphMCTSIterator.
 
         Args:
             init_smiles: path where to load hypothesis, candidate labels and, optionally, the smiles file.
-            batch_size: number of molecules to generate
-            population_size: used for the initial generation of smiles within the population
-            max_children: maximum number of childerns a node could have
-            n_jobs: number of concurrently running jobs
-            num_sims: number of times to traverse the tree
-            max_atoms: maximum number of atoms to explore to terminal the node state
-            generations: number of evolutionary generations
-            patience: used for early stopping if population scores remains the same after generating molecules
+            batch_size: number of molecules to generate.
+            population_size: used for the initial generation of smiles within the population.
+            max_children: maximum number of childerns a node could have.
+            n_jobs: number of concurrently running jobs.
+            num_sims: number of times to traverse the tree.
+            max_atoms: maximum number of atoms to explore to terminal the node state.
+            generations: number of evolutionary generations.
+            patience: used for early stopping if population scores remains the same after generating molecules.
         """
         self.init_smiles = init_smiles
         self.batch_size = batch_size
@@ -316,20 +285,20 @@ class SMILESLSTMHCIterator(Generator):
         max_len: int,
         optimize_batch_size: int,
     ):
-        """Initialize Generator.
+        """Initialize SMILESLSTMHCIterator.
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            batch_size: number of molecules to generate
-            n_epochs: number of epochs to sample
-            mols_to_sample: molecules sampled at each step
-            keep_top: molecules kept each step
-            optimize_n_epochs: number of epochs for the optimization
-            benchmark_num_samples: number of molecules to generate from final model for the benchmark
-            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules
-            n_jobs: number of concurrently running jobs
-            max_len: maximum length of a SMILES string
-            optimize_batch_size: batch size for the optimization
+            batch_size: number of molecules to generate.
+            n_epochs: number of epochs to sample.
+            mols_to_sample: molecules sampled at each step.
+            keep_top: molecules kept each step.
+            optimize_n_epochs: number of epochs for the optimization.
+            benchmark_num_samples: number of molecules to generate from final model for the benchmark.
+            random_start: set to True to randomly choose list of SMILES for generating optimizied molecules.
+            n_jobs: number of concurrently running jobs.
+            max_len: maximum length of a SMILES string.
+            optimize_batch_size: batch size for the optimization.
         """
         self.resource_path = resource_path
         self.batch_size = batch_size
@@ -395,17 +364,17 @@ class SMILESLSTMPPOIterator(Generator):
         kl_div_weight: int,
         clip_param: float,
     ):
-        """Initialize Generator.
+        """Initialize SMILESLSTMPPOIterator.
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            batch_size: number of molecules to generate
-            episode_size: number of molecules sampled by the policy at the start of a series of ppo updates
-            num_epochs: number of epochs to sample
-            optimize_batch_size: batch size for the optimization
-            entropy_weight: used for calculating entropy loss
-            kl_div_weight: used for calculating Kullback-Leibler divergence loss
-            clip_param: used for determining how far the new policy is from the old one
+            batch_size: number of molecules to generate.
+            episode_size: number of molecules sampled by the policy at the start of a series of ppo updates.
+            num_epochs: number of epochs to sample.
+            optimize_batch_size: batch size for the optimization.
+            entropy_weight: used for calculating entropy loss.
+            kl_div_weight: used for calculating Kullback-Leibler divergence loss.
+            clip_param: used for determining how far the new policy is from the old one.
         """
         self.resource_path = resource_path
         self.batch_size = batch_size
@@ -442,7 +411,7 @@ class SMILESLSTMPPOIterator(Generator):
                 kl_div_weight=self.kl_div_weight,
                 clip_param=self.clip_param,
             )
-            logger.info("Initialization of the Generator")
+            logger.info("initialization of the generator")
             self.smiles_lstm_ppo_generator = optimiser.get_generator()
 
         logger.info("generating molecules")
@@ -464,9 +433,9 @@ class AaeIterator:
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            n_samples: Number of samples to sample
-            n_batch: Size of the batch
-            max_len: Max length of SMILES
+            n_samples: number of samples to sample.
+            n_batch: size of the batch.
+            max_len: max length of SMILES.
         """
         self.resource_path = resource_path
         self.model_path = os.path.join(self.resource_path, "model.pt")
@@ -476,6 +445,7 @@ class AaeIterator:
         self.n_batch = n_batch
         self.max_len = max_len
         self.aae_generator: AaeGenerator = None
+        self.device_name = claim_device_name()
 
     def generate_batch(self, target=None) -> List[Any]:
         """Generate a batch of molecules.
@@ -494,6 +464,7 @@ class AaeIterator:
                 n_samples=self.n_samples,
                 n_batch=self.n_batch,
                 max_len=self.max_len,
+                device=self.device_name,
             )
             logger.info("Initialization of the Generator")
             self.aae_generator = optimiser.get_generator()
@@ -513,9 +484,9 @@ class VaeIterator:
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            n_samples: Number of samples to sample
-            n_batch: Size of the batch
-            max_len: Max length of SMILES
+            n_samples: number of samples to sample.
+            n_batch: size of the batch.
+            max_len: max length of SMILES.
         """
         self.resource_path = resource_path
         self.model_path = os.path.join(self.resource_path, "model.pt")
@@ -525,6 +496,7 @@ class VaeIterator:
         self.n_batch = n_batch
         self.max_len = max_len
         self.vae_generator: VaeGenerator = None
+        self.device_name = claim_device_name()
 
     def generate_batch(self, target=None) -> List[Any]:
         """Generate a batch of molecules.
@@ -543,6 +515,7 @@ class VaeIterator:
                 n_samples=self.n_samples,
                 n_batch=self.n_batch,
                 max_len=self.max_len,
+                device=self.device_name,
             )
             logger.info("Initialization of the Generator")
             self.vae_generator = optimiser.get_generator()
@@ -562,9 +535,9 @@ class OrganIterator:
 
         Args:
             resource_path: path to load the hypothesis, candidate labels and, optionally, the smiles file.
-            n_samples: Number of samples to sample
-            n_batch: Size of the batch
-            max_len: Max length of SMILES
+            n_samples: number of samples to sample.
+            n_batch: size of the batch.
+            max_len: max length of SMILES.
         """
         self.resource_path = resource_path
         self.model_path = os.path.join(self.resource_path, "model.pt")
@@ -574,6 +547,7 @@ class OrganIterator:
         self.n_batch = n_batch
         self.max_len = max_len
         self.organ_generator: OrganGenerator = None
+        self.device_name = claim_device_name()
 
     def generate_batch(self, target=None) -> List[Any]:
         """Generate a batch of molecules.
@@ -592,6 +566,7 @@ class OrganIterator:
                 n_samples=self.n_samples,
                 n_batch=self.n_batch,
                 max_len=self.max_len,
+                device=self.device_name,
             )
             logger.info("Initialization of the Generator")
             self.organ_generator = optimiser.get_generator()
