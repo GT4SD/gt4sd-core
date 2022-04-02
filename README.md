@@ -203,6 +203,8 @@ The trainer currently supports the following training pipelines:
 - `guacamol-lstm-trainer`: GuacaMol LSTM models.
 - `moses-organ-trainer`: Moses Organ implementation.
 - `moses-vae-trainer`: Moses VAE models.
+- `torchdrug-gcpn-trainer`: TorchDrug Graph Convolutional Policy Network model.
+- `torchdrug-graphaf-trainer`: TorchDrug autoregressive GraphAF model.
 
 ```console
 $ gt4sd-trainer --help
@@ -232,7 +234,7 @@ gt4sd-trainer  --training_pipeline_name ${TRAINING_PIPELINE_NAME} --configuratio
 Or you can provide directly the needed parameters as arguments:
 
 ```sh
-gt4sd-trainer  --training_pipeline_name language-modeling-trainer --type mlm --model_name_or_path mlm --training_file /pah/to/train_file.jsonl --validation_file /path/to/valid_file.jsonl 
+gt4sd-trainer  --training_pipeline_name language-modeling-trainer --type mlm --model_name_or_path mlm --training_file /path/to/train_file.jsonl --validation_file /path/to/valid_file.jsonl
 ```
 
 To get more info on a specific training pipeleins argument simply type:
@@ -277,9 +279,9 @@ Beyond implementing various generative modeling inference and training pipelines
 
 - [GuacaMol](https://github.com/BenevolentAI/guacamol): inference pipelines for the baselines models and training pipelines for LSTM models.
 - [Moses](https://github.com/molecularsets/moses): inference pipelines for the baselines models and training pipelines for VAEs and Organ.
-- [TorchDrug](https://github.com/DeepGraphLearning/torchdrug): inference pipelines for GCPN and GraphAF models.
+- [TorchDrug](https://github.com/DeepGraphLearning/torchdrug): inference and training pipelines for GCPN and GraphAF models. Training pipelines support custom datasets as well as datasets native in TorchDrug.
 - [TAPE](https://github.com/songlab-cal/tape): encoder modules compatible with the protein language models.
-- [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as traiing pipelines for the generative VAEs.
+- [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as training pipelines for the generative VAEs.
 - [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from [HuggingFace Models](https://huggingface.co/models)
 
 ## References
