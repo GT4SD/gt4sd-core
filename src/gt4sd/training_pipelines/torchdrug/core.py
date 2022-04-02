@@ -8,7 +8,7 @@ from torch.optim.lr_scheduler import _LRScheduler
 from ..core import TrainingPipeline, TrainingPipelineArguments
 from . import DATASET_FACTORY
 
-DATA_ROOT = "~/.gt4sd/data/torchdrug/"
+DATA_ROOT = os.path.join(os.path.expanduser("~"), ".gt4sd", "data", "torchdrug")
 os.makedirs(DATA_ROOT, exist_ok=True)
 
 
