@@ -43,6 +43,15 @@ from .pytorch_lightning.language_modeling.core import (
     LanguageModelingSavingArguments,
     LanguageModelingTrainingPipeline,
 )
+from .torchdrug.core import (
+    TorchDrugDataArguments,
+    TorchDrugSavingArguments,
+    TorchDrugTrainingArguments,
+)
+from .torchdrug.gcpn.core import (
+    TorchDrugGCPNModelArguments,
+    TorchDrugGCPNTrainingPipeline,
+)
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -62,6 +71,11 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         PaccMannTrainingArguments,
         PaccMannDataArguments,
         PaccMannVAEModelArguments,
+    ),
+    "torchdrug-gcpn-trainer": (
+        TorchDrugTrainingArguments,
+        TorchDrugDataArguments,
+        TorchDrugGCPNModelArguments,
     ),
     "granular-trainer": (
         PytorchLightningTrainingArguments,
@@ -88,6 +102,7 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
 TRAINING_PIPELINE_MAPPING = {
     "language-modeling-trainer": LanguageModelingTrainingPipeline,
     "paccmann-vae-trainer": PaccMannVAETrainingPipeline,
+    "torchdrug-gcpn-trainer": TorchDrugGCPNTrainingPipeline,
     "granular-trainer": GranularTrainingPipeline,
     "guacamol-lstm-trainer": GuacaMolLSTMTrainingPipeline,
     "moses-organ-trainer": MosesOrganTrainingPipeline,
@@ -96,6 +111,7 @@ TRAINING_PIPELINE_MAPPING = {
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "paccmann-vae-trainer": PaccMannSavingArguments,
+    "torchdrug-gcpn-trainer": TorchDrugSavingArguments,
     "granular-trainer": GranularSavingArguments,
     "language-modeling-trainer": LanguageModelingSavingArguments,
     "guacamol-lstm-trainer": GuacaMolSavingArguments,
