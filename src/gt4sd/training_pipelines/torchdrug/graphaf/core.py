@@ -129,7 +129,7 @@ class TorchDrugGraphAFTrainingPipeline(TorchDrugTrainingPipeline):
             )
             edge_flow = GraphAF(
                 model,
-                node_prior,
+                edge_prior,
                 num_layer=params.get("num_edge_flow_layers", 12),
                 use_edge=not params.get("no_edge", False),
             )
