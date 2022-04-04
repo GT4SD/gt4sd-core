@@ -25,6 +25,16 @@ from torchdrug.datasets import (
 
 from .dataset import TorchDrugDataset
 
+# isort: off
+from torch import nn
+
+"""
+Necessary because torchdrug silently overwrites the default nn.Module. This is quite
+invasive and causes significant side-effects in the rest of the code.
+See: https://github.com/DeepGraphLearning/torchdrug/issues/77
+"""
+nn.Module = nn._Module  # type: ignore
+
 DATASET_FACTORY = {
     "bace": BACE,
     "bbbp": BBBP,

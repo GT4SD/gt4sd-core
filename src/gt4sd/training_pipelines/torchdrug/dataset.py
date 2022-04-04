@@ -2,6 +2,16 @@ from typing import Callable, List, Optional, Union
 
 from torchdrug import data
 
+# isort: off
+from torch import nn
+
+"""
+Necessary because torchdrug silently overwrites the default nn.Module. This is quite
+invasive and causes significant side-effects in the rest of the code.
+See: https://github.com/DeepGraphLearning/torchdrug/issues/77
+"""
+nn.Module = nn._Module  # type: ignore
+
 
 class TorchDrugDataset(data.MoleculeDataset):
     """A generic TorchDrug dataset class that can be fed with custom data"""

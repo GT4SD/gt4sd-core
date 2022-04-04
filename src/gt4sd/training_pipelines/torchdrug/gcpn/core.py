@@ -12,12 +12,23 @@ from torchdrug.core import Engine
 from torchdrug.models import RGCN
 from torchdrug.tasks import GCPNGeneration
 
+# isort: off
+from torch import nn
+
+# isort: on
 from ...core import TrainingPipelineArguments
 from .. import DATASET_FACTORY
 from ..core import TorchDrugTrainingPipeline
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
+
+"""
+Necessary because torchdrug silently overwrites the default nn.Module. This is quite
+invasive and causes significant side-effects in the rest of the code.
+See: https://github.com/DeepGraphLearning/torchdrug/issues/77
+"""
+nn.Module = nn._Module  # type: ignore
 
 
 class TorchDrugGCPNTrainingPipeline(TorchDrugTrainingPipeline):
