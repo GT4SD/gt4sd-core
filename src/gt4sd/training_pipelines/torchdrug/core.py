@@ -56,9 +56,6 @@ class TorchDrugTrainingArguments(TrainingPipelineArguments):
     num_worker: int = field(
         default=0, metadata={"help": "Number of CPU workers per GPU."}
     )
-    gpus: Optional[Tuple[int]] = field(
-        default=None, metadata={"help": "GPUs to be used. If None, use CPU."}
-    )
     task: Optional[str] = field(
         default=None,
         metadata={
@@ -122,9 +119,6 @@ class TorchDrugDataArguments(TrainingPipelineArguments):
             "help": "If yes, molecules are processed in the dataloader. This is faster "
             "for setup but slower at training time."
         },
-    )
-    transform: Optional[Callable] = field(
-        default=None, metadata={"help": "Optional data transformation function"}
     )
     node_feature: str = field(
         default="default",
