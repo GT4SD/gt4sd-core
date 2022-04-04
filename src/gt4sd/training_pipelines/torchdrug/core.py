@@ -3,8 +3,6 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Optional, Tuple
 
-from torch.optim.lr_scheduler import _LRScheduler
-
 from ..core import TrainingPipeline, TrainingPipelineArguments
 from . import DATASET_FACTORY
 
@@ -57,9 +55,6 @@ class TorchDrugTrainingArguments(TrainingPipelineArguments):
     )
     num_worker: int = field(
         default=0, metadata={"help": "Number of CPU workers per GPU."}
-    )
-    scheduler: Optional[_LRScheduler] = field(
-        default=None, metadata={"help": "Learning rate scheduler"}
     )
     gpus: Optional[Tuple[int]] = field(
         default=None, metadata={"help": "GPUs to be used. If None, use CPU."}
