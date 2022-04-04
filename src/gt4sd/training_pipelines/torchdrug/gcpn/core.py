@@ -16,6 +16,7 @@ from torchdrug.tasks import GCPNGeneration
 from torch import nn
 
 # isort: on
+from ....cli.argument_parser import eval_lambda
 from ...core import TrainingPipelineArguments
 from .. import DATASET_FACTORY
 from ..core import TorchDrugTrainingPipeline
@@ -68,7 +69,7 @@ class TorchDrugGCPNTrainingPipeline(TorchDrugTrainingPipeline):
             joint_dataset_args = {
                 "verbose": params.get("verbose", 1),
                 "lazy": params.get("lazy", False),
-                "transform": eval(params.get("transform", "lambda x: x")),
+                "transform": eval_lambda(params.get("transform", "lambda x: x")),
                 "node_feature": params.get("node_feature", "default"),
                 "edge_feature": params.get("edge_feature", "default"),
                 "graph_feature": params.get("graph_feature", None),
