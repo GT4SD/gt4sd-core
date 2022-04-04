@@ -177,6 +177,9 @@ class TorchDrugGraphAFTrainingPipeline(TorchDrugTrainingPipeline):
                 gradient_interval=params.get("gradient_interval", 1),
                 num_worker=params.get("num_worker", 0),
             )
+            # Necessary since we have re-assigned nn.Module to the native torch.nn.Module
+            # rather than the torchdrug-overwritten version.
+            solver.model.device = solver.device
 
             weight_paths = sorted(list(model_dir.glob("*.pkl")), key=os.path.getmtime)
             if len(weight_paths) > 0:
