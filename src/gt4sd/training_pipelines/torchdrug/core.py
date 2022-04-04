@@ -1,7 +1,7 @@
 """TorchDrug training utilities."""
 import os
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 from ..core import TrainingPipeline, TrainingPipelineArguments
 from . import DATASET_FACTORY
@@ -154,3 +154,27 @@ class TorchDrugSavingArguments(TrainingPipelineArguments):
         metadata={"help": "Path where the model artifacts are stored."}
     )
     training_name: str = field(metadata={"help": "Name used to identify the training."})
+    dataset_name: str = field(
+        metadata={
+            "help": f"Identifier for the dataset. Has to be in {DATASET_FACTORY.keys()}"
+            ". Can either point to one of the predefined TorchDrug datasets or it can "
+            "be `custom` if the user brings their own dataset. If `custom`, then the "
+            "arguments `file_path`, `target_field` and `smiles_field` below have to be"
+            " specified."
+        }
+    )
+    task: Optional[str] = field(
+        default=None,
+        metadata={
+            "help": "Optimization task for goal-driven generation."
+            "Currently, TorchDrug only supports `plogp` and `qed`."
+        },
+    )
+    file_path: str = field(
+        default="",
+        metadata={
+            "help": "Ignored unless `datase_name` is `custom`. In that case it's "
+            "a path to a .csv file containing the training data."
+        },
+    )
+    epochs: int = field(default=10, metadata={"help": "Number of epochs."})
