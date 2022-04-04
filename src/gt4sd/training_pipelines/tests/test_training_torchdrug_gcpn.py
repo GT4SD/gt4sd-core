@@ -67,6 +67,8 @@ def test_train():
     config["dataset_args"]["file_path"] = file_path
     config["dataset_args"]["smiles_field"] = "smiles"
     config["dataset_args"]["target_field"] = "qed"
+    # This should filter out the QED again from the batches
+    config["dataset_args"]["transform"] = "lambda x: {'graph': x['graph']}"
 
     test_pipeline.train(**config)
     shutil.rmtree(TEMPORARY_DIRECTORY)

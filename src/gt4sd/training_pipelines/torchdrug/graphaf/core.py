@@ -69,6 +69,7 @@ class TorchDrugGraphAFTrainingPipeline(TorchDrugTrainingPipeline):
             joint_dataset_args = {
                 "verbose": params.get("verbose", 1),
                 "lazy": params.get("lazy", False),
+                "transform": eval(params.get("transform", "lambda x: x")),
                 "node_feature": params.get("node_feature", "default"),
                 "edge_feature": params.get("edge_feature", "default"),
                 "graph_feature": params.get("graph_feature", None),

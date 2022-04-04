@@ -109,7 +109,14 @@ class TorchDrugDataArguments(TrainingPipelineArguments):
             "name of the column containing the SMILES strings."
         },
     )
-
+    transform: str = field(
+        default="lambda x: x",
+        metadata={
+            "help": "Optional data transformation function. Has to be a lambda function"
+            " (written as a string) that operates on the batch dictionary."
+            "See torchdrug docs for details."
+        },
+    )
     verbose: int = field(
         default=1, metadata={"help": "Output verbosity level for dataset."}
     )
