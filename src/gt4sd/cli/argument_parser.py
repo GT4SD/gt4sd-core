@@ -24,7 +24,7 @@ def eval_lambda(val: str) -> Callable:
     Raises:
         ValueError: in case the lambda can not be parsed.
     """
-    parsed_lamba = ast.parse(val).body[0].value
+    parsed_lamba = ast.parse(val).body[0].value  # type:ignore
     if isinstance(parsed_lamba, ast.Lambda) and "eval" not in val:
         return eval(val)
     else:
