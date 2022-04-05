@@ -202,6 +202,19 @@
     <span class="n">LanguageModelingSavingArguments</span><span class="p">,</span>
     <span class="n">LanguageModelingTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.torchdrug.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TorchDrugDataArguments</span><span class="p">,</span>
+    <span class="n">TorchDrugSavingArguments</span><span class="p">,</span>
+    <span class="n">TorchDrugTrainingArguments</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.torchdrug.gcpn.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TorchDrugGCPNModelArguments</span><span class="p">,</span>
+    <span class="n">TorchDrugGCPNTrainingPipeline</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.torchdrug.graphaf.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TorchDrugGraphAFModelArguments</span><span class="p">,</span>
+    <span class="n">TorchDrugGraphAFTrainingPipeline</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -221,6 +234,16 @@
         <span class="n">PaccMannTrainingArguments</span><span class="p">,</span>
         <span class="n">PaccMannDataArguments</span><span class="p">,</span>
         <span class="n">PaccMannVAEModelArguments</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;torchdrug-gcpn-trainer&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">TorchDrugTrainingArguments</span><span class="p">,</span>
+        <span class="n">TorchDrugDataArguments</span><span class="p">,</span>
+        <span class="n">TorchDrugGCPNModelArguments</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;torchdrug-graphaf-trainer&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">TorchDrugTrainingArguments</span><span class="p">,</span>
+        <span class="n">TorchDrugDataArguments</span><span class="p">,</span>
+        <span class="n">TorchDrugGraphAFModelArguments</span><span class="p">,</span>
     <span class="p">),</span>
     <span class="s2">&quot;granular-trainer&quot;</span><span class="p">:</span> <span class="p">(</span>
         <span class="n">PytorchLightningTrainingArguments</span><span class="p">,</span>
@@ -247,6 +270,8 @@
 <span class="n">TRAINING_PIPELINE_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;language-modeling-trainer&quot;</span><span class="p">:</span> <span class="n">LanguageModelingTrainingPipeline</span><span class="p">,</span>
     <span class="s2">&quot;paccmann-vae-trainer&quot;</span><span class="p">:</span> <span class="n">PaccMannVAETrainingPipeline</span><span class="p">,</span>
+    <span class="s2">&quot;torchdrug-gcpn-trainer&quot;</span><span class="p">:</span> <span class="n">TorchDrugGCPNTrainingPipeline</span><span class="p">,</span>
+    <span class="s2">&quot;torchdrug-graphaf-trainer&quot;</span><span class="p">:</span> <span class="n">TorchDrugGraphAFTrainingPipeline</span><span class="p">,</span>
     <span class="s2">&quot;granular-trainer&quot;</span><span class="p">:</span> <span class="n">GranularTrainingPipeline</span><span class="p">,</span>
     <span class="s2">&quot;guacamol-lstm-trainer&quot;</span><span class="p">:</span> <span class="n">GuacaMolLSTMTrainingPipeline</span><span class="p">,</span>
     <span class="s2">&quot;moses-organ-trainer&quot;</span><span class="p">:</span> <span class="n">MosesOrganTrainingPipeline</span><span class="p">,</span>
@@ -255,6 +280,8 @@
 
 <span class="n">TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;paccmann-vae-trainer&quot;</span><span class="p">:</span> <span class="n">PaccMannSavingArguments</span><span class="p">,</span>
+    <span class="s2">&quot;torchdrug-gcpn-trainer&quot;</span><span class="p">:</span> <span class="n">TorchDrugSavingArguments</span><span class="p">,</span>
+    <span class="s2">&quot;torchdrug-graphaf-trainer&quot;</span><span class="p">:</span> <span class="n">TorchDrugSavingArguments</span><span class="p">,</span>
     <span class="s2">&quot;granular-trainer&quot;</span><span class="p">:</span> <span class="n">GranularSavingArguments</span><span class="p">,</span>
     <span class="s2">&quot;language-modeling-trainer&quot;</span><span class="p">:</span> <span class="n">LanguageModelingSavingArguments</span><span class="p">,</span>
     <span class="s2">&quot;guacamol-lstm-trainer&quot;</span><span class="p">:</span> <span class="n">GuacaMolSavingArguments</span><span class="p">,</span>

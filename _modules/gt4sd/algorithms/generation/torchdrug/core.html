@@ -160,8 +160,11 @@
 <span></span><span class="sd">&quot;&quot;&quot;Torchdrug generation algorithm.&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span>
 
+<span class="kn">from</span> <span class="nn">....training_pipelines.core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span> <span class="nn">....training_pipelines.torchdrug.core</span> <span class="kn">import</span> <span class="n">TorchDrugSavingArguments</span>
 <span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">GeneratorAlgorithm</span><span class="p">,</span> <span class="n">Untargeted</span>
 <span class="kn">from</span> <span class="nn">...registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
 <span class="kn">from</span> <span class="nn">.implementation</span> <span class="kn">import</span> <span class="n">GAFGenerator</span><span class="p">,</span> <span class="n">GCPNGenerator</span><span class="p">,</span> <span class="n">Generator</span>
@@ -247,7 +250,45 @@
 <span class="sd">            instance with :meth:`sample&lt;gt4sd.algorithms.generation.torchdrug.implementation.GCPNGenerator.sample&gt;` method for generation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">generator</span> <span class="o">=</span> <span class="n">GCPNGenerator</span><span class="p">(</span><span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span></div>
+
+<div class="viewcode-block" id="TorchDrugGCPN.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGCPN.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get filepath mappings for the given training pipeline arguments.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            a mapping between artifacts&#39; files and training pipeline&#39;s output files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">TorchDrugSavingArguments</span><span class="p">):</span>
+
+            <span class="n">task_name</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;task=</span><span class="si">{</span><span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2">_&quot;</span>
+                <span class="k">if</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">task</span>
+                <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">)</span>
+            <span class="n">data_name</span> <span class="o">=</span> <span class="s2">&quot;data=&quot;</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">dataset_name</span>
+                <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+                <span class="o">+</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">dataset_name</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span>
+                <span class="k">else</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">dataset_name</span>
+            <span class="p">)</span>
+
+            <span class="n">epochs</span> <span class="o">=</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">epochs</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;weights.pkl&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">training_name</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;gcpn_data=</span><span class="si">{</span><span class="n">data_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">task_name</span><span class="si">}</span><span class="s2">epoch=</span><span class="si">{</span><span class="n">epochs</span><span class="si">}</span><span class="s2">.pkl&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+                <span class="n">training_pipeline_arguments</span>
+            <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TorchDrugGraphAF"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGraphAF">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">TorchDrugGenerator</span><span class="p">)</span>
@@ -269,7 +310,45 @@
 <span class="sd">            instance with :meth:`samples&lt;gt4sd.algorithms.generation.torchdrug.implementation.GAFGenerator.sample&gt;` method for generation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">generator</span> <span class="o">=</span> <span class="n">GAFGenerator</span><span class="p">(</span><span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span></div>
+
+<div class="viewcode-block" id="TorchDrugGraphAF.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGraphAF.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get filepath mappings for the given training pipeline arguments.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            a mapping between artifacts&#39; files and training pipeline&#39;s output files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">TorchDrugSavingArguments</span><span class="p">):</span>
+
+            <span class="n">task_name</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;task=</span><span class="si">{</span><span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2">_&quot;</span>
+                <span class="k">if</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">task</span>
+                <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">)</span>
+            <span class="n">data_name</span> <span class="o">=</span> <span class="s2">&quot;data=&quot;</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">dataset_name</span>
+                <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+                <span class="o">+</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">dataset_name</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span>
+                <span class="k">else</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">dataset_name</span>
+            <span class="p">)</span>
+
+            <span class="n">epochs</span> <span class="o">=</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">epochs</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;weights.pkl&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">training_name</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;graphaf_data=</span><span class="si">{</span><span class="n">data_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">task_name</span><span class="si">}</span><span class="s2">epoch=</span><span class="si">{</span><span class="n">epochs</span><span class="si">}</span><span class="s2">.pkl&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+                <span class="n">training_pipeline_arguments</span>
+            <span class="p">)</span></div></div>
 </pre></div>
 
            </div>

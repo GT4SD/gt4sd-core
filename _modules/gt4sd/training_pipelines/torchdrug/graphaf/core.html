@@ -1,0 +1,522 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.training_pipelines.torchdrug.graphaf.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../training_pipelines.html">gt4sd.training_pipelines</a> &raquo;</li>
+        
+      <li>gt4sd.training_pipelines.torchdrug.graphaf.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.training_pipelines.torchdrug.graphaf.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;TorchDrug GraphAF training utilities.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">ast</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">torchdrug.core</span> <span class="kn">import</span> <span class="n">Engine</span>
+<span class="kn">from</span> <span class="nn">torchdrug.layers</span> <span class="kn">import</span> <span class="n">distribution</span>
+<span class="kn">from</span> <span class="nn">torchdrug.models</span> <span class="kn">import</span> <span class="n">RGCN</span><span class="p">,</span> <span class="n">GraphAF</span>
+<span class="kn">from</span> <span class="nn">torchdrug.tasks</span> <span class="kn">import</span> <span class="n">AutoregressiveGeneration</span>
+
+<span class="c1"># isort: off</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+<span class="c1"># isort: on</span>
+<span class="kn">from</span> <span class="nn">....cli.argument_parser</span> <span class="kn">import</span> <span class="n">eval_lambda</span>
+<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">DATASET_FACTORY</span>
+<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">TorchDrugTrainingPipeline</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Necessary because torchdrug silently overwrites the default nn.Module. This is quite</span>
+<span class="sd">invasive and causes significant side-effects in the rest of the code.</span>
+<span class="sd">See: https://github.com/DeepGraphLearning/torchdrug/issues/77</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">_Module</span>  <span class="c1"># type: ignore</span>
+
+
+<div class="viewcode-block" id="TorchDrugGraphAFTrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.torchdrug.graphaf.core.html#gt4sd.training_pipelines.torchdrug.graphaf.core.TorchDrugGraphAFTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">TorchDrugGraphAFTrainingPipeline</span><span class="p">(</span><span class="n">TorchDrugTrainingPipeline</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TorchDrug GraphAF training pipelines.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TorchDrugGraphAFTrainingPipeline.train"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.torchdrug.graphaf.core.html#gt4sd.training_pipelines.torchdrug.graphaf.core.TorchDrugGraphAFTrainingPipeline.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">training_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generic training function for training a</span>
+<span class="sd">            (GraphAF) model. For details see:</span>
+<span class="sd">                Shi, Chence, et al. &quot;GraphAF: a Flow-based Autoregressive Model for</span>
+<span class="sd">                Molecular Graph Generation&quot;.</span>
+<span class="sd">                International Conference on Learning Representations (ICLR), 2020.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            training_args: training arguments passed to the configuration.</span>
+<span class="sd">            model_args: model arguments passed to the configuration.</span>
+<span class="sd">            dataset_args: dataset arguments passed to the configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">training_args</span><span class="p">,</span> <span class="o">**</span><span class="n">dataset_args</span><span class="p">,</span> <span class="o">**</span><span class="n">model_args</span><span class="p">}</span>
+
+            <span class="n">model_path</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]</span>
+            <span class="n">training_name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;training_name&quot;</span><span class="p">]</span>
+            <span class="n">dataset_name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;dataset_name&quot;</span><span class="p">]</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model with name </span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2"> starts.&quot;</span><span class="p">)</span>
+
+            <span class="n">model_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">training_name</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Set up the dataset here</span>
+            <span class="n">joint_dataset_args</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;verbose&quot;</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="s2">&quot;lazy&quot;</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lazy&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">eval_lambda</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="s2">&quot;lambda x: x&quot;</span><span class="p">)),</span>
+                <span class="s2">&quot;node_feature&quot;</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;node_feature&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;edge_feature&quot;</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edge_feature&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;graph_feature&quot;</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;graph_feature&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="s2">&quot;with_hydrogen&quot;</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;with_hydrogen&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="s2">&quot;kekulize&quot;</span><span class="p">:</span> <span class="ow">not</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;no_kekulization&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">dataset_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DATASET_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Dataset </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> is not supported. Choose from &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DATASET_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">dataset_name</span> <span class="o">!=</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+                <span class="c1"># This is a native TorchDrug dataset</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="n">DATASET_FACTORY</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">](</span>
+                    <span class="n">path</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;dataset_path&quot;</span><span class="p">],</span> <span class="o">**</span><span class="n">joint_dataset_args</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># User brought their own dataset</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="n">DATASET_FACTORY</span><span class="p">[</span><span class="s2">&quot;custom&quot;</span><span class="p">](</span>
+                    <span class="n">file_path</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;file_path&quot;</span><span class="p">],</span>
+                    <span class="n">target_fields</span><span class="o">=</span><span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;target_field&quot;</span><span class="p">]],</span>
+                    <span class="n">smiles_field</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smiles_field&quot;</span><span class="p">,</span> <span class="s2">&quot;smiles&quot;</span><span class="p">),</span>
+                    <span class="o">**</span><span class="n">joint_dataset_args</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">hidden_dims</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;hidden_dims&quot;</span><span class="p">])</span>
+            <span class="n">num_atom_type</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">num_atom_type</span>
+            <span class="n">num_bond_type</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">num_bond_type</span>
+
+            <span class="n">model</span> <span class="o">=</span> <span class="n">RGCN</span><span class="p">(</span>
+                <span class="n">input_dim</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;input_dim&quot;</span><span class="p">,</span> <span class="n">num_atom_type</span><span class="p">),</span>
+                <span class="n">num_relation</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_relation&quot;</span><span class="p">,</span> <span class="n">num_bond_type</span><span class="p">),</span>
+                <span class="n">hidden_dims</span><span class="o">=</span><span class="n">hidden_dims</span><span class="p">,</span>
+                <span class="n">batch_norm</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_norm&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                <span class="n">edge_input_dim</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edge_input_dim&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">short_cut</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;short_cut&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">activation</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;activation&quot;</span><span class="p">,</span> <span class="s2">&quot;relu&quot;</span><span class="p">),</span>
+                <span class="n">concat_hidden</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;concat_hidden&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">readout</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;readout&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dataset_name</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span> <span class="ow">and</span> <span class="n">task</span> <span class="ow">and</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;target_field&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">task</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;If custom dataset is used &amp; task is specified, then target_field &quot;</span>
+                    <span class="s2">&quot;has to be set s.t. it extracts the task/property of interest. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Not task=</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2"> and target_field=</span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;target_field&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;criterion&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;ppo&quot;</span> <span class="ow">in</span> <span class="n">criterion</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;no_kekulization&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;node_feature&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;symbol&quot;</span>
+            <span class="p">):</span>
+                <span class="c1"># See torchdrug issue: https://github.com/DeepGraphLearning/torchdrug/issues/77</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;For property optimiz. leave `no_kekulization` at the default (&quot;</span>
+                    <span class="s2">&quot;False) &amp; set `node_feature` to `symbol` and not: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;no_kekulization&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> and `</span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;node_feature&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">`.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Model prior/flow initialization</span>
+            <span class="n">node_prior</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">IndependentGaussian</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_atom_type</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">num_atom_type</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">edge_prior</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">IndependentGaussian</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_bond_type</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">num_bond_type</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">node_flow</span> <span class="o">=</span> <span class="n">GraphAF</span><span class="p">(</span>
+                <span class="n">model</span><span class="p">,</span> <span class="n">node_prior</span><span class="p">,</span> <span class="n">num_layer</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_node_flow_layers&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">edge_flow</span> <span class="o">=</span> <span class="n">GraphAF</span><span class="p">(</span>
+                <span class="n">model</span><span class="p">,</span>
+                <span class="n">edge_prior</span><span class="p">,</span>
+                <span class="n">num_layer</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_edge_flow_layers&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+                <span class="n">use_edge</span><span class="o">=</span><span class="ow">not</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;no_edge&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="n">task</span> <span class="o">=</span> <span class="n">AutoregressiveGeneration</span><span class="p">(</span>
+                <span class="n">node_flow</span><span class="p">,</span>
+                <span class="n">edge_flow</span><span class="p">,</span>
+                <span class="n">task</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">max_edge_unroll</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_edge_unroll&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+                <span class="n">max_node</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_node&quot;</span><span class="p">,</span> <span class="mi">38</span><span class="p">),</span>
+                <span class="n">criterion</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;criterion&quot;</span><span class="p">]),</span>
+                <span class="n">num_node_sample</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_node_sample&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">num_edge_sample</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_edge_sample&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">agent_update_interval</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent_update_interval&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                <span class="n">gamma</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gamma&quot;</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span>
+                <span class="n">reward_temperature</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reward_temperature&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                <span class="n">baseline_momentum</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;baseline_momentum&quot;</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">solver</span> <span class="o">=</span> <span class="n">Engine</span><span class="p">(</span>
+                <span class="n">task</span><span class="p">,</span>
+                <span class="n">dataset</span><span class="p">,</span>
+                <span class="kc">None</span><span class="p">,</span>  <span class="c1"># validation data</span>
+                <span class="kc">None</span><span class="p">,</span>  <span class="c1"># test data</span>
+                <span class="n">optimizer</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+                <span class="n">log_interval</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;log_interval&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                <span class="n">scheduler</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scheduler&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">gpus</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gpus&quot;</span><span class="p">,</span> <span class="n">device</span><span class="p">),</span>
+                <span class="n">gradient_interval</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gradient_interval&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">num_worker</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_worker&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="c1"># Necessary since we have re-assigned nn.Module to the native torch.nn.Module</span>
+            <span class="c1"># rather than the torchdrug-overwritten version.</span>
+            <span class="n">solver</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">device</span>
+
+            <span class="n">weight_paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">model_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.pkl&quot;</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">weight_paths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">solver</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                    <span class="n">weight_paths</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">load_optimizer</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;load_optimizer&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Restored existing model from </span><span class="si">{</span><span class="n">weight_paths</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;To avoid this, set `training_name` &amp; `model_path` to a new folder.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">epochs</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;epochs&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="n">solver</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">num_epoch</span><span class="o">=</span><span class="n">epochs</span><span class="p">)</span>
+
+            <span class="c1"># Save model</span>
+            <span class="n">task_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;task=</span><span class="si">{</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">_&quot;</span> <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">data_name</span> <span class="o">=</span> <span class="s2">&quot;data=&quot;</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="n">dataset_name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;file_path&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">dataset_name</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span>
+                <span class="k">else</span> <span class="n">dataset_name</span>
+            <span class="p">)</span>
+
+            <span class="n">solver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">model_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;graphaf_data=</span><span class="si">{</span><span class="n">data_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">task_name</span><span class="si">}</span><span class="s2">epoch=</span><span class="si">{</span><span class="n">epochs</span><span class="si">}</span><span class="s2">.pkl&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+                <span class="s2">&quot;Exception occurred while running TorchDrugGraphAFTrainingPipeline&quot;</span>
+            <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TorchDrugGraphAFModelArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.torchdrug.graphaf.core.html#gt4sd.training_pipelines.torchdrug.graphaf.core.TorchDrugGraphAFModelArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TorchDrugGraphAFModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Arguments pertaining to model instantiation.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>
+
+    <span class="n">hidden_dims</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;[128, 128]&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Dimensionality of each hidden layer&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">batch_norm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether the RGCN uses batch normalization&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">edge_input_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Dimension of edge features&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">short_cut</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether the RGCN uses a short cut&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Activation function for RGCN&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">concat_hidden</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether hidden representations from all layers are concatenated&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">num_node_flow_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of layers in the node flow GraphAF model&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">num_edge_flow_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of layers in the edge flow GraphAF model&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">no_edge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether to use edge features in the edge GraphAF model. Per &quot;</span>
+            <span class="s2">&quot;default, edges are used.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">readout</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;RGCN Readout function. Either `sum` or `mean`&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">max_edge_unroll</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;max node id difference. Inferred from training data if not provided&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">max_node</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">38</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;max number of node. Inferred from training data if not provided.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">criterion</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;{&#39;nll&#39;: 1.0}&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;training criterion. Available criteria are `nll` and `ppo` for&quot;</span>
+            <span class="s2">&quot; regular training and property optimization respectively. If dict, the &quot;</span>
+            <span class="s2">&quot;keys are criterions and values are the corresponding weights. If list, &quot;</span>
+            <span class="s2">&quot;both criteria are used with equal weights.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">num_node_sample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of node samples per graph.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">num_edge_sample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of edge samples per graph.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">agent_update_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Update the agent every n batches (similar to gradient accumulation)&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Reward discount rate&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">reward_temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Temperature for the reward (larger -&gt; higher mean reward)&quot;</span>
+            <span class="s2">&quot;lower -&gt; higher maximal reward.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">baseline_momentum</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Momentum for value function baseline&quot;</span><span class="p">},</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
