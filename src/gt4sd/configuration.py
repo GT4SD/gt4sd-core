@@ -24,11 +24,11 @@ class GT4SDConfiguration(BaseSettings):
     gt4sd_max_number_of_stuck_calls: int = 50
     gt4sd_max_number_of_samples: int = 1000000
     gt4sd_max_runtime: int = 86400
-    gt4sd_s3_host: str = "s3.mil01.cloud-object-storage.appdomain.cloud"
-    gt4sd_s3_access_key: str = "a19f93a1c67949f1a31db38e58bcb7e8"
-    gt4sd_s3_secret_key: str = "5748375c761a4f09c30a68cd15e218e3b27ca3e2aebd7726"
+    gt4sd_s3_host: str = "s3.par01.cloud-object-storage.appdomain.cloud"
+    gt4sd_s3_access_key: str = "6e9891531d724da89997575a65f4592e"
+    gt4sd_s3_secret_key: str = "5997d63c4002cc04e13c03dc0c2db9dae751293dab106ac5"
     gt4sd_s3_secure: bool = True
-    gt4sd_s3_bucket: str = "algorithms"
+    gt4sd_s3_bucket: str = "gt4sd-cos-algorithms-artifacts"
 
     class Config:
         # immutable and in turn hashable, that is required for lru_cache
