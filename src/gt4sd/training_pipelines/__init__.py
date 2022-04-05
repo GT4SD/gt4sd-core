@@ -43,6 +43,19 @@ from .pytorch_lightning.language_modeling.core import (
     LanguageModelingSavingArguments,
     LanguageModelingTrainingPipeline,
 )
+from .torchdrug.core import (
+    TorchDrugDataArguments,
+    TorchDrugSavingArguments,
+    TorchDrugTrainingArguments,
+)
+from .torchdrug.gcpn.core import (
+    TorchDrugGCPNModelArguments,
+    TorchDrugGCPNTrainingPipeline,
+)
+from .torchdrug.graphaf.core import (
+    TorchDrugGraphAFModelArguments,
+    TorchDrugGraphAFTrainingPipeline,
+)
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -62,6 +75,16 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         PaccMannTrainingArguments,
         PaccMannDataArguments,
         PaccMannVAEModelArguments,
+    ),
+    "torchdrug-gcpn-trainer": (
+        TorchDrugTrainingArguments,
+        TorchDrugDataArguments,
+        TorchDrugGCPNModelArguments,
+    ),
+    "torchdrug-graphaf-trainer": (
+        TorchDrugTrainingArguments,
+        TorchDrugDataArguments,
+        TorchDrugGraphAFModelArguments,
     ),
     "granular-trainer": (
         PytorchLightningTrainingArguments,
@@ -88,6 +111,8 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
 TRAINING_PIPELINE_MAPPING = {
     "language-modeling-trainer": LanguageModelingTrainingPipeline,
     "paccmann-vae-trainer": PaccMannVAETrainingPipeline,
+    "torchdrug-gcpn-trainer": TorchDrugGCPNTrainingPipeline,
+    "torchdrug-graphaf-trainer": TorchDrugGraphAFTrainingPipeline,
     "granular-trainer": GranularTrainingPipeline,
     "guacamol-lstm-trainer": GuacaMolLSTMTrainingPipeline,
     "moses-organ-trainer": MosesOrganTrainingPipeline,
@@ -96,6 +121,8 @@ TRAINING_PIPELINE_MAPPING = {
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "paccmann-vae-trainer": PaccMannSavingArguments,
+    "torchdrug-gcpn-trainer": TorchDrugSavingArguments,
+    "torchdrug-graphaf-trainer": TorchDrugSavingArguments,
     "granular-trainer": GranularSavingArguments,
     "language-modeling-trainer": LanguageModelingSavingArguments,
     "guacamol-lstm-trainer": GuacaMolSavingArguments,

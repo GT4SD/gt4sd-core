@@ -1,8 +1,11 @@
 """Torchdrug generation algorithm."""
 
 import logging
-from typing import ClassVar, Optional, TypeVar
+import os
+from typing import ClassVar, Dict, Optional, TypeVar
 
+from ....training_pipelines.core import TrainingPipelineArguments
+from ....training_pipelines.torchdrug.core import TorchDrugSavingArguments
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
 from ...registry import ApplicationsRegistry
 from .implementation import GAFGenerator, GCPNGenerator, Generator
@@ -90,6 +93,44 @@ class TorchDrugGCPN(AlgorithmConfiguration[str, None]):
         self.generator = GCPNGenerator(resources_path=resources_path)
         return self.generator
 
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Get filepath mappings for the given training pipeline arguments.
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, TorchDrugSavingArguments):
+
+            task_name = (
+                f"task={training_pipeline_arguments.task}_"
+                if training_pipeline_arguments.task
+                else ""
+            )
+            data_name = "data=" + (
+                training_pipeline_arguments.dataset_name
+                + "_"
+                + training_pipeline_arguments.file_path.split(os.sep)[-1].split(".")[0]
+                if training_pipeline_arguments.dataset_name == "custom"
+                else training_pipeline_arguments.dataset_name
+            )
+
+            epochs = training_pipeline_arguments.epochs
+            return {
+                "weights.pkl": os.path.join(
+                    training_pipeline_arguments.model_path,
+                    training_pipeline_arguments.training_name,
+                    f"gcpn_data={data_name}_{task_name}epoch={epochs}.pkl",
+                )
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
+
 
 @ApplicationsRegistry.register_algorithm_application(TorchDrugGenerator)
 class TorchDrugGraphAF(AlgorithmConfiguration[str, None]):
@@ -111,3 +152,41 @@ class TorchDrugGraphAF(AlgorithmConfiguration[str, None]):
         """
         self.generator = GAFGenerator(resources_path=resources_path)
         return self.generator
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Get filepath mappings for the given training pipeline arguments.
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(training_pipeline_arguments, TorchDrugSavingArguments):
+
+            task_name = (
+                f"task={training_pipeline_arguments.task}_"
+                if training_pipeline_arguments.task
+                else ""
+            )
+            data_name = "data=" + (
+                training_pipeline_arguments.dataset_name
+                + "_"
+                + training_pipeline_arguments.file_path.split(os.sep)[-1].split(".")[0]
+                if training_pipeline_arguments.dataset_name == "custom"
+                else training_pipeline_arguments.dataset_name
+            )
+
+            epochs = training_pipeline_arguments.epochs
+            return {
+                "weights.pkl": os.path.join(
+                    training_pipeline_arguments.model_path,
+                    training_pipeline_arguments.training_name,
+                    f"graphaf_data={data_name}_{task_name}epoch={epochs}.pkl",
+                )
+            }
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )

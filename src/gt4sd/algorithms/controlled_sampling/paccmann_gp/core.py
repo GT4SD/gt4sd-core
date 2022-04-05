@@ -259,7 +259,7 @@ class PaccMannGPGenerator(AlgorithmConfiguration[SmallMolecule, Any]):
     def get_filepath_mappings_for_training_pipeline_arguments(
         cls, training_pipeline_arguments: TrainingPipelineArguments
     ) -> Dict[str, str]:
-        """Ger filepath mappings for the given training pipeline arguments.
+        """Get filepath mappings for the given training pipeline arguments.
 
         Args:
             training_pipeline_arguments: training pipeline arguments.
