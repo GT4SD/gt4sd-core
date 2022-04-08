@@ -1,5 +1,7 @@
 """Module initialization for gt4sd."""
 from ..extras import EXTRAS_ENABLED
+
+# NOTE: here we import the applications to register them
 from .conditional_generation.guacamol.core import (  # noqa: F401
     AaeGenerator,
     GraphGAGenerator,
@@ -11,13 +13,11 @@ from .conditional_generation.guacamol.core import (  # noqa: F401
     VaeGenerator,
 )
 from .conditional_generation.key_bert.core import KeyBERTGenerator  # noqa: F401
-
-# here we import the applications to register them
 from .conditional_generation.paccmann_rl.core import (  # noqa: F401
     PaccMannRLOmicBasedGenerator,
     PaccMannRLProteinBasedGenerator,
 )
-from .conditional_generation.regression_transformer.core import (
+from .conditional_generation.regression_transformer.core import (  # noqa: F401
     RegressionTransformerMolecules,
     RegressionTransformerProteins,
 )

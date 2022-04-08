@@ -1,4 +1,4 @@
-"""Guacamol Baselines tests."""
+"""GuacaMol Baselines tests."""
 
 from typing import ClassVar, Type
 

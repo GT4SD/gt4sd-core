@@ -1,14 +1,34 @@
 """Argument parser for training pipelines."""
 
 
+import ast
 import dataclasses
 import re
 from argparse import ArgumentTypeError
 from enum import Enum
 from functools import partial
-from typing import Any, List, NewType, Optional, Type, Union
+from typing import Any, Callable, List, NewType, Optional, Type, Union
 
 from transformers import HfArgumentParser
+
+
+def eval_lambda(val: str) -> Callable:
+    """Parse a lambda from a string safely.
+
+    Args:
+        val: string representing a lambda.
+
+    Returns:
+        a callable.
+
+    Raises:
+        ValueError: in case the lambda can not be parsed.
+    """
+    parsed_lamba = ast.parse(val).body[0].value  # type:ignore
+    if isinstance(parsed_lamba, ast.Lambda) and "eval" not in val:
+        return eval(val)
+    else:
+        raise ValueError(f"'{val}' can not be safely parsed as a lambda function")
 
 
 def none_checker_bool(val: Union[bool, str]) -> Union[bool, None]:
@@ -16,8 +36,12 @@ def none_checker_bool(val: Union[bool, str]) -> Union[bool, None]:
 
     Args:
         val: model arguments passed to the configuration.
+
     Returns:
         Bool value or None.
+
+    Raises:
+        ArgumentTypeError: value can not be parsed.
     """
     if not val:
         return None

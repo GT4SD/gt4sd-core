@@ -7,6 +7,23 @@ from typing import Any, Dict
 import pkg_resources
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
+from .guacamol_baselines.core import GuacaMolDataArguments, GuacaMolSavingArguments
+from .guacamol_baselines.smiles_lstm.core import (
+    GuacaMolLSTMModelArguments,
+    GuacaMolLSTMTrainingArguments,
+    GuacaMolLSTMTrainingPipeline,
+)
+from .moses.core import MosesDataArguments, MosesSavingArguments
+from .moses.organ.core import (
+    MosesOrganModelArguments,
+    MosesOrganTrainingArguments,
+    MosesOrganTrainingPipeline,
+)
+from .moses.vae.core import (
+    MosesVAEModelArguments,
+    MosesVAETrainingArguments,
+    MosesVAETrainingPipeline,
+)
 from .paccmann.core import (
     PaccMannDataArguments,
     PaccMannSavingArguments,
@@ -25,6 +42,19 @@ from .pytorch_lightning.language_modeling.core import (
     LanguageModelingModelArguments,
     LanguageModelingSavingArguments,
     LanguageModelingTrainingPipeline,
+)
+from .torchdrug.core import (
+    TorchDrugDataArguments,
+    TorchDrugSavingArguments,
+    TorchDrugTrainingArguments,
+)
+from .torchdrug.gcpn.core import (
+    TorchDrugGCPNModelArguments,
+    TorchDrugGCPNTrainingPipeline,
+)
+from .torchdrug.graphaf.core import (
+    TorchDrugGraphAFModelArguments,
+    TorchDrugGraphAFTrainingPipeline,
 )
 
 logger = logging.getLogger(__name__)
@@ -46,23 +76,58 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         PaccMannDataArguments,
         PaccMannVAEModelArguments,
     ),
+    "torchdrug-gcpn-trainer": (
+        TorchDrugTrainingArguments,
+        TorchDrugDataArguments,
+        TorchDrugGCPNModelArguments,
+    ),
+    "torchdrug-graphaf-trainer": (
+        TorchDrugTrainingArguments,
+        TorchDrugDataArguments,
+        TorchDrugGraphAFModelArguments,
+    ),
     "granular-trainer": (
         PytorchLightningTrainingArguments,
         GranularDataArguments,
         GranularModelArguments,
+    ),
+    "guacamol-lstm-trainer": (
+        GuacaMolLSTMModelArguments,
+        GuacaMolLSTMTrainingArguments,
+        GuacaMolDataArguments,
+    ),
+    "moses-vae-trainer": (
+        MosesVAETrainingArguments,
+        MosesVAEModelArguments,
+        MosesDataArguments,
+    ),
+    "moses-organ-trainer": (
+        MosesOrganTrainingArguments,
+        MosesOrganModelArguments,
+        MosesDataArguments,
     ),
 }
 
 TRAINING_PIPELINE_MAPPING = {
     "language-modeling-trainer": LanguageModelingTrainingPipeline,
     "paccmann-vae-trainer": PaccMannVAETrainingPipeline,
+    "torchdrug-gcpn-trainer": TorchDrugGCPNTrainingPipeline,
+    "torchdrug-graphaf-trainer": TorchDrugGraphAFTrainingPipeline,
     "granular-trainer": GranularTrainingPipeline,
+    "guacamol-lstm-trainer": GuacaMolLSTMTrainingPipeline,
+    "moses-organ-trainer": MosesOrganTrainingPipeline,
+    "moses-vae-trainer": MosesVAETrainingPipeline,
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "paccmann-vae-trainer": PaccMannSavingArguments,
+    "torchdrug-gcpn-trainer": TorchDrugSavingArguments,
+    "torchdrug-graphaf-trainer": TorchDrugSavingArguments,
     "granular-trainer": GranularSavingArguments,
     "language-modeling-trainer": LanguageModelingSavingArguments,
+    "guacamol-lstm-trainer": GuacaMolSavingArguments,
+    "moses-organ-trainer": MosesSavingArguments,
+    "moses-vae-trainer": MosesSavingArguments,
 }
 
 
