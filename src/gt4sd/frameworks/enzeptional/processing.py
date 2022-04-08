@@ -2,6 +2,9 @@
 
 import random
 from abc import ABC
+from collections import defaultdict
+from itertools import chain
+from operator import methodcaller
 from typing import Generic, List, Optional, Tuple, TypeVar, Union
 
 import numpy as np
@@ -9,9 +12,22 @@ import torch
 from tape.datasets import pad_sequences
 from tape.registry import registry
 from tape.tokenizers import TAPETokenizer
-from transformers import AutoModelWithLMHead, AutoTokenizer, T5EncoderModel, T5Tokenizer
+from transformers import AutoModelForMaskedLM, AutoTokenizer, T5Model, T5Tokenizer
 
 from ..torch import device_claim
+
+
+def merge_dictionaries(lst_Dict):
+    # initialise defaultdict of lists
+    output = defaultdict(list)
+
+    # iterate dictionary items
+    dict_items = map(methodcaller("items"), lst_Dict)
+    for k, v in chain.from_iterable(dict_items):
+        output[k].append(v)
+
+    return output
+
 
 T = TypeVar("T")  # used for sample embedding
 
@@ -56,7 +72,6 @@ class TAPEEmbedding(StringEmbedding):
         device: Optional[Union[torch.device, str]] = None,
     ) -> None:
         """Initialize the TAPE embedding class.
-
         Args:
             model_type: TAPE model type. Defaults to "transformer".
             model_dir: model directory. Defaults to "bert-base".
@@ -77,10 +92,8 @@ class TAPEEmbedding(StringEmbedding):
 
     def _encode_and_mask(self, sequence: str) -> Tuple[np.ndarray, np.ndarray]:
         """Encode and mask a sequence.
-
         Args:
             sequence: AA sequence.
-
         Returns:
             a tuple containing the token ids and the mask.
         """
@@ -89,10 +102,8 @@ class TAPEEmbedding(StringEmbedding):
 
     def __call__(self, samples: List[str]) -> np.ndarray:
         """Embed multiple protein sequences using TAPE.
-
         Args:
             samples: a list of protein sequences.
-
         Returns:
             a numpy array containing the embedding vectors.
         """
@@ -140,11 +151,25 @@ class ProtTransXL(StringEmbedding):
         self.tokenizer = T5Tokenizer.from_pretrained(
             self.model_name, do_lower_case=False
         )
-        self.model = T5EncoderModel.from_pretrained(self.model_name)
+        self.model = T5Model.from_pretrained(self.model_name)
         self.model = self.model.to(self.device)
         self.model.eval()
 
-    def __call__(self, samples: List[T]) -> np.ndarray:
+    def _encode_and_mask(self, sequence: str) -> Tuple[np.ndarray, np.ndarray]:
+        """Encode and mask a sequence.
+
+        Args:
+            sequence: AA sequence.
+
+        Returns:
+            a tuple containing the token ids and the mask.
+        """
+        token_ids = self.tokenizer.encode_plus(
+            sequence, add_special_tokens=True, padding=True
+        )
+        return token_ids
+
+    def __call__(self, samples: List[str]) -> np.ndarray:
         """Embed multiple protein sequences using ProtTrans Xl model.
 
         Args:
@@ -155,32 +180,32 @@ class ProtTransXL(StringEmbedding):
             a numpy array containing the embedding vectors.
         """
 
-        if len(samples) > 1:
-            ids = self.tokenizer.batch_encode_plus(
-                samples, add_special_tokens=True, padding=True
-            )
+        # prepare input
+        token_ids = merge_dictionaries(
+            [self._encode_and_mask(sequence) for sequence in samples]
+        )
 
-        else:
-            ids = self.tokenizer.encode_plus(
-                samples, add_special_tokens=True, padding=True
-            )
-
-        input_ids = torch.tensor(ids["input_ids"]).to(self.device)
-        attention_mask = torch.tensor(ids["attention_mask"]).to(self.device)
+        input_ids = torch.tensor(token_ids["input_ids"]).to(self.device)
+        attention_mask = torch.tensor(token_ids["attention_mask"]).to(self.device)
 
         with torch.no_grad():
-            sequence_embeddings = self.model(
-                input_ids=input_ids, attention_mask=attention_mask
+            embedding = self.model(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                decoder_input_ids=input_ids,
             )
 
-        sequence_embeddings = sequence_embeddings.last_hidden_state.cpu().numpy()
+        # For feature extraction we recommend to use the encoder embedding
+        encoder_embedding = embedding[2].cpu().numpy()
+        # decoder_embedding = embedding[0].cpu().numpy()
+
         sequence_lenghts = attention_mask.sum(1)
         # get average embedding
         return np.array(
             [
-                sequence_embedding[:sequence_length].mean(0)
-                for sequence_embedding, sequence_length in zip(  # type:ignore
-                    sequence_embeddings, sequence_lenghts
+                encoder_embedding[:sequence_length].mean(0)
+                for encoder_embedding, sequence_length in zip(  # type:ignore
+                    encoder_embedding, sequence_lenghts
                 )
             ]
         )
@@ -196,7 +221,6 @@ class HuggingFaceTransformerEmbedding(StringEmbedding):
         device: Optional[Union[torch.device, str]] = None,
     ) -> None:
         """Initialize the HF transformers embedding class.
-
         Args:
             model_name: model name. Defaults to "seyonec/ChemBERTa-zinc-base-v1".
             tokenizer_name: tokenizer name. Defaults to "seyonec/ChemBERTa-zinc-base-v1".
@@ -207,16 +231,14 @@ class HuggingFaceTransformerEmbedding(StringEmbedding):
         self.device = device_claim(device)
         # tokenizer and model definition
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelWithLMHead.from_pretrained(tokenizer_name)
+        self.model = AutoModelForMaskedLM.from_pretrained(tokenizer_name)
         self.model = self.model.to(self.device)
         self.model.eval()
 
     def __call__(self, samples: List[str]) -> np.ndarray:
         """Embed multiple protein sequences using TAPE.
-
         Args:
             samples: a list of strings representing molecules.
-
         Returns:
             a numpy array containing the embedding vectors.
         """
@@ -304,7 +326,7 @@ def reconstruct_sequence_with_mutation_range(
     return mutated_sequence
 
 
-def selection(scores, k=10):
+def selection(scores, k=20):
     """Selecte the top K mutated sequences based on the score
 
     Args:

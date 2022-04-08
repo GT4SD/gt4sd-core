@@ -72,7 +72,6 @@ class Mutations:
 
     def __init__(self, transition_configuration: TransitionConfiguration) -> None:
         """Generate the mutation given the configuration for the transitions.
-
         Args:
             transition_configuration: transition configuration.
         """
@@ -85,10 +84,8 @@ class Mutations:
         transition_configuration: TransitionConfiguration,
     ) -> TransitionMatrix:
         """Transform a configuration into a valid transition matrix.
-
         Args:
             transition_configuration: transition configuration.
-
         Returns:
             a transition matrix.
         """
@@ -110,7 +107,6 @@ class Mutations:
     @staticmethod
     def from_json(filepath: str) -> "Mutations":
         """Parse the mutation from a JSON containing the transition configuration.
-
         Returns:
             the mutations object.
         """
@@ -119,10 +115,8 @@ class Mutations:
 
     def mutate(self, source: str) -> str:
         """Mutate a source string.
-
         Args:
             source: source string.
-
         Returns:
             the mutated target.
         """
@@ -135,7 +129,6 @@ class AASequence:
         self, sequence: str, mutations: Mutations = Mutations(IUPAC_MUTATION_MAPPING)
     ) -> None:
         """Initialize an AA sequence representation.
-
         Args:
             sequence: AA sequence.
             mutations: mutations definition. Defaults to uniform sampling of IUPAC AAs.
@@ -146,10 +139,8 @@ class AASequence:
 
     def mutate(self, maximum_number_of_mutations: int) -> str:
         """Mutate the sequence in multiple positions.
-
         Args:
             maximum_number_of_mutations: maximum number of mutations.
-
         Returns:
             the mutated sequence.
         """
@@ -191,7 +182,6 @@ class EnzymeOptimizer:
         ordering: List[str] = ["substrate", "product", "sequence"],
     ) -> None:
         """Initialize the enzyme designer.
-
         Args:
             scorer_filepath: pickled scorer filepath.
             substrate: substrate SMILES.
@@ -200,13 +190,10 @@ class EnzymeOptimizer:
             protein_embedding: protein embedding class. Defaults to TAPE bert-base.
             molecule_embedding: molecule embedding class. Defaults to ChemBERTa version 1.
             ordering: ordering of the features for the scorer. Defaults to ["substrate", "product", "sequence"].
-
         Raises:
             ValueError: ordering provided is not feasible.
-
         Example:
             An example optimizing a specific reaction::
-
                 filepath = f"/path/to/model/scoring_model.pkl"
                 substrate = "NC1=CC=C(N)C=C1"
                 product = "CNC1=CC=C(NC(=O)C2=CC=C(C=C2)C(C)=O)C=C1"
@@ -222,8 +209,6 @@ class EnzymeOptimizer:
                 designer = EnzymeOptimizer(
                     scorer_filepath=filepath, substrate=substrate, product=product, sequence=sequence
                 )
-
-
                 # with this sequence length every steps takes ~5s
                 # optimize between positions 150 and 405 allowing for a maximum of 5 mutations.
                 results = designer.optimize(
@@ -254,10 +239,8 @@ class EnzymeOptimizer:
 
     def score_sequence(self, sequence: str) -> float:
         """Score a given sequence.
-
         Args:
             sequence: a sequence to score.
-
         Returns:
             score for the sequence.
         """
@@ -270,10 +253,8 @@ class EnzymeOptimizer:
 
     def score_sequences(self, sequences: List[str]) -> List[Dict[str, Any]]:
         """Score a given sequence list.
-
         Args:
             sequences: a list of sequences to score.
-
         Returns:
             a list of dictionaries of sequences and related scores.
         """
@@ -297,6 +278,53 @@ class EnzymeOptimizer:
             )
         ]
 
+    def protTrans_score_sequence(self, sequence: str) -> float:
+        """Score a given sequence.
+
+        Args:
+            sequence: a sequence to score.
+
+        Returns:
+            score for the sequence.
+        """
+        tokenized_Seq = " ".join(list(sequence))
+        embedded_vectors = {"sequence": self.protein_embedding.embed_one(tokenized_Seq)}
+        embedded_vectors.update(self.embedded_vectors)
+        feature_vector = np.concatenate(
+            [embedded_vectors[feature] for feature in self._ordering], axis=1
+        )
+        return self.scorer.predict_proba(feature_vector)[0][1]
+
+    def protTrans_score_sequences(self, sequences: List[str]) -> List[Dict[str, Any]]:
+        """Score a given sequence list.
+
+        Args:
+            sequences: a list of sequences to score.
+
+        Returns:
+            a list of dictionaries of sequences and related scores.
+        """
+        number_of_sequences = len(sequences)
+        embedded_matrices = {
+            "substrate": np.repeat(
+                self.embedded_vectors["substrate"], number_of_sequences, axis=0
+            ),
+            "product": np.repeat(
+                self.embedded_vectors["product"], number_of_sequences, axis=0
+            ),
+        }
+        tokenized_Seqs = [" ".join(list(seq)) for seq in sequences]
+        embedded_matrices["sequence"] = self.protein_embedding(tokenized_Seqs)
+        feature_vector = np.concatenate(
+            [embedded_matrices[feature] for feature in self._ordering], axis=1
+        )
+        return [
+            {"sequence": sequence, "score": score}
+            for sequence, score in zip(
+                sequences, self.scorer.predict_proba(feature_vector)[:, 1]
+            )
+        ]
+
     def optimize(
         self,
         number_of_mutations: int,
@@ -309,10 +337,8 @@ class EnzymeOptimizer:
         mutations: Mutations = Mutations(IUPAC_MUTATION_MAPPING),
     ) -> List[Dict[str, Any]]:
         """Optimize the enzyme given a number of mutations and a range.
-
         If the range limits are not provided the full sequence is optimized, this might be inefficient.
         The sampling is performing by exploring mutations with a slightly smart random sampling.
-
         Args:
             number_of_mutations: number of allowed mutations.
             intervals: list of ranges in the sequence, zero-based. Defaults to None, a.k.a. use optimize the full sequence.
@@ -322,10 +348,8 @@ class EnzymeOptimizer:
             seed: seed for random number generation. Defaults to 42.
             time_budget: maximum allowed runtime in seconds. Defaults to None, a.k.a., no time limit, running for number_of_steps steps.
             mutations: mutations definition. Defaults to uniform sampling of IUPAC AAs.
-
         Raises:
             ValueError: in case an invalid range is provided.
-
         Returns:
             a list of dictionaries containing a candidate optimal sequence and the related score. Sorted from best to worst.
             Note that, when no limit on the returned number of sequences is set, the worst sequence is the original unmutated sequence.
