@@ -3,7 +3,7 @@ import pandas as pd
 
 from gt4sd.frameworks.enzeptional.core import Mutations
 from gt4sd.frameworks.enzeptional.genetic_algorithm import (
-    EnzymeDesignerGeneticAlgorithm,
+    EnzymeOptimizerGeneticAlgorithm,
 )
 from gt4sd.frameworks.enzeptional.processing import ProtTransXL
 
@@ -19,7 +19,7 @@ mutation_path = "/dccstor/yna/gt4sd-core/src/gt4sd/frameworks/enzeptional/tests/
 # %%
 
 # Initialize the Enzyme Designer
-designer = EnzymeDesignerGeneticAlgorithm(
+designer = EnzymeOptimizerGeneticAlgorithm(
     scorer_filepath=filepath,
     substrate=substrate,
     product=product,
@@ -33,7 +33,7 @@ designer = EnzymeDesignerGeneticAlgorithm(
 results = designer.optimize(
     number_of_mutations=15,
     number_of_steps=2,
-    intervals=[(317, 350), (383, 393)],
+    intervals=[(10, 15), (18, 24)],
     number_of_samples_per_step=5,
     mutations=Mutations.from_json(mutation_path),
 )

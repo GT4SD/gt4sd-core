@@ -1,6 +1,7 @@
-""" Enzyme Designer with Genetic Algorithm"""
+""" Enzyme Optimizer with Genetic Algorithm"""
 
 import random
+import time
 from typing import Any, Dict, List, Optional, Tuple
 
 from loguru import logger
@@ -17,7 +18,7 @@ from .processing import (
 )
 
 
-class EnzymeDesignerGeneticAlgorithm(EnzymeOptimizer):
+class EnzymeOptimizerGeneticAlgorithm(EnzymeOptimizer):
     """Optimize an enzyme to catalyze a reaction from substrate to product."""
 
     def __init__(
@@ -50,6 +51,7 @@ class EnzymeDesignerGeneticAlgorithm(EnzymeOptimizer):
         number_of_samples_per_step: int = 32,
         number_of_sequences: Optional[int] = None,
         seed: int = 42,
+        time_budget: Optional[int] = None,
         mutations: Mutations = Mutations(IUPAC_MUTATION_MAPPING),
     ) -> List[Dict[str, Any]]:
         """Optimize the enzyme given a number of mutations and a range.
@@ -120,12 +122,13 @@ class EnzymeDesignerGeneticAlgorithm(EnzymeOptimizer):
         results: List[Dict[str, Any]] = [scored_original_sequence]
 
         visited_sequences = set()
+        start_time = time.time()
         for step in range(number_of_steps):
             logger.info(f"optimization step={step + 1}")
             population: List[str] = []
 
-            # CREATE POPULATION OF MUTATED SEQUENCES FROM ORIGINAL SEQUENCE
-            while len(population) < 150:  # number_of_samples_per_step
+            # create population of mutated sequences from original sequence
+            while len(population) < (number_of_samples_per_step * number_of_steps):  #
                 mutated_sequence_range = aa_sequence_range.mutate(
                     maximum_number_of_mutations=maximum_number_of_mutations
                 )
@@ -147,11 +150,7 @@ class EnzymeDesignerGeneticAlgorithm(EnzymeOptimizer):
             ):  # score the population in chunks
 
                 # evaluate all candidates in the population
-                if (
-                    self.protein_embedding
-                    == "ProtTransXL"
-                    in str(type(self.protein_embedding))
-                ):
+                if "ProtTransXL" in str(type(self.protein_embedding)):
                     chunk_scores = self.protTrans_score_sequences(population)
 
                 else:
@@ -206,6 +205,13 @@ class EnzymeDesignerGeneticAlgorithm(EnzymeOptimizer):
             # replace population, children are the new population for the next generation
             population = children
 
+            elapsed_time = int(time.time() - start_time)
+            if time_budget is not None:
+                if elapsed_time > time_budget:
+                    logger.warning(
+                        f"used all the given time budget of {time_budget}s, exting optimization loop"
+                    )
+                    break
         logger.info(
             f"optimization completed visiting {len(visited_sequences)} mutated sequences"
         )

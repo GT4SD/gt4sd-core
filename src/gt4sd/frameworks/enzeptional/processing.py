@@ -5,7 +5,7 @@ from abc import ABC
 from collections import defaultdict
 from itertools import chain
 from operator import methodcaller
-from typing import Generic, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, Union
 
 import numpy as np
 import torch
@@ -17,13 +17,13 @@ from transformers import AutoModelForMaskedLM, AutoTokenizer, T5Model, T5Tokeniz
 from ..torch import device_claim
 
 
-def merge_dictionaries(lst_Dict):
+def merge_dictionaries(list_of_dictionaries: List[Dict[str, Any]]) -> Dict[str, List[Any]]:
     # initialise defaultdict of lists
     output = defaultdict(list)
 
     # iterate dictionary items
-    dict_items = map(methodcaller("items"), lst_Dict)
-    for k, v in chain.from_iterable(dict_items):
+    dictionary_items = map(methodcaller("items"), list_of_dictionaries)
+    for k, v in chain.from_iterable(dictionary_items):
         output[k].append(v)
 
     return output
@@ -90,7 +90,7 @@ class TAPEEmbedding(StringEmbedding):
         self.model.eval()
         self.tokenizer = TAPETokenizer(vocab=aa_vocabulary)
 
-    def _encode_and_mask(self, sequence: str) -> Tuple[np.ndarray, np.ndarray]:
+    def _encode_and_mask(self, sequence: str) -> Tuple[Any, Any]:
         """Encode and mask a sequence.
         Args:
             sequence: AA sequence.
@@ -155,7 +155,7 @@ class ProtTransXL(StringEmbedding):
         self.model = self.model.to(self.device)
         self.model.eval()
 
-    def _encode_and_mask(self, sequence: str) -> Tuple[np.ndarray, np.ndarray]:
+    def _encode_and_mask(self, sequence: str) -> Dict[str, Any]:
         """Encode and mask a sequence.
 
         Args:
@@ -326,8 +326,8 @@ def reconstruct_sequence_with_mutation_range(
     return mutated_sequence
 
 
-def selection(scores, k=20):
-    """Selecte the top K mutated sequences based on the score
+def selection(scores: List[Dict[str, Any]], k: int = 20) -> List[Any]:
+    """Select the top k mutated sequences based on the score
 
     Args:
         scores: dictionary containing sequences and scores.
@@ -343,7 +343,7 @@ def selection(scores, k=20):
     return res
 
 
-def crossover(p1, p2):
+def crossover(p1: str, p2: str) -> Tuple[str, str]:
     """Given two sequences perform crossover
 
     Args:
