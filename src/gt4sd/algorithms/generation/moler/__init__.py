@@ -21,7 +21,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Module initialization."""
+"""MoLeR initialization."""
+import logging
 
-__version__ = "0.34.0"
-__name__ = "gt4sd"
+from .core import MoLeR, MoLeRDefaultGenerator
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
+__all__ = [
+    "MoLeR",
+    "MoLeRDefaultGenerator",
+]
