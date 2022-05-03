@@ -143,24 +143,24 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
         An example for generating a peptide around a desired property value::
 
             config = RegressionTransformerMolecules(
-                algorithm_version='esol', search='sample', temperature=2, tolerance=5
+                algorithm_version='solubility', search='sample', temperature=2, tolerance=5
             )
             target = "<esol>-3.534|[Br][C][=C][C][MASK][MASK][=C][C][=C][C][=C][Ring1][MASK][MASK][Branch2_3][Ring1][Branch1_2]"
-            esol_generator = RegressionTransformer(
+            solubility_generator = RegressionTransformer(
                 configuration=config, target=target
             )
-            list(esol_generator.sample(5))
+            list(solubility_generator.sample(5))
 
         An example for predicting the solubility of a molecule::
 
             config = RegressionTransformerMolecules(
-                algorithm_version='esol', search='greedy'
+                algorithm_version='solubility', search='greedy'
             )
             target = "<esol>[MASK][MASK][MASK][MASK][MASK]|[Cl][C][Branch1_2][Branch1_2][=C][Branch1_1][C][Cl][Cl][Cl]"
-            esol_generator = RegressionTransformer(
+            solubility_generator = RegressionTransformer(
                 configuration=config, target=target
             )
-            list(esol_generator.sample(1))
+            list(solubility_generator.sample(1))
     """
 
     algorithm_type: ClassVar[str] = "conditional_generation"
