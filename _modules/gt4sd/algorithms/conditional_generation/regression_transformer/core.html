@@ -302,32 +302,41 @@
 <span class="sd">        An example for generating a peptide around a desired property value::</span>
 
 <span class="sd">            config = RegressionTransformerMolecules(</span>
-<span class="sd">                search=&#39;sample&#39;, temperature=2, tolerance=5</span>
+<span class="sd">                algorithm_version=&#39;solubility&#39;, search=&#39;sample&#39;, temperature=2, tolerance=5</span>
 <span class="sd">            )</span>
 <span class="sd">            target = &quot;&lt;esol&gt;-3.534|[Br][C][=C][C][MASK][MASK][=C][C][=C][C][=C][Ring1][MASK][MASK][Branch2_3][Ring1][Branch1_2]&quot;</span>
-<span class="sd">            esol_generator = RegressionTransformer(</span>
+<span class="sd">            solubility_generator = RegressionTransformer(</span>
 <span class="sd">                configuration=config, target=target</span>
 <span class="sd">            )</span>
-<span class="sd">            list(esol_generator.sample(5))</span>
+<span class="sd">            list(solubility_generator.sample(5))</span>
 
 <span class="sd">        An example for predicting the solubility of a molecule::</span>
 
-<span class="sd">            config = RegressionTransformerMolecules(search=&#39;greedy&#39;)</span>
+<span class="sd">            config = RegressionTransformerMolecules(</span>
+<span class="sd">                algorithm_version=&#39;solubility&#39;, search=&#39;greedy&#39;</span>
+<span class="sd">            )</span>
 <span class="sd">            target = &quot;&lt;esol&gt;[MASK][MASK][MASK][MASK][MASK]|[Cl][C][Branch1_2][Branch1_2][=C][Branch1_1][C][Cl][Cl][Cl]&quot;</span>
-<span class="sd">            esol_generator = RegressionTransformer(</span>
+<span class="sd">            solubility_generator = RegressionTransformer(</span>
 <span class="sd">                configuration=config, target=target</span>
 <span class="sd">            )</span>
-<span class="sd">            list(stability_generator.sample(1))</span>
+<span class="sd">            list(solubility_generator.sample(1))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;conditional_generation&quot;</span>
     <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;materials&quot;</span>
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;v0&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;solubility&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The version of the algorithm to use.&quot;</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;solubility&quot;</span><span class="p">,</span> <span class="s2">&quot;qed&quot;</span><span class="p">],</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
 
     <span class="n">search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="s2">&quot;sample&quot;</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Search algorithm to use for the generation: sample or greedy&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Search algorithm to use for the generation: sample or greedy&quot;</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sample&quot;</span><span class="p">,</span> <span class="s2">&quot;greedy&quot;</span><span class="p">],</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
@@ -444,7 +453,13 @@
 
     <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;conditional_generation&quot;</span>
     <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;materials&quot;</span>
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;v0&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;stability&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The version of the algorithm to use.&quot;</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;stability&quot;</span><span class="p">],</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
 
     <span class="n">search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="s2">&quot;sample&quot;</span><span class="p">,</span>
