@@ -64,7 +64,14 @@ class GranularTrainingPipeline(PyTorchLightningTrainingPipeline):
         configuration = {**model_args, **dataset_args}
 
         with open(model_args["model_list_path"], "r") as fp:  # type:ignore
-            configuration["model_list"] = json.load(fp)["models"]
+            model_config = json.load(fp)
+
+        if "models" in model_config:
+            configuration["model_list"] = model_config["models"]
+        else:
+            raise ValueError(
+                "Models configuration is not given in the specified config file."
+            )
 
         arguments = Namespace(**configuration)
         datasets = []
@@ -116,7 +123,8 @@ class GranularModelArguments(TrainingPipelineArguments):
 
     __name__ = "model_args"
 
-    model_list_path: str = field(
+    model_list_path: Optional[str] = field(
+        default=None,
         metadata={
             "help": "Path to a json file that contains a dictionary with models and their parameters."
         },
