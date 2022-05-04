@@ -25,6 +25,8 @@ import logging
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
+from ....domains.materials import SmallMolecule, validate_molecules
+from ....exceptions import InvalidItem
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
 from .implementation import ReinventConditionalGenerator
@@ -56,7 +58,7 @@ class Reinvent(GeneratorAlgorithm[S, T]):
             An example for predicting topics for a given text::
 
                 config = ReinventGenerator()
-                algorithm = Reinvent(configuration=config, target="")
+                algorithm = Reinvent(configuration=config, target="CCO")
                 items = list(algorithm.sample(1))
                 print(items)
         """
@@ -144,3 +146,24 @@ class ReinventGenerator(AlgorithmConfiguration[str, str]):
             randomize=self.randomize,
             sample_uniquely=self.sample_uniquely,
         )
+
+    def validate_item(self, item: str) -> SmallMolecule:
+        """Check that item is a valid SMILES.
+
+        Args:
+            item: a generated item that is possibly not valid.
+
+        Raises:
+            InvalidItem: in case the item can not be validated.
+
+        Returns:
+            the validated SMILES.
+        """
+        molecules, _ = validate_molecules(smiles_list=[item])
+
+        if molecules[0] is None:
+            raise InvalidItem(
+                title="InvalidSMILES",
+                detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
+            )
+        return SmallMolecule(item)

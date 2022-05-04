@@ -99,7 +99,7 @@ def test_config_instance(config_class: Type[AlgorithmConfiguration]):
 )
 def test_available_versions(config_class: Type[AlgorithmConfiguration]):
     versions = config_class.list_versions()
-    assert "v0" in versions
+    assert "solubility" in versions or "stability" in versions
 
 
 @pytest.mark.parametrize(

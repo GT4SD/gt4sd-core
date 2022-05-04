@@ -165,6 +165,7 @@ class GCPNGenerator(Generator):
             max_node=38,
             criterion="nll",
         )
+        self.task.device = self.device
         optimizer = optim.Adam(self.task.parameters(), lr=1e-3)
         self.solver = core.Engine(self.task, self.dataset, None, None, optimizer)
         self.load_model(resources_path)
@@ -215,6 +216,7 @@ class GAFGenerator(Generator):
         self.task = tasks.AutoregressiveGeneration(
             node_flow, edge_flow, max_node=38, max_edge_unroll=12, criterion="nll"
         )
+        self.task.device = self.device
         optimizer = optim.Adam(self.task.parameters(), lr=1e-3)
         self.solver = core.Engine(self.task, self.dataset, None, None, optimizer)
         self.load_model(resources_path)

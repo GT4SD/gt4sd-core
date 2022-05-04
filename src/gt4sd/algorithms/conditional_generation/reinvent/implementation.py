@@ -133,5 +133,5 @@ class ReinventConditionalGenerator(ReinventBase):
             A Set of SMILES representing molecules.
         """
         return set(
-            [molecule for _, molecule, _ in self.generate_sampled_tuples(scaffold)]
+            molecule for _, molecule, _ in self.generate_sampled_tuples(scaffold)
         )
