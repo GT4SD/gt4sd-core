@@ -127,6 +127,7 @@ class GranularModelArguments(TrainingPipelineArguments):
         default=None,
         metadata={
             "help": "Path to a json file that contains a dictionary with models and their parameters."
+                    "If it is not provided, then the dictionary is searched in the given config file."
         },
     )
     lr: float = field(
