@@ -29,6 +29,7 @@ from argparse import Namespace
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Tuple
 
+import sentencepiece as _sentencepiece
 from pytorch_lightning import LightningDataModule, LightningModule
 
 from ....frameworks.granular.dataloader.data_module import GranularDataModule
@@ -37,6 +38,9 @@ from ....frameworks.granular.ml.models import AUTOENCODER_ARCHITECTURES
 from ....frameworks.granular.ml.module import GranularModule
 from ...core import TrainingPipelineArguments
 from ..core import PyTorchLightningTrainingPipeline
+
+# sentencepiece has to be loaded before lightning to avoid segfaults
+_sentencepiece
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -64,7 +68,14 @@ class GranularTrainingPipeline(PyTorchLightningTrainingPipeline):
         configuration = {**model_args, **dataset_args}
 
         with open(model_args["model_list_path"], "r") as fp:  # type:ignore
-            configuration["model_list"] = json.load(fp)["models"]
+            model_config = json.load(fp)
+
+        if "models" in model_config:
+            configuration["model_list"] = model_config["models"]
+        else:
+            raise ValueError(
+                "Models configuration is not given in the specified config file."
+            )
 
         arguments = Namespace(**configuration)
         datasets = []
@@ -116,9 +127,11 @@ class GranularModelArguments(TrainingPipelineArguments):
 
     __name__ = "model_args"
 
-    model_list_path: str = field(
+    model_list_path: Optional[str] = field(
+        default=None,
         metadata={
             "help": "Path to a json file that contains a dictionary with models and their parameters."
+            "If it is not provided, then the dictionary is searched in the given config file."
         },
     )
     lr: float = field(

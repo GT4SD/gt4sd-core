@@ -25,6 +25,7 @@
 
 from typing import cast
 
+import sentencepiece as _sentencepiece
 import pkg_resources
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 
@@ -44,6 +45,9 @@ from gt4sd.training_pipelines.pytorch_lightning.language_modeling.models import 
     MLMModule,
     PLMModule,
 )
+
+# sentencepiece has to be loaded before lightning to avoid segfaults
+_sentencepiece
 
 template_config = {
     "model_args": {

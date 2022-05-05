@@ -157,6 +157,7 @@ def main() -> None:
     configuration_filepath = base_args.configuration_file
     if configuration_filepath:
         args = parser.parse_json_file(json_file=configuration_filepath)
+
     else:
         args = parser.parse_args_into_dataclasses(return_remaining_strings=True)
     config = {
@@ -164,6 +165,12 @@ def main() -> None:
         for arg in args
         if isinstance(arg, TrainingPipelineArguments) and isinstance(arg.__name__, str)
     }
+
+    if (
+        base_args.training_pipeline_name == "granular-trainer"
+        and config["model_args"]["model_list_path"] is None
+    ):
+        config["model_args"]["model_list_path"] = configuration_filepath
 
     pipeline = TRAINING_PIPELINE_MAPPING[training_pipeline_name]
     pipeline().train(**config)
