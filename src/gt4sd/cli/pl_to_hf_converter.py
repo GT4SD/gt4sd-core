@@ -93,7 +93,7 @@ def convert_pl_to_hf(arguments: LanguageModelingSavingArguments) -> None:
         tokenizer=model_module.tokenizer,
         args=TrainingArguments(output_dir=output_path),
     )
-    trainer.save_model()
+    trainer.save_model()  # type:ignore
 
 
 def main() -> None:
