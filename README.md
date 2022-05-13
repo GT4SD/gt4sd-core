@@ -281,6 +281,7 @@ Beyond implementing various generative modeling inference and training pipelines
 - [GuacaMol](https://github.com/BenevolentAI/guacamol): inference pipelines for the baselines models and training pipelines for LSTM models.
 - [Moses](https://github.com/molecularsets/moses): inference pipelines for the baselines models and training pipelines for VAEs and Organ.
 - [TorchDrug](https://github.com/DeepGraphLearning/torchdrug): inference and training pipelines for GCPN and GraphAF models. Training pipelines support custom datasets as well as datasets native in TorchDrug.
+- [MoLeR](https://github.com/microsoft/molecule-generation): inference pipelines for MoLeR (**MO**lecule-**LE**vel **R**epresentation) generative models for de-novo and scaffold-based generation.
 - [TAPE](https://github.com/songlab-cal/tape): encoder modules compatible with the protein language models.
 - [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as training pipelines for the generative VAEs.
 - [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from [HuggingFace Models](https://huggingface.co/models)

@@ -1,4 +1,27 @@
 #!/usr/bin/env python
+#
+# MIT License
+#
+# Copyright (c) 2022 GT4SD team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 
 """Run training pipelines for the GT4SD."""
 
@@ -134,6 +157,7 @@ def main() -> None:
     configuration_filepath = base_args.configuration_file
     if configuration_filepath:
         args = parser.parse_json_file(json_file=configuration_filepath)
+
     else:
         args = parser.parse_args_into_dataclasses(return_remaining_strings=True)
     config = {
@@ -141,6 +165,12 @@ def main() -> None:
         for arg in args
         if isinstance(arg, TrainingPipelineArguments) and isinstance(arg.__name__, str)
     }
+
+    if (
+        base_args.training_pipeline_name == "granular-trainer"
+        and config["model_args"]["model_list_path"] is None
+    ):
+        config["model_args"]["model_list_path"] = configuration_filepath
 
     pipeline = TRAINING_PIPELINE_MAPPING[training_pipeline_name]
     pipeline().train(**config)

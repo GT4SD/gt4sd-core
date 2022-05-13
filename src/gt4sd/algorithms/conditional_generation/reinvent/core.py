@@ -1,7 +1,32 @@
+#
+# MIT License
+#
+# Copyright (c) 2022 GT4SD team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 import logging
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
+from ....domains.materials import SmallMolecule, validate_molecules
+from ....exceptions import InvalidItem
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
 from .implementation import ReinventConditionalGenerator
@@ -33,7 +58,7 @@ class Reinvent(GeneratorAlgorithm[S, T]):
             An example for predicting topics for a given text::
 
                 config = ReinventGenerator()
-                algorithm = Reinvent(configuration=config, target="")
+                algorithm = Reinvent(configuration=config, target="CCO")
                 items = list(algorithm.sample(1))
                 print(items)
         """
@@ -121,3 +146,24 @@ class ReinventGenerator(AlgorithmConfiguration[str, str]):
             randomize=self.randomize,
             sample_uniquely=self.sample_uniquely,
         )
+
+    def validate_item(self, item: str) -> SmallMolecule:
+        """Check that item is a valid SMILES.
+
+        Args:
+            item: a generated item that is possibly not valid.
+
+        Raises:
+            InvalidItem: in case the item can not be validated.
+
+        Returns:
+            the validated SMILES.
+        """
+        molecules, _ = validate_molecules(smiles_list=[item])
+
+        if molecules[0] is None:
+            raise InvalidItem(
+                title="InvalidSMILES",
+                detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
+            )
+        return SmallMolecule(item)

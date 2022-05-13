@@ -1,3 +1,26 @@
+#
+# MIT License
+#
+# Copyright (c) 2022 GT4SD team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 """RegressionTransformer algorithm.
 
 RegressionTransformer is a mutlitask regression and conditional generation model.
@@ -120,32 +143,41 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
         An example for generating a peptide around a desired property value::
 
             config = RegressionTransformerMolecules(
-                search='sample', temperature=2, tolerance=5
+                algorithm_version='solubility', search='sample', temperature=2, tolerance=5
             )
             target = "<esol>-3.534|[Br][C][=C][C][MASK][MASK][=C][C][=C][C][=C][Ring1][MASK][MASK][Branch2_3][Ring1][Branch1_2]"
-            esol_generator = RegressionTransformer(
+            solubility_generator = RegressionTransformer(
                 configuration=config, target=target
             )
-            list(esol_generator.sample(5))
+            list(solubility_generator.sample(5))
 
         An example for predicting the solubility of a molecule::
 
-            config = RegressionTransformerMolecules(search='greedy')
+            config = RegressionTransformerMolecules(
+                algorithm_version='solubility', search='greedy'
+            )
             target = "<esol>[MASK][MASK][MASK][MASK][MASK]|[Cl][C][Branch1_2][Branch1_2][=C][Branch1_1][C][Cl][Cl][Cl]"
-            esol_generator = RegressionTransformer(
+            solubility_generator = RegressionTransformer(
                 configuration=config, target=target
             )
-            list(stability_generator.sample(1))
+            list(solubility_generator.sample(1))
     """
 
     algorithm_type: ClassVar[str] = "conditional_generation"
     domain: ClassVar[str] = "materials"
-    algorithm_version: str = "v0"
+    algorithm_version: str = field(
+        default="solubility",
+        metadata=dict(
+            description="The version of the algorithm to use.",
+            options=["solubility", "qed"],
+        ),
+    )
 
     search: str = field(
         default="sample",
         metadata=dict(
-            description="Search algorithm to use for the generation: sample or greedy"
+            description="Search algorithm to use for the generation: sample or greedy",
+            options=["sample", "greedy"],
         ),
     )
 
@@ -262,7 +294,13 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
 
     algorithm_type: ClassVar[str] = "conditional_generation"
     domain: ClassVar[str] = "materials"
-    algorithm_version: str = "v0"
+    algorithm_version: str = field(
+        default="stability",
+        metadata=dict(
+            description="The version of the algorithm to use.",
+            options=["stability"],
+        ),
+    )
 
     search: str = field(
         default="sample",

@@ -75,6 +75,12 @@ If you would like to contribute to the package, we recommend the following devel
     python -m mypy src/gt4sd
     ```
 
+    Ensure the license headers:
+
+    ```sh
+    licenseheaders -y 2022 -d src/gt4sd -o "GT4SD team" -t mit.tmpl
+    ```
+
 8. Once the tests and checks passes, but most importantly you are happy with the implemented feature, commit your changes.
 
     ```sh
