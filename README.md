@@ -8,7 +8,7 @@
 [![Docs](https://img.shields.io/badge/website-live-brightgreen)](https://gt4sd.github.io/gt4sd-core/)
 [![Total downloads](https://pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd)
 [![Monthly downloads](https://pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/GT4SD/gt4sd-core/binder-hosted-notebooks)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drugilsberg/gt4sd-core/binder-hosted-notebooks)
 
 <img src="./docs/_static/gt4sd_logo.png" alt="logo" width="500"/>
 
