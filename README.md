@@ -8,7 +8,7 @@
 [![Docs](https://img.shields.io/badge/website-live-brightgreen)](https://gt4sd.github.io/gt4sd-core/)
 [![Total downloads](https://pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd)
 [![Monthly downloads](https://pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drugilsberg/gt4sd-core/binder-hosted-notebooks)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/GT4SD/gt4sd-core/main)
 
 <img src="./docs/_static/gt4sd_logo.png" alt="logo" width="500"/>
 
@@ -272,7 +272,12 @@ gt4sd-inference --algorithm_name PaccMannGP --algorithm_application PaccMannGPGe
 
 Find more examples in [notebooks](./notebooks)
 
-<!-- Having a list of all supported algorithms wouldn be nice! -->
+You can play with them right away using the provided Dockerfile, simply build the image and run it to explore the examples using Jupyter:
+
+```sh
+docker build -f Dockerfile -t gt4sd-demo .
+docker run -p 8888:8888 gt4sd-demo
+```
 
 ## Supported packages
 
