@@ -2,7 +2,7 @@
 FROM drugilsberg/gt4sd-base:main
 ENV PATH=/opt/conda/envs/gt4sd/bin/:${PATH}
 COPY notebooks/requirements.txt notebooks_requirements.txt
-RUN pip install --no-cache-dir notebook==5.* gt4sd>=0.31.0 && pip install --no-cache-dir -r notebooks_requirements.txt
+RUN pip install --no-cache-dir notebook==5.* tensorflow-cpu==2.1.0 gt4sd>=0.31.0 && pip install --no-cache-dir -r notebooks_requirements.txt
 RUN adduser --disabled-password --gecos '' gt4sd
 ENV HOME /home/gt4sd
 COPY notebooks/ ${HOME}/notebooks/
