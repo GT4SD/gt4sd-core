@@ -169,7 +169,7 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
         default="solubility",
         metadata=dict(
             description="The version of the algorithm to use.",
-            options=["solubility", "qed"],
+            options=["solubility", "qed", "logp_and_synthesizability"],
         ),
     )
 
@@ -234,7 +234,7 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
         )
         return self.generator
 
-    def validate_item(self, item: str) -> Union[Molecule, Property]:  # type: ignore
+    def validate_item(self, item: str) -> Union[Molecule, Sequence]:  # type: ignore
         """Check that item is a valid sequence.
 
         Args:
@@ -361,7 +361,7 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
         )
         return self.generator
 
-    def validate_item(self, item: str) -> Union[Molecule, Property]:  # type: ignore
+    def validate_item(self, item: str) -> Union[Molecule, Sequence]:  # type: ignore
         """Check that item is a valid sequence.
 
         Args:
@@ -375,16 +375,20 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
         """
         if item is None:
             raise InvalidItem(title="InvalidSequence", detail="Sequence is None")
+        print("validate item input", item)
         (
             items,
             _,
         ) = self.generator.validate_output([item])
+        print("validation results", items)
         if items[0] is None:
             if self.generator.task == "generation":
                 title = "InvalidSequence"
                 detail = f'"{item}" does not adhere to IUPAC convention for AAS'
             else:
                 title = "InvalidNumerical"
-                detail = f'"{item}" is not a valid floating point number'
+                detail = (
+                    f'"{item}" is not a valid Sequence with a floating point number'
+                )
             raise InvalidItem(title=title, detail=detail)
         return item

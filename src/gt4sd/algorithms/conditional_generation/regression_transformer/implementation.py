@@ -27,6 +27,7 @@ import logging
 import os
 from typing import Any, List, Optional, Tuple, Union
 
+import numpy as np
 import torch
 from terminator.collators import MaskedTextCollator, PropertyCollator
 from terminator.inference import InferenceRT
@@ -129,41 +130,63 @@ class ConditionalGenerator:
         try:
             with open(os.path.join(resources_path, "inference.json"), "r") as f:
                 data = json.load(f)
-            self.property = data["property_token"]
-            self.property_mask_length = data["property_mask_length"][self.property]
-            self.min_ = data.get("property_ranges", {}).get(self.property, [0, 1])[0]
-            self.max_ = data.get("property_ranges", {}).get(self.property, [0, 1])[1]
+            self.properties = data["property_token"]
+            if isinstance(self.properties, str):
+                self.properties = [self.properties]
+
+            self.property_mask_lengths = [
+                data["property_mask_length"][p] for p in self.properties
+            ]
+            self._mins = [
+                data.get("property_ranges", {}).get(p, [0, 1])[0]
+                for p in self.properties
+            ]
+            self._maxs = [
+                data.get("property_ranges", {}).get(p, [0, 1])[1]
+                for p in self.properties
+            ]
             self.metadata = data
         except Exception:
             raise ValueError(
                 f"Could not restore inference parameters from {resources_path}"
             )
 
-    def denormalize(self, x: float, precision: int = 4) -> float:
+    def denormalize(self, x: float, idx: int, precision: int = 4) -> float:
         """
         Denormalize from [0,1] scale to original scale.
 
         Args:
             x: normalized value.
+            idx: index of the property.
             precision: optional rounding precision. Defaults to 4.
 
         Returns:
             float: Value in regular scale.
         """
-        return round(x * (self.max_ - self.min_) + self.min_, precision)
+        return round(
+            x * (self._maxs[idx] - self._mins[idx]) + self._mins[idx], precision
+        )
 
-    def normalize(self, x: float, precision: int = 3) -> float:
+    def normalize(self, x: float, idx: int, precision: int = 3) -> float:
         """
-        Normalize from original scale to [0,1] scale.
+        Normalize from original scale to desired scale.
 
         Args:
             x: unnormalized input.
+            idx: index of the property.
             precision: optional rounding precision.
 
         Returns:
             float: Normalized value.
         """
-        return round((x - self.min_) / (self.max_ - self.min_), precision)
+        if not isinstance(x, float):
+            if self.isfloat(x):
+                x = float(x)
+            else:
+                raise TypeError(f"{x} is not a float and cant safely be casted.")
+        return round(
+            (x - self._mins[idx]) / (self._maxs[idx] - self._mins[idx]), precision
+        )
 
     def validate_input(self, x: str) -> None:
 
@@ -174,14 +197,17 @@ class ConditionalGenerator:
             )
         if self.tokenizer.mask_token not in x:
             raise ValueError(
-                f"Nothing to do, no mask to fill ({self.tokenizer.mask_token}) found"
+                f"Nothing to do, no mask to fill ({self.tokenizer.mask_token}) found "
                 f"in input {x}."
             )
-        if self.property not in x:
-            raise ValueError(f"No property token ({self.property}) found in input")
+        if not all(p in x for p in self.properties):
+            raise ValueError(
+                f"Not all property tokens ({self.properties}) found in input"
+            )
 
         text_sequence = x.split(self.tokenizer.expression_separator)[-1]
         number_sequence = x[: -len(text_sequence) - 1]
+
         if (
             self.tokenizer.mask_token in text_sequence
             and self.tokenizer.mask_token in number_sequence
@@ -189,7 +215,9 @@ class ConditionalGenerator:
             raise ValueError(
                 f"Do not mask number and text sequence at the same time like in {x}."
             )
+
         self.validate_input_molecule(text_sequence)
+        self.validate_input_numerical(number_sequence)
 
     def validate_input_molecule(self, sequence: str) -> None:
         """
@@ -199,6 +227,49 @@ class ConditionalGenerator:
             sequence: input sequence to be validated.
         """
         raise NotImplementedError
+
+    def validate_input_numerical(self, sequence: str) -> None:
+        """
+        Verifies that the numeric part of the input sequence is valid.
+
+        Args:
+            sequence: input sequence to be validated.
+        """
+        if self.tokenizer.mask_token in sequence:
+            # Task is most likely regression
+            if sequence.count(self.tokenizer.mask_token) != sum(
+                self.property_mask_lengths
+            ):
+                raise ValueError(
+                    f"To predict {self.properties} you have to mask exactly "
+                    f"{self.property_mask_lengths} times respectively."
+                )
+        else:
+            # Task is most likely generation
+            tokens = []
+            for toks in sequence.split(self.tokenizer.expression_separator):
+                tokens.extend(self.tokenizer.property_tokenizer.tokenize(toks))
+                tokens.append(self.tokenizer.expression_separator)
+            idx = list(
+                np.where(np.array(tokens) == self.tokenizer.expression_separator)[0]
+            )
+            if len(idx) < len(self.properties):
+                raise ValueError(
+                    "Please append all properties with separator token:"
+                    f"{self.tokenizer.expression_separator}."
+                )
+            if idx[0] != self.property_mask_lengths[0] + 1:
+                raise ValueError(
+                    f"To generate samples, please describe {self.properties[0]} with "
+                    f"{self.property_mask_lengths[0]} tokens."
+                )
+            if len(self.properties) > 1:
+                for i in range(len(self.properties) - 1):
+                    if idx[i + 1] - idx[i] - 2 != self.property_mask_lengths[i + 1]:
+                        raise ValueError(
+                            f"To generate samples, describe {self.properties[i + 1]}"
+                            f" with {self.property_mask_lengths[i+1]} samples."
+                        )
 
     def safely_determine_task(self, x: str) -> str:
         """
@@ -219,16 +290,12 @@ class ConditionalGenerator:
             self.tokenizer.mask_token
             in x.split(self.tokenizer.expression_separator)[-1]
         ):
-            return "generation"
 
-        if x.count(self.tokenizer.mask_token) != self.property_mask_length:
-            raise ValueError(
-                f"To predict {self.property} you have to mask {self.property_mask_length} times"
-            )
+            return "generation"
 
         return "regression"
 
-    def generate_batch_regression(self, context: Sequence) -> List[Property]:
+    def generate_batch_regression(self, context: Sequence) -> List[Sequence]:
         """
         Predict the property of a sample.
 
@@ -237,7 +304,8 @@ class ConditionalGenerator:
                 entity. E.g. <stab>[MASK][MASK][MASK][MASK]|GSQEVNSGTQTYKNASPEEAERIARKAGATTWTEKGNKWEIRI.
 
         Returns:
-            List[Property]: a list of (denormalized) predicted properties for the entity.
+            List[Sequence]: a list of (denormalized) predicted properties for the entity.
+                Stored as a Sequence (str), e.g., '<qed>0.727'.
         """
         logger.info(f"Starting prediction for sequence {context}")
 
@@ -255,7 +323,7 @@ class ConditionalGenerator:
 
     def compile_regression_result(
         self, input_ids: torch.Tensor, prediction: torch.Tensor
-    ) -> List[Property]:
+    ) -> List[Sequence]:
         """
         Postprocesses the prediction from the property task to obtain a float.
 
@@ -264,7 +332,9 @@ class ConditionalGenerator:
             prediction: 2D Tensor of shape (batch_size, sequence_length).
 
         Returns:
-            List[Property]: list of property values.
+            List[Sequence]: list of property sequences (one per sample). Can contain
+                multiple properties but have to be hashable, therefore we use Sequences,
+                e.g., '<qed>0.727' or '<logp>6.65<scscore>3.82'.
         """
         properties = []
         for inp, pred in zip(input_ids, prediction):
@@ -276,7 +346,15 @@ class ConditionalGenerator:
             ).split(" ")
             joined = self.tokenizer.get_sample_prediction(out_tokens, in_tokens)
             _, gen_prop = self.tokenizer.aggregate_tokens(joined, label_mode=False)
-            properties.append(self.denormalize(gen_prop[self.property[1:-1]]))
+
+            properties.append(
+                "".join(
+                    [
+                        f"<{k}>{self.denormalize(v, pidx)}"
+                        for pidx, (k, v) in enumerate(gen_prop.items())
+                    ]
+                )
+            )
         return properties
 
     def generate_batch_generation(self, sequence: Sequence) -> Tuple:
@@ -294,7 +372,7 @@ class ConditionalGenerator:
                 sequence alongside its predicted property value.
         """
 
-        # The property score has to be in the range [0, 1]
+        # The property score has to be in the range understood by the model
         sequence = self.normalize_sequence(sequence)
 
         logger.warning(f"Starting prediction for sequence {sequence}")
@@ -302,6 +380,7 @@ class ConditionalGenerator:
         # Prepare the batch
         tokens = self.tokenizer(sequence)
         inputs = self.collator([tokens] * self.batch_size)
+
         input_ids = inputs["input_ids"].clone()
         # Forward pass
         outputs = self.model(inputs)
@@ -321,6 +400,7 @@ class ConditionalGenerator:
             "target_mapping": _input[2],
             "attention_mask": self.property_collator.attention_mask(generations),
         }
+
         # Pass through model
         property_outputs = self.model(prediction_input)
         # It's a design choice to go with greedy predictions here
@@ -336,10 +416,20 @@ class ConditionalGenerator:
             )
             for seq in generations
         ]
+        # Filter out all sequences that do not satisfy property constraints within
+        # tolerance range.
         successes: Tuple = tuple(
             filter(
-                lambda x: abs(self.normalize(x[1]) - self.target_value)
-                < self.tolerance,
+                lambda x: all(
+                    [
+                        abs(
+                            self.normalize(x[1].split(p)[-1].split("<")[0], i)
+                            - self.target_values[i]
+                        )
+                        < self.tolerance
+                        for i, p in enumerate(self.properties)
+                    ]
+                ),
                 zip(sequences, properties),
             )
         )  # type: ignore
@@ -348,35 +438,57 @@ class ConditionalGenerator:
 
     def normalize_sequence(self, context: Sequence) -> Sequence:
         """
-        Take a sequence with a unnormalized property score and convert it to a
+        Take a sequence with unnormalized property score(s) and convert it to a
         sequence with a normalized score.
 
         Args:
             context: sequence with unnormalized property.
 
         Returns:
-            Sequence: sequence with normalized property.
+            sequence with normalized property.
         """
         tokens = self.tokenizer.tokenize(context)
-        numerical_tokens = tokens[
-            tokens.index(self.property)
-            + 1 : tokens.index(self.tokenizer.expression_separator)
-        ]
+        final_tokens = "".join(tokens[: tokens.index(self.properties[0]) + 1])
+        self.target_values = []
+        for idx, prop in enumerate(self.properties):
+            numerical_tokens = tokens[
+                tokens.index(prop)
+                + 1 : tokens.index(self.tokenizer.expression_separator)
+            ]
 
-        unnorm = self.tokenizer.floating_tokens_to_float(numerical_tokens)
-        # Declard as class variable since used by other methods
-        self.target_value = self.normalize(unnorm)
-        norm = str(self.target_value)[: self.property_mask_length]
+            unnorm = self.tokenizer.floating_tokens_to_float(numerical_tokens)
+            # Declard as class variable since used by other methods
+            target = self.normalize(unnorm, idx)
+            norm = str(target)[: self.property_mask_lengths[idx]]
+            final_tokens += norm + self.tokenizer.expression_separator
+            self.target_values.append(target)
 
-        tokens = (
-            "".join(tokens[: tokens.index(self.property) + 1])
-            + norm
-            + "".join(tokens[tokens.index(self.tokenizer.expression_separator) :])
-        )
-        return "".join(tokens)
+        # Get index of the last expression separator
+        idx = len(tokens) - tokens[::-1].index(self.tokenizer.expression_separator) - 1
+
+        final_tokens += "".join(tokens[idx + 1 :])
+
+        return final_tokens
 
     @staticmethod
-    def validate_numerical(sequences: List[Any]):
+    def isfloat(sequence: str) -> bool:
+        """Safely determine whether a string can be converted to a float
+
+        Args:
+            sequence: A string
+
+        Returns:
+            Whether it can be converted to a float
+        """
+        try:
+            float(sequence)
+            return True
+        except ValueError:
+            return False
+
+    def validate_numerical(
+        self, sequences: List[Any]
+    ) -> Tuple[List[Sequence], List[int]]:
         """
         Validate whether a list of sequences contains only numerical values.
 
@@ -384,11 +496,19 @@ class ConditionalGenerator:
             sequences: a list of hopefully only numerical values.
 
         Returns:
-             List[Any]: a tuple containing of the validated floats and valid indexes.
+            A tuple of two lists for the validated Sequences and their respective
+            indices.
         """
-
-        items = [item if isinstance(item, float) else None for item in sequences]
-        idxs = [i for i, item in enumerate(sequences) if isinstance(item, float)]
+        items = []
+        idxs = []
+        for idx, item in enumerate(sequences):
+            if (
+                isinstance(item, str)
+                and item.startswith("<")
+                and self.isfloat(item.split(">")[-1])
+            ):
+                items.append(item)
+                idxs.append(idx)
         return items, idxs
 
 
@@ -454,8 +574,8 @@ class ChemicalLanguageRT(ConditionalGenerator):
             self.batch_size = batch_size
             self.property_collator = PropertyCollator(
                 tokenizer=self.tokenizer,
-                property_tokens=[self.property],
-                num_tokens_to_mask=[-1],
+                property_tokens=self.properties,
+                num_tokens_to_mask=[-1] * len(self.properties),
                 ignore_errors=False,
             )
             # Tolerance on [0,1] scale
@@ -483,8 +603,11 @@ class ChemicalLanguageRT(ConditionalGenerator):
             sequences: list of sequences to be validated.
 
         Returns:
-            A tuple of validated items (Chem.rdchem.Mol in the case of a generation task
-                floating values otherwise) and a list of valid indexes.
+            A tuple of validated items:
+                - the validate items, a list of either:
+                    - Chem.rdchem.Mol (generation task)
+                    - Sequence denoting the predicted properties (regression task)
+                - list of valid indexes.
         """
 
         if self.task == "regression":
@@ -560,8 +683,8 @@ class ProteinLanguageRT(ConditionalGenerator):
             self.batch_size = batch_size
             self.property_collator = PropertyCollator(
                 tokenizer=self.tokenizer,
-                property_tokens=[self.property],
-                num_tokens_to_mask=[-1],
+                property_tokens=self.properties,
+                num_tokens_to_mask=[-1] * len(self.properties),
                 ignore_errors=False,
             )
             # Tolerance on [0,1] scale
@@ -581,7 +704,7 @@ class ProteinLanguageRT(ConditionalGenerator):
                 f"Sequence {sequence} does not follow IUPAC convention for AAS"
             )
 
-    def validate_output(self, sequences: Any) -> Tuple[List[Any], List[int]]:
+    def validate_output(self, sequences: List[Any]) -> Tuple[List[Any], List[int]]:
         """
         Validate the output of the RT model.
 
@@ -589,7 +712,11 @@ class ProteinLanguageRT(ConditionalGenerator):
             sequences: list of sequences to be validated.
 
         Returns:
-            A tuple of validated items and a list of valid indexes.
+            A tuple of validated items:
+                - List of validated items, either:
+                    - Amino acid sequences (generation task)
+                    - Sequence denoting the predicted properties (regression task)
+                - a list of valid indexes.
         """
 
         if self.task == "regression":
@@ -603,7 +730,7 @@ class ProteinLanguageRT(ConditionalGenerator):
                         and self.tokenizer.mask_token not in item[0]
                         and not any([s.isdigit() for s in item[0]])
                     )
-                    and isinstance(item[1], float)
+                    and self.validate_numerical(item[1])
                 )
                 else None
                 for item in sequences
