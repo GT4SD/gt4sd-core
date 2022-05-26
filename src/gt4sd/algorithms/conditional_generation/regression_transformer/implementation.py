@@ -36,7 +36,7 @@ from terminator.selfies import decoder
 from terminator.tokenization import InferenceBertTokenizer
 from transformers import AutoConfig, AutoModelWithLMHead, XLNetLMHeadModel
 
-from ....domains.materials import Property, Sequence, validate_molecules
+from ....domains.materials import Sequence, validate_molecules
 from ....frameworks.torch import device_claim
 
 logger = logging.getLogger(__name__)
@@ -135,7 +135,7 @@ class ConditionalGenerator:
                 self.properties = [self.properties]
 
             # Optional normalize parameter (for property) defaults to True
-            self.do_normalize = data.get('normalize', [True] * len(self.properties))
+            self.do_normalize = data.get("normalize", [True] * len(self.properties))
 
             self.property_mask_lengths = [
                 data["property_mask_length"][p] for p in self.properties
@@ -187,22 +187,29 @@ class ConditionalGenerator:
         Returns:
             float: Normalized value.
         """
-
         # Error handling
-        if not isinstance(x, float):
-            if self.isfloat(x):
-                x = float(x)
-            else:
-                raise TypeError(f"{x} is not a float and cant safely be casted.")
+        if not isinstance(x, float) and not self.isfloat(x):
+            raise TypeError(f"{x} is not a float and cant safely be casted.")
 
-        # If this property does not require normalization, return the value
+        x_float = float(x)
+
+        # If this property does not require normalization, return it
         if not self.do_normalize[idx]:
-            return x
+            return x_float
         return round(
-            (x - self._mins[idx]) / (self._maxs[idx] - self._mins[idx]), precision
+            (x_float - self._mins[idx]) / (self._maxs[idx] - self._mins[idx]), precision
         )
 
     def validate_input(self, x: str) -> None:
+        """
+        Sanity checking for formatting of the input string.
+
+        Args:
+            x: The string to be validated.
+
+        Raises:
+            ValueError: If string was formatted incorrectly.
+        """
 
         if self.tokenizer.expression_separator not in x:
             raise ValueError(
@@ -360,7 +367,6 @@ class ConditionalGenerator:
             ).split(" ")
             joined = self.tokenizer.get_sample_prediction(out_tokens, in_tokens)
             _, gen_prop = self.tokenizer.aggregate_tokens(joined, label_mode=False)
-
             properties.append(
                 "".join(
                     [
