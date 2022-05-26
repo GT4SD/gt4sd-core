@@ -28,9 +28,12 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Build dist
+      - name: Install build
         run: |
-          python setup.py sdist
+          python -m pip install build
+      - name: Build dists
+        run: |
+          python -m build
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
