@@ -134,6 +134,9 @@ class ConditionalGenerator:
             if isinstance(self.properties, str):
                 self.properties = [self.properties]
 
+            # Optional normalize parameter (for property) defaults to True
+            self.do_normalize = data.get('normalize', [True] * len(self.properties))
+
             self.property_mask_lengths = [
                 data["property_mask_length"][p] for p in self.properties
             ]
@@ -153,21 +156,26 @@ class ConditionalGenerator:
 
     def denormalize(self, x: float, idx: int, precision: int = 4) -> float:
         """
-        Denormalize from [0,1] scale to original scale.
+        Denormalize from the model scale to the original scale.
 
         Args:
-            x: normalized value.
+            x: normalized value (often in [0,1]).
             idx: index of the property.
             precision: optional rounding precision. Defaults to 4.
 
         Returns:
             float: Value in regular scale.
         """
+
+        # If the property was not normalized, return the value
+        if not self.do_normalize[idx]:
+            return x
+
         return round(
             x * (self._maxs[idx] - self._mins[idx]) + self._mins[idx], precision
         )
 
-    def normalize(self, x: float, idx: int, precision: int = 3) -> float:
+    def normalize(self, x: str, idx: int, precision: int = 3) -> float:
         """
         Normalize from original scale to desired scale.
 
@@ -179,11 +187,17 @@ class ConditionalGenerator:
         Returns:
             float: Normalized value.
         """
+
+        # Error handling
         if not isinstance(x, float):
             if self.isfloat(x):
                 x = float(x)
             else:
                 raise TypeError(f"{x} is not a float and cant safely be casted.")
+
+        # If this property does not require normalization, return the value
+        if not self.do_normalize[idx]:
+            return x
         return round(
             (x - self._mins[idx]) / (self._maxs[idx] - self._mins[idx]), precision
         )
@@ -380,8 +394,8 @@ class ConditionalGenerator:
         # Prepare the batch
         tokens = self.tokenizer(sequence)
         inputs = self.collator([tokens] * self.batch_size)
-
         input_ids = inputs["input_ids"].clone()
+
         # Forward pass
         outputs = self.model(inputs)
         # Obtain model predictions via the search method
@@ -447,27 +461,30 @@ class ConditionalGenerator:
         Returns:
             sequence with normalized property.
         """
+
+        # Tokenize sequence and extract positions of separator tokens
         tokens = self.tokenizer.tokenize(context)
-        final_tokens = "".join(tokens[: tokens.index(self.properties[0]) + 1])
+        final_tokens = ""
+        sep_idxs = [
+            i for i, t in enumerate(tokens) if t == self.tokenizer.expression_separator
+        ]
+
+        # Declard as class variable since used by other methods
         self.target_values = []
+
+        # Loop over properties and normalize them
         for idx, prop in enumerate(self.properties):
-            numerical_tokens = tokens[
-                tokens.index(prop)
-                + 1 : tokens.index(self.tokenizer.expression_separator)
-            ]
+            numerical_tokens = tokens[tokens.index(prop) + 1 : sep_idxs[idx]]
+            final_tokens += prop
 
             unnorm = self.tokenizer.floating_tokens_to_float(numerical_tokens)
-            # Declard as class variable since used by other methods
             target = self.normalize(unnorm, idx)
             norm = str(target)[: self.property_mask_lengths[idx]]
             final_tokens += norm + self.tokenizer.expression_separator
             self.target_values.append(target)
 
-        # Get index of the last expression separator
-        idx = len(tokens) - tokens[::-1].index(self.tokenizer.expression_separator) - 1
-
-        final_tokens += "".join(tokens[idx + 1 :])
-
+        # Append rest of sequence
+        final_tokens += "".join(tokens[sep_idxs[-1] + 1 :])
         return final_tokens
 
     @staticmethod

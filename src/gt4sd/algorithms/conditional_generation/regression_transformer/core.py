@@ -375,12 +375,10 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
         """
         if item is None:
             raise InvalidItem(title="InvalidSequence", detail="Sequence is None")
-        print("validate item input", item)
         (
             items,
             _,
         ) = self.generator.validate_output([item])
-        print("validation results", items)
         if items[0] is None:
             if self.generator.task == "generation":
                 title = "InvalidSequence"
