@@ -207,14 +207,16 @@
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">randomize</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">sample_uniquely</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">max_sequence_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize Reinvent.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: path where to load hypothesis, candidate labels and, optionally, the model.</span>
-<span class="sd">            batch_size: number of samples to generate per scaffold</span>
-<span class="sd">            randomize: randomize the scaffolds if set to true</span>
-<span class="sd">            sample_uniquely: generate unique sample sequences if set to true</span>
+<span class="sd">            batch_size: number of samples to generate per scaffold.</span>
+<span class="sd">            randomize: randomize the scaffolds if set to true.</span>
+<span class="sd">            sample_uniquely: generate unique sample sequences if set to true.</span>
+<span class="sd">            max_sequence_length: maximum length of the generated sequences.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span> <span class="o">=</span> <span class="n">resources_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
@@ -228,6 +230,7 @@
             <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;artifacts file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="si">}</span><span class="s2"> does not exist locally&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">DecoratorModel</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max_sequence_length</span> <span class="o">=</span> <span class="n">max_sequence_length</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">randomize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_uniquely</span>
         <span class="p">)</span></div>
