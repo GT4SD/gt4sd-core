@@ -23,5 +23,5 @@
 #
 """Module initialization."""
 
-__version__ = "0.36.2"
+__version__ = "0.37.0"
 __name__ = "gt4sd"
