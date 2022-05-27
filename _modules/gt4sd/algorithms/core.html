@@ -369,7 +369,7 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">SamplingError</span><span class="p">(</span>
                     <span class="n">title</span><span class="o">=</span><span class="s2">&quot;No samples generated&quot;</span><span class="p">,</span>
-                    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;No samples generated.&quot;</span> <span class="o">+</span> <span class="n">detail</span><span class="p">,</span>
+                    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;No samples generated. &quot;</span> <span class="o">+</span> <span class="n">detail</span><span class="p">,</span>
                 <span class="p">)</span>
 
         <span class="n">item_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -407,14 +407,14 @@
                     <span class="n">stuck_counter</span>
                     <span class="o">&gt;=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_number_of_stuck_calls</span>
                 <span class="p">):</span>
-                    <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;no novel samples generared for more than </span><span class="si">{</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_number_of_stuck_calls</span><span class="si">}</span><span class="s2"> cycles&quot;</span>
+                    <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;no novel samples generated for more than </span><span class="si">{</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_number_of_stuck_calls</span><span class="si">}</span><span class="s2"> cycles&quot;</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">detail</span> <span class="o">+</span> <span class="s2">&quot;, exiting&quot;</span><span class="p">)</span>
                     <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
                     <span class="n">raise_if_none_sampled</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">item_set</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>
                     <span class="k">return</span>
                 <span class="n">item_set_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
-            <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Samples took longer than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_runtime</span><span class="si">}</span><span class="s2"> seconds to generate&quot;</span>
+            <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Samples took longer than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_runtime</span><span class="si">}</span><span class="s2"> seconds to generate.&quot;</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">detail</span> <span class="o">+</span> <span class="s2">&quot;, exiting&quot;</span><span class="p">)</span>
             <span class="n">raise_if_none_sampled</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">item_set</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>
         <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>

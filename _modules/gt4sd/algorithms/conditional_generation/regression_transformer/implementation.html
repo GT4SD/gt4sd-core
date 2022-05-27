@@ -184,17 +184,18 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">terminator.collators</span> <span class="kn">import</span> <span class="n">MaskedTextCollator</span><span class="p">,</span> <span class="n">PropertyCollator</span>
 <span class="kn">from</span> <span class="nn">terminator.inference</span> <span class="kn">import</span> <span class="n">InferenceRT</span>
 <span class="kn">from</span> <span class="nn">terminator.search</span> <span class="kn">import</span> <span class="n">SEARCH_FACTORY</span><span class="p">,</span> <span class="n">Search</span>
-<span class="kn">from</span> <span class="nn">terminator.selfies</span> <span class="kn">import</span> <span class="n">decoder</span>
+<span class="kn">from</span> <span class="nn">terminator.selfies</span> <span class="kn">import</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">encoder</span>
 <span class="kn">from</span> <span class="nn">terminator.tokenization</span> <span class="kn">import</span> <span class="n">InferenceBertTokenizer</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoConfig</span><span class="p">,</span> <span class="n">AutoModelWithLMHead</span><span class="p">,</span> <span class="n">XLNetLMHeadModel</span>
 
-<span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">Property</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">validate_molecules</span>
+<span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">validate_molecules</span>
 <span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -207,21 +208,24 @@
     <span class="c1"># device where the inference is running.</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span>
 
-    <span class="c1"># The task the RT is currently performing. Either &#39;regression&#39; or &#39;generation&#39;</span>
+    <span class="c1"># The task the RT is currently performing. Either &#39;regression&#39; or &#39;generation&#39;.</span>
     <span class="n">task</span><span class="p">:</span> <span class="nb">str</span>
 
-    <span class="c1"># method to convert logits to predictions. Either GreedySearch or SamplingSearch</span>
+    <span class="c1"># method to convert logits to predictions. Either GreedySearch or SamplingSearch.</span>
     <span class="n">search</span><span class="p">:</span> <span class="n">Search</span>
 
     <span class="c1"># ***** Additional attributes for text generation *****</span>
-    <span class="c1"># data collator for property prediction of self-generated items</span>
+    <span class="c1"># data collator for property prediction of self-generated items.</span>
     <span class="n">property_collator</span><span class="p">:</span> <span class="n">PropertyCollator</span>
 
-    <span class="c1"># percentage of tolerated deviation between desired and obtained property</span>
+    <span class="c1"># percentage of tolerated deviation between desired and obtained property.</span>
     <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">20</span>
 
-    <span class="c1"># number of samples obtained per call</span>
+    <span class="c1"># number of samples obtained per call.</span>
     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span>
+
+    <span class="c1"># a dictionary to specify sampling from a specific seed molecule.</span>
+    <span class="n">sampling_wrapper</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="ConditionalGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -243,6 +247,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
         <span class="c1"># Set up the data preparation pipeline</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;inference.json&quot;</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;algorithm_version </span><span class="si">{</span><span class="n">resources_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">InferenceBertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
             <span class="n">resources_path</span><span class="p">,</span> <span class="n">pad_even</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span>
@@ -288,43 +296,92 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;inference.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;property_token&quot;</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_length</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;property_mask_length&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">min_</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;property_ranges&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;property_ranges&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;property_token&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">]</span>
+
+            <span class="c1"># Optional normalize parameter (for property) defaults to True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">do_normalize</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;normalize&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_lengths</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;property_mask_length&quot;</span><span class="p">][</span><span class="n">p</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mins</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;property_ranges&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_maxs</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;property_ranges&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span>
+            <span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">data</span>
+
+            <span class="c1"># Tolerance defined on the original scale</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tolerances</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_maxs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mins</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">/</span> <span class="mf">100.0</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">))</span>
+            <span class="p">]</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Could not restore inference parameters from </span><span class="si">{</span><span class="n">resources_path</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ConditionalGenerator.denormalize"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.denormalize">[docs]</a>    <span class="k">def</span> <span class="nf">denormalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="ConditionalGenerator.denormalize"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.denormalize">[docs]</a>    <span class="k">def</span> <span class="nf">denormalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Denormalize from [0,1] scale to original scale.</span>
+<span class="sd">        Denormalize from the model scale to the original scale.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x: normalized value.</span>
+<span class="sd">            x: normalized value (often in [0,1]).</span>
+<span class="sd">            idx: index of the property.</span>
 <span class="sd">            precision: optional rounding precision. Defaults to 4.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: Value in regular scale.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ConditionalGenerator.normalize"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="c1"># If the property was not normalized, return the value</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_normalize</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">x</span>
+
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span>
+            <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_maxs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mins</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mins</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">precision</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.normalize"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Normalize from original scale to [0,1] scale.</span>
+<span class="sd">        Normalize from original scale to desired scale.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: unnormalized input.</span>
+<span class="sd">            idx: index of the property.</span>
 <span class="sd">            precision: optional rounding precision.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: Normalized value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">round</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_</span><span class="p">),</span> <span class="n">precision</span><span class="p">)</span></div>
+        <span class="c1"># Error handling</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isfloat</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is not a float and cant safely be casted.&quot;</span><span class="p">)</span>
+
+        <span class="n">x_float</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># If this property does not require normalization, return it</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_normalize</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">x_float</span>
+        <span class="n">normed</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">x_float</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mins</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_maxs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mins</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span> <span class="n">precision</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">normed</span></div>
 
 <div class="viewcode-block" id="ConditionalGenerator.validate_input"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sanity checking for formatting of the input string.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: The string to be validated.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If string was formatted incorrectly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -333,14 +390,17 @@
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Nothing to do, no mask to fill (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span><span class="si">}</span><span class="s2">) found&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Nothing to do, no mask to fill (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span><span class="si">}</span><span class="s2">) found &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;in input </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">property</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No property token (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="si">}</span><span class="s2">) found in input&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">p</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Not all property tokens (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="si">}</span><span class="s2">) found in input&quot;</span>
+            <span class="p">)</span>
 
         <span class="n">text_sequence</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">number_sequence</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">text_sequence</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
         <span class="k">if</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span> <span class="ow">in</span> <span class="n">text_sequence</span>
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span> <span class="ow">in</span> <span class="n">number_sequence</span>
@@ -348,9 +408,11 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Do not mask number and text sequence at the same time like in </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">text_sequence</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ConditionalGenerator.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">text_sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_numerical</span><span class="p">(</span><span class="n">number_sequence</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Verifies that the non-numerical part of the input is a proper sequence.</span>
 
@@ -358,6 +420,49 @@
 <span class="sd">            sequence: input sequence to be validated.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.validate_input_numerical"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_numerical">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_numerical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies that the numeric part of the input sequence is valid.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence: input sequence to be validated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
+            <span class="c1"># Task is most likely regression</span>
+            <span class="k">if</span> <span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_lengths</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;To predict </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="si">}</span><span class="s2"> you have to mask exactly &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">property_mask_lengths</span><span class="si">}</span><span class="s2"> times respectively.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Task is most likely generation</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">toks</span> <span class="ow">in</span> <span class="n">sequence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">):</span>
+                <span class="n">tokens</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">property_tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">toks</span><span class="p">))</span>
+                <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Please append all properties with separator token:&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;To generate samples, please describe </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> with &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">property_mask_lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> tokens.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">idx</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_lengths</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;To generate samples, describe </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot; with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">property_mask_lengths</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> samples.&quot;</span>
+                        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConditionalGenerator.safely_determine_task"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.safely_determine_task">[docs]</a>    <span class="k">def</span> <span class="nf">safely_determine_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -378,16 +483,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span>
             <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="p">):</span>
-            <span class="k">return</span> <span class="s2">&quot;generation&quot;</span>
 
-        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_length</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;To predict </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="si">}</span><span class="s2"> you have to mask </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">property_mask_length</span><span class="si">}</span><span class="s2"> times&quot;</span>
-            <span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;generation&quot;</span>
 
         <span class="k">return</span> <span class="s2">&quot;regression&quot;</span></div>
 
-<div class="viewcode-block" id="ConditionalGenerator.generate_batch_regression"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.generate_batch_regression">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Property</span><span class="p">]:</span>
+<div class="viewcode-block" id="ConditionalGenerator.generate_batch_regression"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.generate_batch_regression">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Predict the property of a sample.</span>
 
@@ -396,7 +497,8 @@
 <span class="sd">                entity. E.g. &lt;stab&gt;[MASK][MASK][MASK][MASK]|GSQEVNSGTQTYKNASPEEAERIARKAGATTWTEKGNKWEIRI.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            List[Property]: a list of (denormalized) predicted properties for the entity.</span>
+<span class="sd">            List[Sequence]: a list of (denormalized) predicted properties for the entity.</span>
+<span class="sd">                Stored as a Sequence (str), e.g., &#39;&lt;qed&gt;0.727&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting prediction for sequence </span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -414,7 +516,7 @@
 
 <div class="viewcode-block" id="ConditionalGenerator.compile_regression_result"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.compile_regression_result">[docs]</a>    <span class="k">def</span> <span class="nf">compile_regression_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">prediction</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Property</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Postprocesses the prediction from the property task to obtain a float.</span>
 
@@ -423,7 +525,9 @@
 <span class="sd">            prediction: 2D Tensor of shape (batch_size, sequence_length).</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            List[Property]: list of property values.</span>
+<span class="sd">            List[Sequence]: list of property sequences (one per sample). Can contain</span>
+<span class="sd">                multiple properties but have to be hashable, therefore we use Sequences,</span>
+<span class="sd">                e.g., &#39;&lt;qed&gt;0.727&#39; or &#39;&lt;logp&gt;6.65&lt;scscore&gt;3.82&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">properties</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">inp</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">prediction</span><span class="p">):</span>
@@ -435,7 +539,14 @@
             <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
             <span class="n">joined</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">get_sample_prediction</span><span class="p">(</span><span class="n">out_tokens</span><span class="p">,</span> <span class="n">in_tokens</span><span class="p">)</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">gen_prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">aggregate_tokens</span><span class="p">(</span><span class="n">joined</span><span class="p">,</span> <span class="n">label_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">properties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">denormalize</span><span class="p">(</span><span class="n">gen_prop</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]))</span>
+            <span class="n">properties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">denormalize</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">pidx</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">for</span> <span class="n">pidx</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gen_prop</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">properties</span></div>
 
 <div class="viewcode-block" id="ConditionalGenerator.generate_batch_generation"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.generate_batch_generation">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
@@ -453,7 +564,11 @@
 <span class="sd">                sequence alongside its predicted property value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># The property score has to be in the range [0, 1]</span>
+        <span class="c1"># If we are in sampling mode, the sampled sequence changes per iteration.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_wrapper</span> <span class="o">!=</span> <span class="p">{}:</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+
+        <span class="c1"># The property score has to be in the range understood by the model</span>
         <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting prediction for sequence </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -462,6 +577,7 @@
         <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
         <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collator</span><span class="p">([</span><span class="n">tokens</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
         <span class="n">input_ids</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+
         <span class="c1"># Forward pass</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
         <span class="c1"># Obtain model predictions via the search method</span>
@@ -480,6 +596,7 @@
             <span class="s2">&quot;target_mapping&quot;</span><span class="p">:</span> <span class="n">_input</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
             <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_collator</span><span class="o">.</span><span class="n">attention_mask</span><span class="p">(</span><span class="n">generations</span><span class="p">),</span>
         <span class="p">}</span>
+
         <span class="c1"># Pass through model</span>
         <span class="n">property_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">prediction_input</span><span class="p">)</span>
         <span class="c1"># It&#39;s a design choice to go with greedy predictions here</span>
@@ -495,10 +612,21 @@
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">generations</span>
         <span class="p">]</span>
+        <span class="c1"># Filter out all sequences that do not satisfy property constraints within</span>
+        <span class="c1"># tolerance range.</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sequences </span><span class="si">{</span><span class="n">sequences</span><span class="si">}</span><span class="s2">, properties: </span><span class="si">{</span><span class="n">properties</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">successes</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
             <span class="nb">filter</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span><span class="p">)</span>
-                <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span>
+                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">all</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="nb">abs</span><span class="p">(</span>
+                            <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">p</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                            <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="p">)</span>
+                        <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerances</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
                 <span class="nb">zip</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">properties</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="p">)</span>  <span class="c1"># type: ignore</span>
@@ -507,35 +635,60 @@
 
 <div class="viewcode-block" id="ConditionalGenerator.normalize_sequence"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.normalize_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Take a sequence with a unnormalized property score and convert it to a</span>
+<span class="sd">        Take a sequence with unnormalized property score(s) and convert it to a</span>
 <span class="sd">        sequence with a normalized score.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            context: sequence with unnormalized property.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Sequence: sequence with normalized property.</span>
+<span class="sd">            sequence with normalized property.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Tokenize sequence and extract positions of separator tokens</span>
         <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-        <span class="n">numerical_tokens</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span>
-            <span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">)</span>
-            <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)</span>
+        <span class="n">final_tokens</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">sep_idxs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span>
         <span class="p">]</span>
 
-        <span class="n">unnorm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">floating_tokens_to_float</span><span class="p">(</span><span class="n">numerical_tokens</span><span class="p">)</span>
         <span class="c1"># Declard as class variable since used by other methods</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">unnorm</span><span class="p">)</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_value</span><span class="p">)[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_length</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_values</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="n">tokens</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[:</span> <span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
-            <span class="o">+</span> <span class="n">norm</span>
-            <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)</span> <span class="p">:])</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span></div>
+        <span class="c1"># Loop over properties and normalize them</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">):</span>
+            <span class="n">numerical_tokens</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">sep_idxs</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span>
+            <span class="n">final_tokens</span> <span class="o">+=</span> <span class="n">prop</span>
 
-<div class="viewcode-block" id="ConditionalGenerator.validate_numerical"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_numerical">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">validate_numerical</span><span class="p">(</span><span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
+            <span class="n">unnorm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">floating_tokens_to_float</span><span class="p">(</span><span class="n">numerical_tokens</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unnorm</span><span class="p">)</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">unnorm</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_lengths</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span>
+            <span class="n">final_tokens</span> <span class="o">+=</span> <span class="n">norm</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span>
+
+        <span class="c1"># Append rest of sequence</span>
+        <span class="n">final_tokens</span> <span class="o">+=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">sep_idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:])</span>
+        <span class="k">return</span> <span class="n">final_tokens</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.isfloat"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.isfloat">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">isfloat</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Safely determine whether a string can be converted to a float</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence: A string</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Whether it can be converted to a float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.validate_numerical"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_numerical">[docs]</a>    <span class="k">def</span> <span class="nf">validate_numerical</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Sequence</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validate whether a list of sequences contains only numerical values.</span>
 
@@ -543,20 +696,146 @@
 <span class="sd">            sequences: a list of hopefully only numerical values.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">             List[Any]: a tuple containing of the validated floats and valid indexes.</span>
+<span class="sd">            A tuple of two lists for the validated Sequences and their respective</span>
+<span class="sd">            indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sequences</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">item</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">isfloat</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">):</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="n">idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">items</span><span class="p">,</span> <span class="n">idxs</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.validate_sampling_wrapper"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_sampling_wrapper">[docs]</a>    <span class="k">def</span> <span class="nf">validate_sampling_wrapper</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">property_goal</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">fraction_to_mask</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">tokens_to_mask</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validating whether the wrapper can be used for conditional generation of samples.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            context: A string that is used as a seed. Has to be a SELFIES</span>
+<span class="sd">                (RegressionTransformerMolecules) or AAS (RegressionTransformerProteins).</span>
+<span class="sd">            property_goal: Specifies the property conditions for the targeted generation.</span>
+<span class="sd">               The keys are the properties and have to be aligned with the</span>
+<span class="sd">               algorithm_version. For example, for the solubility model use:</span>
+<span class="sd">               {&#39;&lt;esol&gt;&#39;: 1.23}</span>
+<span class="sd">               or for the logp_and_synthesizability model use:</span>
+<span class="sd">               {&#39;&lt;logp&gt;&#39;: 1.23, &#39;&lt;synthesizability&gt;&#39;: 2.34}</span>
+<span class="sd">                Defaults to {}, but it has to be specified.</span>
+<span class="sd">            fraction_to_mask: The fraction of tokens that can be changed. Defaults to 0.2.</span>
+<span class="sd">            tokens_to_mask: A list of atoms (or amino acids) that can be considered for masking.</span>
+<span class="sd">                Defaults to [] meaning that all tokens can be masked. E.g., use [&#39;F&#39;] to</span>
+<span class="sd">                only mask fluorine atoms</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">smiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed_molecule</span> <span class="o">=</span> <span class="n">context</span>
+
+        <span class="k">if</span> <span class="n">property_goal</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please specify the target properties with a dictionary.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">k</span> <span class="ow">in</span> <span class="n">property_goal</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Please provide property goals for all properties: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">property_goal</span> <span class="o">=</span> <span class="n">property_goal</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fraction_to_mask</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The fraction_to_mask </span><span class="si">{</span><span class="n">fraction_to_mask</span><span class="si">}</span><span class="s2"> has to be a float.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">fraction_to_mask</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">fraction_to_mask</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The fraction_to_mask </span><span class="si">{</span><span class="n">fraction_to_mask</span><span class="si">}</span><span class="s2"> has to be between 0 and 1.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fraction_to_mask</span> <span class="o">=</span> <span class="n">fraction_to_mask</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tokens_to_mask</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The tokens_to_mask </span><span class="si">{</span><span class="n">tokens_to_mask</span><span class="si">}</span><span class="s2"> has to be a list.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maskable_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maskable_tokens</span><span class="p">(</span><span class="n">tokens_to_mask</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Will start sampling molecules similar to </span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="s2"> with goal: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">property_goal</span><span class="si">}</span><span class="s2"> and masking </span><span class="si">{</span><span class="n">fraction_to_mask</span><span class="si">}</span><span class="s2"> of the tokens.&quot;</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.sample_sequence"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.sample_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">sample_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assembling a RT-sequence from a seed SMILES/AAS sequence.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            seq: A SMILES/AAS string used as seed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A RT-sequence that uses SELFIES/AAS and incorporates the properties, e.g.:</span>
+<span class="sd">            `&lt;logp&gt;1.234|&lt;synthesizability&gt;1.234|[C][C][O]`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">]</span>
-        <span class="n">idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">float</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="n">items</span><span class="p">,</span> <span class="n">idxs</span></div></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_wrapper</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="k">return</span> <span class="n">seq</span>
+
+        <span class="c1"># Convert SMILES/AAS to list of SELFIES/AAS tokens</span>
+        <span class="n">language_seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_encoding</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">text_tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">language_seq</span><span class="p">)</span>
+
+        <span class="c1"># Determine which tokens can be masked</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maskable_tokens</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="c1"># All tokens can be considered for masking</span>
+            <span class="n">maskable_tokens</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+            <span class="n">num_to_mask</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fraction_to_mask</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Mask only tokens that are specified by the user</span>
+            <span class="n">maskable_tokens</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maskable_tokens</span><span class="p">)</span>
+            <span class="n">num_to_mask</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+                <span class="nb">sum</span><span class="p">([</span><span class="n">tokens</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">maskable_tokens</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fraction_to_mask</span>
+            <span class="p">)</span>
+
+        <span class="n">maskable_idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">maskable_tokens</span><span class="p">]</span>
+
+        <span class="c1"># Mask the tokens</span>
+        <span class="n">mask_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">maskable_idxs</span><span class="p">,</span> <span class="n">num_to_mask</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">sequence_tokens</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">t</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mask_idxs</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Extract the property tokens</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property_goal</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Please provide property goals exactly for: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Define property tokens (this has unnormalized property values)</span>
+        <span class="n">prop_tokens</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">):</span>
+            <span class="n">numerical</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property_goal</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)[</span>
+                <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_mask_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="n">prop_tokens</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">numerical</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span>
+
+        <span class="c1"># Return new sequence</span>
+        <span class="n">sequence</span> <span class="o">=</span> <span class="n">prop_tokens</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sequence_tokens</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sequence</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.get_maskable_tokens"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.get_maskable_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">get_maskable_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens_to_mask</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.language_encoding"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.language_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">language_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
 
 
 <div class="viewcode-block" id="ChemicalLanguageRT"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT">[docs]</a><span class="k">class</span> <span class="nc">ChemicalLanguageRT</span><span class="p">(</span><span class="n">ConditionalGenerator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hybrid regression and conditional molecular generation model as implemented in</span>
-<span class="sd">    https://arxiv.org/abs/2202.01338. It generates molecules with a desired solubility</span>
-<span class="sd">    (ESOL) score or predicts the ESOL of a given molecule.</span>
-<span class="sd">    For details on the ESOL task see: https://pubs.acs.org/doi/10.1021/ci034243x</span>
+<span class="sd">    https://arxiv.org/abs/2202.01338.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        resources_path: path to the model.</span>
@@ -575,6 +854,7 @@
         <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.4</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
         <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+        <span class="n">sampling_wrapper</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -582,18 +862,32 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: directory where to find models and parameters.</span>
+<span class="sd">            context: user-specified input text for the model.</span>
 <span class="sd">            search: search key to instantiate a search, defaults to `sample`.</span>
 <span class="sd">            temperature: temperature for the sampling. Defaults to 1.4.</span>
 <span class="sd">            batch_size: number of points sampled per call. Defaults to 8.</span>
 <span class="sd">            tolerance: the tolerance for the property of the generated molecules.</span>
 <span class="sd">                Given in percent. Defaults to 20.</span>
+<span class="sd">            sampling_wrapper: A high-level entry point that allows specifying a seed</span>
+<span class="sd">                SMILES alongside some target conditions.</span>
+<span class="sd">                NOTE: If this is used, the `target` needs to be a single SMILES string.</span>
+<span class="sd">                Example: {</span>
+<span class="sd">                    &#39;fraction_to_mask&#39;: 0.5,</span>
+<span class="sd">                    &#39;tokens_to_mask&#39;: [],</span>
+<span class="sd">                    &#39;property_goal&#39;: {&#39;&lt;qed&gt;&#39;: 0.85}</span>
+<span class="sd">                }</span>
 <span class="sd">            device: device where the inference s running either as a dedicated class</span>
 <span class="sd">                or a string. If not provided is inferred.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
 
-        <span class="c1"># Validate input and determine task</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">safely_determine_task</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sampling_wrapper</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="c1"># Validate input and determine task</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">safely_determine_task</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_sampling_wrapper</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">sampling_wrapper</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;generation&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_wrapper</span> <span class="o">=</span> <span class="n">sampling_wrapper</span>
 
         <span class="c1"># Console outputs for usage of search methods</span>
         <span class="k">if</span> <span class="n">search</span> <span class="o">==</span> <span class="s2">&quot;sample&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
@@ -613,26 +907,35 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">property_collator</span> <span class="o">=</span> <span class="n">PropertyCollator</span><span class="p">(</span>
                 <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
-                <span class="n">property_tokens</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">],</span>
-                <span class="n">num_tokens_to_mask</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">property_tokens</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
+                <span class="n">num_tokens_to_mask</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">),</span>
                 <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="c1"># Tolerance on [0,1] scale</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span> <span class="o">/</span> <span class="mf">100.0</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown task: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChemicalLanguageRT.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown task: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">small_mol</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ChemicalLanguageRT.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Verifies that the non-numerical part of the input sequence is a SELFIES.</span>
+<span class="sd">        Verifies that the non-numerical part of the input sequence is a molecule.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            sequence: input sequence to be validated.</span>
+<span class="sd">            smiles: whether the input is validated to be a SELFIES (default) or SMILES.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Fractional molecules based on non-masked parts of the SELFIES sequence</span>
-        <span class="n">smis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="n">sequence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">smis</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid sequence: </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">smiles</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">idxs</span> <span class="o">=</span> <span class="n">validate_molecules</span><span class="p">([</span><span class="n">sequence</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The context </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2"> is not a valid SMILES string.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Fractional molecules based on non-masked parts of the SELFIES sequence</span>
+            <span class="n">smis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="n">sequence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">smis</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid sequence: </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ChemicalLanguageRT.validate_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_output">[docs]</a>    <span class="k">def</span> <span class="nf">validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -642,8 +945,11 @@
 <span class="sd">            sequences: list of sequences to be validated.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            A tuple of validated items (Chem.rdchem.Mol in the case of a generation task</span>
-<span class="sd">                floating values otherwise) and a list of valid indexes.</span>
+<span class="sd">            A tuple of validated items:</span>
+<span class="sd">                - the validate items, a list of either:</span>
+<span class="sd">                    - Chem.rdchem.Mol (generation task)</span>
+<span class="sd">                    - Sequence denoting the predicted properties (regression task)</span>
+<span class="sd">                - list of valid indexes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
@@ -655,7 +961,27 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">smiles_list</span> <span class="o">==</span> <span class="p">[]:</span>
                 <span class="k">return</span> <span class="p">([</span><span class="kc">None</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">return</span> <span class="n">validate_molecules</span><span class="p">(</span><span class="n">smiles_list</span><span class="o">=</span><span class="n">smiles_list</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div></div>
+            <span class="k">return</span> <span class="n">validate_molecules</span><span class="p">(</span><span class="n">smiles_list</span><span class="o">=</span><span class="n">smiles_list</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+
+<div class="viewcode-block" id="ChemicalLanguageRT.get_maskable_tokens"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.get_maskable_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">get_maskable_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens_to_mask</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a user-defined list of maskable tokens into a RT model-friendly format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tokens_to_mask: List of atoms specified in SMILES notation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of atoms in SELFIES notation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># To reflect double bonds</span>
+        <span class="n">tokens_to_mask</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;=</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tokens_to_mask</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">encoder</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">tokens_to_mask</span><span class="p">]</span>  <span class="c1"># type: ignore</span></div>
+
+<div class="viewcode-block" id="ChemicalLanguageRT.language_encoding"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.language_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">language_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">selfie</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selfie</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">seq</span><span class="si">}</span><span class="s2"> is not a valid SELFIES sequence.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">selfie</span></div></div>
 
 
 <div class="viewcode-block" id="ProteinLanguageRT"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT">[docs]</a><span class="k">class</span> <span class="nc">ProteinLanguageRT</span><span class="p">(</span><span class="n">ConditionalGenerator</span><span class="p">):</span>
@@ -682,6 +1008,7 @@
         <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.4</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
         <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+        <span class="n">sampling_wrapper</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -694,13 +1021,26 @@
 <span class="sd">            batch_size: number of points sampled per call. Defaults to 8.</span>
 <span class="sd">            tolerance: the tolerance for the property of the generated molecules.</span>
 <span class="sd">                Given in percent. Defaults to 20.</span>
+<span class="sd">            sampling_wrapper: A high-level entry point that allows specifying a seed</span>
+<span class="sd">                SMILES alongside some target conditions.</span>
+<span class="sd">                NOTE: If this is used, the `target` needs to be a single SMILES string.</span>
+<span class="sd">                Example: {</span>
+<span class="sd">                    &#39;fraction_to_mask&#39;: 0.5,</span>
+<span class="sd">                    &#39;tokens_to_mask&#39;: [],</span>
+<span class="sd">                    &#39;property_goal&#39;: {&#39;&lt;stab&gt;&#39;: 0.85}</span>
+<span class="sd">                }</span>
 <span class="sd">            device: device where the inference s running either as a dedicated class</span>
 <span class="sd">                or a string. If not provided is inferred.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
 
-        <span class="c1"># Validate input and determine task</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">safely_determine_task</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sampling_wrapper</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="c1"># Validate input and determine task</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">safely_determine_task</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;generation&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_sampling_wrapper</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">sampling_wrapper</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_wrapper</span> <span class="o">=</span> <span class="n">sampling_wrapper</span>
 
         <span class="c1"># Console outputs for usage of search methods</span>
         <span class="k">if</span> <span class="n">search</span> <span class="o">==</span> <span class="s2">&quot;sample&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
@@ -719,28 +1059,29 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">property_collator</span> <span class="o">=</span> <span class="n">PropertyCollator</span><span class="p">(</span>
                 <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
-                <span class="n">property_tokens</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">],</span>
-                <span class="n">num_tokens_to_mask</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">property_tokens</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
+                <span class="n">num_tokens_to_mask</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">),</span>
                 <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="c1"># Tolerance on [0,1] scale</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span> <span class="o">/</span> <span class="mf">100.0</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown task: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown task: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ProteinLanguageRT.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">small_mol</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ProteinLanguageRT.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Verifies that the non-numerical part of the input sequence is a valid AAS.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            sequence: input sequence to be validated.</span>
+<span class="sd">            smiles: boolean argument that is ignored but needed for sibling class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">sequence</span> <span class="o">!=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Sequence </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2"> does not follow IUPAC convention for AAS&quot;</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ProteinLanguageRT.validate_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_output">[docs]</a>    <span class="k">def</span> <span class="nf">validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<div class="viewcode-block" id="ProteinLanguageRT.validate_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_output">[docs]</a>    <span class="k">def</span> <span class="nf">validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validate the output of the RT model.</span>
 
@@ -748,7 +1089,11 @@
 <span class="sd">            sequences: list of sequences to be validated.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            A tuple of validated items and a list of valid indexes.</span>
+<span class="sd">            A tuple of validated items:</span>
+<span class="sd">                - List of validated items, either:</span>
+<span class="sd">                    - Amino acid sequences (generation task)</span>
+<span class="sd">                    - Sequence denoting the predicted properties (regression task)</span>
+<span class="sd">                - a list of valid indexes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
@@ -762,13 +1107,30 @@
                         <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                         <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
                     <span class="p">)</span>
-                    <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_numerical</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                 <span class="p">)</span>
                 <span class="k">else</span> <span class="kc">None</span>
                 <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sequences</span>
             <span class="p">]</span>
             <span class="n">idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">items</span><span class="p">,</span> <span class="n">idxs</span></div></div>
+            <span class="k">return</span> <span class="n">items</span><span class="p">,</span> <span class="n">idxs</span></div>
+
+<div class="viewcode-block" id="ProteinLanguageRT.get_maskable_tokens"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.get_maskable_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">get_maskable_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens_to_mask</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a user-defined list of maskable tokens (amino acids) into a RT</span>
+<span class="sd">            model-friendly format. Nothing has to be done for proteins, but the function</span>
+<span class="sd">            is more complex for sister-classes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tokens_to_mask: List of amino acids specified in IUPAC convention.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The same.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">tokens_to_mask</span></div>
+
+<div class="viewcode-block" id="ProteinLanguageRT.language_encoding"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.language_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">language_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">seq</span></div></div>
 </pre></div>
 
            </div>

@@ -258,6 +258,11 @@
 <code class="sig-name descname">batch_size</code><em class="property">: int</em><em class="property"> = 8</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.batch_size" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.sampling_wrapper">
+<code class="sig-name descname">sampling_wrapper</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></em><em class="property"> = {}</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.sampling_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__init__" title="Permalink to this definition">¶</a></dt>
@@ -317,12 +322,13 @@ XLNetConfig: configuration of the model.</p>
 
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.denormalize">
-<code class="sig-name descname">denormalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">4</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.denormalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.denormalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Denormalize from [0,1] scale to original scale.</p>
+<code class="sig-name descname">denormalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">idx</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">4</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.denormalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.denormalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Denormalize from the model scale to the original scale.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – normalized value.</p></li>
+<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – normalized value (often in [0,1]).</p></li>
+<li><p><strong>idx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – index of the property.</p></li>
 <li><p><strong>precision</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – optional rounding precision. Defaults to 4.</p></li>
 </ul>
 </dd>
@@ -337,12 +343,13 @@ XLNetConfig: configuration of the model.</p>
 
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.normalize">
-<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">3</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Normalize from original scale to [0,1] scale.</p>
+<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">idx</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">3</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize from original scale to desired scale.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – unnormalized input.</p></li>
+<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – unnormalized input.</p></li>
+<li><p><strong>idx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – index of the property.</p></li>
 <li><p><strong>precision</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – optional rounding precision.</p></li>
 </ul>
 </dd>
@@ -358,7 +365,14 @@ XLNetConfig: configuration of the model.</p>
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input">
 <code class="sig-name descname">validate_input</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.validate_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Sanity checking for formatting of the input string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The string to be validated.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If string was formatted incorrectly.</p>
+</dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
@@ -367,8 +381,22 @@ XLNetConfig: configuration of the model.</p>
 
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_molecule">
-<code class="sig-name descname">validate_input_molecule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.validate_input_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_molecule" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">validate_input_molecule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">smiles</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.validate_input_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verifies that the non-numerical part of the input is a proper sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sequence</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – input sequence to be validated.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_numerical">
+<code class="sig-name descname">validate_input_numerical</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.validate_input_numerical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_numerical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies that the numeric part of the input sequence is valid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>sequence</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – input sequence to be validated.</p>
@@ -409,10 +437,14 @@ XLNetConfig: configuration of the model.</p>
 entity. E.g. &lt;stab&gt;[MASK][MASK][MASK][MASK]|GSQEVNSGTQTYKNASPEEAERIARKAGATTWTEKGNKWEIRI.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a list of (denormalized) predicted properties for the entity.</p>
+<dd class="field-even"><p><dl class="simple">
+<dt>a list of (denormalized) predicted properties for the entity.</dt><dd><p>Stored as a Sequence (str), e.g., ‘&lt;qed&gt;0.727’.</p>
+</dd>
+</dl>
+</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[Property]</p>
+<dd class="field-odd"><p>List[Sequence]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -429,10 +461,15 @@ entity. E.g. &lt;stab&gt;[MASK][MASK][MASK][MASK]|GSQEVNSGTQTYKNASPEEAERIARKAGAT
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>list of property values.</p>
+<dd class="field-even"><p><dl class="simple">
+<dt>list of property sequences (one per sample). Can contain</dt><dd><p>multiple properties but have to be hashable, therefore we use Sequences,
+e.g., ‘&lt;qed&gt;0.727’ or ‘&lt;logp&gt;6.65&lt;scscore&gt;3.82’.</p>
+</dd>
+</dl>
+</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[Property]</p>
+<dd class="field-odd"><p>List[Sequence]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -464,46 +501,122 @@ property is within the tolerance range, the novel sequence is returned.</p>
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.normalize_sequence">
 <code class="sig-name descname">normalize_sequence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.normalize_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.normalize_sequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Take a sequence with a unnormalized property score and convert it to a
+<dd><p>Take a sequence with unnormalized property score(s) and convert it to a
 sequence with a normalized score.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – sequence with unnormalized property.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>sequence with normalized property.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Sequence</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>sequence with normalized property.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.isfloat">
+<em class="property">static </em><code class="sig-name descname">isfloat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.isfloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.isfloat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Safely determine whether a string can be converted to a float</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sequence</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Whether it can be converted to a float</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_numerical">
-<em class="property">static </em><code class="sig-name descname">validate_numerical</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequences</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.validate_numerical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_numerical" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">validate_numerical</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequences</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.validate_numerical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_numerical" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate whether a list of sequences contains only numerical values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>sequences</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – a list of hopefully only numerical values.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a tuple containing of the validated floats and valid indexes.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[Any]</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A tuple of two lists for the validated Sequences and their respective
+indices.</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_sampling_wrapper">
+<code class="sig-name descname">validate_sampling_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">property_goal</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">fraction_to_mask</span><span class="o">=</span><span class="default_value">0.2</span></em>, <em class="sig-param"><span class="n">tokens_to_mask</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.validate_sampling_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_sampling_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validating whether the wrapper can be used for conditional generation of samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string that is used as a seed. Has to be a SELFIES
+(RegressionTransformerMolecules) or AAS (RegressionTransformerProteins).</p></li>
+<li><p><strong>property_goal</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>Specifies the property conditions for the targeted generation.
+The keys are the properties and have to be aligned with the
+algorithm_version. For example, for the solubility model use:
+{‘&lt;esol&gt;’: 1.23}
+or for the logp_and_synthesizability model use:
+{‘&lt;logp&gt;’: 1.23, ‘&lt;synthesizability&gt;’: 2.34}</p>
+<blockquote>
+<div><p>Defaults to {}, but it has to be specified.</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>fraction_to_mask</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The fraction of tokens that can be changed. Defaults to 0.2.</p></li>
+<li><p><strong>tokens_to_mask</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>) – A list of atoms (or amino acids) that can be considered for masking.
+Defaults to [] meaning that all tokens can be masked. E.g., use [‘F’] to
+only mask fluorine atoms</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.sample_sequence">
+<code class="sig-name descname">sample_sequence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.sample_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.sample_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assembling a RT-sequence from a seed SMILES/AAS sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A SMILES/AAS string used as seed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><cite>&lt;logp&gt;1.234|&lt;synthesizability&gt;1.234|[C][C][O]</cite></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A RT-sequence that uses SELFIES/AAS and incorporates the properties, e.g.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.get_maskable_tokens">
+<code class="sig-name descname">get_maskable_tokens</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tokens_to_mask</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.get_maskable_tokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.get_maskable_tokens" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.language_encoding">
+<code class="sig-name descname">language_encoding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.language_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.language_encoding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__annotations__">
-<code class="sig-name descname">__annotations__</code><em class="property"> = {'batch_size': &lt;class 'int'&gt;, 'device': &lt;class 'torch.device'&gt;, 'property_collator': &lt;class 'terminator.collators.PropertyCollator'&gt;, 'search': &lt;class 'terminator.search.Search'&gt;, 'task': &lt;class 'str'&gt;, 'tolerance': &lt;class 'float'&gt;}</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__annotations__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'batch_size': &lt;class 'int'&gt;, 'device': &lt;class 'torch.device'&gt;, 'property_collator': &lt;class 'terminator.collators.PropertyCollator'&gt;, 'sampling_wrapper': typing.Dict[str, typing.Any], 'search': &lt;class 'terminator.search.Search'&gt;, 'task': &lt;class 'str'&gt;, 'tolerance': &lt;class 'float'&gt;}</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__annotations__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__dict__">
-<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.conditional_generation.regression_transformer.implementation', '__annotations__': {'device': &lt;class 'torch.device'&gt;, 'task': &lt;class 'str'&gt;, 'search': &lt;class 'terminator.search.Search'&gt;, 'property_collator': &lt;class 'terminator.collators.PropertyCollator'&gt;, 'tolerance': &lt;class 'float'&gt;, 'batch_size': &lt;class 'int'&gt;}, '__doc__': 'Main interface for a regression transformer.', 'tolerance': 20, 'batch_size': 8, '__init__': &lt;function ConditionalGenerator.__init__&gt;, 'load_model': &lt;function ConditionalGenerator.load_model&gt;, 'load_inference': &lt;function ConditionalGenerator.load_inference&gt;, 'denormalize': &lt;function ConditionalGenerator.denormalize&gt;, 'normalize': &lt;function ConditionalGenerator.normalize&gt;, 'validate_input': &lt;function ConditionalGenerator.validate_input&gt;, 'validate_input_molecule': &lt;function ConditionalGenerator.validate_input_molecule&gt;, 'safely_determine_task': &lt;function ConditionalGenerator.safely_determine_task&gt;, 'generate_batch_regression': &lt;function ConditionalGenerator.generate_batch_regression&gt;, 'compile_regression_result': &lt;function ConditionalGenerator.compile_regression_result&gt;, 'generate_batch_generation': &lt;function ConditionalGenerator.generate_batch_generation&gt;, 'normalize_sequence': &lt;function ConditionalGenerator.normalize_sequence&gt;, 'validate_numerical': &lt;staticmethod object&gt;, '__dict__': &lt;attribute '__dict__' of 'ConditionalGenerator' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'ConditionalGenerator' objects&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.conditional_generation.regression_transformer.implementation', '__annotations__': {'device': &lt;class 'torch.device'&gt;, 'task': &lt;class 'str'&gt;, 'search': &lt;class 'terminator.search.Search'&gt;, 'property_collator': &lt;class 'terminator.collators.PropertyCollator'&gt;, 'tolerance': &lt;class 'float'&gt;, 'batch_size': &lt;class 'int'&gt;, 'sampling_wrapper': typing.Dict[str, typing.Any]}, '__doc__': 'Main interface for a regression transformer.', 'tolerance': 20, 'batch_size': 8, 'sampling_wrapper': {}, '__init__': &lt;function ConditionalGenerator.__init__&gt;, 'load_model': &lt;function ConditionalGenerator.load_model&gt;, 'load_inference': &lt;function ConditionalGenerator.load_inference&gt;, 'denormalize': &lt;function ConditionalGenerator.denormalize&gt;, 'normalize': &lt;function ConditionalGenerator.normalize&gt;, 'validate_input': &lt;function ConditionalGenerator.validate_input&gt;, 'validate_input_molecule': &lt;function ConditionalGenerator.validate_input_molecule&gt;, 'validate_input_numerical': &lt;function ConditionalGenerator.validate_input_numerical&gt;, 'safely_determine_task': &lt;function ConditionalGenerator.safely_determine_task&gt;, 'generate_batch_regression': &lt;function ConditionalGenerator.generate_batch_regression&gt;, 'compile_regression_result': &lt;function ConditionalGenerator.compile_regression_result&gt;, 'generate_batch_generation': &lt;function ConditionalGenerator.generate_batch_generation&gt;, 'normalize_sequence': &lt;function ConditionalGenerator.normalize_sequence&gt;, 'isfloat': &lt;staticmethod object&gt;, 'validate_numerical': &lt;function ConditionalGenerator.validate_numerical&gt;, 'validate_sampling_wrapper': &lt;function ConditionalGenerator.validate_sampling_wrapper&gt;, 'sample_sequence': &lt;function ConditionalGenerator.sample_sequence&gt;, 'get_maskable_tokens': &lt;function ConditionalGenerator.get_maskable_tokens&gt;, 'language_encoding': &lt;function ConditionalGenerator.language_encoding&gt;, '__dict__': &lt;attribute '__dict__' of 'ConditionalGenerator' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'ConditionalGenerator' objects&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -526,12 +639,10 @@ sequence with a normalized score.</p>
 
 <dl class="py class">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT">
-<em class="property">class </em><code class="sig-name descname">ChemicalLanguageRT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">search</span><span class="o">=</span><span class="default_value">'sample'</span></em>, <em class="sig-param"><span class="n">temperature</span><span class="o">=</span><span class="default_value">1.4</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">8</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ChemicalLanguageRT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">ChemicalLanguageRT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">search</span><span class="o">=</span><span class="default_value">'sample'</span></em>, <em class="sig-param"><span class="n">temperature</span><span class="o">=</span><span class="default_value">1.4</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">8</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">sampling_wrapper</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ChemicalLanguageRT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator" title="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator</span></code></a></p>
 <p>Hybrid regression and conditional molecular generation model as implemented in
-<a class="reference external" href="https://arxiv.org/abs/2202.01338">https://arxiv.org/abs/2202.01338</a>. It generates molecules with a desired solubility
-(ESOL) score or predicts the ESOL of a given molecule.
-For details on the ESOL task see: <a class="reference external" href="https://pubs.acs.org/doi/10.1021/ci034243x">https://pubs.acs.org/doi/10.1021/ci034243x</a></p>
+<a class="reference external" href="https://arxiv.org/abs/2202.01338">https://arxiv.org/abs/2202.01338</a>.</p>
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.resources_path">
 <code class="sig-name descname">resources_path</code><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.resources_path" title="Permalink to this definition">¶</a></dt>
@@ -585,17 +696,29 @@ For details on the ESOL task see: <a class="reference external" href="https://pu
 
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">search</span><span class="o">=</span><span class="default_value">'sample'</span></em>, <em class="sig-param"><span class="n">temperature</span><span class="o">=</span><span class="default_value">1.4</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">8</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ChemicalLanguageRT.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">search</span><span class="o">=</span><span class="default_value">'sample'</span></em>, <em class="sig-param"><span class="n">temperature</span><span class="o">=</span><span class="default_value">1.4</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">8</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">sampling_wrapper</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ChemicalLanguageRT.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the molecule generator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>resources_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – directory where to find models and parameters.</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – user-specified input text for the model.</p></li>
 <li><p><strong>search</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – search key to instantiate a search, defaults to <cite>sample</cite>.</p></li>
 <li><p><strong>temperature</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – temperature for the sampling. Defaults to 1.4.</p></li>
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of points sampled per call. Defaults to 8.</p></li>
 <li><p><strong>tolerance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – the tolerance for the property of the generated molecules.
 Given in percent. Defaults to 20.</p></li>
+<li><p><strong>sampling_wrapper</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>A high-level entry point that allows specifying a seed
+SMILES alongside some target conditions.
+NOTE: If this is used, the <cite>target</cite> needs to be a single SMILES string.
+Example: {</p>
+<blockquote>
+<div><p>’fraction_to_mask’: 0.5,
+‘tokens_to_mask’: [],
+‘property_goal’: {‘&lt;qed&gt;’: 0.85}</p>
+</div></blockquote>
+<p>}</p>
+</p></li>
 <li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">device</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – device where the inference s running either as a dedicated class
 or a string. If not provided is inferred.</p></li>
 </ul>
@@ -620,11 +743,14 @@ or a string. If not provided is inferred.</p></li>
 
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_input_molecule">
-<code class="sig-name descname">validate_input_molecule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ChemicalLanguageRT.validate_input_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_input_molecule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Verifies that the non-numerical part of the input sequence is a SELFIES.</p>
+<code class="sig-name descname">validate_input_molecule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">smiles</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ChemicalLanguageRT.validate_input_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_input_molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies that the non-numerical part of the input sequence is a molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>sequence</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – input sequence to be validated.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – input sequence to be validated.</p></li>
+<li><p><strong>smiles</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether the input is validated to be a SELFIES (default) or SMILES.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -640,22 +766,56 @@ or a string. If not provided is inferred.</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>sequences</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – list of sequences to be validated.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><dl class="simple">
-<dt>A tuple of validated items (Chem.rdchem.Mol in the case of a generation task</dt><dd><p>floating values otherwise) and a list of valid indexes.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><dl class="simple">
+<dt>the validate items, a list of either:</dt><dd><ul>
+<li><p>Chem.rdchem.Mol (generation task)</p></li>
+<li><p>Sequence denoting the predicted properties (regression task)</p></li>
+</ul>
 </dd>
 </dl>
+</li>
+<li><p>list of valid indexes.</p></li>
+</ul>
 </p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A tuple of validated items</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.get_maskable_tokens">
+<code class="sig-name descname">get_maskable_tokens</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tokens_to_mask</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ChemicalLanguageRT.get_maskable_tokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.get_maskable_tokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a user-defined list of maskable tokens into a RT model-friendly format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tokens_to_mask</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of atoms specified in SMILES notation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of atoms in SELFIES notation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.language_encoding">
+<code class="sig-name descname">language_encoding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ChemicalLanguageRT.language_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.language_encoding" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.__doc__">
-<code class="sig-name descname">__doc__</code><em class="property"> = '\n    Hybrid regression and conditional molecular generation model as implemented in\n    https://arxiv.org/abs/2202.01338. It generates molecules with a desired solubility\n    (ESOL) score or predicts the ESOL of a given molecule.\n    For details on the ESOL task see: https://pubs.acs.org/doi/10.1021/ci034243x\n\n    Attributes:\n        resources_path: path to the model.\n        context: user-specified input text for the model.\n        search: search key to instantiate a search via terminator.search.SEARCH_FACTORY.\n        temperature: the temperature parameter in case of a `sample` search.\n        batch_size: the batch size for the model, applicable only to generative task.\n        tolerance: the tolerance for the property of the generated molecules.\n    '</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.__doc__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__doc__</code><em class="property"> = '\n    Hybrid regression and conditional molecular generation model as implemented in\n    https://arxiv.org/abs/2202.01338.\n\n    Attributes:\n        resources_path: path to the model.\n        context: user-specified input text for the model.\n        search: search key to instantiate a search via terminator.search.SEARCH_FACTORY.\n        temperature: the temperature parameter in case of a `sample` search.\n        batch_size: the batch size for the model, applicable only to generative task.\n        tolerance: the tolerance for the property of the generated molecules.\n    '</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.__doc__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -672,7 +832,7 @@ or a string. If not provided is inferred.</p></li>
 
 <dl class="py class">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT">
-<em class="property">class </em><code class="sig-name descname">ProteinLanguageRT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">search</span><span class="o">=</span><span class="default_value">'sample'</span></em>, <em class="sig-param"><span class="n">temperature</span><span class="o">=</span><span class="default_value">1.4</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ProteinLanguageRT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">ProteinLanguageRT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">search</span><span class="o">=</span><span class="default_value">'sample'</span></em>, <em class="sig-param"><span class="n">temperature</span><span class="o">=</span><span class="default_value">1.4</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">sampling_wrapper</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ProteinLanguageRT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator" title="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator</span></code></a></p>
 <p>Hybrid regression and conditional protein generation model as implemented in
 <a class="reference external" href="https://arxiv.org/abs/2202.01338">https://arxiv.org/abs/2202.01338</a>. It generates peptides with a desired stability
@@ -731,7 +891,7 @@ For details on the stability task see: <a class="reference external" href="https
 
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">search</span><span class="o">=</span><span class="default_value">'sample'</span></em>, <em class="sig-param"><span class="n">temperature</span><span class="o">=</span><span class="default_value">1.4</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ProteinLanguageRT.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">search</span><span class="o">=</span><span class="default_value">'sample'</span></em>, <em class="sig-param"><span class="n">temperature</span><span class="o">=</span><span class="default_value">1.4</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">sampling_wrapper</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ProteinLanguageRT.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the protein generator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -742,6 +902,17 @@ For details on the stability task see: <a class="reference external" href="https
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of points sampled per call. Defaults to 8.</p></li>
 <li><p><strong>tolerance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – the tolerance for the property of the generated molecules.
 Given in percent. Defaults to 20.</p></li>
+<li><p><strong>sampling_wrapper</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>A high-level entry point that allows specifying a seed
+SMILES alongside some target conditions.
+NOTE: If this is used, the <cite>target</cite> needs to be a single SMILES string.
+Example: {</p>
+<blockquote>
+<div><p>’fraction_to_mask’: 0.5,
+‘tokens_to_mask’: [],
+‘property_goal’: {‘&lt;stab&gt;’: 0.85}</p>
+</div></blockquote>
+<p>}</p>
+</p></li>
 <li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">device</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – device where the inference s running either as a dedicated class
 or a string. If not provided is inferred.</p></li>
 </ul>
@@ -781,11 +952,14 @@ or a string. If not provided is inferred.</p></li>
 
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_input_molecule">
-<code class="sig-name descname">validate_input_molecule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ProteinLanguageRT.validate_input_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_input_molecule" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">validate_input_molecule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">smiles</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ProteinLanguageRT.validate_input_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_input_molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verifies that the non-numerical part of the input sequence is a valid AAS.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>sequence</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – input sequence to be validated.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – input sequence to be validated.</p></li>
+<li><p><strong>smiles</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – boolean argument that is ignored but needed for sibling class.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -799,13 +973,55 @@ or a string. If not provided is inferred.</p></li>
 <dd><p>Validate the output of the RT model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>sequences</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – list of sequences to be validated.</p>
+<dd class="field-odd"><p><strong>sequences</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – list of sequences to be validated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><dl class="simple">
+<dt>List of validated items, either:</dt><dd><ul>
+<li><p>Amino acid sequences (generation task)</p></li>
+<li><p>Sequence denoting the predicted properties (regression task)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>a list of valid indexes.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A tuple of validated items</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.get_maskable_tokens">
+<code class="sig-name descname">get_maskable_tokens</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tokens_to_mask</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ProteinLanguageRT.get_maskable_tokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.get_maskable_tokens" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Convert a user-defined list of maskable tokens (amino acids) into a RT</dt><dd><p>model-friendly format. Nothing has to be done for proteins, but the function
+is more complex for sister-classes.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tokens_to_mask</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of amino acids specified in IUPAC convention.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</p>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A tuple of validated items and a list of valid indexes.</p>
+<dd class="field-odd"><p>The same.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.language_encoding">
+<code class="sig-name descname">language_encoding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ProteinLanguageRT.language_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.language_encoding" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
 </dl>
 </dd></dl>

@@ -328,7 +328,7 @@
         <span class="n">default</span><span class="o">=</span><span class="s2">&quot;solubility&quot;</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The version of the algorithm to use.&quot;</span><span class="p">,</span>
-            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;solubility&quot;</span><span class="p">,</span> <span class="s2">&quot;qed&quot;</span><span class="p">],</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;solubility&quot;</span><span class="p">,</span> <span class="s2">&quot;qed&quot;</span><span class="p">,</span> <span class="s2">&quot;logp_and_synthesizability&quot;</span><span class="p">],</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
@@ -354,6 +354,27 @@
         <span class="n">default</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Precision tolerance for the conditional generation task. Given in percent&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">sampling_wrapper</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;High-level entry point for SMILES-level access. Provide a</span>
+<span class="s2">            dictionary that is used to build a custom sampling wrapper.</span>
+<span class="s2">            NOTE: If this is used, the `target` needs to be a single SMILES string.</span>
+<span class="s2">            Example: {</span>
+<span class="s2">                &#39;fraction_to_mask&#39;: 0.5,</span>
+<span class="s2">                &#39;atoms_to_mask&#39;: [],</span>
+<span class="s2">                &#39;property_goal&#39;: {&#39;&lt;qed&gt;&#39;: 0.85}</span>
+<span class="s2">            }</span>
+<span class="s2">            - &#39;fraction_to_mask&#39; specifies the ratio of tokens that can be changed by</span>
+<span class="s2">                the model.</span>
+<span class="s2">            - &#39;atoms_to_mask&#39; specifies which atoms can be masked. This defaults</span>
+<span class="s2">                to an empty list, meaning that all tokens can be masked.</span>
+<span class="s2">            - &#39;property_goal&#39; specifies the target conditions for the generation. The</span>
+<span class="s2">                properties need to be specified as a dictionary. The keys need to be</span>
+<span class="s2">                properties supported by the algorithm version.</span>
+<span class="s2">            &quot;&quot;&quot;</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
@@ -390,10 +411,11 @@
             <span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
             <span class="n">tolerance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span>
+            <span class="n">sampling_wrapper</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_wrapper</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span></div>
 
-<div class="viewcode-block" id="RegressionTransformerMolecules.validate_item"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerMolecules.validate_item">[docs]</a>    <span class="k">def</span> <span class="nf">validate_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">Property</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
+<div class="viewcode-block" id="RegressionTransformerMolecules.validate_item"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerMolecules.validate_item">[docs]</a>    <span class="k">def</span> <span class="nf">validate_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
         <span class="sd">&quot;&quot;&quot;Check that item is a valid sequence.</span>
 
 <span class="sd">        Args:</span>
@@ -484,6 +506,27 @@
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Precision tolerance for the conditional generation task. Given in percent&quot;</span>
         <span class="p">),</span>
     <span class="p">)</span>
+    <span class="n">sampling_wrapper</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;High-level entry point for SMILES-level access. Provide a</span>
+<span class="s2">            dictionary that is used to build a custom sampling wrapper.</span>
+<span class="s2">            NOTE: If this is used, the `target` needs to be a single SMILES string.</span>
+<span class="s2">            Example: {</span>
+<span class="s2">                &#39;fraction_to_mask&#39;: 0.5,</span>
+<span class="s2">                &#39;atoms_to_mask&#39;: [],</span>
+<span class="s2">                &#39;property_goal&#39;: {&#39;&lt;qed&gt;&#39;: 0.85}</span>
+<span class="s2">            }</span>
+<span class="s2">            - &#39;fraction_to_mask&#39; specifies the ratio of tokens that can be changed by</span>
+<span class="s2">                the model.</span>
+<span class="s2">            - &#39;atoms_to_mask&#39; specifies which atoms can be masked. This defaults</span>
+<span class="s2">                to an empty list, meaning that all tokens can be masked.</span>
+<span class="s2">            - &#39;property_goal&#39; specifies the target conditions for the generation. The</span>
+<span class="s2">                properties need to be specified as a dictionary. The keys need to be</span>
+<span class="s2">                properties supported by the algorithm version.</span>
+<span class="s2">            &quot;&quot;&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
 
 <div class="viewcode-block" id="RegressionTransformerProteins.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerProteins.get_target_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
@@ -517,10 +560,11 @@
             <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
             <span class="n">tolerance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span>
+            <span class="n">sampling_wrapper</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_wrapper</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span></div>
 
-<div class="viewcode-block" id="RegressionTransformerProteins.validate_item"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerProteins.validate_item">[docs]</a>    <span class="k">def</span> <span class="nf">validate_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">Property</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
+<div class="viewcode-block" id="RegressionTransformerProteins.validate_item"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerProteins.validate_item">[docs]</a>    <span class="k">def</span> <span class="nf">validate_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
         <span class="sd">&quot;&quot;&quot;Check that item is a valid sequence.</span>
 
 <span class="sd">        Args:</span>
@@ -544,7 +588,9 @@
                 <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1">&quot; does not adhere to IUPAC convention for AAS&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;InvalidNumerical&quot;</span>
-                <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1">&quot; is not a valid floating point number&#39;</span>
+                <span class="n">detail</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1">&quot; is not a valid Sequence with a floating point number&#39;</span>
+                <span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidItem</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">item</span></div></div>
 </pre></div>
