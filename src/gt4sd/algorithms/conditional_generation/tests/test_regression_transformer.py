@@ -109,14 +109,37 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
             RegressionTransformerMolecules,
             "<esol>[MASK][MASK][MASK][MASK][MASK]|[Cl][C][Branch1_2][Branch1_2][=C][Branch1_1][C][Cl][Cl][Cl]",
             RegressionTransformer,
-            {"search": "greedy", "num_samples": 1},
+            {"algorithm_version": "solubility", "search": "greedy", "num_samples": 1},
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             RegressionTransformerMolecules,
-            "<esol>-3.499|[C][C][MASK][MASK][MASK][C][Br]",
+            "<esol>-3.49|[C][C][MASK][MASK][MASK][C][Br]",
             RegressionTransformer,
             {"search": "sample", "temperature": 2.0, "num_samples": 5},
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            RegressionTransformerMolecules,
+            "<logp>[MASK][MASK][MASK][MASK][MASK]|<scs>[MASK][MASK][MASK][MASK][MASK]|[C][C][O][C][=N][C][=N][C][Branch1_2][Branch1_1][=C][Ring1][Branch1_2][C][N][C][C][O][C][Branch1_1][C][C][C]",
+            RegressionTransformer,
+            {
+                "search": "greedy",
+                "num_samples": 1,
+                "algorithm_version": "logp_and_synthesizability",
+            },
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            RegressionTransformerMolecules,
+            "<logp>6.534|<scs>3.835|[C][MASK][MASK][C][=N][C][=N][C][Branch1_2][Branch1_1][=C][Ring1][Branch1_2][C][N][C][C][O][C][Branch1_1][C][C][C]",
+            RegressionTransformer,
+            {
+                "search": "sample",
+                "num_samples": 3,
+                "temperature": 1.4,
+                "algorithm_version": "logp_and_synthesizability",
+            },
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
@@ -128,9 +151,43 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
         ),
         pytest.param(
             RegressionTransformerProteins,
-            "<stab>1.1234|TTIKNG[MASK][MASK][MASK]YTVPLSPEQAAK[MASK][MASK][MASK]KKRWPDYEVQIHGNTVKVT",
+            "<stab>1.123|TTIKNG[MASK][MASK][MASK]YTVPLSPEQAAK[MASK][MASK][MASK]KKRWPDYEVQIHGNTVKVT",
             RegressionTransformer,
             {"search": "sample", "temperature": 2.0, "num_samples": 5},
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        # Test the sampling wrapper configurations
+        pytest.param(
+            RegressionTransformerProteins,
+            "TTIKNGABCYTVPLSPEQAAKABCKKRWPDYEVQIHGNTVKVT",
+            RegressionTransformer,
+            {
+                "search": "sample",
+                "temperature": 2.0,
+                "num_samples": 5,
+                "tolerance": 20,
+                "sampling_wrapper": {
+                    "property_goal": {"<stab>": 1.123},
+                    "fraction_to_mask": 0.9,
+                    "tokens_to_mask": ["A"],
+                },
+            },
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            RegressionTransformerMolecules,
+            "CCOC1=NC=NC(=C1C)NCCOC(C)C",
+            RegressionTransformer,
+            {
+                "search": "sample",
+                "num_samples": 3,
+                "temperature": 1.4,
+                "algorithm_version": "logp_and_synthesizability",
+                "sampling_wrapper": {
+                    "property_goal": {"<logp>": 6.534, "<scs>": 3.835},
+                    "fraction_to_mask": 0.2,
+                },
+            },
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
     ],
@@ -155,7 +212,7 @@ def test_generation_via_import(config, example_target, algorithm, params):
         ),
         pytest.param(
             RegressionTransformerMolecules.__name__,
-            "<esol>-3.499|[C][C][MASK][MASK][MASK][C][Br]",
+            "<esol>-3.49|[C][C][MASK][MASK][MASK][C][Br]",
             {"search": "sample", "temperature": 2.0, "num_samples": 5},
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
@@ -167,7 +224,7 @@ def test_generation_via_import(config, example_target, algorithm, params):
         ),
         pytest.param(
             RegressionTransformerProteins.__name__,
-            "<stab>1.1234|TTIKNG[MASK][MASK][MASK]YTVPLSPEQAAK[MASK][MASK][MASK]KKRWPDYEVQIHGNTVKVT",
+            "<stab>1.123|TTIKNG[MASK][MASK][MASK]YTVPLSPEQAAK[MASK][MASK][MASK]KKRWPDYEVQIHGNTVKVT",
             {"search": "sample", "temperature": 2.0, "num_samples": 5},
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
