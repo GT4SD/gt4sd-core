@@ -25,14 +25,14 @@
 import json
 import logging
 import os
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
 from terminator.collators import MaskedTextCollator, PropertyCollator
 from terminator.inference import InferenceRT
 from terminator.search import SEARCH_FACTORY, Search
-from terminator.selfies import decoder
+from terminator.selfies import decoder, encoder
 from terminator.tokenization import InferenceBertTokenizer
 from transformers import AutoConfig, AutoModelWithLMHead, XLNetLMHeadModel
 
@@ -49,21 +49,24 @@ class ConditionalGenerator:
     # device where the inference is running.
     device: torch.device
 
-    # The task the RT is currently performing. Either 'regression' or 'generation'
+    # The task the RT is currently performing. Either 'regression' or 'generation'.
     task: str
 
-    # method to convert logits to predictions. Either GreedySearch or SamplingSearch
+    # method to convert logits to predictions. Either GreedySearch or SamplingSearch.
     search: Search
 
     # ***** Additional attributes for text generation *****
-    # data collator for property prediction of self-generated items
+    # data collator for property prediction of self-generated items.
     property_collator: PropertyCollator
 
-    # percentage of tolerated deviation between desired and obtained property
+    # percentage of tolerated deviation between desired and obtained property.
     tolerance: float = 20
 
-    # number of samples obtained per call
+    # number of samples obtained per call.
     batch_size: int = 8
+
+    # a dictionary to specify sampling from a specific seed molecule.
+    sampling_wrapper: Dict[str, Any] = {}
 
     def __init__(
         self, resources_path: str, device: Optional[Union[torch.device, str]] = None
@@ -85,6 +88,10 @@ class ConditionalGenerator:
         self.device = device_claim(device)
 
         # Set up the data preparation pipeline
+        if not os.path.exists(os.path.join(resources_path, "inference.json")):
+            raise OSError(
+                f"algorithm_version {resources_path.split('/')[-1]} does not exist."
+            )
         self.tokenizer = InferenceBertTokenizer.from_pretrained(
             resources_path, pad_even=False
         )
@@ -149,6 +156,12 @@ class ConditionalGenerator:
                 for p in self.properties
             ]
             self.metadata = data
+
+            # Tolerance defined on the original scale
+            self.tolerances = [
+                (self._maxs[i] - self._mins[i]) * self.tolerance / 100.0
+                for i in range(len(self.properties))
+            ]
         except Exception:
             raise ValueError(
                 f"Could not restore inference parameters from {resources_path}"
@@ -192,13 +205,13 @@ class ConditionalGenerator:
             raise TypeError(f"{x} is not a float and cant safely be casted.")
 
         x_float = float(x)
-
         # If this property does not require normalization, return it
         if not self.do_normalize[idx]:
             return x_float
-        return round(
+        normed = round(
             (x_float - self._mins[idx]) / (self._maxs[idx] - self._mins[idx]), precision
         )
+        return normed
 
     def validate_input(self, x: str) -> None:
         """
@@ -240,7 +253,7 @@ class ConditionalGenerator:
         self.validate_input_molecule(text_sequence)
         self.validate_input_numerical(number_sequence)
 
-    def validate_input_molecule(self, sequence: str) -> None:
+    def validate_input_molecule(self, sequence: str, smiles: bool = False) -> None:
         """
         Verifies that the non-numerical part of the input is a proper sequence.
 
@@ -392,6 +405,10 @@ class ConditionalGenerator:
                 sequence alongside its predicted property value.
         """
 
+        # If we are in sampling mode, the sampled sequence changes per iteration.
+        if self.sampling_wrapper != {}:
+            sequence = self.sample_sequence(sequence)
+
         # The property score has to be in the range understood by the model
         sequence = self.normalize_sequence(sequence)
 
@@ -438,15 +455,16 @@ class ConditionalGenerator:
         ]
         # Filter out all sequences that do not satisfy property constraints within
         # tolerance range.
+        logger.debug(f"Sequences {sequences}, properties: {properties}")
         successes: Tuple = tuple(
             filter(
                 lambda x: all(
                     [
                         abs(
-                            self.normalize(x[1].split(p)[-1].split("<")[0], i)
+                            float(x[1].split(p)[-1].split("<")[0])
                             - self.target_values[i]
                         )
-                        < self.tolerance
+                        < self.tolerances[i]
                         for i, p in enumerate(self.properties)
                     ]
                 ),
@@ -484,10 +502,10 @@ class ConditionalGenerator:
             final_tokens += prop
 
             unnorm = self.tokenizer.floating_tokens_to_float(numerical_tokens)
+            self.target_values.append(unnorm)
             target = self.normalize(unnorm, idx)
-            norm = str(target)[: self.property_mask_lengths[idx]]
+            norm = str(target + 1e-10)[: self.property_mask_lengths[idx]]
             final_tokens += norm + self.tokenizer.expression_separator
-            self.target_values.append(target)
 
         # Append rest of sequence
         final_tokens += "".join(tokens[sep_idxs[-1] + 1 :])
@@ -534,13 +552,131 @@ class ConditionalGenerator:
                 idxs.append(idx)
         return items, idxs
 
+    def validate_sampling_wrapper(
+        self,
+        context: str,
+        property_goal: Dict[str, Any] = {},
+        fraction_to_mask: float = 0.2,
+        tokens_to_mask: List = [],
+    ) -> None:
+        """
+        Validating whether the wrapper can be used for conditional generation of samples.
+
+        Args:
+            context: A string that is used as a seed. Has to be a SELFIES
+                (RegressionTransformerMolecules) or AAS (RegressionTransformerProteins).
+            property_goal: Specifies the property conditions for the targeted generation.
+               The keys are the properties and have to be aligned with the
+               algorithm_version. For example, for the solubility model use:
+               {'<esol>': 1.23}
+               or for the logp_and_synthesizability model use:
+               {'<logp>': 1.23, '<synthesizability>': 2.34}
+                Defaults to {}, but it has to be specified.
+            fraction_to_mask: The fraction of tokens that can be changed. Defaults to 0.2.
+            tokens_to_mask: A list of atoms (or amino acids) that can be considered for masking.
+                Defaults to [] meaning that all tokens can be masked. E.g., use ['F'] to
+                only mask fluorine atoms
+        """
+        self.validate_input_molecule(context, smiles=True)
+
+        self.seed_molecule = context
+
+        if property_goal == {}:
+            raise ValueError("Please specify the target properties with a dictionary.")
+        if not all([k in property_goal.keys() for k in self.properties]):
+            raise ValueError(
+                f"Please provide property goals for all properties: {self.properties}."
+            )
+        self.property_goal = property_goal
+
+        if not isinstance(fraction_to_mask, float):
+            raise TypeError(
+                f"The fraction_to_mask {fraction_to_mask} has to be a float."
+            )
+        if fraction_to_mask < 0 or fraction_to_mask > 1:
+            raise ValueError(
+                f"The fraction_to_mask {fraction_to_mask} has to be between 0 and 1."
+            )
+        self.fraction_to_mask = fraction_to_mask
+
+        if not isinstance(tokens_to_mask, list):
+            raise TypeError(f"The tokens_to_mask {tokens_to_mask} has to be a list.")
+        self.maskable_tokens = self.get_maskable_tokens(tokens_to_mask)
+
+        logger.info(
+            f"Will start sampling molecules similar to {context} with goal: "
+            f"{property_goal} and masking {fraction_to_mask} of the tokens."
+        )
+
+    def sample_sequence(self, seq: str) -> str:
+        """
+        Assembling a RT-sequence from a seed SMILES/AAS sequence.
+
+        Args:
+            seq: A SMILES/AAS string used as seed.
+
+        Returns:
+            A RT-sequence that uses SELFIES/AAS and incorporates the properties, e.g.:
+            `<logp>1.234|<synthesizability>1.234|[C][C][O]`
+        """
+
+        if self.sampling_wrapper == {}:
+            return seq
+
+        # Convert SMILES/AAS to list of SELFIES/AAS tokens
+        language_seq = self.language_encoding(seq)
+        tokens = self.tokenizer.text_tokenizer.tokenize(language_seq)
+
+        # Determine which tokens can be masked
+        if self.maskable_tokens == []:
+            # All tokens can be considered for masking
+            maskable_tokens = set(tokens)
+            num_to_mask = round(len(tokens) * self.fraction_to_mask)
+        else:
+            # Mask only tokens that are specified by the user
+            maskable_tokens = set(self.maskable_tokens)
+            num_to_mask = round(
+                sum([tokens.count(t) for t in maskable_tokens]) * self.fraction_to_mask
+            )
+
+        maskable_idxs = [i for i, t in enumerate(tokens) if t in maskable_tokens]
+
+        # Mask the tokens
+        mask_idxs = np.random.choice(maskable_idxs, num_to_mask, replace=False)
+        sequence_tokens = [
+            t if i not in mask_idxs else self.tokenizer.mask_token
+            for i, t in enumerate(tokens)
+        ]
+
+        # Extract the property tokens
+        if not set(self.properties) == set(self.property_goal.keys()):
+            raise ValueError(
+                f"Please provide property goals exactly for: {self.properties}."
+            )
+
+        # Define property tokens (this has unnormalized property values)
+        prop_tokens = ""
+        for i, p in enumerate(self.properties):
+            numerical = str(self.property_goal[p] + 1e-10)[
+                : self.property_mask_lengths[i]
+            ]
+            prop_tokens += p + numerical + self.tokenizer.expression_separator
+
+        # Return new sequence
+        sequence = prop_tokens + "".join(sequence_tokens)
+        return sequence
+
+    def get_maskable_tokens(self, tokens_to_mask: List[str]):
+        raise NotImplementedError
+
+    def language_encoding(self, seq: str):
+        raise NotImplementedError
+
 
 class ChemicalLanguageRT(ConditionalGenerator):
     """
     Hybrid regression and conditional molecular generation model as implemented in
-    https://arxiv.org/abs/2202.01338. It generates molecules with a desired solubility
-    (ESOL) score or predicts the ESOL of a given molecule.
-    For details on the ESOL task see: https://pubs.acs.org/doi/10.1021/ci034243x
+    https://arxiv.org/abs/2202.01338.
 
     Attributes:
         resources_path: path to the model.
@@ -559,6 +695,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
         temperature: float = 1.4,
         batch_size: int = 8,
         tolerance: float = 20.0,
+        sampling_wrapper: Dict[str, Any] = {},
         device: Optional[Union[torch.device, str]] = None,
     ) -> None:
         """
@@ -566,18 +703,32 @@ class ChemicalLanguageRT(ConditionalGenerator):
 
         Args:
             resources_path: directory where to find models and parameters.
+            context: user-specified input text for the model.
             search: search key to instantiate a search, defaults to `sample`.
             temperature: temperature for the sampling. Defaults to 1.4.
             batch_size: number of points sampled per call. Defaults to 8.
             tolerance: the tolerance for the property of the generated molecules.
                 Given in percent. Defaults to 20.
+            sampling_wrapper: A high-level entry point that allows specifying a seed
+                SMILES alongside some target conditions.
+                NOTE: If this is used, the `target` needs to be a single SMILES string.
+                Example: {
+                    'fraction_to_mask': 0.5,
+                    'tokens_to_mask': [],
+                    'property_goal': {'<qed>': 0.85}
+                }
             device: device where the inference s running either as a dedicated class
                 or a string. If not provided is inferred.
         """
         super().__init__(device=device, resources_path=resources_path)
 
-        # Validate input and determine task
-        self.task = self.safely_determine_task(context)
+        if sampling_wrapper == {}:
+            # Validate input and determine task
+            self.task = self.safely_determine_task(context)
+        else:
+            self.validate_sampling_wrapper(context=context, **sampling_wrapper)
+            self.task = "generation"
+        self.sampling_wrapper = sampling_wrapper
 
         # Console outputs for usage of search methods
         if search == "sample" and self.task == "regression":
@@ -601,22 +752,31 @@ class ChemicalLanguageRT(ConditionalGenerator):
                 num_tokens_to_mask=[-1] * len(self.properties),
                 ignore_errors=False,
             )
-            # Tolerance on [0,1] scale
-            self.tolerance = tolerance / 100.0
+
         else:
             raise ValueError(f"Unknown task: {self.task}")
 
-    def validate_input_molecule(self, sequence: str) -> None:
+        self.small_mol = True
+
+    def validate_input_molecule(self, sequence: str, smiles: bool = False) -> None:
         """
-        Verifies that the non-numerical part of the input sequence is a SELFIES.
+        Verifies that the non-numerical part of the input sequence is a molecule.
 
         Args:
             sequence: input sequence to be validated.
+            smiles: whether the input is validated to be a SELFIES (default) or SMILES.
         """
-        # Fractional molecules based on non-masked parts of the SELFIES sequence
-        smis = list(map(decoder, sequence.split(self.tokenizer.mask_token)))
-        if -1 in smis:
-            raise ValueError(f"Invalid sequence: {sequence}")
+        if smiles:
+            _, idxs = validate_molecules([sequence])
+            if len(idxs) != 1:
+                raise ValueError(
+                    f"The context {sequence} is not a valid SMILES string."
+                )
+        else:
+            # Fractional molecules based on non-masked parts of the SELFIES sequence
+            smis = list(map(decoder, sequence.split(self.tokenizer.mask_token)))
+            if -1 in smis:
+                raise ValueError(f"Invalid sequence: {sequence}")
 
     def validate_output(self, sequences: List[Any]) -> Tuple[List[Any], List[int]]:
         """
@@ -644,6 +804,26 @@ class ChemicalLanguageRT(ConditionalGenerator):
                 return ([None], [-1])
             return validate_molecules(smiles_list=smiles_list)  # type: ignore
 
+    def get_maskable_tokens(self, tokens_to_mask: List[str]) -> List[str]:
+        """
+        Convert a user-defined list of maskable tokens into a RT model-friendly format.
+
+        Args:
+            tokens_to_mask: List of atoms specified in SMILES notation.
+
+        Returns:
+            List of atoms in SELFIES notation.
+        """
+        # To reflect double bonds
+        tokens_to_mask.extend([f"={t}" for t in tokens_to_mask])
+        return [encoder(a) for a in tokens_to_mask]  # type: ignore
+
+    def language_encoding(self, seq: str) -> str:
+        selfie = encoder(seq)
+        if not isinstance(selfie, str):
+            raise TypeError(f"{seq} is not a valid SELFIES sequence.")
+        return selfie
+
 
 class ProteinLanguageRT(ConditionalGenerator):
     """
@@ -669,6 +849,7 @@ class ProteinLanguageRT(ConditionalGenerator):
         temperature: float = 1.4,
         batch_size: int = 32,
         tolerance: float = 20.0,
+        sampling_wrapper: Dict[str, Any] = {},
         device: Optional[Union[torch.device, str]] = None,
     ) -> None:
         """
@@ -681,13 +862,26 @@ class ProteinLanguageRT(ConditionalGenerator):
             batch_size: number of points sampled per call. Defaults to 8.
             tolerance: the tolerance for the property of the generated molecules.
                 Given in percent. Defaults to 20.
+            sampling_wrapper: A high-level entry point that allows specifying a seed
+                SMILES alongside some target conditions.
+                NOTE: If this is used, the `target` needs to be a single SMILES string.
+                Example: {
+                    'fraction_to_mask': 0.5,
+                    'tokens_to_mask': [],
+                    'property_goal': {'<stab>': 0.85}
+                }
             device: device where the inference s running either as a dedicated class
                 or a string. If not provided is inferred.
         """
         super().__init__(device=device, resources_path=resources_path)
 
-        # Validate input and determine task
-        self.task = self.safely_determine_task(context)
+        if sampling_wrapper == {}:
+            # Validate input and determine task
+            self.task = self.safely_determine_task(context)
+        else:
+            self.task = "generation"
+            self.validate_sampling_wrapper(context=context, **sampling_wrapper)
+        self.sampling_wrapper = sampling_wrapper
 
         # Console outputs for usage of search methods
         if search == "sample" and self.task == "regression":
@@ -710,17 +904,18 @@ class ProteinLanguageRT(ConditionalGenerator):
                 num_tokens_to_mask=[-1] * len(self.properties),
                 ignore_errors=False,
             )
-            # Tolerance on [0,1] scale
-            self.tolerance = tolerance / 100.0
         else:
             raise ValueError(f"Unknown task: {self.task}")
 
-    def validate_input_molecule(self, sequence: str) -> None:
+        self.small_mol = False
+
+    def validate_input_molecule(self, sequence: str, smiles: bool = False) -> None:
         """
         Verifies that the non-numerical part of the input sequence is a valid AAS.
 
         Args:
             sequence: input sequence to be validated.
+            smiles: boolean argument that is ignored but needed for sibling class.
         """
         if sequence != sequence.upper():
             raise ValueError(
@@ -760,3 +955,20 @@ class ProteinLanguageRT(ConditionalGenerator):
             ]
             idxs = [i for i, item in enumerate(sequences) if item in items]
             return items, idxs
+
+    def get_maskable_tokens(self, tokens_to_mask: List[str]) -> List[str]:
+        """
+        Convert a user-defined list of maskable tokens (amino acids) into a RT
+            model-friendly format. Nothing has to be done for proteins, but the function
+            is more complex for sister-classes.
+
+        Args:
+            tokens_to_mask: List of amino acids specified in IUPAC convention.
+
+        Returns:
+            The same.
+        """
+        return tokens_to_mask
+
+    def language_encoding(self, seq: str) -> str:
+        return seq

@@ -156,6 +156,40 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
             {"search": "sample", "temperature": 2.0, "num_samples": 5},
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
+        # Test the sampling wrapper configurations
+        pytest.param(
+            RegressionTransformerProteins,
+            "TTIKNGABCYTVPLSPEQAAKABCKKRWPDYEVQIHGNTVKVT",
+            RegressionTransformer,
+            {
+                "search": "sample",
+                "temperature": 2.0,
+                "num_samples": 5,
+                "tolerance": 20,
+                "sampling_wrapper": {
+                    "property_goal": {"<stab>": 1.123},
+                    "fraction_to_mask": 0.9,
+                    "tokens_to_mask": ["A"],
+                },
+            },
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            RegressionTransformerMolecules,
+            "CCOC1=NC=NC(=C1C)NCCOC(C)C",
+            RegressionTransformer,
+            {
+                "search": "sample",
+                "num_samples": 3,
+                "temperature": 1.4,
+                "algorithm_version": "logp_and_synthesizability",
+                "sampling_wrapper": {
+                    "property_goal": {"<logp>": 6.534, "<scs>": 3.835},
+                    "fraction_to_mask": 0.2,
+                },
+            },
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
     ],
 )
 def test_generation_via_import(config, example_target, algorithm, params):

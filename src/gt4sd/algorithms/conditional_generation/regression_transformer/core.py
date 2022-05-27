@@ -197,6 +197,27 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
             description="Precision tolerance for the conditional generation task. Given in percent"
         ),
     )
+    sampling_wrapper: Dict = field(
+        default_factory=dict,
+        metadata=dict(
+            description="""High-level entry point for SMILES-level access. Provide a
+            dictionary that is used to build a custom sampling wrapper.
+            NOTE: If this is used, the `target` needs to be a single SMILES string.
+            Example: {
+                'fraction_to_mask': 0.5,
+                'atoms_to_mask': [],
+                'property_goal': {'<qed>': 0.85}
+            }
+            - 'fraction_to_mask' specifies the ratio of tokens that can be changed by
+                the model.
+            - 'atoms_to_mask' specifies which atoms can be masked. This defaults
+                to an empty list, meaning that all tokens can be masked.
+            - 'property_goal' specifies the target conditions for the generation. The
+                properties need to be specified as a dictionary. The keys need to be
+                properties supported by the algorithm version.
+            """
+        ),
+    )
 
     def get_target_description(self) -> Dict[str, str]:
         """Get description of the target for generation.
@@ -231,6 +252,7 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
             temperature=self.temperature,
             batch_size=self.batch_size,
             tolerance=self.tolerance,
+            sampling_wrapper=self.sampling_wrapper,
         )
         return self.generator
 
@@ -325,6 +347,27 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
             description="Precision tolerance for the conditional generation task. Given in percent"
         ),
     )
+    sampling_wrapper: Dict = field(
+        default_factory=dict,
+        metadata=dict(
+            description="""High-level entry point for SMILES-level access. Provide a
+            dictionary that is used to build a custom sampling wrapper.
+            NOTE: If this is used, the `target` needs to be a single SMILES string.
+            Example: {
+                'fraction_to_mask': 0.5,
+                'atoms_to_mask': [],
+                'property_goal': {'<qed>': 0.85}
+            }
+            - 'fraction_to_mask' specifies the ratio of tokens that can be changed by
+                the model.
+            - 'atoms_to_mask' specifies which atoms can be masked. This defaults
+                to an empty list, meaning that all tokens can be masked.
+            - 'property_goal' specifies the target conditions for the generation. The
+                properties need to be specified as a dictionary. The keys need to be
+                properties supported by the algorithm version.
+            """
+        ),
+    )
 
     def get_target_description(self) -> Dict[str, str]:
         """Get description of the target for generation.
@@ -358,6 +401,7 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
             context=context,
             batch_size=self.batch_size,
             tolerance=self.tolerance,
+            sampling_wrapper=self.sampling_wrapper,
         )
         return self.generator
 
