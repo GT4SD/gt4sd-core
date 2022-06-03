@@ -48,14 +48,16 @@ class ReinventConditionalGenerator(ReinventBase):
         batch_size: int,
         randomize: bool,
         sample_uniquely: bool,
+        max_sequence_length: int,
     ):
         """Initialize Reinvent.
 
         Args:
             resources_path: path where to load hypothesis, candidate labels and, optionally, the model.
-            batch_size: number of samples to generate per scaffold
-            randomize: randomize the scaffolds if set to true
-            sample_uniquely: generate unique sample sequences if set to true
+            batch_size: number of samples to generate per scaffold.
+            randomize: randomize the scaffolds if set to true.
+            sample_uniquely: generate unique sample sequences if set to true.
+            max_sequence_length: maximum length of the generated sequences.
         """
         self.resources_path = resources_path
         self.batch_size = batch_size
@@ -69,6 +71,7 @@ class ReinventConditionalGenerator(ReinventBase):
             raise OSError(f"artifacts file {self.model_path} does not exist locally")
 
         self.model = DecoratorModel.load_from_file(path=self.model_path)
+        self.model.max_sequence_length = max_sequence_length
         super().__init__(
             self.model, self.batch_size, self.randomize, self.sample_uniquely
         )

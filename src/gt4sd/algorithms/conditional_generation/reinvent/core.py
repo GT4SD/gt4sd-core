@@ -116,6 +116,10 @@ class ReinventGenerator(AlgorithmConfiguration[str, str]):
         default=True,
         metadata=dict(description=("Generate unique sample sequences if set to true")),
     )
+    max_sequence_length: int = field(
+        default=256,
+        metadata=dict(description=("Maximal length of SMILES sequences")),
+    )
 
     def get_target_description(self) -> Dict[str, str]:
         """Get description of the target for generation.
@@ -145,6 +149,7 @@ class ReinventGenerator(AlgorithmConfiguration[str, str]):
             batch_size=self.batch_size,
             randomize=self.randomize,
             sample_uniquely=self.sample_uniquely,
+            max_sequence_length=self.max_sequence_length,
         )
 
     def validate_item(self, item: str) -> SmallMolecule:
