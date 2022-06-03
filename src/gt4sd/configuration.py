@@ -30,7 +30,7 @@ from typing import Optional, Set
 
 from pydantic import BaseSettings
 
-from .s3 import GT4SDS3Client, S3SyncError, sync_folder_with_s3
+from .s3 import GT4SDS3Client, S3SyncError, sync_folder_with_s3, upload_file_to_s3
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -71,6 +71,26 @@ try:
     os.makedirs(gt4sd_configuration_instance.gt4sd_local_cache_path)
 except FileExistsError:
     logger.debug("local cache path already exists")
+
+
+def upload_to_s3(target_filepath: str, source_filepath: str):
+    """Upload an algorithm in source_filepath in target_filepath on a bucket.
+    Args:
+        target_filepath: path to save the objects in s3.
+        source_filepath: path to the file to sync.
+    """
+    try:
+        upload_file_to_s3(
+            host=gt4sd_configuration_instance.gt4sd_s3_host,
+            access_key=gt4sd_configuration_instance.gt4sd_s3_access_key,
+            secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key,
+            bucket=gt4sd_configuration_instance.gt4sd_s3_bucket,
+            target_filepath=target_filepath,
+            source_filepath=source_filepath,
+            secure=gt4sd_configuration_instance.gt4sd_s3_secure,
+        )
+    except S3SyncError:
+        logger.exception("error in syncing the cache with S3")
 
 
 def sync_algorithm_with_s3(prefix: Optional[str] = None) -> str:
