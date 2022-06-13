@@ -268,6 +268,16 @@ Run the algorithm via `gt4sd-inference` (again the model produced in the example
 gt4sd-inference --algorithm_name PaccMannGP --algorithm_application PaccMannGPGenerator --algorithm_version fast-example-v0 --number_of_samples 5  --target '{"molwt": {"target": 60.0}}'
 ```
 
+### Uploading a trained algorithm on a server via the CLI command
+
+If you have access to a server (local or cloud) you can upload your trained models easily. The syntax follow the saving pipeline using `gt4sd-upload`:
+
+```sh
+gt4sd-upload --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4sd-paccmann-gp --training_name fast-example --target_version fast-example-v0 --algorithm_application PaccMannGPGenerator
+```
+
+You will have to set up appropriate [configurations](https://github.com/GT4SD/gt4sd-core/blob/main/src/gt4sd/configuration.py#L39) and deactivate the secure protocol (depending on your server security). More details [here]().
+
 ### Additional examples
 
 Find more examples in [notebooks](./notebooks)
