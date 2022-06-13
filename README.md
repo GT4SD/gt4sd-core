@@ -253,19 +253,19 @@ Here a small example for `PaccmannGP` algorithm ([paper](https://doi.org/10.1021
 You can train a model with `gt4sd-trainer` (quick training using few data, not really recommended for a realistic model :warning:):
 
 ```sh
-gt4sd-trainer  --training_pipeline_name paccmann-vae-trainer --epochs 250 --batch_size 4 --n_layers 1 --rnn_cell_size 16 --latent_dim 16 --train_smiles_filepath src/gt4sd/training_pipelines/tests/molecules.smi --test_smiles_filepath src/gt4sd/training_pipelines/tests/molecules.smi --model_path /tmp/gt4sd-paccmann-gp/ --training_name fast-example --eval_interval 15 --save_interval 15 --selfies
+gt4sd-trainer --training_pipeline_name moses-vae-trainer --train_load src/gt4sd/training_pipelines/tests/molecules.smi --val_load src/gt4sd/training_pipelines/tests/molecules.smi --model_save /tmp/gt4sd-moses-vae/epoch_xy --log_file /tmp/gt4sd-moses-vae/logs.txt --config_save /tmp/gt4sd-moses-vae/config.json --vocab_save /tmp/gt4sd-moses-vae/vocab.txt --lr_n_period 2 --lr_n_restarts 2
 ```
 
 Save the model with the compatible inference pipeline using `gt4sd-saving`:
 
 ```sh
-gt4sd-saving --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4sd-paccmann-gp/ --training_name fast-example --target_version fast-example-v0 --algorithm_application PaccMannGPGenerator
+gt4sd-saving --training_pipeline_name moses-vae-trainer --model_path /tmp/gt4sd-moses-vae/epoch__003.pt --target_version fast-example-v0 --algorithm_application VaeGenerator --config_path /tmp/gt4sd-moses-vae/config.json --vocab_path /tmp/gt4sd-moses-vae/vocab.txt
 ```
 
 Run the algorithm via `gt4sd-inference` (again the model produced in the example is trained on dummy data and will give dummy outputs, do not use it as is :no_good:):
 
 ```sh
-gt4sd-inference --algorithm_name PaccMannGP --algorithm_application PaccMannGPGenerator --algorithm_version fast-example-v0 --number_of_samples 5  --target '{"molwt": {"target": 60.0}}'
+gt4sd-inference --algorithm_name MosesGenerator --algorithm_version fast-example-v0 --algorithm_application VaeGenerator --number_of_samples 3
 ```
 
 ### Additional examples
