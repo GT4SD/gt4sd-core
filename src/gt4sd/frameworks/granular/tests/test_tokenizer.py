@@ -24,6 +24,7 @@
 """Tests for granular tokenizer."""
 
 from gt4sd.frameworks.granular.tokenizer.tokenizer import (
+    BigSmilesTokenizer,
     SelfiesTokenizer,
     SmilesTokenizer,
 )
@@ -182,3 +183,38 @@ def test_tokenization():
             "[Ag]",
         ],
     )
+
+
+def test_big_smiles_tokenization():
+    big_smiles = "{[][$]CC(C#N)[$],[$]CC(c1ccccc1)[$][]}"
+    tokenizer = BigSmilesTokenizer("test")
+    assert tokenizer.tokenize(big_smiles) == [
+        "{",
+        "[]",
+        "[$]",
+        "C",
+        "C",
+        "(",
+        "C",
+        "#",
+        "N",
+        ")",
+        "[$]",
+        ",",
+        "[$]",
+        "C",
+        "C",
+        "(",
+        "c",
+        "1",
+        "c",
+        "c",
+        "c",
+        "c",
+        "c",
+        "1",
+        ")",
+        "[$]",
+        "[]",
+        "}",
+    ]

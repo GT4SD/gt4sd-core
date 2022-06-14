@@ -332,6 +332,7 @@ class AutoEncoderDataset(GranularDataset):
 DATASET_FACTORY: Dict[str, Type[GranularDataset]] = {
     "latentmodel": LatentModelDataset,
     "smiles": SmilesTokenizationPreProcessingDataset,
+    "big-smiles": SmilesTokenizationPreProcessingDataset,
     "selfies": SmilesTokenizationPreProcessingDataset,
     "autoencoder": AutoEncoderDataset,
 }
@@ -374,7 +375,7 @@ def build_dataset(
     Args:
         name: dataset name.
         data: dataframe representing the dataset.
-        dataset_type: dataset type. Feasible values: "latentmodel", "smiles", "selfies" and "autoencoder".
+        dataset_type: dataset type. Feasible values: "latentmodel", "smiles", "selfies", "big-smiles" and "autoencoder".
         data_columns: data columns mapping.
         hparams: hyper-parameters for the data columns.
 
@@ -410,7 +411,7 @@ def build_dataset(
         else:
             target_columns = [data_columns["target"]]
 
-    if dataset_type in {"smiles", "selfies"}:
+    if dataset_type in {"smiles", "selfies", "big-smiles"}:
         try:
             build_vocab = hparams["build_vocab"]
         except KeyError:
@@ -526,7 +527,7 @@ def build_dataset_and_architecture(
         name: dataset name.
         data_path: path to the dataset.
         data_file: data file name.
-        dataset_type: dataset type. Feasible values: "latentmodel", "smiles", "selfies" and "autoencoder".
+        dataset_type: dataset type. Feasible values: "latentmodel", "smiles", "selfies", "big-smiles" and "autoencoder".
         model_type: model type. Feasible values: "vae_rnn", "vae_trans", "mlp_predictor", "no_encoding", "mlp_autoencoder" and "vae_mlp".
         hparams: hyper-parameters for the data columns.
 
