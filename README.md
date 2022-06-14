@@ -248,7 +248,7 @@ gt4sd-trainer --training_pipeline_name ${TRAINING_PIPELINE_NAME} --help
 
 Once a training pipeline has been run via the `gt4sd-trainer`, it's possible to save the trained algorithm via `gt4sd-saving` for usage in compatible inference pipelines.
 
-Here a small example for `PaccmannGP` algorithm ([paper](https://doi.org/10.1021/acs.jcim.1c00889)).
+Here a small example for `PaccMannGP` algorithm ([paper](https://doi.org/10.1021/acs.jcim.1c00889)).
 
 You can train a model with `gt4sd-trainer` (quick training using few data, not really recommended for a realistic model :warning:):
 

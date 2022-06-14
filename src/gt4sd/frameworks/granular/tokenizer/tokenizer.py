@@ -33,6 +33,7 @@ import selfies as sf
 from pytoda.smiles.processing import tokenize_selfies
 
 SMI_REGEX_PATTERN = r"(\[[^\]]+]|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|=|#|-|\+|\\|\/|:|~|@|\?|>>?|\*|\$|\%[0-9]{2}|[0-9])"
+BIG_SMI_REGEX_PATTERN = r"(\[[^\]]+]|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|\,|\{|\}|\[\]|=|#|-|\+|\\|\/|:|~|@|\?|>>?|\*|\$|\%[0-9]{2}|[0-9])"
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
@@ -486,6 +487,46 @@ class SmilesTokenizer(Tokenizer):
         )
 
 
+class BigSmilesTokenizer(Tokenizer):
+    """Big-SMILES tokenizer that can build a vocabulary on the fly."""
+
+    def __init__(
+        self,
+        vocab_file: str,
+        smiles: List[str] = [],
+        pad_token: str = "<pad>",
+        sos_token: str = "<sos>",
+        eos_token: str = "</s>",
+        unk_token: str = "<unk>",
+    ) -> None:
+        """Constructs a BigSmilesTokenizer.
+
+        Args:
+            vocab_file: path to vocabulary file. If the file is not present, the provided Big-SMILES list
+                is used to generate one.
+            smiles: list of big smiles. Default to empty list, used only if the vocabulary file does not exist.
+            pad_token: padding token. Defaults to '<pad>'.
+            sos_token: start of sequence token. Defaults to '<sos>'.
+            eos_token: end of sequence token. Defaults to '</s>'.
+            unk_token: unknown token. Defaults to '<unk>'.
+        """
+        super().__init__(
+            vocab_file=vocab_file,
+            basic_tokenizer=BasicSmilesTokenizer(
+                regex_pattern=BIG_SMI_REGEX_PATTERN,
+                pad_token=pad_token,
+                sos_token=sos_token,
+                eos_token=eos_token,
+                unk_token=unk_token,
+            ),
+            smiles=smiles,
+            pad_token=pad_token,
+            sos_token=sos_token,
+            eos_token=eos_token,
+            unk_token=unk_token,
+        )
+
+
 class SelfiesTokenizer(Tokenizer):
     """SELFIES tokenizer that can build a vocabulary on the fly."""
 
@@ -528,5 +569,6 @@ class SelfiesTokenizer(Tokenizer):
 TOKENIZER_FACTORY: Dict[str, Type[Tokenizer]] = {
     "generic": GenericTokenizer,
     "smiles": SmilesTokenizer,
+    "big-smiles": BigSmilesTokenizer,
     "selfies": SelfiesTokenizer,
 }
