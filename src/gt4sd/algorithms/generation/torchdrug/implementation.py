@@ -183,7 +183,7 @@ class GAFGenerator(Generator):
     task: AutoregressiveGeneration
 
     input_dim: int = 9
-    num_relations: int = 3
+    num_relation: int = 3
     batch_norm: bool = True
     atom_types: List[int] = [6, 7, 8, 9, 15, 16, 17, 35, 53]
     hidden_dims: List[int] = [256, 256, 256]
@@ -197,7 +197,7 @@ class GAFGenerator(Generator):
         """
         super().__init__(
             input_dim=self.input_dim,
-            num_relation=self.num_relations,
+            num_relation=self.num_relation,
             batch_norm=self.batch_norm,
             atom_types=self.atom_types,
             hidden_dims=self.hidden_dims,
@@ -208,7 +208,7 @@ class GAFGenerator(Generator):
             torch.zeros(self.input_dim), torch.ones(self.input_dim)
         )
         edge_prior = distribution.IndependentGaussian(
-            torch.zeros(self.num_relations + 1), torch.ones(self.num_relations + 1)
+            torch.zeros(self.num_relation + 1), torch.ones(self.num_relation + 1)
         )
         node_flow = models.GraphAF(self.model, node_prior, num_layer=12)
         edge_flow = models.GraphAF(self.model, edge_prior, use_edge=True, num_layer=12)

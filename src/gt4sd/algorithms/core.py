@@ -210,7 +210,7 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
             if len(items) == 0:
                 raise SamplingError(
                     title="No samples generated",
-                    detail="No samples generated." + detail,
+                    detail="No samples generated. " + detail,
                 )
 
         item_set = set()
@@ -248,14 +248,14 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
                     stuck_counter
                     >= gt4sd_configuration_instance.gt4sd_max_number_of_stuck_calls
                 ):
-                    detail = f"no novel samples generared for more than {gt4sd_configuration_instance.gt4sd_max_number_of_stuck_calls} cycles"
+                    detail = f"no novel samples generated for more than {gt4sd_configuration_instance.gt4sd_max_number_of_stuck_calls} cycles"
                     logger.warning(detail + ", exiting")
                     signal.alarm(0)
                     raise_if_none_sampled(items=item_set, detail=detail)
                     return
                 item_set_length = len(item_set)
         except TimeoutError:
-            detail = f"Samples took longer than {self.max_runtime} seconds to generate"
+            detail = f"Samples took longer than {self.max_runtime} seconds to generate."
             logger.warning(detail + ", exiting")
             raise_if_none_sampled(items=item_set, detail=detail)
         signal.alarm(0)

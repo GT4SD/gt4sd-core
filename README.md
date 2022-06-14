@@ -8,6 +8,7 @@
 [![Docs](https://img.shields.io/badge/website-live-brightgreen)](https://gt4sd.github.io/gt4sd-core/)
 [![Total downloads](https://pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd)
 [![Monthly downloads](https://pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/GT4SD/gt4sd-core/main)
 
 <img src="./docs/_static/gt4sd_logo.png" alt="logo" width="500"/>
 
@@ -247,7 +248,7 @@ gt4sd-trainer --training_pipeline_name ${TRAINING_PIPELINE_NAME} --help
 
 Once a training pipeline has been run via the `gt4sd-trainer`, it's possible to save the trained algorithm via `gt4sd-saving` for usage in compatible inference pipelines.
 
-Here a small example for `PaccmannGP` algorithm ([paper](https://doi.org/10.1021/acs.jcim.1c00889)).
+Here a small example for `PaccMannGP` algorithm ([paper](https://doi.org/10.1021/acs.jcim.1c00889)).
 
 You can train a model with `gt4sd-trainer` (quick training using few data, not really recommended for a realistic model :warning:):
 
@@ -271,7 +272,12 @@ gt4sd-inference --algorithm_name PaccMannGP --algorithm_application PaccMannGPGe
 
 Find more examples in [notebooks](./notebooks)
 
-<!-- Having a list of all supported algorithms wouldn be nice! -->
+You can play with them right away using the provided Dockerfile, simply build the image and run it to explore the examples using Jupyter:
+
+```sh
+docker build -f Dockerfile -t gt4sd-demo .
+docker run -p 8888:8888 gt4sd-demo
+```
 
 ## Supported packages
 

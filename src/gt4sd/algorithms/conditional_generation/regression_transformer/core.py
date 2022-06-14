@@ -169,7 +169,7 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
         default="solubility",
         metadata=dict(
             description="The version of the algorithm to use.",
-            options=["solubility", "qed"],
+            options=["solubility", "qed", "logp_and_synthesizability"],
         ),
     )
 
@@ -195,6 +195,27 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
         default=20.0,
         metadata=dict(
             description="Precision tolerance for the conditional generation task. Given in percent"
+        ),
+    )
+    sampling_wrapper: Dict = field(
+        default_factory=dict,
+        metadata=dict(
+            description="""High-level entry point for SMILES-level access. Provide a
+            dictionary that is used to build a custom sampling wrapper.
+            NOTE: If this is used, the `target` needs to be a single SMILES string.
+            Example: {
+                'fraction_to_mask': 0.5,
+                'atoms_to_mask': [],
+                'property_goal': {'<qed>': 0.85}
+            }
+            - 'fraction_to_mask' specifies the ratio of tokens that can be changed by
+                the model.
+            - 'atoms_to_mask' specifies which atoms can be masked. This defaults
+                to an empty list, meaning that all tokens can be masked.
+            - 'property_goal' specifies the target conditions for the generation. The
+                properties need to be specified as a dictionary. The keys need to be
+                properties supported by the algorithm version.
+            """
         ),
     )
 
@@ -231,10 +252,11 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
             temperature=self.temperature,
             batch_size=self.batch_size,
             tolerance=self.tolerance,
+            sampling_wrapper=self.sampling_wrapper,
         )
         return self.generator
 
-    def validate_item(self, item: str) -> Union[Molecule, Property]:  # type: ignore
+    def validate_item(self, item: str) -> Union[Molecule, Sequence]:  # type: ignore
         """Check that item is a valid sequence.
 
         Args:
@@ -325,6 +347,27 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
             description="Precision tolerance for the conditional generation task. Given in percent"
         ),
     )
+    sampling_wrapper: Dict = field(
+        default_factory=dict,
+        metadata=dict(
+            description="""High-level entry point for SMILES-level access. Provide a
+            dictionary that is used to build a custom sampling wrapper.
+            NOTE: If this is used, the `target` needs to be a single SMILES string.
+            Example: {
+                'fraction_to_mask': 0.5,
+                'atoms_to_mask': [],
+                'property_goal': {'<qed>': 0.85}
+            }
+            - 'fraction_to_mask' specifies the ratio of tokens that can be changed by
+                the model.
+            - 'atoms_to_mask' specifies which atoms can be masked. This defaults
+                to an empty list, meaning that all tokens can be masked.
+            - 'property_goal' specifies the target conditions for the generation. The
+                properties need to be specified as a dictionary. The keys need to be
+                properties supported by the algorithm version.
+            """
+        ),
+    )
 
     def get_target_description(self) -> Dict[str, str]:
         """Get description of the target for generation.
@@ -358,10 +401,11 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
             context=context,
             batch_size=self.batch_size,
             tolerance=self.tolerance,
+            sampling_wrapper=self.sampling_wrapper,
         )
         return self.generator
 
-    def validate_item(self, item: str) -> Union[Molecule, Property]:  # type: ignore
+    def validate_item(self, item: str) -> Union[Molecule, Sequence]:  # type: ignore
         """Check that item is a valid sequence.
 
         Args:
@@ -385,6 +429,8 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
                 detail = f'"{item}" does not adhere to IUPAC convention for AAS'
             else:
                 title = "InvalidNumerical"
-                detail = f'"{item}" is not a valid floating point number'
+                detail = (
+                    f'"{item}" is not a valid Sequence with a floating point number'
+                )
             raise InvalidItem(title=title, detail=detail)
         return item
