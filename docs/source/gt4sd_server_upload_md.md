@@ -112,13 +112,13 @@ mc ls myminio/gt4sd-cos-algorithms-artifacts/
 
 ## Upload models
 
-You can now upload your model on the server:
+After setting th environment variables appropriately and following steps 1-4), you can now upload your model on the server:
 
 ```sh
 gt4sd-upload --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4sd-paccmann-gp --training_name fast-example --target_version fast-example-v0 --algorithm_application PaccMannGPGenerator
 ```
 
-You should be able to see this model running:
+You should be able to see the model and uploaded files running:
 
 ```sh
 mc ls myminio/gt4sd-algorithms-artifacts/controlled_sampling/PaccMannGP/PaccMannGPGenerator/fast-example-v0/

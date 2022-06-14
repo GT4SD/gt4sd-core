@@ -443,34 +443,6 @@ class AlgorithmConfiguration(Generic[S, T]):
         versions = versions.union(get_algorithm_subdirectories_in_cache(prefix))
         return versions
 
-    # QUESTION: should this be in core.py? Uploading to S3 is not a core functionality.
-    @classmethod
-    def list_versions_s3(cls, prefix) -> Set[str]:
-        """Get possible algorithm versions on s3.
-           Before uploading an artifact on S3, we need to check that
-           a particular version is not already present and overwrite by mistake.
-           If the final set is empty we can then upload the folder artifact.
-           If the final set is not empty, we need to check that the specific version
-           of interest is not present.
-
-        only S3 is searched (not the local cache) for matching versions.
-
-        Returns:
-            viable values as :attr:`algorithm_version` for the environment.
-        """
-        # all name without version
-        if not prefix:
-            prefix = cls.get_application_prefix()
-        try:
-            versions = get_algorithm_subdirectories_with_s3(prefix)
-        except (KeyError, S3SyncError) as error:
-            logger.info(
-                f"searching S3 raised {error.__class__.__name__}. This means that no versions are available on S3."
-            )
-            logger.debug(error)
-            versions = set()
-        return versions
-
     @classmethod
     def list_remote_versions(cls, prefix) -> Set[str]:
         """Get possible algorithm versions on s3.
