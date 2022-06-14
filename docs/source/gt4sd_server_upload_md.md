@@ -18,13 +18,13 @@ If you want to upload your trained models on a local (or cloud) server running `
 export GT4SD_S3_SECRET_KEY=''
 export GT4SD_S3_ACCESS_KEY=''
 export GT4SD_S3_HOST='127.0.0.1:9000'
-export GT4SD_S3_SECURE='False'
+export GT4SD_S3_SECURE=False
 export GT4SD_S3_BUCKET='gt4sd-cos-algorithms-artifacts'
 export GT4SD_S3_BUCKET_MODELS='gt4sd-cos-algorithms-models'
 export GT4SD_S3_BUCKET_DATA='gt4sd-cos-algorithms-data'
 ```
 
-set `GT4SD_S3_SECURE` `'True'` or `'False'` if https/http server.
+set `GT4SD_S3_SECURE` `True` or `False` if https/http server.
 
 ### 2) Create a docker container with a minio server
 
@@ -82,9 +82,9 @@ Add the new server to the minio configuration file (`~/.mc/config.json`):
 	"version": "10",
 	"aliases": {
                 "myminio": {
-                        "url": "http://127.0.0.1:9000",
-                        "accessKey": "",
-                        "secretKey": "",
+                        "url": "${GT4SD_S3_HOST}",
+                        "accessKey": "${GT4SD_S3_ACCESS_KEY}",
+                        "secretKey": "${GT4SD_S3_SECRET_KEY}",
                         "api": "s3v4",
                         "path": "auto"
                 },
