@@ -5,6 +5,7 @@
 * docker
 * minio
 * gt4sd [requirements](https://github.com/GT4SD/gt4sd-core/blob/main/requirements.txt)
+
 -----
 
 ## Run a local minio server
@@ -13,15 +14,17 @@ If you want to upload your trained models on a local (or cloud) server running `
 
 ### 1) Set environment variables
 
-copy exports in `~/.bashrc` or `~/.zshrc`
-
 ```sh
-export UPDATE_SECRET_KEY=''
-export UPDATE_ACCESS_KEY=''
-export UPDATE_BUCKET_MODELS='gt4sd-algorithms-models'
-export UPDATE_BUCKET_DATA='gt4sd-algorithms-data'
-export UPDATE_BUCKET_ARTIFACTS='gt4sd-algorithms-artifacts'
+export GT4SD_S3_SECRET_KEY=''
+export GT4SD_S3_ACCESS_KEY=''
+export GT4SD_S3_HOST='127.0.0.1:9000'
+export GT4SD_S3_SECURE='False'
+export GT4SD_S3_BUCKET='gt4sd-cos-algorithms-artifacts'
+export GT4SD_S3_BUCKET_MODELS='gt4sd-cos-algorithms-models'
+export GT4SD_S3_BUCKET_DATA='gt4sd-cos-algorithms-data'
 ```
+
+set `GT4SD_S3_SECURE` `'True'` or `'False'` if https/http server.
 
 ### 2) Create a docker container with a minio server
 
@@ -45,8 +48,8 @@ services:
     env_file:
      - env/.env.dev 
     environment:
-      MINIO_ACCESS_KEY: "${UPDATE_ACCESS_KEY}"
-      MINIO_SECRET_KEY: "${UPDATE_SECRET_KEY}"
+      MINIO_ACCESS_KEY: "${GT4SD_S3_ACCESS_KEY}"
+      MINIO_SECRET_KEY: "${GT4SD_S3_SECRET_KEY}"
     command: server /export
   createbuckets:
     image: minio/mc
@@ -57,12 +60,12 @@ services:
     # ensure there is a file in the artifacts bucket
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add myminio http://cos:9000 ${UPDATE_ACCESS_KEY} ${UPDATE_SECRET_KEY};
-      /usr/bin/mc mb myminio/${UPDATE_BUCKET_ARTIFACTS};
-      /usr/bin/mc mb myminio/${UPDATE_BUCKET_DATA};
-      /usr/bin/mc mb myminio/${UPDATE_BUCKET_MODELS};
+      /usr/bin/mc config host add myminio http://cos:9000 ${GT4SD_S3_ACCESS_KEY} ${GT4SD_S3_SECRET_KEY};
+      /usr/bin/mc mb myminio/${GT4SD_S3_BUCKET};
+      /usr/bin/mc mb myminio/${GT4SD_S3_BUCKET_DATA};
+      /usr/bin/mc mb myminio/${GT4SD_S3_BUCKET_MODELS};
       echo 'this is an artifact' >> a_file.txt;
-      /usr/bin/mc cp a_file.txt myminio/${UPDATE_BUCKET_ARTIFACTS}/a_file.txt;
+      /usr/bin/mc cp a_file.txt myminio/${GT4SD_S3_BUCKET}/a_file.txt;
       exit 0;
       "
 ```
@@ -70,7 +73,7 @@ services:
 You can store default environment variables in `.env.dev`.
 
 
-### 3) minio configuration
+### 3) MinIO server configuration
 
 Add the new server to the minio configuration file (`~/.mc/config.json`):
 
@@ -78,7 +81,7 @@ Add the new server to the minio configuration file (`~/.mc/config.json`):
 {
 	"version": "10",
 	"aliases": {
-                "local-dev": {
+                "myminio": {
                         "url": "http://127.0.0.1:9000",
                         "accessKey": "",
                         "secretKey": "",
@@ -90,14 +93,21 @@ Add the new server to the minio configuration file (`~/.mc/config.json`):
 }
 ```
 
-### 4) run `docker compose up`
+ and add the `myminio` to the list of servers
 
-After running `docker compose up` inside localhost-server this script will create a local minio server and the bucket `myminio` structure .
+```sh
+mc alias set myminio $GT4SD_S3_HOST $GT4SD_S3_ACCESS_KEY $GT4SD_S3_SECRET_KEY
+```
+
+### 4) run docker
+
+After running `docker compose up` inside localhost-server the script creates a local minio server and the bucket structure on `myminio`.
 If everything is working you should be able to see `a_file.txt` running:
 
 ```
-mc ls local-dev/gt4sd-algorithms-artifacts/
+mc ls myminio/gt4sd-cos-algorithms-artifacts/
 ```
+
 -------
 
 ## Upload models
@@ -111,5 +121,5 @@ gt4sd-upload --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4
 You should be able to see this model running:
 
 ```sh
-mc ls local-dev/gt4sd-algorithms-artifacts/controlled_sampling/PaccMannGP/PaccMannGPGenerator/fast-example-v0/
+mc ls myminio/gt4sd-algorithms-artifacts/controlled_sampling/PaccMannGP/PaccMannGPGenerator/fast-example-v0/
 ```

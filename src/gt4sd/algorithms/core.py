@@ -632,7 +632,7 @@ class AlgorithmConfiguration(Generic[S, T]):
             )
 
         if len(filepaths_mapping) > 0:
-            # probably redundant, but just in case
+            # probably redundant
             if source_version is None:
                 source_version = cls.algorithm_version
             source_missing_path = cls.ensure_artifacts_for_version(source_version)
