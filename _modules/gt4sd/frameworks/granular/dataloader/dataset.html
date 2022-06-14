@@ -491,6 +491,7 @@
 <span class="n">DATASET_FACTORY</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">GranularDataset</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;latentmodel&quot;</span><span class="p">:</span> <span class="n">LatentModelDataset</span><span class="p">,</span>
     <span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="n">SmilesTokenizationPreProcessingDataset</span><span class="p">,</span>
+    <span class="s2">&quot;big-smiles&quot;</span><span class="p">:</span> <span class="n">SmilesTokenizationPreProcessingDataset</span><span class="p">,</span>
     <span class="s2">&quot;selfies&quot;</span><span class="p">:</span> <span class="n">SmilesTokenizationPreProcessingDataset</span><span class="p">,</span>
     <span class="s2">&quot;autoencoder&quot;</span><span class="p">:</span> <span class="n">AutoEncoderDataset</span><span class="p">,</span>
 <span class="p">}</span>
@@ -533,7 +534,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        name: dataset name.</span>
 <span class="sd">        data: dataframe representing the dataset.</span>
-<span class="sd">        dataset_type: dataset type. Feasible values: &quot;latentmodel&quot;, &quot;smiles&quot;, &quot;selfies&quot; and &quot;autoencoder&quot;.</span>
+<span class="sd">        dataset_type: dataset type. Feasible values: &quot;latentmodel&quot;, &quot;smiles&quot;, &quot;selfies&quot;, &quot;big-smiles&quot; and &quot;autoencoder&quot;.</span>
 <span class="sd">        data_columns: data columns mapping.</span>
 <span class="sd">        hparams: hyper-parameters for the data columns.</span>
 
@@ -569,7 +570,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">target_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]]</span>
 
-    <span class="k">if</span> <span class="n">dataset_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;smiles&quot;</span><span class="p">,</span> <span class="s2">&quot;selfies&quot;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">dataset_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;smiles&quot;</span><span class="p">,</span> <span class="s2">&quot;selfies&quot;</span><span class="p">,</span> <span class="s2">&quot;big-smiles&quot;</span><span class="p">}:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">build_vocab</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;build_vocab&quot;</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -685,7 +686,7 @@
 <span class="sd">        name: dataset name.</span>
 <span class="sd">        data_path: path to the dataset.</span>
 <span class="sd">        data_file: data file name.</span>
-<span class="sd">        dataset_type: dataset type. Feasible values: &quot;latentmodel&quot;, &quot;smiles&quot;, &quot;selfies&quot; and &quot;autoencoder&quot;.</span>
+<span class="sd">        dataset_type: dataset type. Feasible values: &quot;latentmodel&quot;, &quot;smiles&quot;, &quot;selfies&quot;, &quot;big-smiles&quot; and &quot;autoencoder&quot;.</span>
 <span class="sd">        model_type: model type. Feasible values: &quot;vae_rnn&quot;, &quot;vae_trans&quot;, &quot;mlp_predictor&quot;, &quot;no_encoding&quot;, &quot;mlp_autoencoder&quot; and &quot;vae_mlp&quot;.</span>
 <span class="sd">        hparams: hyper-parameters for the data columns.</span>
 

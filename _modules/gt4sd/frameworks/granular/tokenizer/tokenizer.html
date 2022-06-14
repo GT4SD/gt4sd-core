@@ -192,6 +192,7 @@
 <span class="kn">from</span> <span class="nn">pytoda.smiles.processing</span> <span class="kn">import</span> <span class="n">tokenize_selfies</span>
 
 <span class="n">SMI_REGEX_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(\[[^\]]+]|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|=|#|-|\+|</span><span class="se">\\</span><span class="s2">|\/|:|~|@|\?|&gt;&gt;?|\*|\$|\%[0-9]</span><span class="si">{2}</span><span class="s2">|[0-9])&quot;</span>
+<span class="n">BIG_SMI_REGEX_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(\[[^\]]+]|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|\,|\{|\}|\[\]|=|#|-|\+|</span><span class="se">\\</span><span class="s2">|\/|:|~|@|\?|&gt;&gt;?|\*|\$|\%[0-9]</span><span class="si">{2}</span><span class="s2">|[0-9])&quot;</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
@@ -645,6 +646,46 @@
         <span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="BigSmilesTokenizer"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.tokenizer.tokenizer.html#gt4sd.frameworks.granular.tokenizer.tokenizer.BigSmilesTokenizer">[docs]</a><span class="k">class</span> <span class="nc">BigSmilesTokenizer</span><span class="p">(</span><span class="n">Tokenizer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Big-SMILES tokenizer that can build a vocabulary on the fly.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BigSmilesTokenizer.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.tokenizer.tokenizer.html#gt4sd.frameworks.granular.tokenizer.tokenizer.BigSmilesTokenizer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">vocab_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">smiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">pad_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&lt;pad&gt;&quot;</span><span class="p">,</span>
+        <span class="n">sos_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&lt;sos&gt;&quot;</span><span class="p">,</span>
+        <span class="n">eos_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&lt;/s&gt;&quot;</span><span class="p">,</span>
+        <span class="n">unk_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Constructs a BigSmilesTokenizer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            vocab_file: path to vocabulary file. If the file is not present, the provided Big-SMILES list</span>
+<span class="sd">                is used to generate one.</span>
+<span class="sd">            smiles: list of big smiles. Default to empty list, used only if the vocabulary file does not exist.</span>
+<span class="sd">            pad_token: padding token. Defaults to &#39;&lt;pad&gt;&#39;.</span>
+<span class="sd">            sos_token: start of sequence token. Defaults to &#39;&lt;sos&gt;&#39;.</span>
+<span class="sd">            eos_token: end of sequence token. Defaults to &#39;&lt;/s&gt;&#39;.</span>
+<span class="sd">            unk_token: unknown token. Defaults to &#39;&lt;unk&gt;&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">vocab_file</span><span class="o">=</span><span class="n">vocab_file</span><span class="p">,</span>
+            <span class="n">basic_tokenizer</span><span class="o">=</span><span class="n">BasicSmilesTokenizer</span><span class="p">(</span>
+                <span class="n">regex_pattern</span><span class="o">=</span><span class="n">BIG_SMI_REGEX_PATTERN</span><span class="p">,</span>
+                <span class="n">pad_token</span><span class="o">=</span><span class="n">pad_token</span><span class="p">,</span>
+                <span class="n">sos_token</span><span class="o">=</span><span class="n">sos_token</span><span class="p">,</span>
+                <span class="n">eos_token</span><span class="o">=</span><span class="n">eos_token</span><span class="p">,</span>
+                <span class="n">unk_token</span><span class="o">=</span><span class="n">unk_token</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">smiles</span><span class="o">=</span><span class="n">smiles</span><span class="p">,</span>
+            <span class="n">pad_token</span><span class="o">=</span><span class="n">pad_token</span><span class="p">,</span>
+            <span class="n">sos_token</span><span class="o">=</span><span class="n">sos_token</span><span class="p">,</span>
+            <span class="n">eos_token</span><span class="o">=</span><span class="n">eos_token</span><span class="p">,</span>
+            <span class="n">unk_token</span><span class="o">=</span><span class="n">unk_token</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="SelfiesTokenizer"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.tokenizer.tokenizer.html#gt4sd.frameworks.granular.tokenizer.tokenizer.SelfiesTokenizer">[docs]</a><span class="k">class</span> <span class="nc">SelfiesTokenizer</span><span class="p">(</span><span class="n">Tokenizer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;SELFIES tokenizer that can build a vocabulary on the fly.&quot;&quot;&quot;</span>
 
@@ -687,6 +728,7 @@
 <span class="n">TOKENIZER_FACTORY</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Tokenizer</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;generic&quot;</span><span class="p">:</span> <span class="n">GenericTokenizer</span><span class="p">,</span>
     <span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="n">SmilesTokenizer</span><span class="p">,</span>
+    <span class="s2">&quot;big-smiles&quot;</span><span class="p">:</span> <span class="n">BigSmilesTokenizer</span><span class="p">,</span>
     <span class="s2">&quot;selfies&quot;</span><span class="p">:</span> <span class="n">SelfiesTokenizer</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
