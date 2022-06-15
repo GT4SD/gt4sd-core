@@ -276,7 +276,7 @@ If you have access to a server (local or cloud) you can upload your trained mode
 gt4sd-upload --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4sd-paccmann-gp --training_name fast-example --target_version fast-example-v0 --algorithm_application PaccMannGPGenerator
 ```
 
-You have to update `gt4sd_s3_host`, `gt4sd_s3_access_key`, `gt4sd_s3_secret_key`, `gt4sd_s3_secure` and `gt4sd_s3_bucket` appropriately to upload the models.
+You have to update `GT4SD_S3_HOST`, `GT4SD_S3_ACCESS_KEY`, `GT4SD_S3_SECRET_KEY`, `GT4SD_S3_SECURE`, and `GT4SD_S3_BUCKET` appropriately to upload the models.
 An example on self-hosting locally a COS (minio) where to upload your models can be found [here](https://gt4sd.github.io/gt4sd-core/source/gt4sd_server_upload_md.md).
 
 ### Additional examples
