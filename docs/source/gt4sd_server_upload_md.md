@@ -1,5 +1,9 @@
 # GT4SD server upload
 
+Here we report an example of how you can setup a custom minio server on localhost where you can upload your algorithms. Keep in mind that the same procedure can be used with a pre-existing COS simply setting the environment variables to the appropriate values.
+
+------
+
 ## Requirements
 
 * docker
@@ -10,7 +14,6 @@
 
 ## Run a local minio server
 
-If you want to upload your trained models on a local (or cloud) server running `minio` you can:
 
 ### 1) Set environment variables
 
@@ -36,7 +39,7 @@ mkdir env/
 echo >> docker-compose.yml
 ```
 
-Copy this configuration script in `docker-compose.yml`:
+copy this configuration script in `docker-compose.yml`:
 
 ```sh
 version: '10'
@@ -93,7 +96,7 @@ Add the new server to the minio configuration file (`~/.mc/config.json`):
 }
 ```
 
- and add the `myminio` to the list of servers
+ and add `myminio` to the list of servers:
 
 ```sh
 mc alias set myminio $GT4SD_S3_HOST $GT4SD_S3_ACCESS_KEY $GT4SD_S3_SECRET_KEY

@@ -64,7 +64,7 @@ class GT4SDConfiguration(BaseSettings):
 
 
 gt4sd_configuration_instance = GT4SDConfiguration.get_instance()
-print(gt4sd_configuration_instance)
+
 logger.info(
     f"using as local cache path: {gt4sd_configuration_instance.gt4sd_local_cache_path}"
 )
