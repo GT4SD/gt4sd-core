@@ -16,7 +16,7 @@ jobs:
       - name: Adding user to contributors
         run: |
           echo Signature by ${{ github.event.issue.user.login }}
-          git clone ${{ github.repositoryUrl }} --branch main --single-branch gt4sd-core-main
+          git clone https://github.com/GT4SD/gt4sd-core.git --branch main --single-branch gt4sd-core-main
           cd gt4sd-core-main
           previous_commit_hash=$(git rev-parse HEAD | cut -c 1-8)
           echo $(jq '.contributors |= (. + ["${{ github.event.issue.user.login }}"] | unique)' .clabot) > .clabot
