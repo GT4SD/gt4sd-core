@@ -54,6 +54,7 @@ from ..configuration import (
     get_algorithm_subdirectories_with_s3,
     get_cached_algorithm_path,
     sync_algorithm_with_s3,
+    upload_to_s3,
 )
 from ..exceptions import InvalidItem, S3SyncError, SamplingError
 from ..training_pipelines.core import TrainingPipelineArguments
@@ -443,6 +444,33 @@ class AlgorithmConfiguration(Generic[S, T]):
         return versions
 
     @classmethod
+    def list_remote_versions(cls, prefix) -> Set[str]:
+        """Get possible algorithm versions on s3.
+           Before uploading an artifact on S3, we need to check that
+           a particular version is not already present and overwrite by mistake.
+           If the final set is empty we can then upload the folder artifact.
+           If the final set is not empty, we need to check that the specific version
+           of interest is not present.
+
+        only S3 is searched (not the local cache) for matching versions.
+
+        Returns:
+            viable values as :attr:`algorithm_version` for the environment.
+        """
+        # all name without version
+        if not prefix:
+            prefix = cls.get_application_prefix()
+        try:
+            versions = get_algorithm_subdirectories_with_s3(prefix)
+        except (KeyError, S3SyncError) as error:
+            logger.info(
+                f"searching S3 raised {error.__class__.__name__}. This means that no versions are available on S3."
+            )
+            logger.debug(error)
+            versions = set()
+        return versions
+
+    @classmethod
     def get_filepath_mappings_for_training_pipeline_arguments(
         cls, training_pipeline_arguments: TrainingPipelineArguments
     ) -> Dict[str, str]:
@@ -534,6 +562,99 @@ class AlgorithmConfiguration(Generic[S, T]):
             )
 
             logger.info(f"Artifacts saving completed into {target_path}")
+
+    @classmethod
+    def upload_version_from_training_pipeline_arguments_postprocess(
+        cls,
+        training_pipeline_arguments: TrainingPipelineArguments,
+    ):
+        """Postprocess after uploading. Not implemented yet.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+        """
+        pass
+
+    @classmethod
+    def upload_version_from_training_pipeline_arguments(
+        cls,
+        training_pipeline_arguments: TrainingPipelineArguments,
+        target_version: str,
+        source_version: Optional[str] = None,
+    ) -> None:
+        """Upload a version using training pipeline arguments.
+
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+            target_version: target version used to save the model in s3.
+            source_version: source version to use for missing artifacts.
+                Defaults to None, a.k.a., use the default version.
+        """
+        filepaths_mapping: Dict[str, str] = {}
+
+        try:
+            filepaths_mapping = (
+                cls.get_filepath_mappings_for_training_pipeline_arguments(
+                    training_pipeline_arguments=training_pipeline_arguments
+                )
+            )
+        except ValueError:
+            logger.info(
+                f"{cls.__name__} can not save a version based on {training_pipeline_arguments}"
+            )
+
+        if len(filepaths_mapping) > 0:
+            # probably redundant
+            if source_version is None:
+                source_version = cls.algorithm_version
+            source_missing_path = cls.ensure_artifacts_for_version(source_version)
+
+            # prefix for a run
+            prefix = cls.get_application_prefix()
+            # versions in s3 with that prefix
+            versions = cls.list_remote_versions(prefix)
+
+            # check if the target version is already in s3. If yes, don't upload.
+            if target_version not in versions:
+                logger.info(
+                    f"There is no version {target_version} in S3, starting upload..."
+                )
+            else:
+                logger.info(
+                    f"Version {target_version} already exists in S3, skipping upload..."
+                )
+                return
+
+            # mapping between filenames and paths for a version.
+            filepaths_mapping = {
+                filename: source_filepath
+                if os.path.exists(source_filepath)
+                else os.path.join(source_missing_path, filename)
+                for filename, source_filepath in filepaths_mapping.items()
+            }
+
+            logger.info(
+                f"Uploading artifacts into {os.path.join(prefix, target_version)}..."
+            )
+            try:
+                for target_filename, source_filepath in filepaths_mapping.items():
+                    # algorithm_type/algorithm_name/algorithm_application/version/filename
+                    # for the moment we assume that the prefix exists in s3.
+                    target_filepath = os.path.join(
+                        prefix, target_version, target_filename
+                    )
+                    upload_to_s3(target_filepath, source_filepath)
+                    logger.info(
+                        f"Upload artifact {source_filepath} into {target_filepath}..."
+                    )
+
+            except S3SyncError:
+                logger.warning("Problem with upload...")
+                return
+
+            logger.info(
+                f"Artifacts uploading completed into {os.path.join(prefix, target_version)}"
+            )
 
     @classmethod
     def ensure_artifacts_for_version(cls, algorithm_version: str) -> str:

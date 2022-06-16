@@ -111,6 +111,18 @@ class GT4SDS3Client:
             if s3_object.object_name[-1] == "/"
         )
 
+    def upload_file(
+        self, bucket: str, target_filepath: str, source_filepath: str
+    ) -> None:
+        """Upload a local file to S3 bucket.
+
+        Args:
+            bucket: bucket name to upload to.
+            target_filepath: path to the file in S3.
+            source_filepath: path to the file to upload.
+        """
+        self.client.fput_object(bucket, target_filepath, source_filepath)
+
     def sync_folder(
         self, bucket: str, path: str, prefix: Optional[str] = None, force: bool = False
     ) -> None:
@@ -145,6 +157,46 @@ class GT4SDS3Client:
                 self.client.fget_object(
                     bucket_name=bucket, object_name=object_name, file_path=filepath
                 )
+
+
+def upload_file_to_s3(
+    host: str,
+    access_key: str,
+    secret_key: str,
+    bucket: str,
+    target_filepath: str,
+    source_filepath: str,
+    secure: bool = True,
+) -> None:
+    """
+    Sync the cache with the S3 remote storage.
+
+    Args:
+        host: s3 host address.
+        access_key: s3 access key.
+        secret_key: s3 secret key.
+        bucket: bucket name to search for objects.
+        target_filepath: path to save the objects in s3.
+        source_filepath: path to the file to sync.
+        secure: whether the connection is secure or not. Defaults
+            to True.
+
+    Raises:
+        S3SyncError: in case of S3 syncing errors.
+    """
+    try:
+        client = GT4SDS3Client(
+            host=host, access_key=access_key, secret_key=secret_key, secure=secure
+        )
+        logger.info("starting syncing")
+        client.upload_file(bucket, target_filepath, source_filepath)
+        logger.info("syncing complete")
+    except Exception:
+        logger.exception("generic syncing error")
+        raise S3SyncError(
+            "UploadArtifactsErrors",
+            f"error in uploading path={target_filepath} with host={host} and bucket={bucket}",
+        )
 
 
 def sync_folder_with_s3(
