@@ -88,6 +88,7 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/gt4sd.html">API of the gt4sd package</a></li>
@@ -213,6 +214,7 @@
     <span class="n">get_algorithm_subdirectories_with_s3</span><span class="p">,</span>
     <span class="n">get_cached_algorithm_path</span><span class="p">,</span>
     <span class="n">sync_algorithm_with_s3</span><span class="p">,</span>
+    <span class="n">upload_to_s3</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">..exceptions</span> <span class="kn">import</span> <span class="n">InvalidItem</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">,</span> <span class="n">SamplingError</span>
 <span class="kn">from</span> <span class="nn">..training_pipelines.core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
@@ -601,6 +603,33 @@
         <span class="n">versions</span> <span class="o">=</span> <span class="n">versions</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">get_algorithm_subdirectories_in_cache</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">versions</span></div>
 
+<div class="viewcode-block" id="AlgorithmConfiguration.list_remote_versions"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration.list_remote_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_remote_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get possible algorithm versions on s3.</span>
+<span class="sd">           Before uploading an artifact on S3, we need to check that</span>
+<span class="sd">           a particular version is not already present and overwrite by mistake.</span>
+<span class="sd">           If the final set is empty we can then upload the folder artifact.</span>
+<span class="sd">           If the final set is not empty, we need to check that the specific version</span>
+<span class="sd">           of interest is not present.</span>
+
+<span class="sd">        only S3 is searched (not the local cache) for matching versions.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># all name without version</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">prefix</span><span class="p">:</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_application_prefix</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">versions</span> <span class="o">=</span> <span class="n">get_algorithm_subdirectories_with_s3</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;searching S3 raised </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">. This means that no versions are available on S3.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="n">versions</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">versions</span></div>
+
 <div class="viewcode-block" id="AlgorithmConfiguration.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
@@ -693,6 +722,99 @@
             <span class="p">)</span>
 
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Artifacts saving completed into </span><span class="si">{</span><span class="n">target_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AlgorithmConfiguration.upload_version_from_training_pipeline_arguments_postprocess"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration.upload_version_from_training_pipeline_arguments_postprocess">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">upload_version_from_training_pipeline_arguments_postprocess</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Postprocess after uploading. Not implemented yet.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="AlgorithmConfiguration.upload_version_from_training_pipeline_arguments"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration.upload_version_from_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">upload_version_from_training_pipeline_arguments</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span><span class="p">,</span>
+        <span class="n">target_version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">source_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Upload a version using training pipeline arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
+<span class="sd">            target_version: target version used to save the model in s3.</span>
+<span class="sd">            source_version: source version to use for missing artifacts.</span>
+<span class="sd">                Defaults to None, a.k.a., use the default version.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filepaths_mapping</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">filepaths_mapping</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">=</span><span class="n">training_pipeline_arguments</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> can not save a version based on </span><span class="si">{</span><span class="n">training_pipeline_arguments</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filepaths_mapping</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># probably redundant</span>
+            <span class="k">if</span> <span class="n">source_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">source_version</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span>
+            <span class="n">source_missing_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ensure_artifacts_for_version</span><span class="p">(</span><span class="n">source_version</span><span class="p">)</span>
+
+            <span class="c1"># prefix for a run</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_application_prefix</span><span class="p">()</span>
+            <span class="c1"># versions in s3 with that prefix</span>
+            <span class="n">versions</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">list_remote_versions</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+
+            <span class="c1"># check if the target version is already in s3. If yes, don&#39;t upload.</span>
+            <span class="k">if</span> <span class="n">target_version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;There is no version </span><span class="si">{</span><span class="n">target_version</span><span class="si">}</span><span class="s2"> in S3, starting upload...&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Version </span><span class="si">{</span><span class="n">target_version</span><span class="si">}</span><span class="s2"> already exists in S3, skipping upload...&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># mapping between filenames and paths for a version.</span>
+            <span class="n">filepaths_mapping</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">filename</span><span class="p">:</span> <span class="n">source_filepath</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">source_filepath</span><span class="p">)</span>
+                <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">source_missing_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">source_filepath</span> <span class="ow">in</span> <span class="n">filepaths_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Uploading artifacts into </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">target_version</span><span class="p">)</span><span class="si">}</span><span class="s2">...&quot;</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">target_filename</span><span class="p">,</span> <span class="n">source_filepath</span> <span class="ow">in</span> <span class="n">filepaths_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="c1"># algorithm_type/algorithm_name/algorithm_application/version/filename</span>
+                    <span class="c1"># for the moment we assume that the prefix exists in s3.</span>
+                    <span class="n">target_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="n">prefix</span><span class="p">,</span> <span class="n">target_version</span><span class="p">,</span> <span class="n">target_filename</span>
+                    <span class="p">)</span>
+                    <span class="n">upload_to_s3</span><span class="p">(</span><span class="n">target_filepath</span><span class="p">,</span> <span class="n">source_filepath</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Upload artifact </span><span class="si">{</span><span class="n">source_filepath</span><span class="si">}</span><span class="s2"> into </span><span class="si">{</span><span class="n">target_filepath</span><span class="si">}</span><span class="s2">...&quot;</span>
+                    <span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">S3SyncError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Problem with upload...&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Artifacts uploading completed into </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">target_version</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
 
 <div class="viewcode-block" id="AlgorithmConfiguration.ensure_artifacts_for_version"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.AlgorithmConfiguration.ensure_artifacts_for_version">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">ensure_artifacts_for_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

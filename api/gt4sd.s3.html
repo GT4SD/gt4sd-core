@@ -91,6 +91,7 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
@@ -207,6 +208,9 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.s3.sync_folder_with_s3" title="gt4sd.s3.sync_folder_with_s3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync_folder_with_s3</span></code></a></p></td>
 <td><p>Sync the cache with the S3 remote storage.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.s3.upload_file_to_s3" title="gt4sd.s3.upload_file_to_s3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upload_file_to_s3</span></code></a></p></td>
+<td><p>Sync the cache with the S3 remote storage.</p></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -291,6 +295,24 @@ Needs to be a “directory” itself.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt id="gt4sd.s3.GT4SDS3Client.upload_file">
+<code class="sig-name descname">upload_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span></em>, <em class="sig-param"><span class="n">target_filepath</span></em>, <em class="sig-param"><span class="n">source_filepath</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/s3.html#GT4SDS3Client.upload_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.s3.GT4SDS3Client.upload_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload a local file to S3 bucket.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bucket</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – bucket name to upload to.</p></li>
+<li><p><strong>target_filepath</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the file in S3.</p></li>
+<li><p><strong>source_filepath</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the file to upload.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="gt4sd.s3.GT4SDS3Client.sync_folder">
 <code class="sig-name descname">sync_folder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/s3.html#GT4SDS3Client.sync_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.s3.GT4SDS3Client.sync_folder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sync an entire folder from S3 recursively and save it under the given path.</p>
@@ -313,7 +335,7 @@ Needs to be a “directory” itself.</p></li>
 
 <dl class="py attribute">
 <dt id="gt4sd.s3.GT4SDS3Client.__dict__">
-<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.s3', '__init__': &lt;function GT4SDS3Client.__init__&gt;, 'list_bucket_names': &lt;function GT4SDS3Client.list_bucket_names&gt;, 'list_object_names': &lt;function GT4SDS3Client.list_object_names&gt;, 'list_directories': &lt;function GT4SDS3Client.list_directories&gt;, 'sync_folder': &lt;function GT4SDS3Client.sync_folder&gt;, '__dict__': &lt;attribute '__dict__' of 'GT4SDS3Client' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'GT4SDS3Client' objects&gt;, '__doc__': None, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.s3.GT4SDS3Client.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.s3', '__init__': &lt;function GT4SDS3Client.__init__&gt;, 'list_bucket_names': &lt;function GT4SDS3Client.list_bucket_names&gt;, 'list_object_names': &lt;function GT4SDS3Client.list_object_names&gt;, 'list_directories': &lt;function GT4SDS3Client.list_directories&gt;, 'upload_file': &lt;function GT4SDS3Client.upload_file&gt;, 'sync_folder': &lt;function GT4SDS3Client.sync_folder&gt;, '__dict__': &lt;attribute '__dict__' of 'GT4SDS3Client' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'GT4SDS3Client' objects&gt;, '__doc__': None, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.s3.GT4SDS3Client.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -332,6 +354,32 @@ Needs to be a “directory” itself.</p></li>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt id="gt4sd.s3.upload_file_to_s3">
+<code class="sig-name descname">upload_file_to_s3</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">host</span></em>, <em class="sig-param"><span class="n">access_key</span></em>, <em class="sig-param"><span class="n">secret_key</span></em>, <em class="sig-param"><span class="n">bucket</span></em>, <em class="sig-param"><span class="n">target_filepath</span></em>, <em class="sig-param"><span class="n">source_filepath</span></em>, <em class="sig-param"><span class="n">secure</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/s3.html#upload_file_to_s3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.s3.upload_file_to_s3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sync the cache with the S3 remote storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – s3 host address.</p></li>
+<li><p><strong>access_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – s3 access key.</p></li>
+<li><p><strong>secret_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – s3 secret key.</p></li>
+<li><p><strong>bucket</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – bucket name to search for objects.</p></li>
+<li><p><strong>target_filepath</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to save the objects in s3.</p></li>
+<li><p><strong>source_filepath</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the file to sync.</p></li>
+<li><p><strong>secure</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether the connection is secure or not. Defaults
+to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="gt4sd.exceptions.html#gt4sd.exceptions.S3SyncError" title="gt4sd.exceptions.S3SyncError"><strong>S3SyncError</strong></a> – in case of S3 syncing errors.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

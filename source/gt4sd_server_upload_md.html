@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>GT4SD server upload &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd package" href="../api/gt4sd.html" />
+    <link rel="prev" title="Adding a new algorithm" href="gt4sd_algorithm_addition_md.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples on how to upload models on a self-hosted minio service using GT4SD</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-a-local-minio-server">Run a local minio server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#set-environment-variables">1) Set environment variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-docker-container-with-a-minio-server">2) Create a docker container with a minio server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minio-server-configuration">3) MinIO server configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-docker">4) run docker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#upload-models">Upload models</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>GT4SD server upload</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/source/gt4sd_server_upload_md.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="gt4sd-server-upload">
+<h1>GT4SD server upload<a class="headerlink" href="#gt4sd-server-upload" title="Permalink to this headline">¶</a></h1>
+<p>Here we report an example of how you can setup a custom minio server on localhost where you can upload your algorithms. Keep in mind that the same procedure can be used with a pre-existing COS simply setting the environment variables to the appropriate values.</p>
+<hr class="docutils" />
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>docker</p></li>
+<li><p>minio</p></li>
+<li><p>gt4sd <a class="reference external" href="https://github.com/GT4SD/gt4sd-core/blob/main/requirements.txt">requirements</a></p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="run-a-local-minio-server">
+<h2>Run a local minio server<a class="headerlink" href="#run-a-local-minio-server" title="Permalink to this headline">¶</a></h2>
+<section id="set-environment-variables">
+<h3>1) Set environment variables<a class="headerlink" href="#set-environment-variables" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">GT4SD_S3_SECRET_KEY</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+<span class="nb">export</span> <span class="nv">GT4SD_S3_ACCESS_KEY</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+<span class="nb">export</span> <span class="nv">GT4SD_S3_HOST</span><span class="o">=</span><span class="s1">&#39;127.0.0.1:9000&#39;</span>
+<span class="nb">export</span> <span class="nv">GT4SD_S3_SECURE</span><span class="o">=</span>False
+<span class="nb">export</span> <span class="nv">GT4SD_S3_BUCKET</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-artifacts&#39;</span>
+<span class="nb">export</span> <span class="nv">GT4SD_S3_BUCKET_MODELS</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-models&#39;</span>
+<span class="nb">export</span> <span class="nv">GT4SD_S3_BUCKET_DATA</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-data&#39;</span>
+</pre></div>
+</div>
+<p>set <code class="docutils literal notranslate"><span class="pre">GT4SD_S3_SECURE</span></code> <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> if https/http server.</p>
+</section>
+<section id="create-a-docker-container-with-a-minio-server">
+<h3>2) Create a docker container with a minio server<a class="headerlink" href="#create-a-docker-container-with-a-minio-server" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/
+mkdir localhost-server
+<span class="nb">cd</span> localhost-server
+mkdir env/
+<span class="nb">echo</span> &gt;&gt; docker-compose.yml
+</pre></div>
+</div>
+<p>copy this configuration script in <code class="docutils literal notranslate"><span class="pre">docker-compose.yml</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>version: <span class="s1">&#39;10&#39;</span>
+services:
+  cos:
+    image: minio/minio:RELEASE.2022-06-07T00-33-41Z
+    ports:
+      - <span class="m">9000</span>:9000
+    env_file:
+     - env/.env.dev 
+    environment:
+      MINIO_ACCESS_KEY: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY</span><span class="si">}</span><span class="s2">&quot;</span>
+      MINIO_SECRET_KEY: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY</span><span class="si">}</span><span class="s2">&quot;</span>
+    command: server /export
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - cos
+    env_file:
+     - env/.env.dev
+    <span class="c1"># ensure there is a file in the artifacts bucket</span>
+    entrypoint: &gt;
+      /bin/sh -c <span class="s2">&quot;</span>
+<span class="s2">      /usr/bin/mc config host add myminio http://cos:9000 </span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY</span><span class="si">}</span><span class="s2"> </span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_DATA</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_MODELS</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">      echo &#39;this is an artifact&#39; &gt;&gt; a_file.txt;</span>
+<span class="s2">      /usr/bin/mc cp a_file.txt myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET</span><span class="si">}</span><span class="s2">/a_file.txt;</span>
+<span class="s2">      exit 0;</span>
+<span class="s2">      &quot;</span>
+</pre></div>
+</div>
+<p>You can store default environment variables in <code class="docutils literal notranslate"><span class="pre">.env.dev</span></code>.</p>
+</section>
+<section id="minio-server-configuration">
+<h3>3) MinIO server configuration<a class="headerlink" href="#minio-server-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Add the new server to the minio configuration file (<code class="docutils literal notranslate"><span class="pre">~/.mc/config.json</span></code>):</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="o">{</span>
+	<span class="s2">&quot;version&quot;</span>: <span class="s2">&quot;10&quot;</span>,
+	<span class="s2">&quot;aliases&quot;</span>: <span class="o">{</span>
+                <span class="s2">&quot;myminio&quot;</span>: <span class="o">{</span>
+                        <span class="s2">&quot;url&quot;</span>: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_HOST</span><span class="si">}</span><span class="s2">&quot;</span>,
+                        <span class="s2">&quot;accessKey&quot;</span>: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY</span><span class="si">}</span><span class="s2">&quot;</span>,
+                        <span class="s2">&quot;secretKey&quot;</span>: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY</span><span class="si">}</span><span class="s2">&quot;</span>,
+                        <span class="s2">&quot;api&quot;</span>: <span class="s2">&quot;s3v4&quot;</span>,
+                        <span class="s2">&quot;path&quot;</span>: <span class="s2">&quot;auto&quot;</span>
+                <span class="o">}</span>,
+                ...
+                <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>and add <code class="docutils literal notranslate"><span class="pre">myminio</span></code> to the list of servers:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mc <span class="nb">alias</span> <span class="nb">set</span> myminio <span class="nv">$GT4SD_S3_HOST</span> <span class="nv">$GT4SD_S3_ACCESS_KEY</span> <span class="nv">$GT4SD_S3_SECRET_KEY</span>
+</pre></div>
+</div>
+</section>
+<section id="run-docker">
+<h3>4) run docker<a class="headerlink" href="#run-docker" title="Permalink to this headline">¶</a></h3>
+<p>After running <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">up</span></code> inside localhost-server the script creates a local minio server and the bucket structure on <code class="docutils literal notranslate"><span class="pre">myminio</span></code>.
+If everything is working you should be able to see <code class="docutils literal notranslate"><span class="pre">a_file.txt</span></code> running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mc</span> <span class="n">ls</span> <span class="n">myminio</span><span class="o">/</span><span class="n">gt4sd</span><span class="o">-</span><span class="n">cos</span><span class="o">-</span><span class="n">algorithms</span><span class="o">-</span><span class="n">artifacts</span><span class="o">/</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="upload-models">
+<h2>Upload models<a class="headerlink" href="#upload-models" title="Permalink to this headline">¶</a></h2>
+<p>After setting th environment variables appropriately and following steps 1-4), you can now upload your model on the server:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>gt4sd-upload --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4sd-paccmann-gp --training_name fast-example --target_version fast-example-v0 --algorithm_application PaccMannGPGenerator
+</pre></div>
+</div>
+<p>You should be able to see the model and uploaded files running:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mc ls myminio/gt4sd-algorithms-artifacts/controlled_sampling/PaccMannGP/PaccMannGPGenerator/fast-example-v0/
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../api/gt4sd.html" class="btn btn-neutral float-right" title="gt4sd package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd_algorithm_addition_md.html" class="btn btn-neutral float-left" title="Adding a new algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

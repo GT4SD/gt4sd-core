@@ -88,6 +88,7 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../api/gt4sd.html">API of the gt4sd package</a></li>
@@ -189,7 +190,7 @@
 
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseSettings</span>
 
-<span class="kn">from</span> <span class="nn">.s3</span> <span class="kn">import</span> <span class="n">GT4SDS3Client</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">,</span> <span class="n">sync_folder_with_s3</span>
+<span class="kn">from</span> <span class="nn">.s3</span> <span class="kn">import</span> <span class="n">GT4SDS3Client</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">,</span> <span class="n">sync_folder_with_s3</span><span class="p">,</span> <span class="n">upload_file_to_s3</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -223,6 +224,7 @@
 
 
 <span class="n">gt4sd_configuration_instance</span> <span class="o">=</span> <span class="n">GT4SDConfiguration</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
+
 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">&quot;using as local cache path: </span><span class="si">{</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_local_cache_path</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
@@ -230,6 +232,26 @@
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_local_cache_path</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;local cache path already exists&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="upload_to_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.upload_to_s3">[docs]</a><span class="k">def</span> <span class="nf">upload_to_s3</span><span class="p">(</span><span class="n">target_filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source_filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Upload an algorithm in source_filepath in target_filepath on a bucket.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        target_filepath: path to save the objects in s3.</span>
+<span class="sd">        source_filepath: path to the file to sync.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">upload_file_to_s3</span><span class="p">(</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_host</span><span class="p">,</span>
+            <span class="n">access_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_access_key</span><span class="p">,</span>
+            <span class="n">secret_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secret_key</span><span class="p">,</span>
+            <span class="n">bucket</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_bucket</span><span class="p">,</span>
+            <span class="n">target_filepath</span><span class="o">=</span><span class="n">target_filepath</span><span class="p">,</span>
+            <span class="n">source_filepath</span><span class="o">=</span><span class="n">source_filepath</span><span class="p">,</span>
+            <span class="n">secure</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secure</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">S3SyncError</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;error in syncing the cache with S3&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="sync_algorithm_with_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.sync_algorithm_with_s3">[docs]</a><span class="k">def</span> <span class="nf">sync_algorithm_with_s3</span><span class="p">(</span><span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
