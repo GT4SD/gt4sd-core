@@ -40,6 +40,7 @@ class GT4SDConfiguration(BaseSettings):
     """GT4SDConfiguration settings from environment variables.
 
     Default configurations for gt4sd including a read-only COS for algorithms' artifacts.
+    Default configuration for gt4sd hub including a read-write COS for algorithms' artifacts uploaded by users.
     """
 
     gt4sd_local_cache_path: str = os.path.join(os.path.expanduser("~"), ".gt4sd")
@@ -47,11 +48,18 @@ class GT4SDConfiguration(BaseSettings):
     gt4sd_max_number_of_stuck_calls: int = 50
     gt4sd_max_number_of_samples: int = 1000000
     gt4sd_max_runtime: int = 86400
+
     gt4sd_s3_host: str = "s3.par01.cloud-object-storage.appdomain.cloud"
     gt4sd_s3_access_key: str = "6e9891531d724da89997575a65f4592e"
     gt4sd_s3_secret_key: str = "5997d63c4002cc04e13c03dc0c2db9dae751293dab106ac5"
     gt4sd_s3_secure: bool = True
     gt4sd_s3_bucket: str = "gt4sd-cos-algorithms-artifacts"
+
+    gt4sd_s3_host_hub: str = "s3.par01.cloud-object-storage.appdomain.cloud"
+    gt4sd_s3_access_key_hub: str = "d9536662ebcf462f937efb9f58012830"
+    gt4sd_s3_secret_key_hub: str = "934d1f3afdaea55ac586f6c2f729ac2ba2694bb8e975ee0b"
+    gt4sd_s3_secure_hub: bool = True
+    gt4sd_s3_bucket_hub: str = "gt4sd-cos-hub-algorithms-artifacts"
 
     class Config:
         # immutable and in turn hashable, that is required for lru_cache
@@ -64,7 +72,6 @@ class GT4SDConfiguration(BaseSettings):
 
 
 gt4sd_configuration_instance = GT4SDConfiguration.get_instance()
-
 logger.info(
     f"using as local cache path: {gt4sd_configuration_instance.gt4sd_local_cache_path}"
 )
@@ -75,20 +82,20 @@ except FileExistsError:
 
 
 def upload_to_s3(target_filepath: str, source_filepath: str):
-    """Upload an algorithm in source_filepath in target_filepath on a bucket.
+    """Upload an algorithm in source_filepath in target_filepath on a bucket in the model hub.
     Args:
         target_filepath: path to save the objects in s3.
         source_filepath: path to the file to sync.
     """
     try:
         upload_file_to_s3(
-            host=gt4sd_configuration_instance.gt4sd_s3_host,
-            access_key=gt4sd_configuration_instance.gt4sd_s3_access_key,
-            secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key,
-            bucket=gt4sd_configuration_instance.gt4sd_s3_bucket,
+            host=gt4sd_configuration_instance.gt4sd_s3_host_hub,
+            access_key=gt4sd_configuration_instance.gt4sd_s3_access_key_hub,
+            secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key_hub,
+            bucket=gt4sd_configuration_instance.gt4sd_s3_bucket_hub,
             target_filepath=target_filepath,
             source_filepath=source_filepath,
-            secure=gt4sd_configuration_instance.gt4sd_s3_secure,
+            secure=gt4sd_configuration_instance.gt4sd_s3_secure_hub,
         )
     except S3SyncError:
         logger.exception("error in syncing the cache with S3")
@@ -108,7 +115,9 @@ def sync_algorithm_with_s3(prefix: Optional[str] = None) -> str:
         gt4sd_configuration_instance.gt4sd_local_cache_path,
         gt4sd_configuration_instance.gt4sd_local_cache_path_algorithms,
     )
+
     try:
+        # sync with the public bucket
         sync_folder_with_s3(
             host=gt4sd_configuration_instance.gt4sd_s3_host,
             access_key=gt4sd_configuration_instance.gt4sd_s3_access_key,
@@ -117,6 +126,16 @@ def sync_algorithm_with_s3(prefix: Optional[str] = None) -> str:
             folder_path=folder_path,
             prefix=prefix,
             secure=gt4sd_configuration_instance.gt4sd_s3_secure,
+        )
+        # sync with the public bucket hub
+        sync_folder_with_s3(
+            host=gt4sd_configuration_instance.gt4sd_s3_host_hub,
+            access_key=gt4sd_configuration_instance.gt4sd_s3_access_key_hub,
+            secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key_hub,
+            bucket=gt4sd_configuration_instance.gt4sd_s3_bucket_hub,
+            folder_path=folder_path,
+            prefix=prefix,
+            secure=gt4sd_configuration_instance.gt4sd_s3_secure_hub,
         )
     except S3SyncError:
         logger.exception("error in syncing the cache with S3")
@@ -141,6 +160,7 @@ def get_cached_algorithm_path(prefix: Optional[str] = None) -> str:
 def get_algorithm_subdirectories_with_s3(prefix: Optional[str] = None) -> Set[str]:
 
     try:
+        # public bucket - read access
         host = gt4sd_configuration_instance.gt4sd_s3_host
         access_key = gt4sd_configuration_instance.gt4sd_s3_access_key
         secret_key = gt4sd_configuration_instance.gt4sd_s3_secret_key
@@ -149,7 +169,27 @@ def get_algorithm_subdirectories_with_s3(prefix: Optional[str] = None) -> Set[st
             host=host, access_key=access_key, secret_key=secret_key, secure=secure
         )
         bucket = gt4sd_configuration_instance.gt4sd_s3_bucket
-        return client.list_directories(bucket=bucket, prefix=prefix)
+
+        # public bucket hub - write access
+        host_hub = gt4sd_configuration_instance.gt4sd_s3_host_hub
+        access_key_hub = gt4sd_configuration_instance.gt4sd_s3_access_key_hub
+        secret_key_hub = gt4sd_configuration_instance.gt4sd_s3_secret_key_hub
+        secure_hub = gt4sd_configuration_instance.gt4sd_s3_secure_hub
+        client_hub = GT4SDS3Client(
+            host=host_hub,
+            access_key=access_key_hub,
+            secret_key=secret_key_hub,
+            secure=secure_hub,
+        )
+        bucket_hub = gt4sd_configuration_instance.gt4sd_s3_bucket_hub
+
+        # directories in the read-only bucket
+        dirs = client.list_directories(bucket=bucket, prefix=prefix)
+        # directories in the write bucket hub
+        dirs_hub = client_hub.list_directories(bucket=bucket_hub, prefix=prefix)
+        versions = dirs.union(dirs_hub)
+        return versions
+
     except Exception:
         logger.exception("generic syncing error")
         raise S3SyncError(
