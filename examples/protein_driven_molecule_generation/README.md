@@ -17,6 +17,7 @@ items = list(paccmann_gp.sample(10))
 
 If you were simultaneously interested to optimize other properties like QED or SCScore, define this in your target specification.
 You can also add weights to each component of the multi-objective. 
+
 ```py
 target = {
     "qed": {"weight": 1.0},
