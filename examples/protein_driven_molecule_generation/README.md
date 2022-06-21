@@ -27,6 +27,7 @@ target = {
 ```
 
 For details on this methodology see:
+
 ```bib
 @article{born2022active,
 	author = {Born, Jannis and Huynh, Tien and Stroobants, Astrid and Cornell, Wendy D. and Manica, Matteo},
