@@ -9,6 +9,7 @@
 [![Total downloads](https://pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd)
 [![Monthly downloads](https://pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/GT4SD/gt4sd-core/main)
+[![DOI](https://zenodo.org/badge/458309249.svg)](https://zenodo.org/badge/latestdoi/458309249)
 
 <img src="./docs/_static/gt4sd_logo.png" alt="logo" width="500"/>
 
