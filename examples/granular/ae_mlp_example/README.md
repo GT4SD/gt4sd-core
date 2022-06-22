@@ -21,5 +21,5 @@ Use the checkpoint generated for testing and saving the latent space:
 python example_test_ae_and_mlp.py
 ```
 
-*NOTE:* update the path to the checkpoint in the test [script](./example_test_ae_and_mlp.py)
+*NOTE:* update the path to the checkpoint in the test [script](./example_test_ae_and_mlp.py).
 
