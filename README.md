@@ -277,7 +277,7 @@ You can upload trained and finetuned models easily in the public hub using `gt4s
 gt4sd-upload --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4sd-paccmann-gp --training_name fast-example --target_version fast-example-v0 --algorithm_application PaccMannGPGenerator
 ```
 
-**NOTE:** You can also upload your own models on a self-hosted/custom COS storage.
+**NOTE:** GT4SD can be configured to upload models to a custom or self-hosted COS.
 An example on self-hosting locally a COS (minio) where to upload your models can be found [here](https://gt4sd.github.io/gt4sd-core/source/gt4sd_server_upload_md.html).
 
 ### Additional examples
