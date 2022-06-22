@@ -157,36 +157,53 @@ def get_cached_algorithm_path(prefix: Optional[str] = None) -> str:
     )
 
 
+def get_algorithm_subdirectories_from_s3_coordinates(
+    host: str,
+    access_key: str,
+    secret_key: str,
+    bucket: str,
+    secure: bool = True,
+    prefix: Optional[str] = None,
+) -> Set[str]:
+    """Wrapper to initialize a client and list the directories in a bucket."""
+    client = GT4SDS3Client(
+        host=host, access_key=access_key, secret_key=secret_key, secure=secure
+    )
+    return client.list_directories(bucket=bucket, prefix=prefix)
+
+
 def get_algorithm_subdirectories_with_s3(prefix: Optional[str] = None) -> Set[str]:
+    """Get algorithms in the s3 buckets.
 
+    Args:
+        prefix: the relative path in the bucket (both
+            on S3 and locally) to match files to download. Defaults to None.
+
+    Returns:
+        Set: set of available algorithms on s3 with that prefix.
+    """
     try:
-        # public bucket - read access
-        host = gt4sd_configuration_instance.gt4sd_s3_host
-        access_key = gt4sd_configuration_instance.gt4sd_s3_access_key
-        secret_key = gt4sd_configuration_instance.gt4sd_s3_secret_key
-        secure = gt4sd_configuration_instance.gt4sd_s3_secure
-        client = GT4SDS3Client(
-            host=host, access_key=access_key, secret_key=secret_key, secure=secure
+        # directories in the read-only public bucket
+        dirs = get_algorithm_subdirectories_from_s3_coordinates(
+            host=gt4sd_configuration_instance.gt4sd_s3_host,
+            access_key=gt4sd_configuration_instance.gt4sd_s3_access_key,
+            secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key,
+            bucket=gt4sd_configuration_instance.gt4sd_s3_bucket,
+            secure=gt4sd_configuration_instance.gt4sd_s3_secure,
+            prefix=prefix,
         )
-        bucket = gt4sd_configuration_instance.gt4sd_s3_bucket
 
-        # public bucket hub - write access
-        host_hub = gt4sd_configuration_instance.gt4sd_s3_host_hub
-        access_key_hub = gt4sd_configuration_instance.gt4sd_s3_access_key_hub
-        secret_key_hub = gt4sd_configuration_instance.gt4sd_s3_secret_key_hub
-        secure_hub = gt4sd_configuration_instance.gt4sd_s3_secure_hub
-        client_hub = GT4SDS3Client(
-            host=host_hub,
-            access_key=access_key_hub,
-            secret_key=secret_key_hub,
-            secure=secure_hub,
+        # directories in the write public-hub bucket
+        dirs_hub = get_algorithm_subdirectories_from_s3_coordinates(
+            host=gt4sd_configuration_instance.gt4sd_s3_host_hub,
+            access_key=gt4sd_configuration_instance.gt4sd_s3_access_key_hub,
+            secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key_hub,
+            bucket=gt4sd_configuration_instance.gt4sd_s3_bucket_hub,
+            secure=gt4sd_configuration_instance.gt4sd_s3_secure_hub,
+            prefix=prefix,
         )
-        bucket_hub = gt4sd_configuration_instance.gt4sd_s3_bucket_hub
 
-        # directories in the read-only bucket
-        dirs = client.list_directories(bucket=bucket, prefix=prefix)
-        # directories in the write bucket hub
-        dirs_hub = client_hub.list_directories(bucket=bucket_hub, prefix=prefix)
+        # set of directories in the public bucket and public hub bucket
         versions = dirs.union(dirs_hub)
         return versions
 
@@ -194,7 +211,7 @@ def get_algorithm_subdirectories_with_s3(prefix: Optional[str] = None) -> Set[st
         logger.exception("generic syncing error")
         raise S3SyncError(
             "CacheSyncingError",
-            f"error in getting directories of prefix={prefix} with host={host} access_key={access_key} secret_key={secret_key} secure={secure} bucket={bucket}",
+            f"error in getting directories of prefix={prefix}",
         )
 
 
