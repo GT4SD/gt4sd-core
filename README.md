@@ -269,16 +269,16 @@ Run the algorithm via `gt4sd-inference` (again the model produced in the example
 gt4sd-inference --algorithm_name PaccMannGP --algorithm_application PaccMannGPGenerator --algorithm_version fast-example-v0 --number_of_samples 5  --target '{"molwt": {"target": 60.0}}'
 ```
 
-### Uploading a trained algorithm on a server via the CLI command
+### Uploading a trained algorithm on a public hub via the CLI command
 
-If you have access to a server (local or cloud) you can upload your trained models easily. The syntax follow the saving pipeline using `gt4sd-upload`:
+You can upload trained and finetuned models easily in the public hub using `gt4sd-upload`. The syntax follows the saving pipeline:
 
 ```sh
 gt4sd-upload --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4sd-paccmann-gp --training_name fast-example --target_version fast-example-v0 --algorithm_application PaccMannGPGenerator
 ```
 
-**NOTE:** GT4SD default COS credentials for model syncing are read-only. To upload your own models, you can rely on a self-hosted/custom COS storage and configure the following environment variables accordingly: `GT4SD_S3_HOST`, `GT4SD_S3_ACCESS_KEY`, `GT4SD_S3_SECRET_KEY`, `GT4SD_S3_SECURE`, and `GT4SD_S3_BUCKET`.
-An example on self-hosting locally a COS (minio) where to upload your models can be found [here](https://gt4sd.github.io/gt4sd-core/source/gt4sd_server_upload_md.md).
+**NOTE:** GT4SD can be configured to upload models to a custom or self-hosted COS.
+An example on self-hosting locally a COS (minio) where to upload your models can be found [here](https://gt4sd.github.io/gt4sd-core/source/gt4sd_server_upload_md.html).
 
 ### Additional examples
 
