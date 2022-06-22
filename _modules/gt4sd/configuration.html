@@ -200,6 +200,7 @@
     <span class="sd">&quot;&quot;&quot;GT4SDConfiguration settings from environment variables.</span>
 
 <span class="sd">    Default configurations for gt4sd including a read-only COS for algorithms&#39; artifacts.</span>
+<span class="sd">    Default configuration for gt4sd hub including a read-write COS for algorithms&#39; artifacts uploaded by users.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">gt4sd_local_cache_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;.gt4sd&quot;</span><span class="p">)</span>
@@ -207,11 +208,18 @@
     <span class="n">gt4sd_max_number_of_stuck_calls</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span>
     <span class="n">gt4sd_max_number_of_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span>
     <span class="n">gt4sd_max_runtime</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">86400</span>
+
     <span class="n">gt4sd_s3_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s3.par01.cloud-object-storage.appdomain.cloud&quot;</span>
     <span class="n">gt4sd_s3_access_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;6e9891531d724da89997575a65f4592e&quot;</span>
     <span class="n">gt4sd_s3_secret_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;5997d63c4002cc04e13c03dc0c2db9dae751293dab106ac5&quot;</span>
     <span class="n">gt4sd_s3_secure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">gt4sd_s3_bucket</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gt4sd-cos-algorithms-artifacts&quot;</span>
+
+    <span class="n">gt4sd_s3_host_hub</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s3.par01.cloud-object-storage.appdomain.cloud&quot;</span>
+    <span class="n">gt4sd_s3_access_key_hub</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;d9536662ebcf462f937efb9f58012830&quot;</span>
+    <span class="n">gt4sd_s3_secret_key_hub</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;934d1f3afdaea55ac586f6c2f729ac2ba2694bb8e975ee0b&quot;</span>
+    <span class="n">gt4sd_s3_secure_hub</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">gt4sd_s3_bucket_hub</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gt4sd-cos-hub-algorithms-artifacts&quot;</span>
 
 <div class="viewcode-block" id="GT4SDConfiguration.Config"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.GT4SDConfiguration.Config">[docs]</a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
         <span class="c1"># immutable and in turn hashable, that is required for lru_cache</span>
@@ -224,7 +232,6 @@
 
 
 <span class="n">gt4sd_configuration_instance</span> <span class="o">=</span> <span class="n">GT4SDConfiguration</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
-
 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">&quot;using as local cache path: </span><span class="si">{</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_local_cache_path</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
@@ -235,20 +242,20 @@
 
 
 <div class="viewcode-block" id="upload_to_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.upload_to_s3">[docs]</a><span class="k">def</span> <span class="nf">upload_to_s3</span><span class="p">(</span><span class="n">target_filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source_filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Upload an algorithm in source_filepath in target_filepath on a bucket.</span>
+    <span class="sd">&quot;&quot;&quot;Upload an algorithm in source_filepath in target_filepath on a bucket in the model hub.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        target_filepath: path to save the objects in s3.</span>
 <span class="sd">        source_filepath: path to the file to sync.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">upload_file_to_s3</span><span class="p">(</span>
-            <span class="n">host</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_host</span><span class="p">,</span>
-            <span class="n">access_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_access_key</span><span class="p">,</span>
-            <span class="n">secret_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secret_key</span><span class="p">,</span>
-            <span class="n">bucket</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_bucket</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_host_hub</span><span class="p">,</span>
+            <span class="n">access_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_access_key_hub</span><span class="p">,</span>
+            <span class="n">secret_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secret_key_hub</span><span class="p">,</span>
+            <span class="n">bucket</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_bucket_hub</span><span class="p">,</span>
             <span class="n">target_filepath</span><span class="o">=</span><span class="n">target_filepath</span><span class="p">,</span>
             <span class="n">source_filepath</span><span class="o">=</span><span class="n">source_filepath</span><span class="p">,</span>
-            <span class="n">secure</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secure</span><span class="p">,</span>
+            <span class="n">secure</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secure_hub</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="n">S3SyncError</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;error in syncing the cache with S3&quot;</span><span class="p">)</span></div>
@@ -268,7 +275,9 @@
         <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_local_cache_path</span><span class="p">,</span>
         <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_local_cache_path_algorithms</span><span class="p">,</span>
     <span class="p">)</span>
+
     <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># sync with the public bucket</span>
         <span class="n">sync_folder_with_s3</span><span class="p">(</span>
             <span class="n">host</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_host</span><span class="p">,</span>
             <span class="n">access_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_access_key</span><span class="p">,</span>
@@ -277,6 +286,16 @@
             <span class="n">folder_path</span><span class="o">=</span><span class="n">folder_path</span><span class="p">,</span>
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
             <span class="n">secure</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secure</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># sync with the public bucket hub</span>
+        <span class="n">sync_folder_with_s3</span><span class="p">(</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_host_hub</span><span class="p">,</span>
+            <span class="n">access_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_access_key_hub</span><span class="p">,</span>
+            <span class="n">secret_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secret_key_hub</span><span class="p">,</span>
+            <span class="n">bucket</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_bucket_hub</span><span class="p">,</span>
+            <span class="n">folder_path</span><span class="o">=</span><span class="n">folder_path</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">secure</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secure_hub</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="n">S3SyncError</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;error in syncing the cache with S3&quot;</span><span class="p">)</span>
@@ -298,23 +317,61 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_algorithm_subdirectories_with_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_with_s3">[docs]</a><span class="k">def</span> <span class="nf">get_algorithm_subdirectories_with_s3</span><span class="p">(</span><span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_algorithm_subdirectories_from_s3_coordinates"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_from_s3_coordinates">[docs]</a><span class="k">def</span> <span class="nf">get_algorithm_subdirectories_from_s3_coordinates</span><span class="p">(</span>
+    <span class="n">host</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">access_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">secret_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">bucket</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">secure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Wrapper to initialize a client and list the directories in a bucket.&quot;&quot;&quot;</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">GT4SDS3Client</span><span class="p">(</span>
+        <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">access_key</span><span class="o">=</span><span class="n">access_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="n">secure</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">list_directories</span><span class="p">(</span><span class="n">bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="get_algorithm_subdirectories_with_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_with_s3">[docs]</a><span class="k">def</span> <span class="nf">get_algorithm_subdirectories_with_s3</span><span class="p">(</span><span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Get algorithms in the s3 buckets.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix: the relative path in the bucket (both</span>
+<span class="sd">            on S3 and locally) to match files to download. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Set: set of available algorithms on s3 with that prefix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">host</span> <span class="o">=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_host</span>
-        <span class="n">access_key</span> <span class="o">=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_access_key</span>
-        <span class="n">secret_key</span> <span class="o">=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secret_key</span>
-        <span class="n">secure</span> <span class="o">=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secure</span>
-        <span class="n">client</span> <span class="o">=</span> <span class="n">GT4SDS3Client</span><span class="p">(</span>
-            <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">access_key</span><span class="o">=</span><span class="n">access_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="n">secure</span>
+        <span class="c1"># directories in the read-only public bucket</span>
+        <span class="n">dirs</span> <span class="o">=</span> <span class="n">get_algorithm_subdirectories_from_s3_coordinates</span><span class="p">(</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_host</span><span class="p">,</span>
+            <span class="n">access_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_access_key</span><span class="p">,</span>
+            <span class="n">secret_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secret_key</span><span class="p">,</span>
+            <span class="n">bucket</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_bucket</span><span class="p">,</span>
+            <span class="n">secure</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secure</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">bucket</span> <span class="o">=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_bucket</span>
-        <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">list_directories</span><span class="p">(</span><span class="n">bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+
+        <span class="c1"># directories in the write public-hub bucket</span>
+        <span class="n">dirs_hub</span> <span class="o">=</span> <span class="n">get_algorithm_subdirectories_from_s3_coordinates</span><span class="p">(</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_host_hub</span><span class="p">,</span>
+            <span class="n">access_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_access_key_hub</span><span class="p">,</span>
+            <span class="n">secret_key</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secret_key_hub</span><span class="p">,</span>
+            <span class="n">bucket</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_bucket_hub</span><span class="p">,</span>
+            <span class="n">secure</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secure_hub</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># set of directories in the public bucket and public hub bucket</span>
+        <span class="n">versions</span> <span class="o">=</span> <span class="n">dirs</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">dirs_hub</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">versions</span>
+
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;generic syncing error&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">S3SyncError</span><span class="p">(</span>
             <span class="s2">&quot;CacheSyncingError&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;error in getting directories of prefix=</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> with host=</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2"> access_key=</span><span class="si">{</span><span class="n">access_key</span><span class="si">}</span><span class="s2"> secret_key=</span><span class="si">{</span><span class="n">secret_key</span><span class="si">}</span><span class="s2"> secure=</span><span class="si">{</span><span class="n">secure</span><span class="si">}</span><span class="s2"> bucket=</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;error in getting directories of prefix=</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 

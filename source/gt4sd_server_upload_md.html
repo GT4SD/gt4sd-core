@@ -190,13 +190,13 @@
 <h2>Run a local minio server<a class="headerlink" href="#run-a-local-minio-server" title="Permalink to this headline">¶</a></h2>
 <section id="set-environment-variables">
 <h3>1) Set environment variables<a class="headerlink" href="#set-environment-variables" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">GT4SD_S3_SECRET_KEY</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
-<span class="nb">export</span> <span class="nv">GT4SD_S3_ACCESS_KEY</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
-<span class="nb">export</span> <span class="nv">GT4SD_S3_HOST</span><span class="o">=</span><span class="s1">&#39;127.0.0.1:9000&#39;</span>
-<span class="nb">export</span> <span class="nv">GT4SD_S3_SECURE</span><span class="o">=</span>False
-<span class="nb">export</span> <span class="nv">GT4SD_S3_BUCKET</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-artifacts&#39;</span>
-<span class="nb">export</span> <span class="nv">GT4SD_S3_BUCKET_MODELS</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-models&#39;</span>
-<span class="nb">export</span> <span class="nv">GT4SD_S3_BUCKET_DATA</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-data&#39;</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+<span class="nb">export</span> <span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+<span class="nb">export</span> <span class="nv">GT4SD_S3_HOST_HUB</span><span class="o">=</span><span class="s1">&#39;127.0.0.1:9000&#39;</span>
+<span class="nb">export</span> <span class="nv">GT4SD_S3_SECURE_HUB</span><span class="o">=</span>False
+<span class="nb">export</span> <span class="nv">GT4SD_S3_BUCKET_HUB</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-artifacts&#39;</span>
+<span class="nb">export</span> <span class="nv">GT4SD_S3_BUCKET_MODELS_HUB</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-models&#39;</span>
+<span class="nb">export</span> <span class="nv">GT4SD_S3_BUCKET_DATA_HUB</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-data&#39;</span>
 </pre></div>
 </div>
 <p>set <code class="docutils literal notranslate"><span class="pre">GT4SD_S3_SECURE</span></code> <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> if https/http server.</p>
@@ -220,8 +220,8 @@ services:
     env_file:
      - env/.env.dev 
     environment:
-      MINIO_ACCESS_KEY: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY</span><span class="si">}</span><span class="s2">&quot;</span>
-      MINIO_SECRET_KEY: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY</span><span class="si">}</span><span class="s2">&quot;</span>
+      MINIO_ACCESS_KEY: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="si">}</span><span class="s2">&quot;</span>
+      MINIO_SECRET_KEY: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="si">}</span><span class="s2">&quot;</span>
     command: server /export
   createbuckets:
     image: minio/mc
@@ -232,12 +232,12 @@ services:
     <span class="c1"># ensure there is a file in the artifacts bucket</span>
     entrypoint: &gt;
       /bin/sh -c <span class="s2">&quot;</span>
-<span class="s2">      /usr/bin/mc config host add myminio http://cos:9000 </span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY</span><span class="si">}</span><span class="s2"> </span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY</span><span class="si">}</span><span class="s2">;</span>
-<span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET</span><span class="si">}</span><span class="s2">;</span>
-<span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_DATA</span><span class="si">}</span><span class="s2">;</span>
-<span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_MODELS</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">      /usr/bin/mc config host add myminio http://cos:9000 </span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="si">}</span><span class="s2"> </span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_HUB</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_DATA_HUB</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_MODELS_HUB</span><span class="si">}</span><span class="s2">;</span>
 <span class="s2">      echo &#39;this is an artifact&#39; &gt;&gt; a_file.txt;</span>
-<span class="s2">      /usr/bin/mc cp a_file.txt myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET</span><span class="si">}</span><span class="s2">/a_file.txt;</span>
+<span class="s2">      /usr/bin/mc cp a_file.txt myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_HUB</span><span class="si">}</span><span class="s2">/a_file.txt;</span>
 <span class="s2">      exit 0;</span>
 <span class="s2">      &quot;</span>
 </pre></div>
@@ -251,9 +251,9 @@ services:
 	<span class="s2">&quot;version&quot;</span>: <span class="s2">&quot;10&quot;</span>,
 	<span class="s2">&quot;aliases&quot;</span>: <span class="o">{</span>
                 <span class="s2">&quot;myminio&quot;</span>: <span class="o">{</span>
-                        <span class="s2">&quot;url&quot;</span>: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_HOST</span><span class="si">}</span><span class="s2">&quot;</span>,
-                        <span class="s2">&quot;accessKey&quot;</span>: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY</span><span class="si">}</span><span class="s2">&quot;</span>,
-                        <span class="s2">&quot;secretKey&quot;</span>: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY</span><span class="si">}</span><span class="s2">&quot;</span>,
+                        <span class="s2">&quot;url&quot;</span>: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_HOST_HUB</span><span class="si">}</span><span class="s2">&quot;</span>,
+                        <span class="s2">&quot;accessKey&quot;</span>: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="si">}</span><span class="s2">&quot;</span>,
+                        <span class="s2">&quot;secretKey&quot;</span>: <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="si">}</span><span class="s2">&quot;</span>,
                         <span class="s2">&quot;api&quot;</span>: <span class="s2">&quot;s3v4&quot;</span>,
                         <span class="s2">&quot;path&quot;</span>: <span class="s2">&quot;auto&quot;</span>
                 <span class="o">}</span>,
@@ -263,7 +263,7 @@ services:
 </pre></div>
 </div>
 <p>and add <code class="docutils literal notranslate"><span class="pre">myminio</span></code> to the list of servers:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mc <span class="nb">alias</span> <span class="nb">set</span> myminio <span class="nv">$GT4SD_S3_HOST</span> <span class="nv">$GT4SD_S3_ACCESS_KEY</span> <span class="nv">$GT4SD_S3_SECRET_KEY</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mc <span class="nb">alias</span> <span class="nb">set</span> myminio <span class="nv">$GT4SD_S3_HOST_HUB</span> <span class="nv">$GT4SD_S3_ACCESS_KEY_HUB</span> <span class="nv">$GT4SD_S3_SECRET_KEY_HUB</span>
 </pre></div>
 </div>
 </section>
