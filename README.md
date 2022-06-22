@@ -269,7 +269,7 @@ Run the algorithm via `gt4sd-inference` (again the model produced in the example
 gt4sd-inference --algorithm_name PaccMannGP --algorithm_application PaccMannGPGenerator --algorithm_version fast-example-v0 --number_of_samples 5  --target '{"molwt": {"target": 60.0}}'
 ```
 
-### Uploading a trained algorithm on a server via the CLI command
+### Uploading a trained algorithm on a public hub via the CLI command
 
 You can upload trained and finetuned models easily in the public hub using `gt4sd-upload`. The syntax follows the saving pipeline:
 
