@@ -18,7 +18,7 @@ When you contribute to the GT4SD project with a new pull request,
 a bot will evaluate whether you have signed the CLA. If required, the
 bot will comment on the pull request, including a link to accept the
 agreement. The [individual CLA](./iCLA.md) document is available for review in this repo.
-You can sign the agreement right away by opening an issue clicking [here](https://github.com/GT4SD/gt4sd-core/issues/new?assignees=C-nit%2C+christofid%2C+drugilsberg%2C+jannisborn%2C+kwehden&labels=cla-signing&template=cla-signature.md&title=CLA+signature).
+You can sign the agreement right away by opening an issue clicking [here](https://github.com/GT4SD/gt4sd-core/issues/new?assignees=&labels=cla-signing&template=cla-signature.yaml&title=CLA+signature).
 
 ## Contributing to GT4SD codebase
 
