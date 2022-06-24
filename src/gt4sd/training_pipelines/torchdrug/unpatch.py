@@ -26,6 +26,23 @@ from typing import List
 
 import torch
 import torch.utils.data.dataset as dataset
+import torch.optim.lr_scheduler as lr_scheduler
+from torch.optim.lr_scheduler import (
+    ChainedScheduler,
+    ConstantLR,
+    CosineAnnealingLR,
+    CosineAnnealingWarmRestarts,
+    CyclicLR,
+    ExponentialLR,
+    LambdaLR,
+    LinearLR,
+    MultiplicativeLR,
+    MultiStepLR,
+    OneCycleLR,
+    SequentialLR,
+    StepLR,
+    _LRScheduler,
+)
 from torch.utils.data.dataset import (
     ChainDataset,
     ConcatDataset,
@@ -50,9 +67,26 @@ sane_datasets = [
     TensorDataset,
 ]
 
+sane_schedulers = [
+    _LRScheduler,
+    ChainedScheduler,
+    ConstantLR,
+    CosineAnnealingLR,
+    CosineAnnealingWarmRestarts,
+    CyclicLR,
+    ExponentialLR,
+    LambdaLR,
+    LinearLR,
+    MultiStepLR,
+    MultiplicativeLR,
+    OneCycleLR,
+    SequentialLR,
+    StepLR,
+]
+
 
 @typing.no_type_check
-def fix_datasets(sane_datasets: List[dataset.Dataset]) -> None:
+def fix_datasets(sane_datasets: List[Dataset]) -> None:
     """
     Helper function to revert TorchDrug dataset handling (which breaks core
     pytorch functionalities). For details see:
@@ -80,4 +114,41 @@ def fix_datasets(sane_datasets: List[dataset.Dataset]) -> None:
             raise AttributeError(
                 f"Reverting silent TorchDrug overwriting failed, {ds} is not a subclass"
                 f" of {dataset}."
+            )
+
+
+@typing.no_type_check
+def fix_schedulers(sane_schedulers: List[_LRScheduler]) -> None:
+    """
+    Helper function to revert TorchDrug LR scheduler handling (which breaks core
+    pytorch functionalities). For details see:
+    https://github.com/DeepGraphLearning/torchdrug/issues/96
+
+    Args:
+        sane_schedulers: A list of pytorch lr_schedulers.
+
+    Raises:
+        AttributeError: If a passed lr_scheduler was not sane.
+    """
+    scheduler = sane_schedulers[0]
+    torch.optim.lr_scheduler._LRScheduler = scheduler  # type: ignore
+    torch.optim.lr_scheduler.ChainedScheduler = sane_schedulers[1]  # type: ignore
+    torch.optim.lr_scheduler.ConstantLR = sane_schedulers[2]  # type: ignore
+    torch.optim.lr_scheduler.CosineAnnealingLR = sane_schedulers[3]  # type: ignore
+    torch.optim.lr_scheduler.CosineAnnealingWarmRestarts = sane_schedulers[4]  # type: ignore
+    torch.optim.lr_scheduler.CyclicLR = sane_schedulers[5]  # type: ignore
+    torch.optim.lr_scheduler.ExponentialLR = sane_schedulers[6]  # type: ignore
+    torch.optim.lr_scheduler.LambdaLR = sane_schedulers[7]  # type: ignore
+    torch.optim.lr_scheduler.LinearLR = sane_schedulers[8]  # type: ignore
+    torch.optim.lr_scheduler.MultiStepLR = sane_schedulers[9]  # type: ignore
+    torch.optim.lr_scheduler.MultiplicativeLR = sane_schedulers[10]  # type: ignore
+    torch.optim.lr_scheduler.OneCycleLR = sane_schedulers[11]  # type: ignore
+    torch.optim.lr_scheduler.SequentialLR = sane_schedulers[12]  # type: ignore
+    torch.optim.lr_scheduler.StepLR = sane_schedulers[13]  # type: ignore
+
+    for lrs in sane_schedulers[1:]:
+        if not issubclass(lrs, scheduler):
+            raise AttributeError(
+                f"Reverting silent TorchDrug overwriting failed, {lrs} is not a subclass"
+                f" of {scheduler}."
             )
