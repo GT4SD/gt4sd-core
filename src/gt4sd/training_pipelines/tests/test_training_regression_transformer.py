@@ -74,13 +74,13 @@ def combine_defaults_and_user_args(
             Iterable[DataClassType],
             tuple([*arguments]),
         ),
-        conflict_handler='resolve',
+        conflict_handler="resolve",
     )
     parser.add_argument(
-        '--output_dir',
+        "--output_dir",
         type=str,
         help="The output directory where the model predictions and checkpoints will be written.",
-        default=config['training_args']['output_dir'],
+        default=config["training_args"]["output_dir"],
     )
     args = parser.parse_args_into_dataclasses(return_remaining_strings=True)
     input_config = {
