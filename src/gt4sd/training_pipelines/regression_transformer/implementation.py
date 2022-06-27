@@ -55,7 +55,7 @@ from .utils import (
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-MODEL_CONFIG_CLASSES = list(MODEL_WITH_LM_HEAD_MAPPING.keys())
+MODEL_CONFIG_CLASSES = list(MODEL_WITH_LM_HEAD_MAPPING.keys())  # type: ignore
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
 
 
@@ -163,7 +163,7 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
             )
 
             trainer.train(model_path=params["output_dir"])
-            trainer.save_model()
+            trainer.save_model()  # type: ignore
 
         except Exception:
             logger.exception(
