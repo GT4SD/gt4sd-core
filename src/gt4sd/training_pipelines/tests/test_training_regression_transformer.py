@@ -45,13 +45,14 @@ template_config = {
     "dataset_args": {"test_fraction": 0.5},
     "training_args": {
         "training_name": "regression-transformer-test",
-        "epochs": 1,
         "batch_size": 4,
         "learning_rate": 0.0005,
         "do_train": True,
         "eval_accumulation_steps": 1,
-        "eval_steps": 2,
-        "save_steps": 2,
+        "eval_steps": 100,
+        "save_steps": 100,
+        "max_steps": 3,
+        "epochs": 1,
         "overwrite_output_dir": True,
     },
 }
@@ -62,11 +63,24 @@ def combine_defaults_and_user_args(
 ) -> Dict[str, Dict[str, Any]]:
 
     arguments = TRAINING_PIPELINE_ARGUMENTS_MAPPING["regression-transformer-trainer"]
+    """
+    We need `conflict_handler='resolve'` because the RT relies on the TrainingArguments
+    in HuggingFace. Some arguments, like `output_dir` do not have defaults and thus
+    an "empty" parser like the below complains once we call `parse_args_into_dataclasses`.
+    Therefore, we manually add the `output_dir` argument with the correct value.
+    """
     parser = TrainerArgumentParser(
         cast(
             Iterable[DataClassType],
             tuple([*arguments]),
-        )
+        ),
+        conflict_handler='resolve',
+    )
+    parser.add_argument(
+        '--output_dir',
+        type=str,
+        help="The output directory where the model predictions and checkpoints will be written.",
+        default=config['training_args']['output_dir'],
     )
     args = parser.parse_args_into_dataclasses(return_remaining_strings=True)
     input_config = {
@@ -94,7 +108,6 @@ def test_train():
 
     config: Dict[str, Any] = template_config.copy()
     config["training_args"]["output_dir"] = TEMPORARY_DIRECTORY
-
     raw_path = pkg_resources.resource_filename(
         "gt4sd",
         "training_pipelines/tests/regression_transformer_raw.csv",
@@ -132,6 +145,5 @@ def test_train():
     # Test training model from scratch with processed setup
     config["dataset_args"]["test_data_path"] = processed_path
     config["dataset_args"]["train_data_path"] = processed_path
-    config["dataset_args"]["test_data_path"] = processed_path
     input_config = combine_defaults_and_user_args(config)
     test_pipeline.train(**input_config)
