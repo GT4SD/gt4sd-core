@@ -23,6 +23,8 @@
 #
 """Regression Transformer trainer unit tests."""
 
+import json
+import os
 import tempfile
 from typing import Any, Dict, Iterable, cast
 
@@ -55,6 +57,41 @@ template_config = {
         "epochs": 1,
         "overwrite_output_dir": True,
     },
+}
+
+xlnet_config = {
+    "architectures": ["XLNetLMHeadModel"],
+    "attn_type": "bi",
+    "bi_data": False,
+    "bos_token_id": 14,
+    "clamp_len": -1,
+    "d_head": 8,
+    "d_inner": 512,
+    "d_model": 32,
+    "dropout": 0.2,
+    "end_n_top": 5,
+    "eos_token_id": 14,
+    "ff_activation": "gelu",
+    "initializer_range": 0.02,
+    "language": "selfies",
+    "layer_norm_eps": 1e-12,
+    "model_type": "xlnet",
+    "n_head": 4,
+    "n_layer": 8,
+    "ne_dim": 16,
+    "ne_format": "sum",
+    "ne_type": "float",
+    "pad_token_id": 0,
+    "same_length": False,
+    "start_n_top": 5,
+    "summary_activation": "tanh",
+    "summary_last_dropout": 0.1,
+    "summary_type": "last",
+    "summary_use_proj": True,
+    "task_specific_params": {"text-generation": {"do_sample": True, "max_length": 250}},
+    "untie_r": True,
+    "use_ne": True,
+    "vmax": 1.0,
 }
 
 
@@ -132,18 +169,24 @@ def test_train():
     test_pipeline.train(**input_config)
 
     # Test training model from scratch with csv setup
-    del config["model_args"]["model_path"]
-    del config["dataset_args"]["train_data_path"]
-    del config["dataset_args"]["test_data_path"]
-    config["model_args"]["model_type"] = "xlnet"
-    config["model_args"]["tokenizer_name"] = mol_path
-    config["dataset_args"]["data_path"] = raw_path
-    config["dataset_args"]["augment"] = 2
-    input_config = combine_defaults_and_user_args(config)
-    test_pipeline.train(**input_config)
+    with tempfile.TemporaryDirectory() as temp:
+        f_name = os.path.join(temp, "tmp_xlnet_config.json")
+        # Write file
+        with open(f_name, "w") as f:
+            json.dump(xlnet_config, f, indent=4)
 
-    # Test training model from scratch with processed setup
-    config["dataset_args"]["test_data_path"] = processed_path
-    config["dataset_args"]["train_data_path"] = processed_path
-    input_config = combine_defaults_and_user_args(config)
-    test_pipeline.train(**input_config)
+        config["model_args"]["config_name"] = f_name
+        del config["model_args"]["model_path"]
+        del config["dataset_args"]["train_data_path"]
+        del config["dataset_args"]["test_data_path"]
+        config["model_args"]["tokenizer_name"] = mol_path
+        config["dataset_args"]["data_path"] = raw_path
+        config["dataset_args"]["augment"] = 2
+        input_config = combine_defaults_and_user_args(config)
+        test_pipeline.train(**input_config)
+
+        # Test training model from scratch with processed setup
+        config["dataset_args"]["test_data_path"] = processed_path
+        config["dataset_args"]["train_data_path"] = processed_path
+        input_config = combine_defaults_and_user_args(config)
+        test_pipeline.train(**input_config)
