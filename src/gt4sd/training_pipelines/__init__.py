@@ -66,6 +66,15 @@ from .pytorch_lightning.language_modeling.core import (
     LanguageModelingSavingArguments,
     LanguageModelingTrainingPipeline,
 )
+from .regression_transformer.core import (
+    RegressionTransformerDataArguments,
+    RegressionTransformerSavingArguments,
+    RegressionTransformerTrainingArguments,
+)
+from .regression_transformer.implementation import (
+    RegressionTransformerModelArguments,
+    RegressionTransformerTrainingPipeline,
+)
 from .torchdrug.core import (
     TorchDrugDataArguments,
     TorchDrugSavingArguments,
@@ -129,6 +138,11 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         MosesOrganModelArguments,
         MosesDataArguments,
     ),
+    "regression-transformer-trainer": (
+        RegressionTransformerTrainingArguments,
+        RegressionTransformerDataArguments,
+        RegressionTransformerModelArguments,
+    ),
 }
 
 TRAINING_PIPELINE_MAPPING = {
@@ -140,6 +154,7 @@ TRAINING_PIPELINE_MAPPING = {
     "guacamol-lstm-trainer": GuacaMolLSTMTrainingPipeline,
     "moses-organ-trainer": MosesOrganTrainingPipeline,
     "moses-vae-trainer": MosesVAETrainingPipeline,
+    "regression-transformer-trainer": RegressionTransformerTrainingPipeline,
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
@@ -151,6 +166,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "guacamol-lstm-trainer": GuacaMolSavingArguments,
     "moses-organ-trainer": MosesSavingArguments,
     "moses-vae-trainer": MosesSavingArguments,
+    "regression-transformer-trainer": RegressionTransformerSavingArguments,
 }
 
 
