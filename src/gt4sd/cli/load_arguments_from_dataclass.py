@@ -23,9 +23,12 @@
 #
 """Functions to facilitate conversion from dataclasses to training descriptions."""
 
-
+import logging
 from dataclasses import _MISSING_TYPE, fields
 from typing import Any, Dict, Optional, Type, Union
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 def find_type(input_type: Type) -> Optional[str]:
@@ -64,7 +67,10 @@ def extract_fields_from_class(
 
     # assign type and description
     arg_fields = {
-        field.name: {"type": field.type, "description": field.metadata["help"]}
+        field.name: {
+            "type": field.type,
+            "description": field.metadata.get("help", "No help provided"),
+        }
         for field in fields(dataclass)
     }
 
@@ -103,7 +109,7 @@ def extract_fields_from_class(
                 raise ValueError(f"{arg_fields[field_name]['type']} not supported")
 
         else:
-            raise ValueError(
+            logger.error(
                 f" argument {field_name}: {arg_fields[field_name]['type']} not supported"
             )
 
