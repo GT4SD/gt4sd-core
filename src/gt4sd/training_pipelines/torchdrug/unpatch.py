@@ -25,7 +25,7 @@ import typing
 from typing import List
 
 import torch
-from torch.optim.lr_scheduler import (
+from torch.optim.lr_scheduler import (  # type: ignore
     ChainedScheduler,
     ConstantLR,
     CosineAnnealingLR,

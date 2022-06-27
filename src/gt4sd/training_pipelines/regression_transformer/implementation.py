@@ -331,19 +331,19 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
                 get_dataset(
                     train_data_path,
                     tokenizer=self.tokenizer,
-                    block_size=self.tokenizer.max_len,
-                    line_by_line=line_by_line,
+                    block_size=self.tokenizer.max_len,  # type: ignore
+                    line_by_line=line_by_line if line_by_line is not None else False,
                 ),
                 get_dataset(
                     test_data_path,
                     tokenizer=self.tokenizer,
-                    block_size=self.tokenizer.max_len,
-                    line_by_line=line_by_line,
+                    block_size=self.tokenizer.max_len,  # type: ignore
+                    line_by_line=line_by_line if line_by_line is not None else False,
                 ),
             ]
 
             # Logging
-            for v, d, n in zip(
+            for v, d, n in zip(  # type: ignore
                 [augment, test_fraction], [0, None], ["augment", "test_fraction"]
             ):
                 if v != d:
@@ -388,11 +388,11 @@ class RegressionTransformerModelArguments(TrainingPipelineArguments):
 
     __name__ = "model_args"
 
-    model_path: str = field(
+    model_path: Optional[str] = field(
         default=None,
         metadata={"help": "Path where the pretrained model artifacts are stored."},
     )
-    tokenizer_name: str = field(
+    tokenizer_name: Optional[str] = field(
         default=None,
         metadata={
             "help": "Pretrained tokenizer name or path. If not provided, will be "

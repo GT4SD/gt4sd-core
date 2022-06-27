@@ -23,7 +23,7 @@ AUGMENT_FACTORY = {
 
 
 def prepare_and_split_data(
-    path: str, test_fraction: float, augment: int, language: str
+    path: str, test_fraction: Optional[float], augment: Optional[int], language: str
 ) -> Tuple[List[str], List[str]]:
     """
 
@@ -37,7 +37,7 @@ def prepare_and_split_data(
         Tuple of training and test dataset.
     """
 
-    if test_fraction <= 0 or test_fraction >= 1:
+    if not test_fraction or (test_fraction <= 0 or test_fraction >= 1):
         raise ValueError(f"Test fraction has to be 0 < t < 1, not {test_fraction}")
     if not path.endswith(".csv"):
         raise TypeError(f"Please provide a csv file not {path}.")
@@ -64,19 +64,19 @@ def prepare_and_split_data(
     properties.remove("text")
 
     for i, row in df.iterrows():
-        line = "".join([f"<{p}>{row[p]:.3f}|" for p in properties] + [trans(row.text)])
+        line = "".join([f"<{p}>{row[p]:.3f}|" for p in properties] + [trans(row.text)])  # type: ignore
         if i in test_idxs:
             test_data.append(line)
         else:
             train_data.append(line)
 
     # Perform augmentation on training data if applicable
-    if augment > 1:
+    if augment is not None and augment > 1:
         for _ in range(augment):
             for i in train_idxs:
                 row = df.iloc[i]
                 line = "".join(
-                    [f"<{p}>{row[p]:.3f}|" for p in properties] + [trans(aug(row.text))]
+                    [f"<{p}>{row[p]:.3f}|" for p in properties] + [trans(aug(row.text))]  # type: ignore
                 )
                 train_data.append(line)
 
@@ -101,8 +101,8 @@ def add_tokens_from_lists(
             set of property tokens.
     """
     num_tokens = len(tokenizer)
-    properties = set()
-    all_tokens = set()
+    properties: Set = set()
+    all_tokens: Set = set()
     for data in [train_data, test_data]:
         for i, line in enumerate(data):
             # Grow the set of all tokens in the dataset
@@ -178,14 +178,14 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
     Therefore, this class changes the affected attributes to CLI compatible datatypes.
     """
 
-    label_names: Optional[str] = field(
+    label_names: Optional[str] = field(  # type: ignore
         default=None,
         metadata={
             "help": "A string containing keys in your dictionary of inputs that correspond to the labels."
             "A single string, but can contain multiple keys separated with comma: `key1,key2`"
         },
     )
-    report_to: Optional[str] = field(
+    report_to: Optional[str] = field(  # type: ignore
         default=None,
         metadata={
             "help": "The list of integrations to report the results and logs to."
