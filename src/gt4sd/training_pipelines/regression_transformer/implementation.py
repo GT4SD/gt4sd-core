@@ -147,7 +147,6 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
                 json.dump(train_config, f, indent="\t")
 
             custom_trainer_params = get_trainer_dict(self.model_params)
-
             hf_train_object = get_hf_training_arg_object(training_args)
 
             trainer = CustomTrainer(

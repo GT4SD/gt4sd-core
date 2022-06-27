@@ -37,7 +37,7 @@ os.makedirs(DATA_ROOT, exist_ok=True)
 
 @dataclass
 class RegressionTransformerTrainingArguments(
-    TransformersTrainingArgumentsCLI, TrainingPipelineArguments
+    TrainingPipelineArguments, TransformersTrainingArgumentsCLI
 ):
     """
     Arguments related to RegressionTransformer trainer.
@@ -147,9 +147,6 @@ class RegressionTransformerSavingArguments(TrainingPipelineArguments):
 
     __name__ = "saving_args"
 
-    # TODO: Not really sure what else should be here.
     model_path: str = field(
         metadata={"help": "Path where the model artifacts are stored."}
     )
-    training_name: str = field(metadata={"help": "Name used to identify the training."})
-    epochs: int = field(default=10, metadata={"help": "Number of epochs."})

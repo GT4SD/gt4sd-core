@@ -193,7 +193,7 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
         },
     )
     sharded_ddp: str = field(
-        default=" ",
+        default="",
         metadata={
             "help": "Whether or not to use sharded DDP training (in distributed training only). The base option "
             "should be `simple`, `zero_dp_2` or `zero_dp_3` and you can add CPU-offload to `zero_dp_2` or `zero_dp_3` "
@@ -202,7 +202,18 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
         },
     )
 
-    # TODO: Have to parse these ones into lists
+    def __post_init__(self):
+        """
+        Necessary because the our ArgumentParses (that is based on argparse) converts
+        empty strings to None. This is prohibitive since the HFTrainer relies on
+        them being actual strings. Only concerns a few arguments.
+        """
+        if self.sharded_ddp is None:
+            self.sharded_ddp = ""
+        if self.fsdp is None:
+            self.fsdp = ""
+
+        super().__post_init__()
 
 
 def get_hf_training_arg_object(training_args: Dict[str, Any]) -> TrainingArguments:
@@ -212,7 +223,7 @@ def get_hf_training_arg_object(training_args: Dict[str, Any]) -> TrainingArgumen
     This routine also takes care of removing arguments that are not necessary.
 
     Args:
-        training_args: A dictionary of training
+        training_args: A dictionary of training arguments.
 
     Returns:
         object of type `TrainingArguments`.
@@ -225,7 +236,7 @@ def get_hf_training_arg_object(training_args: Dict[str, Any]) -> TrainingArgumen
     hf_training_args = {k: v for k, v in training_args.items() if k in org_attrs.keys()}
 
     # Instantiate class object
-    hf_train_object = TrainingArguments(hf_training_args["output_dir"])
+    hf_train_object = TrainingArguments(training_args["output_dir"])
 
     # Set attributes manually (since this is a `dataclass` not everything can be passed
     # to constructor)
