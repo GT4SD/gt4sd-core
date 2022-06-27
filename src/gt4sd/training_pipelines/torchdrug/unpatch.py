@@ -25,8 +25,6 @@ import typing
 from typing import List
 
 import torch
-import torch.utils.data.dataset as dataset
-import torch.optim.lr_scheduler as lr_scheduler
 from torch.optim.lr_scheduler import (
     ChainedScheduler,
     ConstantLR,

@@ -41,17 +41,15 @@ from transformers import (
     DataCollatorForPermutationLanguageModeling,
     LineByLineTextDataset,
     set_seed,
-    TrainingArguments,
 )
 
 from ..core import TrainingPipeline, TrainingPipelineArguments
 from .utils import (
     add_tokens_from_files,
     add_tokens_from_lists,
+    get_hf_training_arg_object,
     get_train_config_dict,
     prepare_and_split_data,
-    TransformersTrainingArgumentsCLI,
-    get_hf_training_arg_object,
 )
 
 logger = logging.getLogger(__name__)
@@ -164,7 +162,7 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
                 **custom_trainer_params,
             )
 
-            trainer.train(model_path=params['output_dir'])
+            trainer.train(model_path=params["output_dir"])
             trainer.save_model()
 
         except Exception:
@@ -190,7 +188,7 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
             )
         if params["output_dir"] is None:
             raise ValueError(
-                'You have to specify an output directory for the trained model'
+                "You have to specify an output directory for the trained model"
             )
         if (
             os.path.exists(params["output_dir"])
@@ -211,7 +209,7 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
         #   2) If provided, take model configuration from `config_name`.
         #   3) Instantiate a fresh model.
 
-        if params['model_path'] is None and params['model_type'] is None:
+        if params["model_path"] is None and params["model_type"] is None:
             raise ValueError(
                 "Either pass pretrained model via `model_path` or specify"
                 "which model to use via `model_typ`."
@@ -262,7 +260,7 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
                 f"No support for creating new tokenizer for: {params['model_type']}."
             )
 
-        if not params['model_path']:
+        if not params["model_path"]:
             logger.info("Training new model from scratch")
             self.model = AutoModelWithLMHead.from_config(config)
 
@@ -409,7 +407,7 @@ class RegressionTransformerModelArguments(TrainingPipelineArguments):
         },
     )
     model_type: Optional[str] = field(
-        default='xlnet',
+        default="xlnet",
         metadata={
             "help": "If training from scratch, pass a model type from the list: "
             f"{', '.join(MODEL_TYPES)}. If `model_path` is also provided, `model_path` "

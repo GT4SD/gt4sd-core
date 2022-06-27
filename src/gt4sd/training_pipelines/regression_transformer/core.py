@@ -26,9 +26,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Optional
 
-from transformers.training_args import TrainingArguments
-
-from ..core import TrainingPipelineArguments, TrainingPipeline
+from ..core import TrainingPipelineArguments
 from .utils import TransformersTrainingArgumentsCLI
 
 DATA_ROOT = os.path.join(

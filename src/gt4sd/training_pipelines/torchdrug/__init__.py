@@ -22,12 +22,12 @@
 # SOFTWARE.
 #
 
-from .unpatch import (
+from .unpatch import (  # isort:skip
     fix_datasets,
     sane_datasets,
     fix_schedulers,
     sane_schedulers,
-)  # isort:skip
+)
 
 from torchdrug.datasets import (
     BACE,

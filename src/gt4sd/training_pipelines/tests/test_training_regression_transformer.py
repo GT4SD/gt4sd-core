@@ -23,7 +23,6 @@
 #
 """Regression Transformer trainer unit tests."""
 
-import shutil
 import tempfile
 from typing import Any, Dict, Iterable, cast
 
@@ -35,10 +34,9 @@ from gt4sd.algorithms.conditional_generation.regression_transformer import (
 from gt4sd.cli.argument_parser import DataClassType
 from gt4sd.cli.trainer import TrainerArgumentParser
 from gt4sd.training_pipelines import (
-    TRAINING_PIPELINE_MAPPING,
-    RegressionTransformerTrainingArguments,
-    RegressionTransformerTrainingPipeline,
     TRAINING_PIPELINE_ARGUMENTS_MAPPING,
+    TRAINING_PIPELINE_MAPPING,
+    RegressionTransformerTrainingPipeline,
 )
 from gt4sd.training_pipelines.core import TrainingPipelineArguments
 
@@ -52,9 +50,9 @@ template_config = {
         "learning_rate": 0.0005,
         "do_train": True,
         "eval_accumulation_steps": 1,
-        'eval_steps': 2,
-        'save_steps': 2,
-        'overwrite_output_dir': True,
+        "eval_steps": 2,
+        "save_steps": 2,
+        "overwrite_output_dir": True,
     },
 }
 
@@ -63,7 +61,7 @@ def combine_defaults_and_user_args(
     config: Dict[str, Dict[str, Any]]
 ) -> Dict[str, Dict[str, Any]]:
 
-    arguments = TRAINING_PIPELINE_ARGUMENTS_MAPPING['regression-transformer-trainer']
+    arguments = TRAINING_PIPELINE_ARGUMENTS_MAPPING["regression-transformer-trainer"]
     parser = TrainerArgumentParser(
         cast(
             Iterable[DataClassType],
@@ -76,9 +74,9 @@ def combine_defaults_and_user_args(
         for arg in args
         if isinstance(arg, TrainingPipelineArguments) and isinstance(arg.__name__, str)
     }
-    input_config['model_args'].update(**config['model_args'])
-    input_config['dataset_args'].update(**config['dataset_args'])
-    input_config['training_args'].update(**config['training_args'])
+    input_config["model_args"].update(**config["model_args"])
+    input_config["dataset_args"].update(**config["dataset_args"])
+    input_config["training_args"].update(**config["training_args"])
 
     return input_config
 
@@ -88,8 +86,8 @@ def test_train():
     pipeline = TRAINING_PIPELINE_MAPPING.get("regression-transformer-trainer")
     assert pipeline is not None
 
-    mol_model = RegressionTransformerMolecules(algorithm_version='qed')
-    mol_path = mol_model.ensure_artifacts_for_version('qed')
+    mol_model = RegressionTransformerMolecules(algorithm_version="qed")
+    mol_path = mol_model.ensure_artifacts_for_version("qed")
 
     TEMPORARY_DIRECTORY = tempfile.mkdtemp()
     test_pipeline = cast(RegressionTransformerTrainingPipeline, pipeline())
@@ -108,32 +106,32 @@ def test_train():
 
     # Test the QED model with csv setup
     config["model_args"]["model_path"] = mol_path
-    config['dataset_args']['data_path'] = raw_path
-    config['dataset_args']['augment'] = 2
+    config["dataset_args"]["data_path"] = raw_path
+    config["dataset_args"]["augment"] = 2
     input_config = combine_defaults_and_user_args(config)
     test_pipeline.train(**input_config)
 
     # Test the QED model with processed setup
     config["model_args"]["model_path"] = mol_path
-    config['dataset_args']['train_data_path'] = processed_path
-    config['dataset_args']['test_data_path'] = processed_path
+    config["dataset_args"]["train_data_path"] = processed_path
+    config["dataset_args"]["test_data_path"] = processed_path
     input_config = combine_defaults_and_user_args(config)
     test_pipeline.train(**input_config)
 
     # Test training model from scratch with csv setup
     del config["model_args"]["model_path"]
-    del config['dataset_args']['train_data_path']
-    del config['dataset_args']['test_data_path']
-    config["model_args"]["model_type"] = 'xlnet'
+    del config["dataset_args"]["train_data_path"]
+    del config["dataset_args"]["test_data_path"]
+    config["model_args"]["model_type"] = "xlnet"
     config["model_args"]["tokenizer_name"] = mol_path
-    config['dataset_args']['data_path'] = raw_path
-    config['dataset_args']['augment'] = 2
+    config["dataset_args"]["data_path"] = raw_path
+    config["dataset_args"]["augment"] = 2
     input_config = combine_defaults_and_user_args(config)
     test_pipeline.train(**input_config)
 
     # Test training model from scratch with processed setup
-    config['dataset_args']['test_data_path'] = processed_path
-    config['dataset_args']['train_data_path'] = processed_path
-    config['dataset_args']['test_data_path'] = processed_path
+    config["dataset_args"]["test_data_path"] = processed_path
+    config["dataset_args"]["train_data_path"] = processed_path
+    config["dataset_args"]["test_data_path"] = processed_path
     input_config = combine_defaults_and_user_args(config)
     test_pipeline.train(**input_config)

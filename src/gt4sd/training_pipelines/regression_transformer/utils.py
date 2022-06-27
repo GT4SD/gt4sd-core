@@ -1,6 +1,5 @@
 import inspect
 import logging
-from collections import namedtuple
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -226,7 +225,7 @@ def get_hf_training_arg_object(training_args: Dict[str, Any]) -> TrainingArgumen
     hf_training_args = {k: v for k, v in training_args.items() if k in org_attrs.keys()}
 
     # Instantiate class object
-    hf_train_object = TrainingArguments(hf_training_args['output_dir'])
+    hf_train_object = TrainingArguments(hf_training_args["output_dir"])
 
     # Set attributes manually (since this is a `dataclass` not everything can be passed
     # to constructor)
