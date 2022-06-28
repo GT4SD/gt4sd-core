@@ -150,7 +150,7 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
 
     __name__ = "pl_trainer_args"
 
-    accelerator: Union[str] = field(
+    accelerator: Optional[str] = field(
         default="ddp", metadata={"help": "Accelerator type."}
     )
     accumulate_grad_batches: int = field(
@@ -165,7 +165,7 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
     save_dir: Optional[str] = field(
         default="logs", metadata={"help": "Save directory for logs and output."}
     )
-    basename: Union[str, None] = field(
+    basename: Optional[str] = field(
         default="lightning_logs", metadata={"help": "Experiment name."}
     )
     gradient_clip_val: float = field(
