@@ -201,7 +201,7 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
             "with the same syntax: zero_dp_2 auto_wrap` or `zero_dp_3 auto_wrap`.",
         },
     )
-    tf32: Optional[str] = field( # type: ignore
+    tf32: Optional[str] = field(  # type: ignore
         default="no",
         metadata={
             "help": (
