@@ -215,6 +215,33 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
         default="no",
         metadata={"help": "Whether or not to disable the tqdm progress bars."},
     )
+    greater_is_better: Optional[str] = field(  # type: ignore
+        default="no",
+        metadata={
+            "help": "Whether the `metric_for_best_model` should be maximized or not."
+        },
+    )
+    remove_unused_columns: Optional[str] = field(  # type: ignore
+        default="yes",
+        metadata={
+            "help": "Remove columns not required by the model when using an nlp.Dataset."
+        },
+    )
+    load_best_model_at_end: Optional[str] = field(  # type: ignore
+        default=None,
+        metadata={
+            "help": "Whether or not to load the best model found during training at the end of training."
+        },
+    )
+    ddp_find_unused_parameters: Optional[str] = field(  # type: ignore
+        default="no",
+        metadata={
+            "help": (
+                "When using distributed training, the value of the flag `find_unused_parameters` passed to "
+                "`DistributedDataParallel`."
+            )
+        },
+    )
 
     def __post_init__(self):
         """
