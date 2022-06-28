@@ -9,6 +9,7 @@ from pytoda.smiles.transforms import Augment
 from pytoda.transforms import AugmentByReversing
 from terminator.selfies import encoder
 from terminator.tokenization import ExpressionBertTokenizer
+from transformers.hf_argparser import string_to_bool
 from transformers.training_args import TrainingArguments
 
 logger = logging.getLogger(__name__)
@@ -210,6 +211,10 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
             )
         },
     )
+    disable_tqdm: Optional[str] = field(  # type: ignore
+        default="no",
+        metadata={"help": "Whether or not to disable the tqdm progress bars."},
+    )
 
     def __post_init__(self):
         """
@@ -221,6 +226,9 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
             self.sharded_ddp = ""
         if self.fsdp is None:
             self.fsdp = ""
+
+        self.disable_tqdm = string_to_bool(self.disable_tqdm)
+        self.tf32 = string_to_bool(self.tf32)
 
         super().__post_init__()
 
