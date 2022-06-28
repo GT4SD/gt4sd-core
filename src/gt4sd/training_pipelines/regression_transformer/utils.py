@@ -1,7 +1,7 @@
 import inspect
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -199,6 +199,15 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
             "should be `simple`, `zero_dp_2` or `zero_dp_3` and you can add CPU-offload to `zero_dp_2` or `zero_dp_3` "
             "like this: zero_dp_2 offload` or `zero_dp_3 offload`. You can add auto-wrap to `zero_dp_2` or "
             "with the same syntax: zero_dp_2 auto_wrap` or `zero_dp_3 auto_wrap`.",
+        },
+    )
+    tf32: Optional[str] = field( # type: ignore
+        default="no",
+        metadata={
+            "help": (
+                "Whether to enable tf32 mode, available in Ampere and newer GPU architectures. This is an experimental"
+                " API and it may change."
+            )
         },
     )
 
