@@ -57,6 +57,7 @@ from .pytorch_lightning.core import PytorchLightningTrainingArguments
 from .pytorch_lightning.granular.core import (
     GranularDataArguments,
     GranularModelArguments,
+    GranularPytorchLightningTrainingArguments,
     GranularSavingArguments,
     GranularTrainingPipeline,
 )
@@ -110,7 +111,7 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         TorchDrugGraphAFModelArguments,
     ),
     "granular-trainer": (
-        PytorchLightningTrainingArguments,
+        GranularPytorchLightningTrainingArguments,
         GranularDataArguments,
         GranularModelArguments,
     ),
