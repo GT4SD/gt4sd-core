@@ -93,44 +93,27 @@ class RegressionTransformerDataArguments(TrainingPipelineArguments):
 
     __name__ = "dataset_args"
 
-    data_path: Optional[str] = field(
-        default=None,
+    train_data_path: str = field(
         metadata={
-            "help": "Path to a `.csv` file with the data. File has to contain a `text` column "
-            "(with the string input, e.g, SMILES, AAS, natural text)"
+            "help": "Path to a `.csv` file with the input training data. The file has to "
+            "contain a `text` column (with the string input, e.g, SMILES, AAS, natural "
+            "text) and an arbitrary number of numerical columns."
         },
     )
-    train_data_path: Optional[str] = field(
-        default=None,
+    test_data_path: str = field(
         metadata={
-            "help": "The input training data file. Should contain text and properties"
-            "in RT-compatible format, e.g. QED on SELFIES: `<qed>0.123|[C][C][O]. "
-            "Dependent on the tokenizer, can also be natural text, AA sequences etc."
-            "NOTE: Only used if `data_path` is not specified."
-        },
-    )
-    test_data_path: Optional[str] = field(
-        default=None,
-        metadata={
-            "help": "The evaluation data file. Should contain text and properties"
-            "in RT-compatible format, e.g. QED on SELFIES: `<qed>0.123|[C][C][O]. "
-            "Dependent on the tokenizer, can also be natural text, AA sequences etc."
-            "NOTE: Only used if `data_path` is not specified."
-        },
-    )
-    test_fraction: Optional[float] = field(
-        default=0.1,
-        metadata={
-            "help": "Fraction of data used for testing. Only used if `data_path` is specified."
+            "help": "Path to a `.csv` file with the input testing data. The file has to "
+            "contain a `text` column (with the string input, e.g, SMILES, AAS, natural "
+            "text) and an arbitrary number of numerical columns."
         },
     )
     augment: Optional[int] = field(
         default=0,
         metadata={
-            "help": "Factor by which the training data is augmented. Only used if `data_path` is "
-            "specified. The data modality (SMILES, SELFIES, AAS, natural text) is "
-            "inferred. NOTE: For natural text, no augmentation is supported. Defaults to "
-            "0, meaning no augmentation. "
+            "help": "Factor by which the training data is augmented. The data modality "
+            "(SMILES, SELFIES, AAS, natural text) is inferred from the tokenizer. "
+            "NOTE: For natural text, no augmentation is supported. Defaults to 0, "
+            "meaning no augmentation. "
         },
     )
 

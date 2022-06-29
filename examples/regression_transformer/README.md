@@ -11,8 +11,9 @@ conda activate gt4sd
 To launch a finetuning of a RT pretrained on drug-like moelcules from ChEMBL, execute the following from the GT4SD root:
 
 ```console
- gt4sd-trainer --training_pipeline_name regression-transformer-trainer --model_path ~/.gt4sd/algorithms/conditional_generation/RegressionTransformer/RegressionTransformerMolecules/qed --do_train --output_dir dummy_regression_transformer --data_path src/gt4sd/training_pipelines/tests/regression_transformer_raw.csv --overwrite_output_dir --eval_steps 2 --augment 10 --test_fraction 0.2
+ gt4sd-trainer --training_pipeline_name regression-transformer-trainer --model_path ~/.gt4sd/algorithms/conditional_generation/RegressionTransformer/RegressionTransformerMolecules/qed --do_train --output_dir dummy_regression_transformer --train_data_path src/gt4sd/training_pipelines/tests/regression_transformer_raw.csv --test_data_path src/gt4sd/training_pipelines/tests/regression_transformer_raw.csv --overwrite_output_dir --eval_steps 2 --augment 10 --test_fraction 0.2 --eval_accumulation_steps 1
 ```
+*NOTE*: This is *dummy* example, do not use "as is" :warning:
 
 For details on this methodology see:
 

@@ -30,7 +30,6 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from terminator.collators import TRAIN_COLLATORS
-from terminator.datasets import get_dataset
 from terminator.tokenization import ExpressionBertTokenizer
 from terminator.trainer import CustomTrainer, get_trainer_dict
 from transformers import (
@@ -45,11 +44,9 @@ from transformers import (
 
 from ..core import TrainingPipeline, TrainingPipelineArguments
 from .utils import (
-    add_tokens_from_files,
-    add_tokens_from_lists,
     get_hf_training_arg_object,
     get_train_config_dict,
-    prepare_and_split_data,
+    prepare_datasets_from_files,
 )
 
 logger = logging.getLogger(__name__)
@@ -265,95 +262,35 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
 
     def setup_dataset(
         self,
-        data_path: Optional[str],
-        test_fraction: Optional[float],
-        train_data_path: Optional[str],
-        test_data_path: Optional[str],
+        train_data_path: str,
+        test_data_path: str,
         line_by_line: Optional[bool],
-        augment: Optional[int],
+        augment: int = 0,
         *args,
         **kwargs,
     ):
         """
         Constructs the dataset objects.
 
-        NOTE: User has to either provide `data_path` (if train/test data should be
-        created from a single `.csv` file) or provide `train_data_path` and `test_data_path`
-        (in that case the user has to take care that the data adheres to the RT-format).
-        Also, `data_path` takes preference.
 
         Args:
-            data_path: Optional path to a `.csv` file. Has to have a `text` column and
+            train_data_path: Path to `.csv` file. Has to have a `text` column and
                 at least one column of numerical properties.
-            test_fraction: Optional fraction of the data used for testing.
-            train_data_path: Optional path to the already-prepared training data file.
-            test_data_path: Optional path to the already-prepared validation data file.
+            train_data_path: Path to `.csv` file. Has to have a `text` column and
+                at least one column of numerical properties.
             line_by_line: Whether the data can be read line-by-line from disk.
             augment: How many times each training sample is augmented.
         """
 
         logger.info("Preparing/reading data...")
 
-        if data_path:
-
-            # Create datasets from .csv file.
-            train_data, test_data = prepare_and_split_data(
-                path=data_path,
-                test_fraction=test_fraction,
-                augment=augment,
-                language=self.tokenizer.language,
-            )
-
-            self.tokenizer, self.properties = add_tokens_from_lists(
-                self.tokenizer, train_data=train_data, test_data=test_data
-            )
-
-            datasets = [
-                self.create_dataset_from_list(data) for data in [train_data, test_data]
-            ]
-
-            # Logging
-            for v, n in zip(
-                [train_data_path, test_data_path], ["train_data_path", "test_data_path"]
-            ):
-                if v is not None:
-                    logger.warning(f"Ignoring parameter: {n}={v}")
-
-        elif train_data_path and test_data_path:
-
-            self.tokenizer, self.properties = add_tokens_from_files(
-                self.tokenizer, train_path=train_data_path, test_path=test_data_path
-            )
-
-            # User passed prepared datasets
-            datasets = [
-                get_dataset(
-                    train_data_path,
-                    tokenizer=self.tokenizer,
-                    block_size=self.tokenizer.max_len,  # type: ignore
-                    line_by_line=line_by_line if line_by_line is not None else False,
-                ),
-                get_dataset(
-                    test_data_path,
-                    tokenizer=self.tokenizer,
-                    block_size=self.tokenizer.max_len,  # type: ignore
-                    line_by_line=line_by_line if line_by_line is not None else False,
-                ),
-            ]
-
-            # Logging
-            for v, d, n in zip(  # type: ignore
-                [augment, test_fraction], [0, None], ["augment", "test_fraction"]
-            ):
-                if v != d:
-                    logger.warning(f"Ignoring parameter: {n}={v}")
-
-        else:
-            raise ValueError(
-                "Provide either raw data in csv format via `data_path` or pass your "
-                "prepared, split data via `train_data_path` and `test_data_path`."
-            )
-
+        tokenizer, properties, train_data, test_data = prepare_datasets_from_files(
+            self.tokenizer, train_data_path, test_data_path, augment=augment
+        )
+        self.tokenizer, self.properties = tokenizer, properties
+        datasets = [
+            self.create_dataset_from_list(data) for data in [train_data, test_data]
+        ]
         logger.info("Finished data setup.")
         return datasets
 

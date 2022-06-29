@@ -3,7 +3,6 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-import numpy as np
 import pandas as pd
 from pytoda.smiles.transforms import Augment
 from pytoda.transforms import AugmentByReversing
@@ -23,71 +22,9 @@ AUGMENT_FACTORY = {
 }
 
 
-def prepare_and_split_data(
-    path: str, test_fraction: Optional[float], augment: Optional[int], language: str
-) -> Tuple[List[str], List[str]]:
-    """
-
-    Args:
-        path: A path to a `.csv` file with the data.
-        test_fraction: Fraction of data used for testing.
-        augment: Factor by which each training sample is augmented.
-        language: Language of the tokenizer.
-
-    Returns:
-        Tuple of training and test dataset.
-    """
-
-    if not test_fraction or (test_fraction <= 0 or test_fraction >= 1):
-        raise ValueError(f"Test fraction has to be 0 < t < 1, not {test_fraction}")
-    if not path.endswith(".csv"):
-        raise TypeError(f"Please provide a csv file not {path}.")
-    logger.info(f"Using {int(test_fraction*100)}% of the data for testing.")
-
-    # Load data
-    df = pd.read_csv(path)
-    if "text" not in df.columns:
-        raise ValueError("Please provide text in the `text` column.")
-
-    # Split dataset
-    idxs = list(range(len(df)))
-    np.random.shuffle(idxs)
-    test_idxs = idxs[: int(len(df) * test_fraction)]
-    train_idxs = idxs[int(len(df) * test_fraction) :]
-
-    # Setup data transforms and augmentations
-    aug = AUGMENT_FACTORY.get(language, lambda x: x)
-    trans = TRANSFORM_FACTORY.get(language, lambda x: x)
-
-    # Create RT-compatible dataset
-    train_data, test_data = [], []
-    properties = list(df.columns)
-    properties.remove("text")
-
-    for i, row in df.iterrows():
-        line = "".join([f"<{p}>{row[p]:.3f}|" for p in properties] + [trans(row.text)])  # type: ignore
-        if i in test_idxs:
-            test_data.append(line)
-        else:
-            train_data.append(line)
-
-    # Perform augmentation on training data if applicable
-    if augment is not None and augment > 1:
-        for _ in range(augment):
-            for i in train_idxs:
-                row = df.iloc[i]
-                line = "".join(
-                    [f"<{p}>{row[p]:.3f}|" for p in properties] + [trans(aug(row.text))]  # type: ignore
-                )
-                train_data.append(line)
-
-    logger.info("Data splitting completed.")
-    return train_data, test_data
-
-
 def add_tokens_from_lists(
     tokenizer: ExpressionBertTokenizer, train_data: List[str], test_data: List[str]
-) -> Tuple[ExpressionBertTokenizer, Set]:
+) -> Tuple[ExpressionBertTokenizer, Set, List[str], List[str]]:
     """
     Addding tokens to a tokenizer from parsed datasets hold in memory.
 
@@ -100,6 +37,8 @@ def add_tokens_from_lists(
        Tuple with:
             tokenizer with updated vocabulary.
             set of property tokens.
+            list of strings with training samples.
+            list of strings with testing samples.
     """
     num_tokens = len(tokenizer)
     properties: Set = set()
@@ -110,7 +49,10 @@ def add_tokens_from_lists(
             toks = tokenizer.tokenize(line)
             all_tokens = all_tokens.union(toks)
             # Grow the set of all properties (assumes that the text follows the last `|`)
-            props = [x.split(">")[0] + ">" for x in line.split("|")[:-1]]
+            props = [
+                x.split(">")[0] + ">"
+                for x in line.split(tokenizer.expression_separator)[:-1]
+            ]
             properties = properties.union(props)
 
     # Finish adding new tokens
@@ -118,38 +60,87 @@ def add_tokens_from_lists(
     tokenizer.update_vocab(all_tokens)
     logger.info(f"Added {len(tokenizer)-num_tokens} new tokens to tokenizer.")
 
-    return tokenizer, properties
+    return tokenizer, properties, train_data, test_data
 
 
-def add_tokens_from_files(
-    tokenizer: ExpressionBertTokenizer, train_path: str, test_path: str
-) -> Tuple[ExpressionBertTokenizer, Set]:
+def prepare_datasets_from_files(
+    tokenizer: ExpressionBertTokenizer,
+    train_path: str,
+    test_path: str,
+    augment: int = 0,
+) -> Tuple[ExpressionBertTokenizer, Set, List[str], List[str]]:
     """
-    Addding tokens to a tokenizer from paths to training/testing data files.
+    Converts datasets saved in provided `.csv` paths into RT-compatible datasets.
+    NOTE: Also adds the new tokens from train/test data to provided tokenizer.
 
     Args:
         tokenizer: The tokenizer.
         train_path: Path to the training data.
         test_path: Path to the testing data.
+        augment: Factor by which each training sample is augmented.
 
     Returns:
        Tuple with:
             tokenizer with updated vocabulary.
             set of property tokens.
+            list of strings with training samples.
+            list of strings with testing samples.
     """
 
-    datasets = []
-    for path in [train_path, test_path]:
-        with open(path, encoding="utf-8") as f:
-            lines = [
-                line
-                for line in f.read().splitlines()
-                if (len(line) > 0 and not line.isspace())
-            ]
-        datasets.append(lines)
+    # Setup data transforms and augmentations
+    train_data: List[str] = []
+    test_data: List[str] = []
+    properties: List[str] = []
+
+    aug = AUGMENT_FACTORY.get(tokenizer.language, lambda x: x)
+    trans = TRANSFORM_FACTORY.get(tokenizer.language, lambda x: x)
+
+    for i, (data, path) in enumerate(
+        zip([train_data, test_data], [train_path, test_path])
+    ):
+
+        if not path.endswith(".csv"):
+            raise TypeError(f"Please provide a csv file not {path}.")
+
+        # Load data
+        df = pd.read_csv(path)
+        if "text" not in df.columns:
+            raise ValueError("Please provide text in the `text` column.")
+
+        if i == 1 and set(df.columns) != set(properties + ["text"]):
+            raise ValueError(
+                "Train and test data have to have identical columns, not "
+                f"{set(properties + ['text'])} and {set(df.columns)}."
+            )
+        properties = sorted(list(set(properties).union(list(df.columns))))
+        properties.remove("text")
+
+        # Parse data and create RT-compatible format
+        for i, row in df.iterrows():
+            line = "".join(
+                [
+                    f"<{p}>{row[p]:.3f}{tokenizer.expression_separator}"
+                    for p in properties
+                ]
+                + [trans(row.text)]  # type: ignore
+            )
+            data.append(line)
+
+        # Perform augmentation on training data if applicable
+        if i == 0 and augment is not None and augment > 1:
+            for _ in range(augment):
+                for i, row in df.iterrows():
+                    line = "".join(
+                        [
+                            f"<{p}>{row[p]:.3f}{tokenizer.expression_separator}"
+                            for p in properties
+                        ]
+                        + [trans(aug(row.text))]  # type: ignore
+                    )
+                    data.append(line)
 
     return add_tokens_from_lists(
-        tokenizer=tokenizer, train_data=datasets[0], test_data=datasets[1]
+        tokenizer=tokenizer, train_data=train_data, test_data=test_data
     )
 
 
@@ -245,7 +236,7 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
 
     def __post_init__(self):
         """
-        Necessary because the our ArgumentParses (that is based on argparse) converts
+        Necessary because the our ArgumentParser (that is based on argparse) converts
         empty strings to None. This is prohibitive since the HFTrainer relies on
         them being actual strings. Only concerns a few arguments.
         """

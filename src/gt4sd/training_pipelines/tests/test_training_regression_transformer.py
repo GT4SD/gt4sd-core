@@ -119,6 +119,18 @@ def combine_defaults_and_user_args(
         help="The output directory where the model predictions and checkpoints will be written.",
         default=config["training_args"]["output_dir"],
     )
+    parser.add_argument(
+        "--train_data_path",
+        type=str,
+        help="The output directory where the model predictions and checkpoints will be written.",
+        default=config["dataset_args"]["train_data_path"],
+    )
+    parser.add_argument(
+        "--test_data_path",
+        type=str,
+        help="The output directory where the model predictions and checkpoints will be written.",
+        default=config["dataset_args"]["test_data_path"],
+    )
     args = parser.parse_args_into_dataclasses(return_remaining_strings=True)
     input_config = {
         arg.__name__: arg.__dict__
@@ -149,26 +161,16 @@ def test_train():
         "gt4sd",
         "training_pipelines/tests/regression_transformer_raw.csv",
     )
-    processed_path = pkg_resources.resource_filename(
-        "gt4sd",
-        "training_pipelines/tests/regression_transformer_selfies.txt",
-    )
 
-    # Test the QED model with csv setup
+    # Test the pretrained QED model
     config["model_args"]["model_path"] = mol_path
-    config["dataset_args"]["data_path"] = raw_path
+    config["dataset_args"]["train_data_path"] = raw_path
+    config["dataset_args"]["test_data_path"] = raw_path
     config["dataset_args"]["augment"] = 2
     input_config = combine_defaults_and_user_args(config)
     test_pipeline.train(**input_config)
 
-    # Test the QED model with processed setup
-    config["model_args"]["model_path"] = mol_path
-    config["dataset_args"]["train_data_path"] = processed_path
-    config["dataset_args"]["test_data_path"] = processed_path
-    input_config = combine_defaults_and_user_args(config)
-    test_pipeline.train(**input_config)
-
-    # Test training model from scratch with csv setup
+    # Test training model from scratch
     with tempfile.TemporaryDirectory() as temp:
         f_name = os.path.join(temp, "tmp_xlnet_config.json")
         # Write file
@@ -177,16 +179,8 @@ def test_train():
 
         config["model_args"]["config_name"] = f_name
         del config["model_args"]["model_path"]
-        del config["dataset_args"]["train_data_path"]
-        del config["dataset_args"]["test_data_path"]
         config["model_args"]["tokenizer_name"] = mol_path
         config["dataset_args"]["data_path"] = raw_path
         config["dataset_args"]["augment"] = 2
-        input_config = combine_defaults_and_user_args(config)
-        test_pipeline.train(**input_config)
-
-        # Test training model from scratch with processed setup
-        config["dataset_args"]["test_data_path"] = processed_path
-        config["dataset_args"]["train_data_path"] = processed_path
         input_config = combine_defaults_and_user_args(config)
         test_pipeline.train(**input_config)
