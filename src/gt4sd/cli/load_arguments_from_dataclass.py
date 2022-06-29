@@ -109,6 +109,8 @@ def extract_fields_from_class(
                 raise ValueError(f"{arg_fields[field_name]['type']} not supported")
 
         else:
+            # NOTE: not raising since the HF training args might introduce typing inconsistencies
+            # Could be changed once the following is merged: https://github.com/huggingface/transformers/pull/17934
             logger.error(
                 f" argument {field_name}: {arg_fields[field_name]['type']} not supported"
             )

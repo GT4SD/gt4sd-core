@@ -57,10 +57,10 @@ sane_datasets = [
     Dataset,
     ChainDataset,
     ConcatDataset,
-    DFIterDataPipe,
+    DFIterDataPipe,  # type: ignore
     IterableDataset,
-    IterDataPipe,
-    MapDataPipe,
+    IterDataPipe,  # type: ignore
+    MapDataPipe,  # type: ignore
     Subset,
     TensorDataset,
 ]
