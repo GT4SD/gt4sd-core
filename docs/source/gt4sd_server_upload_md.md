@@ -18,13 +18,13 @@ Here we report an example of how you can setup a custom minio server on localhos
 ### 1) Set environment variables
 
 ```sh
-export GT4SD_S3_SECRET_KEY=''
-export GT4SD_S3_ACCESS_KEY=''
-export GT4SD_S3_HOST='127.0.0.1:9000'
-export GT4SD_S3_SECURE=False
-export GT4SD_S3_BUCKET='gt4sd-cos-algorithms-artifacts'
-export GT4SD_S3_BUCKET_MODELS='gt4sd-cos-algorithms-models'
-export GT4SD_S3_BUCKET_DATA='gt4sd-cos-algorithms-data'
+export GT4SD_S3_SECRET_KEY_HUB=''
+export GT4SD_S3_ACCESS_KEY_HUB=''
+export GT4SD_S3_HOST_HUB='127.0.0.1:9000'
+export GT4SD_S3_SECURE_HUB=False
+export GT4SD_S3_BUCKET_HUB='gt4sd-cos-algorithms-artifacts'
+export GT4SD_S3_BUCKET_MODELS_HUB='gt4sd-cos-algorithms-models'
+export GT4SD_S3_BUCKET_DATA_HUB='gt4sd-cos-algorithms-data'
 ```
 
 set `GT4SD_S3_SECURE` `True` or `False` if https/http server.
@@ -51,8 +51,8 @@ services:
     env_file:
      - env/.env.dev 
     environment:
-      MINIO_ACCESS_KEY: "${GT4SD_S3_ACCESS_KEY}"
-      MINIO_SECRET_KEY: "${GT4SD_S3_SECRET_KEY}"
+      MINIO_ACCESS_KEY: "${GT4SD_S3_ACCESS_KEY_HUB}"
+      MINIO_SECRET_KEY: "${GT4SD_S3_SECRET_KEY_HUB}"
     command: server /export
   createbuckets:
     image: minio/mc
@@ -63,12 +63,12 @@ services:
     # ensure there is a file in the artifacts bucket
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add myminio http://cos:9000 ${GT4SD_S3_ACCESS_KEY} ${GT4SD_S3_SECRET_KEY};
-      /usr/bin/mc mb myminio/${GT4SD_S3_BUCKET};
-      /usr/bin/mc mb myminio/${GT4SD_S3_BUCKET_DATA};
-      /usr/bin/mc mb myminio/${GT4SD_S3_BUCKET_MODELS};
+      /usr/bin/mc config host add myminio http://cos:9000 ${GT4SD_S3_ACCESS_KEY_HUB} ${GT4SD_S3_SECRET_KEY_HUB};
+      /usr/bin/mc mb myminio/${GT4SD_S3_BUCKET_HUB};
+      /usr/bin/mc mb myminio/${GT4SD_S3_BUCKET_DATA_HUB};
+      /usr/bin/mc mb myminio/${GT4SD_S3_BUCKET_MODELS_HUB};
       echo 'this is an artifact' >> a_file.txt;
-      /usr/bin/mc cp a_file.txt myminio/${GT4SD_S3_BUCKET}/a_file.txt;
+      /usr/bin/mc cp a_file.txt myminio/${GT4SD_S3_BUCKET_HUB}/a_file.txt;
       exit 0;
       "
 ```
@@ -85,9 +85,9 @@ Add the new server to the minio configuration file (`~/.mc/config.json`):
 	"version": "10",
 	"aliases": {
                 "myminio": {
-                        "url": "${GT4SD_S3_HOST}",
-                        "accessKey": "${GT4SD_S3_ACCESS_KEY}",
-                        "secretKey": "${GT4SD_S3_SECRET_KEY}",
+                        "url": "${GT4SD_S3_HOST_HUB}",
+                        "accessKey": "${GT4SD_S3_ACCESS_KEY_HUB}",
+                        "secretKey": "${GT4SD_S3_SECRET_KEY_HUB}",
                         "api": "s3v4",
                         "path": "auto"
                 },
@@ -99,7 +99,7 @@ Add the new server to the minio configuration file (`~/.mc/config.json`):
  and add `myminio` to the list of servers:
 
 ```sh
-mc alias set myminio $GT4SD_S3_HOST $GT4SD_S3_ACCESS_KEY $GT4SD_S3_SECRET_KEY
+mc alias set myminio $GT4SD_S3_HOST_HUB $GT4SD_S3_ACCESS_KEY_HUB $GT4SD_S3_SECRET_KEY_HUB
 ```
 
 ### 4) run docker
