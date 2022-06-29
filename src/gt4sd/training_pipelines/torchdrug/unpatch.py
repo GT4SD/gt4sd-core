@@ -41,7 +41,7 @@ from torch.optim.lr_scheduler import (  # type: ignore
     StepLR,
     _LRScheduler,
 )
-from torch.utils.data.dataset import (
+from torch.utils.data.dataset import (  # type: ignore
     ChainDataset,
     ConcatDataset,
     Dataset,
@@ -57,10 +57,10 @@ sane_datasets = [
     Dataset,
     ChainDataset,
     ConcatDataset,
-    DFIterDataPipe,  # type: ignore
+    DFIterDataPipe,
     IterableDataset,
-    IterDataPipe,  # type: ignore
-    MapDataPipe,  # type: ignore
+    IterDataPipe,
+    MapDataPipe,
     Subset,
     TensorDataset,
 ]
