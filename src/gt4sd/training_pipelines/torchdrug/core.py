@@ -26,10 +26,13 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
 
+from ...configuration import gt4sd_configuration_instance
 from ..core import TrainingPipeline, TrainingPipelineArguments
 from . import DATASET_FACTORY
 
-DATA_ROOT = os.path.join(os.path.expanduser("~"), ".gt4sd", "data", "torchdrug")
+DATA_ROOT = os.path.join(
+    gt4sd_configuration_instance.gt4sd_local_cache_path, "data", "torchdrug"
+)
 os.makedirs(DATA_ROOT, exist_ok=True)
 
 

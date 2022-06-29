@@ -26,11 +26,12 @@ import os
 from dataclasses import dataclass, field
 from typing import Optional
 
+from ...configuration import gt4sd_configuration_instance
 from ..core import TrainingPipelineArguments
 from .utils import TransformersTrainingArgumentsCLI
 
 DATA_ROOT = os.path.join(
-    os.path.expanduser("~"), ".gt4sd", "data", "RegressionTransformer"
+    gt4sd_configuration_instance.gt4sd_local_cache_path, "data", "RegressionTransformer"
 )
 os.makedirs(DATA_ROOT, exist_ok=True)
 
