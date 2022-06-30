@@ -27,7 +27,7 @@ import json
 import logging
 from argparse import Namespace
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple
 
 import sentencepiece as _sentencepiece
 from pytorch_lightning import LightningDataModule, LightningModule
