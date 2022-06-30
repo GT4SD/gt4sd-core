@@ -1,0 +1,566 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.training_pipelines.regression_transformer.implementation &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../training_pipelines.html">gt4sd.training_pipelines</a> &raquo;</li>
+        
+      <li>gt4sd.training_pipelines.regression_transformer.implementation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.training_pipelines.regression_transformer.implementation</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Regression Transformer training implementation.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">terminator.collators</span> <span class="kn">import</span> <span class="n">TRAIN_COLLATORS</span>
+<span class="kn">from</span> <span class="nn">terminator.tokenization</span> <span class="kn">import</span> <span class="n">ExpressionBertTokenizer</span>
+<span class="kn">from</span> <span class="nn">terminator.trainer</span> <span class="kn">import</span> <span class="n">CustomTrainer</span><span class="p">,</span> <span class="n">get_trainer_dict</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CONFIG_MAPPING</span><span class="p">,</span>
+    <span class="n">MODEL_WITH_LM_HEAD_MAPPING</span><span class="p">,</span>
+    <span class="n">AutoConfig</span><span class="p">,</span>
+    <span class="n">AutoModelWithLMHead</span><span class="p">,</span>
+    <span class="n">DataCollatorForPermutationLanguageModeling</span><span class="p">,</span>
+    <span class="n">LineByLineTextDataset</span><span class="p">,</span>
+    <span class="n">set_seed</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">TrainingPipeline</span><span class="p">,</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_hf_training_arg_object</span><span class="p">,</span>
+    <span class="n">get_train_config_dict</span><span class="p">,</span>
+    <span class="n">prepare_datasets_from_files</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="n">MODEL_CONFIG_CLASSES</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">MODEL_WITH_LM_HEAD_MAPPING</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>  <span class="c1"># type: ignore</span>
+<span class="n">MODEL_TYPES</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">model_type</span> <span class="k">for</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">MODEL_CONFIG_CLASSES</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RegressionTransformerTrainingPipeline"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">RegressionTransformerTrainingPipeline</span><span class="p">(</span><span class="n">TrainingPipeline</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;RegressionTransformer training pipeline.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RegressionTransformerTrainingPipeline.train"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">training_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generic training function for training a Regression Transformer (RT) model.</span>
+<span class="sd">           For details see:</span>
+<span class="sd">            Born, J., &amp; Manica, M. (2022). Regression Transformer: Concurrent Conditional</span>
+<span class="sd">            Generation and Regression by Blending Numerical and Textual Tokens.</span>
+<span class="sd">            `ICLR Workshop on Machine Learning for Drug Discovery`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            training_args: training arguments passed to the configuration.</span>
+<span class="sd">            model_args: model arguments passed to the configuration.</span>
+<span class="sd">            dataset_args: dataset arguments passed to the configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">training_args</span><span class="p">,</span> <span class="o">**</span><span class="n">dataset_args</span><span class="p">,</span> <span class="o">**</span><span class="n">model_args</span><span class="p">}</span>
+            <span class="c1"># Setup logging</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> -   </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %H:%M:%S&quot;</span><span class="p">,</span>
+                <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;do_train&quot;</span><span class="p">]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Nothing to do.&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">training_name</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;training_name&quot;</span><span class="p">,</span> <span class="s2">&quot;rt_training&quot;</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model with name </span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2"> starts.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_model</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+            <span class="c1"># Register training_dataset and eval_dataset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setup_dataset</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;# samples: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Model logging</span>
+            <span class="n">num_params</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span>
+            <span class="p">)</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# parameters: </span><span class="si">{</span><span class="n">num_params</span><span class="si">}</span><span class="s2">. Model: </span><span class="si">{</span><span class="n">typ</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">typ</span> <span class="o">!=</span> <span class="s2">&quot;xlnet&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Full functionality only with XLNet; not </span><span class="si">{</span><span class="n">typ</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Setup training configuration</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;alternate_steps&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># No alternation of training objectives means: Vanilla PLM training</span>
+                <span class="n">data_collator</span> <span class="o">=</span> <span class="n">DataCollatorForPermutationLanguageModeling</span><span class="p">(</span>
+                    <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
+                    <span class="n">plm_probability</span><span class="o">=</span><span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;plm_probability&quot;</span><span class="p">],</span>
+                    <span class="n">max_span_length</span><span class="o">=</span><span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;max_span_length&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="n">alternating_collator</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_collator</span> <span class="o">=</span> <span class="n">TRAIN_COLLATORS</span><span class="p">[</span><span class="s2">&quot;property&quot;</span><span class="p">](</span>
+                    <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
+                    <span class="n">property_tokens</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
+                    <span class="n">num_tokens_to_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">mask_token_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">alternating_collator</span> <span class="o">=</span> <span class="n">TRAIN_COLLATORS</span><span class="p">[</span><span class="s2">&quot;vanilla_cg&quot;</span><span class="p">](</span>
+                    <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
+                    <span class="n">property_tokens</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
+                    <span class="n">plm_probability</span><span class="o">=</span><span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;plm_probability&quot;</span><span class="p">],</span>
+                    <span class="n">max_span_length</span><span class="o">=</span><span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;max_span_length&quot;</span><span class="p">],</span>
+                    <span class="n">do_sample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Initialize our Trainer</span>
+            <span class="n">train_config</span> <span class="o">=</span> <span class="n">get_train_config_dict</span><span class="p">(</span><span class="n">training_args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">]):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">])</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">],</span> <span class="s2">&quot;training_config.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">train_config</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">custom_trainer_params</span> <span class="o">=</span> <span class="n">get_trainer_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_params</span><span class="p">)</span>
+            <span class="n">hf_train_object</span> <span class="o">=</span> <span class="n">get_hf_training_arg_object</span><span class="p">(</span><span class="n">training_args</span><span class="p">)</span>
+
+            <span class="n">trainer</span> <span class="o">=</span> <span class="n">CustomTrainer</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="n">hf_train_object</span><span class="p">,</span>
+                <span class="n">data_collator</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
+                <span class="n">train_dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span>
+                <span class="n">eval_dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">,</span>
+                <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
+                <span class="n">alternating_collator</span><span class="o">=</span><span class="n">alternating_collator</span><span class="p">,</span>
+                <span class="n">train_config</span><span class="o">=</span><span class="n">train_config</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">custom_trainer_params</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">])</span>
+            <span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+                <span class="s2">&quot;Exception occurred while running RegressionTransformerTrainingPipeline.&quot;</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="RegressionTransformerTrainingPipeline.setup_model"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.setup_model">[docs]</a>    <span class="k">def</span> <span class="nf">setup_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Error handling and training setup routine.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            params: A dictionary with all parameters to launch training.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If flawed values are passed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test_data_path&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;do_eval&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot do evaluation without an evaluation data file. Either supply a &quot;</span>
+                <span class="s2">&quot;file to --test_data_path or remove the --do_eval argument.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;You have to specify an output directory for the trained model&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">])</span>
+            <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">])</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;overwrite_output_dir&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Output directory (</span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">) exists and is not empty. &quot;</span>
+                <span class="s2">&quot;Use --overwrite_output_dir to overcome.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Set seed</span>
+        <span class="n">set_seed</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Load model configuration.</span>
+        <span class="c1"># Priorities:</span>
+        <span class="c1">#   1) If provided, take it from the model path: `model_path`.</span>
+        <span class="c1">#   2) If provided, take model configuration from `config_name`.</span>
+        <span class="c1">#   3) Instantiate a fresh model.</span>
+
+        <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_type&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Either pass pretrained model via `model_path` or specify&quot;</span>
+                <span class="s2">&quot;which model to use via `model_typ`.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">],</span>
+                <span class="n">cache_dir</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_params</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="vm">__dict__</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelWithLMHead</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">],</span>
+                <span class="n">from_tf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+                <span class="n">cache_dir</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model restored from </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;model_path&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;config_name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;config_name&quot;</span><span class="p">],</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_params</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;config_name&quot;</span><span class="p">],</span>
+                <span class="n">cache_dir</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">],</span>
+                <span class="n">mem_len</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mem_len&quot;</span><span class="p">,</span> <span class="mi">1024</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">CONFIG_MAPPING</span><span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_type&quot;</span><span class="p">]]()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_params</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="vm">__dict__</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Instantiating a new config instance: </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;model_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Load tokenizer</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]:</span>
+            <span class="c1"># If model_path was provided we load tokenizer from there</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">ExpressionBertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;tokenizer_name&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">ExpressionBertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;tokenizer_name&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;No support for creating new tokenizer for: </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;model_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training new model from scratch&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelWithLMHead</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RegressionTransformerTrainingPipeline.setup_dataset"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.setup_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">setup_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">train_data_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">test_data_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">line_by_line</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>
+        <span class="n">augment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs the dataset objects.</span>
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            train_data_path: Path to `.csv` file. Has to have a `text` column and</span>
+<span class="sd">                at least one column of numerical properties.</span>
+<span class="sd">            train_data_path: Path to `.csv` file. Has to have a `text` column and</span>
+<span class="sd">                at least one column of numerical properties.</span>
+<span class="sd">            line_by_line: Whether the data can be read line-by-line from disk.</span>
+<span class="sd">            augment: How many times each training sample is augmented.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preparing/reading data...&quot;</span><span class="p">)</span>
+
+        <span class="n">tokenizer</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span> <span class="o">=</span> <span class="n">prepare_datasets_from_files</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">train_data_path</span><span class="p">,</span> <span class="n">test_data_path</span><span class="p">,</span> <span class="n">augment</span><span class="o">=</span><span class="n">augment</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">properties</span>
+        <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset_from_list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="p">[</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished data setup.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">datasets</span></div>
+
+<div class="viewcode-block" id="RegressionTransformerTrainingPipeline.create_dataset_from_list"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.create_dataset_from_list">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset_from_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LineByLineTextDataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a LineByLineTextDataset from a List of strings.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: List of strings with the samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Write files to temporary location and create data</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp</span><span class="p">:</span>
+            <span class="n">f_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="s2">&quot;tmp_data.txt&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Write file</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Create dataset</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">LineByLineTextDataset</span><span class="p">(</span>
+                <span class="n">file_path</span><span class="o">=</span><span class="n">f_name</span><span class="p">,</span> <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">64</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span></div></div>
+
+
+<div class="viewcode-block" id="RegressionTransformerModelArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">RegressionTransformerModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Arguments pertaining to model instantiation.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>
+
+    <span class="n">model_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path where the pretrained model artifacts are stored.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">tokenizer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Pretrained tokenizer name or path. If not provided, will be &quot;</span>
+            <span class="s2">&quot;inferred from `model_path`. If `model_path` is not provided either you &quot;</span>
+            <span class="s2">&quot;have to pass a tokenizer.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">config_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Pretrained config name or path. But `model_path` takes preference.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;xlnet&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;If training from scratch, pass a model type from the list: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_TYPES</span><span class="p">)</span><span class="si">}</span><span class="s2">. If `model_path` is also provided, `model_path` &quot;</span>
+            <span class="s2">&quot;takes preference.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Where do you want to store the pretrained models downloaded from s3&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

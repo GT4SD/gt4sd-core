@@ -186,35 +186,77 @@
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.utils.data.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
+<span class="kn">from</span> <span class="nn">packaging</span> <span class="kn">import</span> <span class="n">version</span>
+<span class="kn">from</span> <span class="nn">torch.optim.lr_scheduler</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># type: ignore</span>
+    <span class="n">ChainedScheduler</span><span class="p">,</span>
+    <span class="n">ConstantLR</span><span class="p">,</span>
+    <span class="n">CosineAnnealingLR</span><span class="p">,</span>
+    <span class="n">CosineAnnealingWarmRestarts</span><span class="p">,</span>
+    <span class="n">CyclicLR</span><span class="p">,</span>
+    <span class="n">ExponentialLR</span><span class="p">,</span>
+    <span class="n">LambdaLR</span><span class="p">,</span>
+    <span class="n">LinearLR</span><span class="p">,</span>
+    <span class="n">MultiplicativeLR</span><span class="p">,</span>
+    <span class="n">MultiStepLR</span><span class="p">,</span>
+    <span class="n">OneCycleLR</span><span class="p">,</span>
+    <span class="n">SequentialLR</span><span class="p">,</span>
+    <span class="n">StepLR</span><span class="p">,</span>
+    <span class="n">_LRScheduler</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data.dataset</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ChainDataset</span><span class="p">,</span>
     <span class="n">ConcatDataset</span><span class="p">,</span>
     <span class="n">Dataset</span><span class="p">,</span>
-    <span class="n">DFIterDataPipe</span><span class="p">,</span>
     <span class="n">IterableDataset</span><span class="p">,</span>
-    <span class="n">IterDataPipe</span><span class="p">,</span>
-    <span class="n">MapDataPipe</span><span class="p">,</span>
     <span class="n">Subset</span><span class="p">,</span>
     <span class="n">TensorDataset</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="n">OLD_TORCH</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">sane_datasets</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">Dataset</span><span class="p">,</span>
     <span class="n">ChainDataset</span><span class="p">,</span>
     <span class="n">ConcatDataset</span><span class="p">,</span>
-    <span class="n">DFIterDataPipe</span><span class="p">,</span>
     <span class="n">IterableDataset</span><span class="p">,</span>
-    <span class="n">IterDataPipe</span><span class="p">,</span>
-    <span class="n">MapDataPipe</span><span class="p">,</span>
     <span class="n">Subset</span><span class="p">,</span>
     <span class="n">TensorDataset</span><span class="p">,</span>
 <span class="p">]</span>
 
+<span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">pkg_resources</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">version</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+    <span class="s2">&quot;1.11&quot;</span>
+<span class="p">):</span>
+    <span class="n">OLD_TORCH</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="kn">from</span> <span class="nn">torch.utils.data.dataset</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="n">DFIterDataPipe</span><span class="p">,</span>
+        <span class="n">IterDataPipe</span><span class="p">,</span>
+        <span class="n">MapDataPipe</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">sane_datasets</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">DFIterDataPipe</span><span class="p">,</span> <span class="n">IterDataPipe</span><span class="p">,</span> <span class="n">MapDataPipe</span><span class="p">])</span>
+
+
+<span class="n">sane_schedulers</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">_LRScheduler</span><span class="p">,</span>
+    <span class="n">ChainedScheduler</span><span class="p">,</span>
+    <span class="n">ConstantLR</span><span class="p">,</span>
+    <span class="n">CosineAnnealingLR</span><span class="p">,</span>
+    <span class="n">CosineAnnealingWarmRestarts</span><span class="p">,</span>
+    <span class="n">CyclicLR</span><span class="p">,</span>
+    <span class="n">ExponentialLR</span><span class="p">,</span>
+    <span class="n">LambdaLR</span><span class="p">,</span>
+    <span class="n">LinearLR</span><span class="p">,</span>
+    <span class="n">MultiStepLR</span><span class="p">,</span>
+    <span class="n">MultiplicativeLR</span><span class="p">,</span>
+    <span class="n">OneCycleLR</span><span class="p">,</span>
+    <span class="n">SequentialLR</span><span class="p">,</span>
+    <span class="n">StepLR</span><span class="p">,</span>
+<span class="p">]</span>
+
 
 <div class="viewcode-block" id="fix_datasets"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.torchdrug.unpatch.html#gt4sd.training_pipelines.torchdrug.unpatch.fix_datasets">[docs]</a><span class="nd">@typing</span><span class="o">.</span><span class="n">no_type_check</span>
-<span class="k">def</span> <span class="nf">fix_datasets</span><span class="p">(</span><span class="n">sane_datasets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">fix_datasets</span><span class="p">(</span><span class="n">sane_datasets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to revert TorchDrug dataset handling (which breaks core</span>
 <span class="sd">    pytorch functionalities). For details see:</span>
@@ -230,18 +272,57 @@
     <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">dataset</span>  <span class="c1"># type: ignore</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">ChainDataset</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">ConcatDataset</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">DFIterDataPipe</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">IterableDataset</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">IterDataPipe</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">MapDataPipe</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Subset</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">TensorDataset</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">IterableDataset</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Subset</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">TensorDataset</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">if</span> <span class="n">OLD_TORCH</span><span class="p">:</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">DFIterDataPipe</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">IterDataPipe</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">MapDataPipe</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
 
     <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Reverting silent TorchDrug overwriting failed, </span><span class="si">{</span><span class="n">ds</span><span class="si">}</span><span class="s2"> is not a subclass&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot; of </span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fix_schedulers"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.torchdrug.unpatch.html#gt4sd.training_pipelines.torchdrug.unpatch.fix_schedulers">[docs]</a><span class="nd">@typing</span><span class="o">.</span><span class="n">no_type_check</span>
+<span class="k">def</span> <span class="nf">fix_schedulers</span><span class="p">(</span><span class="n">sane_schedulers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">_LRScheduler</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to revert TorchDrug LR scheduler handling (which breaks core</span>
+<span class="sd">    pytorch functionalities). For details see:</span>
+<span class="sd">    https://github.com/DeepGraphLearning/torchdrug/issues/96</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sane_schedulers: A list of pytorch lr_schedulers.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        AttributeError: If a passed lr_scheduler was not sane.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scheduler</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">_LRScheduler</span> <span class="o">=</span> <span class="n">scheduler</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">ChainedScheduler</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">ConstantLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">CosineAnnealingLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">CosineAnnealingWarmRestarts</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">CyclicLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">ExponentialLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">LambdaLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">LinearLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">MultiStepLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">MultiplicativeLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">OneCycleLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">SequentialLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span> <span class="o">=</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">for</span> <span class="n">lrs</span> <span class="ow">in</span> <span class="n">sane_schedulers</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">lrs</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Reverting silent TorchDrug overwriting failed, </span><span class="si">{</span><span class="n">lrs</span><span class="si">}</span><span class="s2"> is not a subclass&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; of </span><span class="si">{</span><span class="n">scheduler</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span></div>
 </pre></div>
 

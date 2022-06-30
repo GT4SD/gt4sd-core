@@ -1,0 +1,344 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.training_pipelines.regression_transformer.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../training_pipelines.html">gt4sd.training_pipelines</a> &raquo;</li>
+        
+      <li>gt4sd.training_pipelines.regression_transformer.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.training_pipelines.regression_transformer.core</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Regression Transformer training utilities.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">...configuration</span> <span class="kn">import</span> <span class="n">gt4sd_configuration_instance</span>
+<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">TransformersTrainingArgumentsCLI</span>
+
+<span class="n">DATA_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_local_cache_path</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;RegressionTransformer&quot;</span>
+<span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RegressionTransformerTrainingArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.core.html#gt4sd.training_pipelines.regression_transformer.core.RegressionTransformerTrainingArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">RegressionTransformerTrainingArguments</span><span class="p">(</span>
+    <span class="n">TrainingPipelineArguments</span><span class="p">,</span> <span class="n">TransformersTrainingArgumentsCLI</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Arguments related to RegressionTransformer trainer.</span>
+<span class="sd">    NOTE: All arguments from `transformers.training_args.TrainingArguments` can be used.</span>
+<span class="sd">    Only additional ones are specified below.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;training_args&quot;</span>
+
+    <span class="n">training_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;rt_training&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Name used to identify the training.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of epochs.&quot;</span><span class="p">})</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Size of the batch.&quot;</span><span class="p">})</span>
+    <span class="n">log_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of steps between log intervals.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">gradient_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Gradient accumulation steps&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">max_span_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Max length of a span of masked tokens for PLM.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">plm_probability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Ratio of length of a span of masked tokens to surrounding context length for PLM.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">alternate_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Per default, training alternates between property prediction and &quot;</span>
+            <span class="s2">&quot;conditional generation. This argument specifies the alternation frequency.&quot;</span>
+            <span class="s2">&quot;If you set it to 0, no alternation occurs and we fall back to vanilla &quot;</span>
+            <span class="s2">&quot;permutation language modeling (PLM). Default: 50.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">cc_loss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether the cycle-consistency loss is computed during the conditional &quot;</span>
+            <span class="s2">&quot;generation task. Defaults to True.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RegressionTransformerDataArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.core.html#gt4sd.training_pipelines.regression_transformer.core.RegressionTransformerDataArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">RegressionTransformerDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Arguments related to RegressionTransformer data loading.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;dataset_args&quot;</span>
+
+    <span class="n">train_data_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path to a `.csv` file with the input training data. The file has to &quot;</span>
+            <span class="s2">&quot;contain a `text` column (with the string input, e.g, SMILES, AAS, natural &quot;</span>
+            <span class="s2">&quot;text) and an arbitrary number of numerical columns.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">test_data_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path to a `.csv` file with the input testing data. The file has to &quot;</span>
+            <span class="s2">&quot;contain a `text` column (with the string input, e.g, SMILES, AAS, natural &quot;</span>
+            <span class="s2">&quot;text) and an arbitrary number of numerical columns.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">augment</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Factor by which the training data is augmented. The data modality &quot;</span>
+            <span class="s2">&quot;(SMILES, SELFIES, AAS, natural text) is inferred from the tokenizer. &quot;</span>
+            <span class="s2">&quot;NOTE: For natural text, no augmentation is supported. Defaults to 0, &quot;</span>
+            <span class="s2">&quot;meaning no augmentation. &quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">line_by_line</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether lines of text in the dataset are to be handled as distinct samples.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RegressionTransformerSavingArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.core.html#gt4sd.training_pipelines.regression_transformer.core.RegressionTransformerSavingArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">RegressionTransformerSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Saving arguments related to RegressionTransformer trainer.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_args&quot;</span>
+
+    <span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path where the model artifacts are stored.&quot;</span><span class="p">}</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

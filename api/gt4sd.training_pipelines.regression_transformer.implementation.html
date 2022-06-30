@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.training_pipelines.regression_transformer.implementation module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd.training_pipelines.regression_transformer.utils module" href="gt4sd.training_pipelines.regression_transformer.utils.html" />
+    <link rel="prev" title="gt4sd.training_pipelines.regression_transformer.core module" href="gt4sd.training_pipelines.regression_transformer.core.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.configuration.html">gt4sd.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.conftest.html">gt4sd.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.exceptions.html">gt4sd.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.s3.html">gt4sd.s3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.algorithms.html">gt4sd.algorithms package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.cli.html">gt4sd.cli package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.domains.html">gt4sd.domains package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.extras.html">gt4sd.extras package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.tests.html">gt4sd.tests package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.training_pipelines.core.html">gt4sd.training_pipelines.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.training_pipelines.guacamol_baselines.html">gt4sd.training_pipelines.guacamol_baselines package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.training_pipelines.moses.html">gt4sd.training_pipelines.moses package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.training_pipelines.paccmann.html">gt4sd.training_pipelines.paccmann package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.training_pipelines.pytorch_lightning.html">gt4sd.training_pipelines.pytorch_lightning package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="gt4sd.training_pipelines.regression_transformer.html">gt4sd.training_pipelines.regression_transformer package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.training_pipelines.regression_transformer.core.html">gt4sd.training_pipelines.regression_transformer.core module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">gt4sd.training_pipelines.regression_transformer.implementation module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.training_pipelines.regression_transformer.utils.html">gt4sd.training_pipelines.regression_transformer.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.training_pipelines.tests.html">gt4sd.training_pipelines.tests package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.training_pipelines.torchdrug.html">gt4sd.training_pipelines.torchdrug package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.training_pipelines.html#summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.training_pipelines.html#reference">Reference</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="gt4sd.html">gt4sd package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.training_pipelines.regression_transformer.html">gt4sd.training_pipelines.regression_transformer package</a> &raquo;</li>
+        
+      <li>gt4sd.training_pipelines.regression_transformer.implementation module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/gt4sd.training_pipelines.regression_transformer.implementation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-gt4sd.training_pipelines.regression_transformer.implementation">
+<span id="gt4sd-training-pipelines-regression-transformer-implementation-module"></span><h1>gt4sd.training_pipelines.regression_transformer.implementation module<a class="headerlink" href="#module-gt4sd.training_pipelines.regression_transformer.implementation" title="Permalink to this headline">¶</a></h1>
+<p>Regression Transformer training implementation.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments" title="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionTransformerModelArguments</span></code></a></p></td>
+<td><p>Arguments pertaining to model instantiation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline" title="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionTransformerTrainingPipeline</span></code></a></p></td>
+<td><p>RegressionTransformer training pipeline.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline">
+<em class="property">class </em><code class="sig-name descname">RegressionTransformerTrainingPipeline</code><a class="reference internal" href="../_modules/gt4sd/training_pipelines/regression_transformer/implementation.html#RegressionTransformerTrainingPipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="gt4sd.training_pipelines.core.html#gt4sd.training_pipelines.core.TrainingPipeline" title="gt4sd.training_pipelines.core.TrainingPipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">gt4sd.training_pipelines.core.TrainingPipeline</span></code></a></p>
+<p>RegressionTransformer training pipeline.</p>
+<dl class="py method">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.train">
+<code class="sig-name descname">train</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">training_args</span></em>, <em class="sig-param"><span class="n">model_args</span></em>, <em class="sig-param"><span class="n">dataset_args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/training_pipelines/regression_transformer/implementation.html#RegressionTransformerTrainingPipeline.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.train" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Generic training function for training a Regression Transformer (RT) model.</dt><dd><dl class="simple">
+<dt>For details see:</dt><dd><p>Born, J., &amp; Manica, M. (2022). Regression Transformer: Concurrent Conditional
+Generation and Regression by Blending Numerical and Textual Tokens.
+<cite>ICLR Workshop on Machine Learning for Drug Discovery</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>training_args</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – training arguments passed to the configuration.</p></li>
+<li><p><strong>model_args</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – model arguments passed to the configuration.</p></li>
+<li><p><strong>dataset_args</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dataset arguments passed to the configuration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.setup_model">
+<code class="sig-name descname">setup_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/training_pipelines/regression_transformer/implementation.html#RegressionTransformerTrainingPipeline.setup_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.setup_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error handling and training setup routine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – A dictionary with all parameters to launch training.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If flawed values are passed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.setup_dataset">
+<code class="sig-name descname">setup_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">train_data_path</span></em>, <em class="sig-param"><span class="n">test_data_path</span></em>, <em class="sig-param"><span class="n">line_by_line</span></em>, <em class="sig-param"><span class="n">augment</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/training_pipelines/regression_transformer/implementation.html#RegressionTransformerTrainingPipeline.setup_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.setup_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the dataset objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_data_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Path to <cite>.csv</cite> file. Has to have a <cite>text</cite> column and
+at least one column of numerical properties.</p></li>
+<li><p><strong>train_data_path</strong> – Path to <cite>.csv</cite> file. Has to have a <cite>text</cite> column and
+at least one column of numerical properties.</p></li>
+<li><p><strong>line_by_line</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]) – Whether the data can be read line-by-line from disk.</p></li>
+<li><p><strong>augment</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – How many times each training sample is augmented.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.create_dataset_from_list">
+<code class="sig-name descname">create_dataset_from_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/training_pipelines/regression_transformer/implementation.html#RegressionTransformerTrainingPipeline.create_dataset_from_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.create_dataset_from_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a LineByLineTextDataset from a List of strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of strings with the samples.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">LineByLineTextDataset</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'RegressionTransformer training pipeline.'</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.training_pipelines.regression_transformer.implementation'</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments">
+<em class="property">class </em><code class="sig-name descname">RegressionTransformerModelArguments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tokenizer_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_type</span><span class="o">=</span><span class="default_value">'xlnet'</span></em>, <em class="sig-param"><span class="n">cache_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/training_pipelines/regression_transformer/implementation.html#RegressionTransformerModelArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="gt4sd.training_pipelines.core.html#gt4sd.training_pipelines.core.TrainingPipelineArguments" title="gt4sd.training_pipelines.core.TrainingPipelineArguments"><code class="xref py py-class docutils literal notranslate"><span class="pre">gt4sd.training_pipelines.core.TrainingPipelineArguments</span></code></a></p>
+<p>Arguments pertaining to model instantiation.</p>
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__name__">
+<code class="sig-name descname">__name__</code><em class="property"> = 'RegressionTransformerModelArguments'</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__name__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.model_path">
+<code class="sig-name descname">model_path</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.model_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.tokenizer_name">
+<code class="sig-name descname">tokenizer_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.tokenizer_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.config_name">
+<code class="sig-name descname">config_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.config_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.model_type">
+<code class="sig-name descname">model_type</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = 'xlnet'</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.model_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.cache_dir">
+<code class="sig-name descname">cache_dir</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.cache_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'cache_dir': typing.Union[str, NoneType], 'config_name': typing.Union[str, NoneType], 'model_path': typing.Union[str, NoneType], 'model_type': typing.Union[str, NoneType], 'tokenizer_name': typing.Union[str, NoneType]}</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__dataclass_fields__">
+<code class="sig-name descname">__dataclass_fields__</code><em class="property"> = {'cache_dir': Field(name='cache_dir',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Where do you want to store the pretrained models downloaded from s3'}),_field_type=_FIELD), 'config_name': Field(name='config_name',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Pretrained config name or path. But `model_path` takes preference.'}),_field_type=_FIELD), 'model_path': Field(name='model_path',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Path where the pretrained model artifacts are stored.'}),_field_type=_FIELD), 'model_type': Field(name='model_type',type=typing.Union[str, NoneType],default='xlnet',default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'If training from scratch, pass a model type from the list: albert, bart, bert, big_bird, bigbird_pegasus, blenderbot-small, bloom, camembert, convbert, ctrl, data2vec-text, deberta, deberta-v2, distilbert, electra, encoder-decoder, flaubert, fnet, fsmt, funnel, gpt2, gpt_neo, gpt_neox, gptj, ibert, layoutlm, led, longformer, longt5, m2m_100, marian, megatron-bert, mobilebert, mpnet, nystromformer, openai-gpt, plbart, qdqbert, reformer, rembert, roberta, roformer, speech_to_text, squeezebert, t5, tapas, transfo-xl, wav2vec2, xlm, xlm-roberta, xlm-roberta-xl, xlnet, yoso. If `model_path` is also provided, `model_path` takes preference.'}),_field_type=_FIELD), 'tokenizer_name': Field(name='tokenizer_name',type=typing.Union[str, NoneType],default=None,default_factory=&lt;dataclasses._MISSING_TYPE object&gt;,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({'help': 'Pretrained tokenizer name or path. If not provided, will be inferred from `model_path`. If `model_path` is not provided either you have to pass a tokenizer.'}),_field_type=_FIELD)}</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__dataclass_fields__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__dataclass_params__">
+<code class="sig-name descname">__dataclass_params__</code><em class="property"> = _DataclassParams(init=True,repr=True,eq=True,order=False,unsafe_hash=False,frozen=False)</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__dataclass_params__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Arguments pertaining to model instantiation.'</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__hash__">
+<code class="sig-name descname">__hash__</code><em class="property"> = None</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tokenizer_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_type</span><span class="o">=</span><span class="default_value">'xlnet'</span></em>, <em class="sig-param"><span class="n">cache_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.training_pipelines.regression_transformer.implementation'</em><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gt4sd.training_pipelines.regression_transformer.utils.html" class="btn btn-neutral float-right" title="gt4sd.training_pipelines.regression_transformer.utils module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd.training_pipelines.regression_transformer.core.html" class="btn btn-neutral float-left" title="gt4sd.training_pipelines.regression_transformer.core module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -183,9 +183,12 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Functions to facilitate conversion from dataclasses to training descriptions.&quot;&quot;&quot;</span>
 
-
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">_MISSING_TYPE</span><span class="p">,</span> <span class="n">fields</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
 <div class="viewcode-block" id="find_type"><a class="viewcode-back" href="../../../api/gt4sd.cli.load_arguments_from_dataclass.html#gt4sd.cli.load_arguments_from_dataclass.find_type">[docs]</a><span class="k">def</span> <span class="nf">find_type</span><span class="p">(</span><span class="n">input_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -224,7 +227,10 @@
 
     <span class="c1"># assign type and description</span>
     <span class="n">arg_fields</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">field</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">]}</span>
+        <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">field</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;help&quot;</span><span class="p">,</span> <span class="s2">&quot;No help provided&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
         <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">dataclass</span><span class="p">)</span>
     <span class="p">}</span>
 
@@ -263,7 +269,9 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg_fields</span><span class="p">[</span><span class="n">field_name</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="c1"># NOTE: not raising since the HF training args might introduce typing inconsistencies</span>
+            <span class="c1"># Could be changed once the following is merged: https://github.com/huggingface/transformers/pull/17934</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot; argument </span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">arg_fields</span><span class="p">[</span><span class="n">field_name</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> not supported&quot;</span>
             <span class="p">)</span>
 

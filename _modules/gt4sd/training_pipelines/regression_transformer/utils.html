@@ -1,0 +1,489 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.training_pipelines.regression_transformer.utils &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../training_pipelines.html">gt4sd.training_pipelines</a> &raquo;</li>
+        
+      <li>gt4sd.training_pipelines.regression_transformer.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.training_pipelines.regression_transformer.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pytoda.smiles.transforms</span> <span class="kn">import</span> <span class="n">Augment</span>
+<span class="kn">from</span> <span class="nn">pytoda.transforms</span> <span class="kn">import</span> <span class="n">AugmentByReversing</span>
+<span class="kn">from</span> <span class="nn">terminator.selfies</span> <span class="kn">import</span> <span class="n">encoder</span>
+<span class="kn">from</span> <span class="nn">terminator.tokenization</span> <span class="kn">import</span> <span class="n">ExpressionBertTokenizer</span>
+<span class="kn">from</span> <span class="nn">transformers.hf_argparser</span> <span class="kn">import</span> <span class="n">string_to_bool</span>
+<span class="kn">from</span> <span class="nn">transformers.training_args</span> <span class="kn">import</span> <span class="n">TrainingArguments</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="n">TRANSFORM_FACTORY</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;SELFIES&quot;</span><span class="p">:</span> <span class="n">encoder</span><span class="p">}</span>
+<span class="n">AUGMENT_FACTORY</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;SMILES&quot;</span><span class="p">:</span> <span class="n">Augment</span><span class="p">(),</span>
+    <span class="s2">&quot;SELFIES&quot;</span><span class="p">:</span> <span class="n">Augment</span><span class="p">(),</span>
+    <span class="s2">&quot;AAS&quot;</span><span class="p">:</span> <span class="n">AugmentByReversing</span><span class="p">(),</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="add_tokens_from_lists"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.utils.html#gt4sd.training_pipelines.regression_transformer.utils.add_tokens_from_lists">[docs]</a><span class="k">def</span> <span class="nf">add_tokens_from_lists</span><span class="p">(</span>
+    <span class="n">tokenizer</span><span class="p">:</span> <span class="n">ExpressionBertTokenizer</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">test_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ExpressionBertTokenizer</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Addding tokens to a tokenizer from parsed datasets hold in memory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tokenizer: The tokenizer.</span>
+<span class="sd">        train_data: List of strings, one per sample.</span>
+<span class="sd">        test_data: List of strings, one per sample.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       Tuple with:</span>
+<span class="sd">            tokenizer with updated vocabulary.</span>
+<span class="sd">            set of property tokens.</span>
+<span class="sd">            list of strings with training samples.</span>
+<span class="sd">            list of strings with testing samples.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
+    <span class="n">properties</span><span class="p">:</span> <span class="n">Set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">all_tokens</span><span class="p">:</span> <span class="n">Set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="p">[</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="c1"># Grow the set of all tokens in the dataset</span>
+            <span class="n">toks</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">all_tokens</span> <span class="o">=</span> <span class="n">all_tokens</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">toks</span><span class="p">)</span>
+            <span class="c1"># Grow the set of all properties (assumes that the text follows the last `|`)</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&gt;&quot;</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+
+    <span class="c1"># Finish adding new tokens</span>
+    <span class="n">tokenizer</span><span class="o">.</span><span class="n">add_tokens</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">all_tokens</span><span class="p">))</span>
+    <span class="n">tokenizer</span><span class="o">.</span><span class="n">update_vocab</span><span class="p">(</span><span class="n">all_tokens</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span><span class="o">-</span><span class="n">num_tokens</span><span class="si">}</span><span class="s2"> new tokens to tokenizer.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span></div>
+
+
+<div class="viewcode-block" id="prepare_datasets_from_files"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.utils.html#gt4sd.training_pipelines.regression_transformer.utils.prepare_datasets_from_files">[docs]</a><span class="k">def</span> <span class="nf">prepare_datasets_from_files</span><span class="p">(</span>
+    <span class="n">tokenizer</span><span class="p">:</span> <span class="n">ExpressionBertTokenizer</span><span class="p">,</span>
+    <span class="n">train_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">test_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">augment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ExpressionBertTokenizer</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts datasets saved in provided `.csv` paths into RT-compatible datasets.</span>
+<span class="sd">    NOTE: Also adds the new tokens from train/test data to provided tokenizer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tokenizer: The tokenizer.</span>
+<span class="sd">        train_path: Path to the training data.</span>
+<span class="sd">        test_path: Path to the testing data.</span>
+<span class="sd">        augment: Factor by which each training sample is augmented.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       Tuple with:</span>
+<span class="sd">            tokenizer with updated vocabulary.</span>
+<span class="sd">            set of property tokens.</span>
+<span class="sd">            list of strings with training samples.</span>
+<span class="sd">            list of strings with testing samples.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Setup data transforms and augmentations</span>
+    <span class="n">train_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">test_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">properties</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">aug</span> <span class="o">=</span> <span class="n">AUGMENT_FACTORY</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">trans</span> <span class="o">=</span> <span class="n">TRANSFORM_FACTORY</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+        <span class="nb">zip</span><span class="p">([</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">],</span> <span class="p">[</span><span class="n">train_path</span><span class="p">,</span> <span class="n">test_path</span><span class="p">])</span>
+    <span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please provide a csv file not </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Load data</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;text&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please provide text in the `text` column.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">properties</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Train and test data have to have identical columns, not &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">properties</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))))</span>
+        <span class="n">properties</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Parse data and create RT-compatible format</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&gt;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}{</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">properties</span>
+                <span class="p">]</span>
+                <span class="o">+</span> <span class="p">[</span><span class="n">trans</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">text</span><span class="p">)]</span>  <span class="c1"># type: ignore</span>
+            <span class="p">)</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="c1"># Perform augmentation on training data if applicable</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">augment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">augment</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">augment</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&gt;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}{</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">properties</span>
+                        <span class="p">]</span>
+                        <span class="o">+</span> <span class="p">[</span><span class="n">trans</span><span class="p">(</span><span class="n">aug</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">text</span><span class="p">))]</span>  <span class="c1"># type: ignore</span>
+                    <span class="p">)</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">add_tokens_from_lists</span><span class="p">(</span>
+        <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">train_data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="o">=</span><span class="n">test_data</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_train_config_dict"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.utils.html#gt4sd.training_pipelines.regression_transformer.utils.get_train_config_dict">[docs]</a><span class="k">def</span> <span class="nf">get_train_config_dict</span><span class="p">(</span>
+    <span class="n">training_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">properties</span><span class="p">:</span> <span class="n">Set</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;alternate_steps&quot;</span><span class="p">:</span> <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;alternate_steps&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;reset_training_loss&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;cc_loss&quot;</span><span class="p">:</span> <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;cc_loss&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;property_tokens&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">properties</span><span class="p">),</span>
+        <span class="s2">&quot;cg_collator_params&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;do_sample&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;property_tokens&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">properties</span><span class="p">),</span>
+            <span class="s2">&quot;plm_probability&quot;</span><span class="p">:</span> <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;plm_probability&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;max_span_length&quot;</span><span class="p">:</span> <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;max_span_length&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="TransformersTrainingArgumentsCLI"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.utils.html#gt4sd.training_pipelines.regression_transformer.utils.TransformersTrainingArgumentsCLI">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TransformersTrainingArgumentsCLI</span><span class="p">(</span><span class="n">TrainingArguments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    GT4SD ships with a CLI to launch training. This conflicts with some data types</span>
+<span class="sd">    native in `transformers.training_arguments.TrainingArguments` especially iterables</span>
+<span class="sd">    which cannot be easily passed from CLI.</span>
+<span class="sd">    Therefore, this class changes the affected attributes to CLI compatible datatypes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">label_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;A string containing keys in your dictionary of inputs that correspond to the labels.&quot;</span>
+            <span class="s2">&quot;A single string, but can contain multiple keys separated with comma: `key1,key2`&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">report_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The list of integrations to report the results and logs to.&quot;</span>
+            <span class="s2">&quot;A single string, but can contain multiple keys separated with comma: `i1,i2`&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">sharded_ddp</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether or not to use sharded DDP training (in distributed training only). The base option &quot;</span>
+            <span class="s2">&quot;should be `simple`, `zero_dp_2` or `zero_dp_3` and you can add CPU-offload to `zero_dp_2` or `zero_dp_3` &quot;</span>
+            <span class="s2">&quot;like this: zero_dp_2 offload` or `zero_dp_3 offload`. You can add auto-wrap to `zero_dp_2` or &quot;</span>
+            <span class="s2">&quot;with the same syntax: zero_dp_2 auto_wrap` or `zero_dp_3 auto_wrap`.&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">tf32</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;no&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;Whether to enable tf32 mode, available in Ampere and newer GPU architectures. This is an experimental&quot;</span>
+                <span class="s2">&quot; API and it may change.&quot;</span>
+            <span class="p">)</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">disable_tqdm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;no&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether or not to disable the tqdm progress bars.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">greater_is_better</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;no&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether the `metric_for_best_model` should be maximized or not.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">remove_unused_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Remove columns not required by the model when using an nlp.Dataset.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">load_best_model_at_end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether or not to load the best model found during training at the end of training.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">ddp_find_unused_parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;no&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;When using distributed training, the value of the flag `find_unused_parameters` passed to &quot;</span>
+                <span class="s2">&quot;`DistributedDataParallel`.&quot;</span>
+            <span class="p">)</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="TransformersTrainingArgumentsCLI.__post_init__"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.utils.html#gt4sd.training_pipelines.regression_transformer.utils.TransformersTrainingArgumentsCLI.__post_init__">[docs]</a>    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Necessary because the our ArgumentParser (that is based on argparse) converts</span>
+<span class="sd">        empty strings to None. This is prohibitive since the HFTrainer relies on</span>
+<span class="sd">        them being actual strings. Only concerns a few arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sharded_ddp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sharded_ddp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">disable_tqdm</span> <span class="o">=</span> <span class="n">string_to_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">disable_tqdm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tf32</span> <span class="o">=</span> <span class="n">string_to_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf32</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="get_hf_training_arg_object"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.utils.html#gt4sd.training_pipelines.regression_transformer.utils.get_hf_training_arg_object">[docs]</a><span class="k">def</span> <span class="nf">get_hf_training_arg_object</span><span class="p">(</span><span class="n">training_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TrainingArguments</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A method to convert a training_args Dictionary into a HuggingFace</span>
+<span class="sd">    `TrainingArguments` object.</span>
+<span class="sd">    This routine also takes care of removing arguments that are not necessary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        training_args: A dictionary of training arguments.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        object of type `TrainingArguments`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get attributes of parent class</span>
+    <span class="n">org_attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">TrainingArguments</span><span class="p">))</span>
+
+    <span class="c1"># Remove attributes that were specified by child classes</span>
+    <span class="n">hf_training_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">training_args</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">org_attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+
+    <span class="c1"># Instantiate class object</span>
+    <span class="n">hf_train_object</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span><span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Set attributes manually (since this is a `dataclass` not everything can be passed</span>
+    <span class="c1"># to constructor)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">hf_training_args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">hf_train_object</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">hf_train_object</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
