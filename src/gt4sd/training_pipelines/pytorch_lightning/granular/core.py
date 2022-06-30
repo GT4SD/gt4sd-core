@@ -131,7 +131,7 @@ class GranularPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
         default=5,
         metadata={"help": "Number of training epochs between checkpoints."},
     )
-    auto_lr_find: Union[bool, str] = field(
+    auto_lr_find: bool = field(
         default=True,
         metadata={
             "help": "Select whether to run a learning rate finder to try to optimize initial learning for faster convergence."
