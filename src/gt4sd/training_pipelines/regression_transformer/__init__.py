@@ -21,7 +21,3 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Module initialization."""
-
-__version__ = "0.42.0"
-__name__ = "gt4sd"
