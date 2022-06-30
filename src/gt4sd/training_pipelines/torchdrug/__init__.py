@@ -22,7 +22,12 @@
 # SOFTWARE.
 #
 
-from .unpatch import fix_datasets, sane_datasets  # isort:skip
+from .unpatch import (  # isort:skip
+    fix_datasets,
+    sane_datasets,
+    fix_schedulers,
+    sane_schedulers,
+)
 
 from torchdrug.datasets import (
     BACE,
@@ -60,8 +65,9 @@ invasive and causes significant side-effects in the rest of the code.
 See: https://github.com/DeepGraphLearning/torchdrug/issues/77
 """
 nn.Module = nn._Module  # type: ignore
-
 fix_datasets(sane_datasets)
+fix_schedulers(sane_schedulers)
+
 
 DATASET_FACTORY = {
     "bace": BACE,

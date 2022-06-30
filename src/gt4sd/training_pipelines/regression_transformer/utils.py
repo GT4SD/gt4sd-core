@@ -1,0 +1,281 @@
+import inspect
+import logging
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Set, Tuple
+
+import pandas as pd
+from pytoda.smiles.transforms import Augment
+from pytoda.transforms import AugmentByReversing
+from terminator.selfies import encoder
+from terminator.tokenization import ExpressionBertTokenizer
+from transformers.hf_argparser import string_to_bool
+from transformers.training_args import TrainingArguments
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
+TRANSFORM_FACTORY = {"SELFIES": encoder}
+AUGMENT_FACTORY = {
+    "SMILES": Augment(),
+    "SELFIES": Augment(),
+    "AAS": AugmentByReversing(),
+}
+
+
+def add_tokens_from_lists(
+    tokenizer: ExpressionBertTokenizer, train_data: List[str], test_data: List[str]
+) -> Tuple[ExpressionBertTokenizer, Set, List[str], List[str]]:
+    """
+    Addding tokens to a tokenizer from parsed datasets hold in memory.
+
+    Args:
+        tokenizer: The tokenizer.
+        train_data: List of strings, one per sample.
+        test_data: List of strings, one per sample.
+
+    Returns:
+       Tuple with:
+            tokenizer with updated vocabulary.
+            set of property tokens.
+            list of strings with training samples.
+            list of strings with testing samples.
+    """
+    num_tokens = len(tokenizer)
+    properties: Set = set()
+    all_tokens: Set = set()
+    for data in [train_data, test_data]:
+        for i, line in enumerate(data):
+            # Grow the set of all tokens in the dataset
+            toks = tokenizer.tokenize(line)
+            all_tokens = all_tokens.union(toks)
+            # Grow the set of all properties (assumes that the text follows the last `|`)
+            props = [
+                x.split(">")[0] + ">"
+                for x in line.split(tokenizer.expression_separator)[:-1]
+            ]
+            properties = properties.union(props)
+
+    # Finish adding new tokens
+    tokenizer.add_tokens(list(all_tokens))
+    tokenizer.update_vocab(all_tokens)
+    logger.info(f"Added {len(tokenizer)-num_tokens} new tokens to tokenizer.")
+
+    return tokenizer, properties, train_data, test_data
+
+
+def prepare_datasets_from_files(
+    tokenizer: ExpressionBertTokenizer,
+    train_path: str,
+    test_path: str,
+    augment: int = 0,
+) -> Tuple[ExpressionBertTokenizer, Set, List[str], List[str]]:
+    """
+    Converts datasets saved in provided `.csv` paths into RT-compatible datasets.
+    NOTE: Also adds the new tokens from train/test data to provided tokenizer.
+
+    Args:
+        tokenizer: The tokenizer.
+        train_path: Path to the training data.
+        test_path: Path to the testing data.
+        augment: Factor by which each training sample is augmented.
+
+    Returns:
+       Tuple with:
+            tokenizer with updated vocabulary.
+            set of property tokens.
+            list of strings with training samples.
+            list of strings with testing samples.
+    """
+
+    # Setup data transforms and augmentations
+    train_data: List[str] = []
+    test_data: List[str] = []
+    properties: List[str] = []
+
+    aug = AUGMENT_FACTORY.get(tokenizer.language, lambda x: x)
+    trans = TRANSFORM_FACTORY.get(tokenizer.language, lambda x: x)
+
+    for i, (data, path) in enumerate(
+        zip([train_data, test_data], [train_path, test_path])
+    ):
+
+        if not path.endswith(".csv"):
+            raise TypeError(f"Please provide a csv file not {path}.")
+
+        # Load data
+        df = pd.read_csv(path)
+        if "text" not in df.columns:
+            raise ValueError("Please provide text in the `text` column.")
+
+        if i == 1 and set(df.columns) != set(properties + ["text"]):
+            raise ValueError(
+                "Train and test data have to have identical columns, not "
+                f"{set(properties + ['text'])} and {set(df.columns)}."
+            )
+        properties = sorted(list(set(properties).union(list(df.columns))))
+        properties.remove("text")
+
+        # Parse data and create RT-compatible format
+        for i, row in df.iterrows():
+            line = "".join(
+                [
+                    f"<{p}>{row[p]:.3f}{tokenizer.expression_separator}"
+                    for p in properties
+                ]
+                + [trans(row.text)]  # type: ignore
+            )
+            data.append(line)
+
+        # Perform augmentation on training data if applicable
+        if i == 0 and augment is not None and augment > 1:
+            for _ in range(augment):
+                for i, row in df.iterrows():
+                    line = "".join(
+                        [
+                            f"<{p}>{row[p]:.3f}{tokenizer.expression_separator}"
+                            for p in properties
+                        ]
+                        + [trans(aug(row.text))]  # type: ignore
+                    )
+                    data.append(line)
+
+    return add_tokens_from_lists(
+        tokenizer=tokenizer, train_data=train_data, test_data=test_data
+    )
+
+
+def get_train_config_dict(
+    training_args: Dict[str, Any], properties: Set
+) -> Dict[str, Any]:
+    return {
+        "alternate_steps": training_args["alternate_steps"],
+        "reset_training_loss": True,
+        "cc_loss": training_args["cc_loss"],
+        "property_tokens": list(properties),
+        "cg_collator_params": {
+            "do_sample": False,
+            "property_tokens": list(properties),
+            "plm_probability": training_args["plm_probability"],
+            "max_span_length": training_args["max_span_length"],
+        },
+    }
+
+
+@dataclass
+class TransformersTrainingArgumentsCLI(TrainingArguments):
+    """
+    GT4SD ships with a CLI to launch training. This conflicts with some data types
+    native in `transformers.training_arguments.TrainingArguments` especially iterables
+    which cannot be easily passed from CLI.
+    Therefore, this class changes the affected attributes to CLI compatible datatypes.
+    """
+
+    label_names: Optional[str] = field(  # type: ignore
+        default=None,
+        metadata={
+            "help": "A string containing keys in your dictionary of inputs that correspond to the labels."
+            "A single string, but can contain multiple keys separated with comma: `key1,key2`"
+        },
+    )
+    report_to: Optional[str] = field(  # type: ignore
+        default=None,
+        metadata={
+            "help": "The list of integrations to report the results and logs to."
+            "A single string, but can contain multiple keys separated with comma: `i1,i2`"
+        },
+    )
+    sharded_ddp: str = field(
+        default="",
+        metadata={
+            "help": "Whether or not to use sharded DDP training (in distributed training only). The base option "
+            "should be `simple`, `zero_dp_2` or `zero_dp_3` and you can add CPU-offload to `zero_dp_2` or `zero_dp_3` "
+            "like this: zero_dp_2 offload` or `zero_dp_3 offload`. You can add auto-wrap to `zero_dp_2` or "
+            "with the same syntax: zero_dp_2 auto_wrap` or `zero_dp_3 auto_wrap`.",
+        },
+    )
+    tf32: Optional[str] = field(  # type: ignore
+        default="no",
+        metadata={
+            "help": (
+                "Whether to enable tf32 mode, available in Ampere and newer GPU architectures. This is an experimental"
+                " API and it may change."
+            )
+        },
+    )
+    disable_tqdm: Optional[str] = field(  # type: ignore
+        default="no",
+        metadata={"help": "Whether or not to disable the tqdm progress bars."},
+    )
+    greater_is_better: Optional[str] = field(  # type: ignore
+        default="no",
+        metadata={
+            "help": "Whether the `metric_for_best_model` should be maximized or not."
+        },
+    )
+    remove_unused_columns: Optional[str] = field(  # type: ignore
+        default="yes",
+        metadata={
+            "help": "Remove columns not required by the model when using an nlp.Dataset."
+        },
+    )
+    load_best_model_at_end: Optional[str] = field(  # type: ignore
+        default=None,
+        metadata={
+            "help": "Whether or not to load the best model found during training at the end of training."
+        },
+    )
+    ddp_find_unused_parameters: Optional[str] = field(  # type: ignore
+        default="no",
+        metadata={
+            "help": (
+                "When using distributed training, the value of the flag `find_unused_parameters` passed to "
+                "`DistributedDataParallel`."
+            )
+        },
+    )
+
+    def __post_init__(self):
+        """
+        Necessary because the our ArgumentParser (that is based on argparse) converts
+        empty strings to None. This is prohibitive since the HFTrainer relies on
+        them being actual strings. Only concerns a few arguments.
+        """
+        if self.sharded_ddp is None:
+            self.sharded_ddp = ""
+        if self.fsdp is None:
+            self.fsdp = ""
+
+        self.disable_tqdm = string_to_bool(self.disable_tqdm)
+        self.tf32 = string_to_bool(self.tf32)
+
+        super().__post_init__()
+
+
+def get_hf_training_arg_object(training_args: Dict[str, Any]) -> TrainingArguments:
+    """
+    A method to convert a training_args Dictionary into a HuggingFace
+    `TrainingArguments` object.
+    This routine also takes care of removing arguments that are not necessary.
+
+    Args:
+        training_args: A dictionary of training arguments.
+
+    Returns:
+        object of type `TrainingArguments`.
+    """
+
+    # Get attributes of parent class
+    org_attrs = dict(inspect.getmembers(TrainingArguments))
+
+    # Remove attributes that were specified by child classes
+    hf_training_args = {k: v for k, v in training_args.items() if k in org_attrs.keys()}
+
+    # Instantiate class object
+    hf_train_object = TrainingArguments(training_args["output_dir"])
+
+    # Set attributes manually (since this is a `dataclass` not everything can be passed
+    # to constructor)
+    for k, v in hf_training_args.items():
+        setattr(hf_train_object, k, v)
+
+    return hf_train_object
