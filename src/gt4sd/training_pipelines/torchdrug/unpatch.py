@@ -24,7 +24,9 @@
 import typing
 from typing import List
 
+import pkg_resources
 import torch
+from packaging import version
 from torch.optim.lr_scheduler import (  # type: ignore
     ChainedScheduler,
     ConstantLR,
@@ -41,29 +43,33 @@ from torch.optim.lr_scheduler import (  # type: ignore
     StepLR,
     _LRScheduler,
 )
-from torch.utils.data.dataset import (  # type: ignore
+from torch.utils.data.dataset import (
     ChainDataset,
     ConcatDataset,
     Dataset,
-    DFIterDataPipe,
     IterableDataset,
-    IterDataPipe,
-    MapDataPipe,
     Subset,
     TensorDataset,
 )
 
+OLD_TORCH: bool = False
 sane_datasets = [
     Dataset,
     ChainDataset,
     ConcatDataset,
-    DFIterDataPipe,
     IterableDataset,
-    IterDataPipe,
-    MapDataPipe,
     Subset,
     TensorDataset,
 ]
+
+if version.parse(pkg_resources.get_distribution("torch").version) <= version.parse(
+    "1.11"
+):
+    OLD_TORCH = True
+    from torch.utils.data.dataset import DFIterDataPipe, IterDataPipe, MapDataPipe
+
+    sane_datasets.extend([DFIterDataPipe, IterDataPipe, MapDataPipe])
+
 
 sane_schedulers = [
     _LRScheduler,
@@ -100,12 +106,14 @@ def fix_datasets(sane_datasets: List[Dataset]) -> None:
     torch.utils.data.dataset.Dataset = dataset  # type: ignore
     torch.utils.data.dataset.ChainDataset = sane_datasets[1]  # type: ignore
     torch.utils.data.dataset.ConcatDataset = sane_datasets[2]  # type: ignore
-    torch.utils.data.dataset.DFIterDataPipe = sane_datasets[3]  # type: ignore
-    torch.utils.data.dataset.IterableDataset = sane_datasets[4]  # type: ignore
-    torch.utils.data.dataset.IterDataPipe = sane_datasets[5]  # type: ignore
-    torch.utils.data.dataset.MapDataPipe = sane_datasets[6]  # type: ignore
-    torch.utils.data.dataset.Subset = sane_datasets[7]  # type: ignore
-    torch.utils.data.dataset.TensorDataset = sane_datasets[8]  # type: ignore
+    torch.utils.data.dataset.IterableDataset = sane_datasets[3]  # type: ignore
+    torch.utils.data.dataset.Subset = sane_datasets[4]  # type: ignore
+    torch.utils.data.dataset.TensorDataset = sane_datasets[5]  # type: ignore
+
+    if OLD_TORCH:
+        torch.utils.data.dataset.DFIterDataPipe = sane_datasets[6]  # type: ignore
+        torch.utils.data.dataset.IterDataPipe = sane_datasets[7]  # type: ignore
+        torch.utils.data.dataset.MapDataPipe = sane_datasets[8]  # type: ignore
 
     for ds in sane_datasets[1:]:
         if not issubclass(ds, dataset):
