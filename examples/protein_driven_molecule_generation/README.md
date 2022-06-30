@@ -1,9 +1,9 @@
 # Protein-driven molecule generation
 
-You can use the `PaccMann<sup>GP</sup>` model, a VAE pretrained on drug-like compounds from ChEMBL, to generate molecules with high binding affinity to a desired protein.
-`PaccMann<sup>GP</sup>` relies on Gaussian processes to navigate a static latent space of the pretrained VAE.
+You can use the **PaccMann<sup>GP</sup>** model, a VAE pretrained on drug-like compounds from ChEMBL, to generate molecules with high binding affinity to a desired protein.
+**PaccMann<sup>GP</sup>** relies on Gaussian processes to navigate a static latent space of the pretrained VAE.
 
-Say, you are interested in discovering potential inhibitors of the [JAK1 kinase (UniProt ID: P23458)](https://www.uniprot.org/uniprot/P23458). Then, leverage `PaccMann<sup>GP</sup>` as follows:
+Say, you are interested in discovering potential inhibitors of the [JAK1 kinase (UniProt ID: P23458)](https://www.uniprot.org/uniprot/P23458). Then, leverage **PaccMann<sup>GP</sup>** as follows:
 
 ```py
 from gt4sd.algorithms.controlled_sampling.paccmann_gp import PaccMannGPGenerator, PaccMannGP
