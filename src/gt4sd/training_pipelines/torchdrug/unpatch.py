@@ -66,7 +66,11 @@ if version.parse(pkg_resources.get_distribution("torch").version) <= version.par
     "1.11"
 ):
     OLD_TORCH = True
-    from torch.utils.data.dataset import DFIterDataPipe, IterDataPipe, MapDataPipe  # type: ignore
+    from torch.utils.data.dataset import (  # type: ignore
+        DFIterDataPipe,
+        IterDataPipe,
+        MapDataPipe,
+    )
 
     sane_datasets.extend([DFIterDataPipe, IterDataPipe, MapDataPipe])
 
