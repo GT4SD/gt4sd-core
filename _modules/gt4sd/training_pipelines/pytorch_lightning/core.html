@@ -194,6 +194,7 @@
 <span class="kn">from</span> <span class="nn">pytorch_lightning.callbacks.base</span> <span class="kn">import</span> <span class="n">Callback</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning.callbacks.early_stopping</span> <span class="kn">import</span> <span class="n">EarlyStopping</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning.callbacks.model_checkpoint</span> <span class="kn">import</span> <span class="n">ModelCheckpoint</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning.loggers</span> <span class="kn">import</span> <span class="n">TensorBoardLogger</span>
 
 <span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">TrainingPipeline</span><span class="p">,</span> <span class="n">TrainingPipelineArguments</span>
 
@@ -236,6 +237,7 @@
                 <span class="s2">&quot;save_top_k&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;save_top_k&quot;</span><span class="p">],</span>
                 <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">],</span>
                 <span class="s2">&quot;every_n_train_steps&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;every_n_train_steps&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;every_n_val_epochs&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;every_n_val_epochs&quot;</span><span class="p">],</span>
                 <span class="s2">&quot;save_last&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;save_last&quot;</span><span class="p">],</span>
             <span class="p">}</span>
         <span class="p">}</span>
@@ -246,9 +248,15 @@
             <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">],</span>
             <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;every_n_train_steps&quot;</span><span class="p">],</span>
             <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;save_last&quot;</span><span class="p">],</span>
+            <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;every_n_val_epochs&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
         <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;callbacks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_callbacks</span><span class="p">(</span><span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;callbacks&quot;</span><span class="p">])</span>
+
+        <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;logger&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">TensorBoardLogger</span><span class="p">(</span>
+            <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;save_dir&quot;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;basename&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">del</span> <span class="p">(</span><span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;save_dir&quot;</span><span class="p">],</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;basename&quot;</span><span class="p">])</span>
 
         <span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="o">**</span><span class="n">pl_trainer_args</span><span class="p">)</span>
         <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_and_model_modules</span><span class="p">(</span>
@@ -304,7 +312,7 @@
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;pl_trainer_args&quot;</span>
 
-    <span class="n">accelerator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+    <span class="n">accelerator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ddp&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Accelerator type.&quot;</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">accumulate_grad_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
@@ -316,10 +324,12 @@
     <span class="n">val_check_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot; How often to check the validation set.&quot;</span><span class="p">}</span>
     <span class="p">)</span>
-    <span class="n">default_root_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Default path for logs and output.&quot;</span><span class="p">}</span>
+    <span class="n">save_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;logs&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Save directory for logs and output.&quot;</span><span class="p">}</span>
     <span class="p">)</span>
-
+    <span class="n">basename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;lightning_logs&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Experiment name.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
     <span class="n">gradient_clip_val</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Gradient clipping value.&quot;</span><span class="p">}</span>
     <span class="p">)</span>
@@ -333,20 +343,20 @@
         <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Stop training once this number of epochs is reached.&quot;</span><span class="p">},</span>
     <span class="p">)</span>
-    <span class="n">resume_from_checkpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+    <span class="n">resume_from_checkpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path/URL of the checkpoint from which training is resumed.&quot;</span><span class="p">},</span>
     <span class="p">)</span>
-    <span class="n">gpus</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+    <span class="n">gpus</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of gpus to train on.&quot;</span><span class="p">},</span>
     <span class="p">)</span>
-    <span class="n">monitor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+    <span class="n">monitor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Quantity to monitor in order to store a checkpoint.&quot;</span><span class="p">},</span>
     <span class="p">)</span>
-    <span class="n">save_last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">save_last</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;When True, always saves the model at the end of the epoch to a file last.ckpt&quot;</span>
         <span class="p">},</span>
@@ -361,7 +371,7 @@
         <span class="n">default</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Quantity to monitor in order to store a checkpoint.&quot;</span><span class="p">},</span>
     <span class="p">)</span>
-    <span class="n">every_n_train_steps</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+    <span class="n">every_n_train_steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of training steps between checkpoints.&quot;</span><span class="p">},</span>
     <span class="p">)</span></div>
