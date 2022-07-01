@@ -32,6 +32,7 @@ from pytorch_lightning import LightningDataModule, LightningModule, Trainer
 from pytorch_lightning.callbacks.base import Callback
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
+from pytorch_lightning.loggers import TensorBoardLogger
 
 from ..core import TrainingPipeline, TrainingPipelineArguments
 
@@ -74,6 +75,7 @@ class PyTorchLightningTrainingPipeline(TrainingPipeline):
                 "save_top_k": pl_trainer_args["save_top_k"],
                 "mode": pl_trainer_args["mode"],
                 "every_n_train_steps": pl_trainer_args["every_n_train_steps"],
+                "every_n_val_epochs": pl_trainer_args["every_n_val_epochs"],
                 "save_last": pl_trainer_args["save_last"],
             }
         }
@@ -84,9 +86,15 @@ class PyTorchLightningTrainingPipeline(TrainingPipeline):
             pl_trainer_args["mode"],
             pl_trainer_args["every_n_train_steps"],
             pl_trainer_args["save_last"],
+            pl_trainer_args["every_n_val_epochs"],
         )
 
         pl_trainer_args["callbacks"] = self.add_callbacks(pl_trainer_args["callbacks"])
+
+        pl_trainer_args["logger"] = TensorBoardLogger(
+            pl_trainer_args["save_dir"], name=pl_trainer_args["basename"]
+        )
+        del (pl_trainer_args["save_dir"], pl_trainer_args["basename"])
 
         trainer = Trainer(**pl_trainer_args)
         data_module, model_module = self.get_data_and_model_modules(
@@ -142,7 +150,7 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
 
     __name__ = "pl_trainer_args"
 
-    accelerator: Union[str, None] = field(
+    accelerator: Optional[str] = field(
         default="ddp", metadata={"help": "Accelerator type."}
     )
     accumulate_grad_batches: int = field(
@@ -154,10 +162,12 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
     val_check_interval: int = field(
         default=5000, metadata={"help": " How often to check the validation set."}
     )
-    default_root_dir: Union[str, None] = field(
-        default=None, metadata={"help": "Default path for logs and output."}
+    save_dir: Optional[str] = field(
+        default="logs", metadata={"help": "Save directory for logs and output."}
     )
-
+    basename: Optional[str] = field(
+        default="lightning_logs", metadata={"help": "Experiment name."}
+    )
     gradient_clip_val: float = field(
         default=0.0, metadata={"help": "Gradient clipping value."}
     )
@@ -171,20 +181,20 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
         default=3,
         metadata={"help": "Stop training once this number of epochs is reached."},
     )
-    resume_from_checkpoint: Union[str, None] = field(
+    resume_from_checkpoint: Optional[str] = field(
         default=None,
         metadata={"help": "Path/URL of the checkpoint from which training is resumed."},
     )
-    gpus: Union[int, None] = field(
+    gpus: Optional[int] = field(
         default=-1,
         metadata={"help": "Number of gpus to train on."},
     )
-    monitor: Union[str, None] = field(
+    monitor: Optional[str] = field(
         default=None,
         metadata={"help": "Quantity to monitor in order to store a checkpoint."},
     )
-    save_last: bool = field(
-        default=True,
+    save_last: Optional[bool] = field(
+        default=None,
         metadata={
             "help": "When True, always saves the model at the end of the epoch to a file last.ckpt"
         },
@@ -199,7 +209,7 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
         default="min",
         metadata={"help": "Quantity to monitor in order to store a checkpoint."},
     )
-    every_n_train_steps: Union[int, None] = field(
+    every_n_train_steps: Optional[int] = field(
         default=None,
         metadata={"help": "Number of training steps between checkpoints."},
     )
