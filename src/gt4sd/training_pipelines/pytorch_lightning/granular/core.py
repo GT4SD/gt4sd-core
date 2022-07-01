@@ -37,7 +37,7 @@ from ....frameworks.granular.dataloader.dataset import build_dataset_and_archite
 from ....frameworks.granular.ml.models import AUTOENCODER_ARCHITECTURES
 from ....frameworks.granular.ml.module import GranularModule
 from ...core import TrainingPipelineArguments
-from ..core import PyTorchLightningTrainingPipeline
+from ..core import PytorchLightningTrainingArguments, PyTorchLightningTrainingPipeline
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
@@ -117,6 +117,32 @@ class GranularTrainingPipeline(PyTorchLightningTrainingPipeline):
         )
 
         return dm, module
+
+
+@dataclass
+class GranularPytorchLightningTrainingArguments(PytorchLightningTrainingArguments):
+    """
+    Arguments related to pytorch lightning trainer.
+    """
+
+    __name__ = "pl_trainer_args"
+
+    every_n_val_epochs: Optional[int] = field(
+        default=5,
+        metadata={"help": "Number of training epochs between checkpoints."},
+    )
+    auto_lr_find: bool = field(
+        default=True,
+        metadata={
+            "help": "Select whether to run a learning rate finder to try to optimize initial learning for faster convergence."
+        },
+    )
+    profiler: Optional[str] = field(
+        default="simple",
+        metadata={
+            "help": "To profile individual steps during training and assist in identifying bottlenecks."
+        },
+    )
 
 
 @dataclass
