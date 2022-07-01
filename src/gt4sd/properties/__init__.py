@@ -21,35 +21,3 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Callable, Dict
-
-from rdkit.Chem import Mol
-
-from ...domains.materials import MacroMolecule, Property
-from .core import (
-    aliphatic_index,
-    aromaticity,
-    boman_index,
-    charge,
-    charge_density,
-    hydrophobic_ratio,
-    instability,
-    isoelectric_point,
-    length,
-)
-
-# All functions can be called with either a SMILES or a Mol object.
-PROTEIN_FACTORY: Dict[str, Callable[[MacroMolecule], Property]] = {
-    # Inherent properties
-    "length": length,
-    # Rule-based properties
-    "boman_index": boman_index,
-    "charge_density": charge_density,
-    "charge": charge,
-    "aliphaticity": aliphatic_index,
-    "hydrophobicity": hydrophobic_ratio,
-    "isoelectric_point": isoelectric_point,
-    "aromaticity": aromaticity,
-    "instability": instability,
-    # Properties predicted by ML models
-}

@@ -25,31 +25,57 @@ from typing import Callable, Dict
 
 from rdkit.Chem import Mol
 
-from ...domains.materials import MacroMolecule, Property
+from ...domains.materials import Property, SmallMolecule
 from .core import (
-    aliphatic_index,
-    aromaticity,
-    boman_index,
-    charge,
-    charge_density,
-    hydrophobic_ratio,
-    instability,
-    isoelectric_point,
-    length,
+    bertz,
+    esol,
+    is_scaffold,
+    lipinski,
+    logp,
+    molecular_weight,
+    number_of_aromatic_rings,
+    number_of_atoms,
+    number_of_h_acceptors,
+    number_of_h_donors,
+    number_of_heterocycles,
+    number_of_large_rings,
+    number_of_rings,
+    number_of_rotatable_bonds,
+    number_of_stereocenters,
+    plogp,
+    qed,
+    sas,
+    scscore,
+    similarity_to_seed,
+    tpsa,
 )
+from .utils import get_similarity_fn  # type: ignore
 
 # All functions can be called with either a SMILES or a Mol object.
-PROTEIN_FACTORY: Dict[str, Callable[[MacroMolecule], Property]] = {
+MOLECULE_FACTORY: Dict[str, Callable[[SmallMolecule], Property]] = {
     # Inherent properties
-    "length": length,
+    "molecular_weight": molecular_weight,
+    "number_of_aromatic_rings": number_of_aromatic_rings,
+    "number_of_h_acceptors": number_of_h_acceptors,
+    "number_of_h_donors": number_of_h_donors,
+    "number_of_atoms": number_of_atoms,
+    "number_of_rings": number_of_rings,
+    "number_of_rotatable_bonds": number_of_rotatable_bonds,
+    "number_of_large_rings": number_of_large_rings,
+    "number_of_heterocycles": number_of_heterocycles,
+    "number_of_stereocenters": number_of_stereocenters,
+    "is_scaffold": is_scaffold,
     # Rule-based properties
-    "boman_index": boman_index,
-    "charge_density": charge_density,
-    "charge": charge,
-    "aliphaticity": aliphatic_index,
-    "hydrophobicity": hydrophobic_ratio,
-    "isoelectric_point": isoelectric_point,
-    "aromaticity": aromaticity,
-    "instability": instability,
+    "bertz": bertz,
+    "tpsa": tpsa,
+    "logp": logp,
+    "qed": qed,
+    "plog": plogp,
+    "penalized_logp": plogp,
+    "lipinski": lipinski,
+    "sas": sas,
+    "esol": esol,
+    "similarity": similarity_to_seed,
     # Properties predicted by ML models
+    "scscore": scscore,
 }
