@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Any, Callable
 
 from rdkit import Chem
 from guacamol.utils.descriptors import bertz as _bertz
@@ -34,6 +34,8 @@ _esol = ESOL()
 _lipinski = Lipinski()
 _penalized_logp = PenalizedLogP()
 
+from ...properties import SmallMoleculeProperty
+
 
 def plogp(mol: SmallMolecule) -> float:
     """Calculate the penalized logP of a molecule. This is the logP minus the number of
@@ -46,6 +48,31 @@ def plogp(mol: SmallMolecule) -> float:
     NOTE: Check the initial arXiv for the plogp reference: https://arxiv.org/abs/1610.02415v1
     """
     return _penalized_logp(mol)
+
+
+class Plogp(SmallMoleculeProperty):
+    """Calculate the penalized logP of a molecule. This is the logP minus the number of
+    rings with > 6 atoms minus the SAS.
+
+    Gómez-Bombarelli, R., Wei, J. N., Duvenaud, D., Hernández-Lobato, J. M., Sánchez-Lengeling, B., Sheberla, D., ... & Aspuru-Guzik, A. (2018).
+    Automatic chemical design using a data-driven continuous representation of molecules.
+    ACS central science, 4(2), 268-276.
+
+    NOTE: Check the initial arXiv for the plogp reference: https://arxiv.org/abs/1610.02415v1
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def __call__(self, mol: SmallMolecule) -> float:
+        """
+        Args:
+            mol (SmallMolecule)
+
+        Returns:
+            float: property value
+        """
+        return _penalized_logp(mol)
 
 
 def lipinski(mol: SmallMolecule) -> int:
