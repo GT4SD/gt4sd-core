@@ -26,6 +26,7 @@
 import json
 import logging
 import os
+from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
 
 import torch
@@ -177,7 +178,7 @@ class GPConditionalGenerator:
         if isinstance(target, str):
             target_dictionary = json.loads(target)
         elif isinstance(target, dict):
-            target_dictionary = target
+            target_dictionary = deepcopy(target)
         else:
             raise ValueError(
                 f"{target} of type {type(target)} is not supported: provide 'str' or 'Dict[str, Dict[str, Any]]'"
