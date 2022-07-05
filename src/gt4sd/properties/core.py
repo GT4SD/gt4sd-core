@@ -1,15 +1,19 @@
-from ..domains.materials import Property, Protein, SmallMolecule, MacroMolecule
+from typing import Any, Callable, Union
+
 from pydantic import BaseModel
-from typing import Any, Union, Callable
+
+from ..domains.materials import MacroMolecule, Property, Protein, SmallMolecule
+
 
 class PropertyPredictorConfiguration(BaseModel):
-    """Abstract class for property prediction in molecules and proteins.
-    """
+    """Abstract class for property prediction in molecules and proteins."""
+
     pass
 
+
 class PropertyPredictor(BaseModel):
-    """Property predictor.
-    """
+    """Property predictor."""
+
     def __init__(self, parameters: PropertyPredictorConfiguration = None) -> None:
         """
         Args:
@@ -39,30 +43,34 @@ class PropertyPredictor(BaseModel):
         """
         pass
 
-    def __call__(self, sample : Any) -> Property:
+    def __call__(self, sample: Any) -> Property:
         """generic call method for all properties.
 
-        pp = PropertyPredictor(params) 
+        pp = PropertyPredictor(params)
         property_value = pp(sample)
 
         Args:
-            sample: 
+            sample:
 
         Returns:
             Property:
         """
-        pass 
+        pass
+
 
 class CallablePropertyPredictor(PropertyPredictor):
-
-    def __init__(self, parameters: PropertyPredictorConfiguration, callable_fn: Callable) -> None:
+    def __init__(
+        self, parameters: PropertyPredictorConfiguration, callable_fn: Callable
+    ) -> None:
         self.callable_fn = callable_fn
         super().__init__(parameters=parameters)
-    
-    def __call__(self, sample : Union[SmallMolecule, MacroMolecule, Protein]) -> Property:
+
+    def __call__(
+        self, sample: Union[SmallMolecule, MacroMolecule, Protein]
+    ) -> Property:
         """generic call method for all properties.
 
-        pp = PropertyPredictor(params) 
+        pp = PropertyPredictor(params)
         property_value = pp(sample)
 
         Args:
@@ -73,16 +81,18 @@ class CallablePropertyPredictor(PropertyPredictor):
         """
         return self.callable_fn(sample)
 
+
 class SmallMoleculeProperty(PropertyPredictor):
     def __init__(self) -> None:
         super().__init__()
-        
+
     def __call__(self, molecule: SmallMolecule) -> Property:
         pass
+
 
 class ProteinProperty(PropertyPredictor):
     def __init__(self) -> None:
         super().__init__()
-        
+
     def __call__(self, protein: MacroMolecule) -> Property:
         pass

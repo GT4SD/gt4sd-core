@@ -23,7 +23,7 @@
 #
 """Types, classes, validation, etc. for the material domain."""
 
-from typing import List, NewType, Tuple, Union, Dict, Any
+from typing import Any, Dict, List, NewType, Tuple, Union
 
 import numpy as np
 import pandas as pd

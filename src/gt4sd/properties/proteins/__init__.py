@@ -21,13 +21,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Callable, Dict, Union
-from ..core import PropertyPredictor, CallablePropertyPredictor
-
+from typing import Any, Callable, Dict, Union
 
 from rdkit.Chem import Mol
 
-from ...domains.materials import MacroMolecule, Property
+from ...domains.materials import MacroMolecule, Property, SmallMolecule
+from ..core import CallablePropertyPredictor, PropertyPredictor
 from .core import (
     AliphaticIndex,
     Aromaticity,
@@ -41,7 +40,7 @@ from .core import (
 )
 
 # All functions can be called with either a SMILES or a Mol object.
-PROTEIN_FACTORY: Dict[str, Union[CallablePropertyPredictor, PropertyPredictor]] = {
+PROTEIN_FACTORY: Dict[str, Any] = {
     # Inherent properties
     "length": Length,
     # Rule-based properties

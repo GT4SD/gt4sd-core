@@ -1,4 +1,4 @@
-from ...domains.materials import MacroMolecule
+from ..core import MacroMolecule
 from .utils import get_descriptor
 
 

@@ -22,13 +22,13 @@
 # SOFTWARE.
 #
 
-from typing import Dict, Type
-from .core import PropertyPredictor
-from .molecules import MOLECULE_FACTORY
-from .proteins import PROTEIN_FACTORY 
+from typing import Any, Dict, Type
 
-PROPERTY_PREDICTION_FACTORY: Dict[str, Type[PropertyPredictor]] = {
-}
+from .core import CallablePropertyPredictor, PropertyPredictor
+from .molecules import MOLECULE_FACTORY
+from .proteins import PROTEIN_FACTORY
+
+PROPERTY_PREDICTION_FACTORY: Dict[str, Any] = {}
 
 PROPERTY_PREDICTION_FACTORY.update(MOLECULE_FACTORY)
 PROPERTY_PREDICTION_FACTORY.update(PROTEIN_FACTORY)

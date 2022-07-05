@@ -21,11 +21,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Callable, Dict, Type, Union
-from ..core import PropertyPredictor, CallablePropertyPredictor
+from typing import Any, Callable, Dict, Type, Union
 
 from rdkit.Chem import Mol
 
+from ..core import CallablePropertyPredictor, PropertyPredictor
 from .core import (
     Bertz,
     Esol,
@@ -52,7 +52,7 @@ from .core import (
 from .utils import get_similarity_fn  # type: ignore
 
 # All functions can be called with either a SMILES or a Mol object.
-MOLECULE_FACTORY: Dict[str, Union[CallablePropertyPredictor, PropertyPredictor]] = {
+MOLECULE_FACTORY: Dict[str, Any] = {
     # Inherent properties
     "molecular_weight": MolecularWeight,
     "number_of_aromatic_rings": NumberAromaticRings,

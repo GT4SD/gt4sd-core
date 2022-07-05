@@ -1,3 +1,5 @@
+from typing import Callable
+
 from rdkit import Chem
 from guacamol.utils.descriptors import bertz as _bertz
 from guacamol.utils.descriptors import (
@@ -22,9 +24,8 @@ from paccmann_generator.drug_evaluators import (  # SIDER,; ClinTox,; OrganDB,; 
 from rdkit.Chem.rdMolDescriptors import CalcNumAtomStereoCenters, CalcNumHeterocycles
 from rdkit.Chem.Scaffolds.MurckoScaffold import MurckoScaffoldSmiles
 
-from ...domains.materials import Property, SmallMolecule, MacroMolecule, Protein
+from ..core import Property, SmallMolecule
 from .utils import to_mol, to_smiles
-from typing import Dict, Tuple, Type, Callable
 
 # Instantiate classes for faster inference
 _sas = SAS()
@@ -46,6 +47,7 @@ def plogp(mol: SmallMolecule) -> float:
     """
     return _penalized_logp(mol)
 
+
 def lipinski(mol: SmallMolecule) -> int:
     """
     Calculate whether a molecule adheres to the Lipinski-rule-of-5.
@@ -58,6 +60,7 @@ def lipinski(mol: SmallMolecule) -> int:
     """
     return int(_lipinski(mol)[0])
 
+
 def esol(mol: SmallMolecule) -> float:
     """Estimate the water solubility of a molecule.
 
@@ -67,6 +70,7 @@ def esol(mol: SmallMolecule) -> float:
 
     """
     return _esol(mol)
+
 
 def scscore(mol: SmallMolecule) -> float:
     """Calculate the synthetic complexity score (SCScore) of a molecule.
@@ -89,6 +93,7 @@ def sas(mol: SmallMolecule) -> float:
     """
     return _sas(mol)
 
+
 def bertz(mol: SmallMolecule) -> float:
     """Calculate Bertz index of a molecule.
 
@@ -109,6 +114,7 @@ def tpsa(mol: SmallMolecule) -> float:
     Journal of medicinal chemistry, 43(20), 3714-3717.
     """
     return _tpsa(to_mol(mol))
+
 
 def logp(mol: SmallMolecule) -> float:
     """
@@ -223,7 +229,6 @@ def activity_against_target(
 
     """
     return affinity_fn(to_smiles(mol))
-
 
 
 # TODO: Need to put the trained models on COS and implement caching logic
