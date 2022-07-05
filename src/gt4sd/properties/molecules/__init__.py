@@ -21,61 +21,61 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Callable, Dict
+from typing import Callable, Dict, Type, Union
+from ..core import PropertyPredictor, CallablePropertyPredictor
 
 from rdkit.Chem import Mol
 
-from ...domains.materials import Property, SmallMolecule
 from .core import (
-    bertz,
-    esol,
-    is_scaffold,
-    lipinski,
-    logp,
-    molecular_weight,
-    number_of_aromatic_rings,
-    number_of_atoms,
-    number_of_h_acceptors,
-    number_of_h_donors,
-    number_of_heterocycles,
-    number_of_large_rings,
-    number_of_rings,
-    number_of_rotatable_bonds,
-    number_of_stereocenters,
-    plogp,
-    qed,
-    sas,
-    scscore,
-    similarity_to_seed,
-    tpsa,
+    Bertz,
+    Esol,
+    IsScaffold,
+    Lipinski,
+    Logp,
+    MolecularWeight,
+    NumberAromaticRings,
+    NumberAtoms,
+    NumberHAcceptors,
+    NumberHDonors,
+    NumberHeterocycles,
+    NumberLargeRings,
+    NumberRings,
+    NumberRotatableBonds,
+    NumberStereocenters,
+    Plogp,
+    Qed,
+    Sas,
+    Scscore,
+    SimilaritySeed,
+    Tpsa,
 )
 from .utils import get_similarity_fn  # type: ignore
 
 # All functions can be called with either a SMILES or a Mol object.
-MOLECULE_FACTORY: Dict[str, Callable[[SmallMolecule], Property]] = {
+MOLECULE_FACTORY: Dict[str, Union[CallablePropertyPredictor, PropertyPredictor]] = {
     # Inherent properties
-    "molecular_weight": molecular_weight,
-    "number_of_aromatic_rings": number_of_aromatic_rings,
-    "number_of_h_acceptors": number_of_h_acceptors,
-    "number_of_h_donors": number_of_h_donors,
-    "number_of_atoms": number_of_atoms,
-    "number_of_rings": number_of_rings,
-    "number_of_rotatable_bonds": number_of_rotatable_bonds,
-    "number_of_large_rings": number_of_large_rings,
-    "number_of_heterocycles": number_of_heterocycles,
-    "number_of_stereocenters": number_of_stereocenters,
-    "is_scaffold": is_scaffold,
+    "molecular_weight": MolecularWeight,
+    "number_of_aromatic_rings": NumberAromaticRings,
+    "number_of_h_acceptors": NumberHAcceptors,
+    "number_of_h_donors": NumberHDonors,
+    "number_of_atoms": NumberAtoms,
+    "number_of_rings": NumberRings,
+    "number_of_rotatable_bonds": NumberRotatableBonds,
+    "number_of_large_rings": NumberLargeRings,
+    "number_of_heterocycles": NumberHeterocycles,
+    "number_of_stereocenters": NumberStereocenters,
+    "is_scaffold": IsScaffold,
     # Rule-based properties
-    "bertz": bertz,
-    "tpsa": tpsa,
-    "logp": logp,
-    "qed": qed,
-    "plog": plogp,
-    "penalized_logp": plogp,
-    "lipinski": lipinski,
-    "sas": sas,
-    "esol": esol,
-    "similarity": similarity_to_seed,
+    "bertz": Bertz,
+    "tpsa": Tpsa,
+    "logp": Logp,
+    "qed": Qed,
+    "plogp": Plogp,
+    "penalized_logp": Plogp,
+    "lipinski": Lipinski,
+    "sas": Sas,
+    "esol": Esol,
+    "similarity_seed": SimilaritySeed,
     # Properties predicted by ML models
-    "scscore": scscore,
+    "scscore": Scscore,
 }

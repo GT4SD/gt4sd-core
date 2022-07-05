@@ -23,7 +23,7 @@
 #
 """Types, classes, validation, etc. for the material domain."""
 
-from typing import List, NewType, Tuple, Union
+from typing import List, NewType, Tuple, Union, Dict, Any
 
 import numpy as np
 import pandas as pd
@@ -41,7 +41,7 @@ Omics = Union[np.ndarray, pd.Series]
 PAG = SMILES
 Molecule = Union[SmallMolecule, MacroMolecule]
 Sequence = str
-Property = Union[float, int]
+Property = Union[float, int, Dict[str, Any]]
 
 
 def check_smiles(smiles: SMILES):

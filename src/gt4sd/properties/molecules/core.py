@@ -1,265 +1,321 @@
+from dataclasses import field
 from typing import Any, Callable
 
-from rdkit import Chem
-from guacamol.utils.descriptors import bertz as _bertz
-from guacamol.utils.descriptors import (
-    logP,
-    mol_weight,
-    num_aromatic_rings,
-    num_atoms,
-    num_H_acceptors,
-    num_H_donors,
-    num_rings,
-    num_rotatable_bonds,
-)
-from guacamol.utils.descriptors import qed as _qed
-from guacamol.utils.descriptors import tpsa as _tpsa
-from paccmann_generator.drug_evaluators import (  # SIDER,; ClinTox,; OrganDB,; Tox21,
-    ESOL,
-    SAS,
-    Lipinski,
-    PenalizedLogP,
-    SCScore,
-)
-from rdkit.Chem.rdMolDescriptors import CalcNumAtomStereoCenters, CalcNumHeterocycles
-from rdkit.Chem.Scaffolds.MurckoScaffold import MurckoScaffoldSmiles
 
-from ...domains.materials import Property, SmallMolecule
+from ...domains.materials import Property, SmallMolecule, MacroMolecule, Protein
 from .utils import to_mol, to_smiles
+from typing import Dict, Tuple, Type, Union
 
-# Instantiate classes for faster inference
-_sas = SAS()
-_sccore = SCScore(score_scale=5, fp_len=1024, fp_rad=2)
-_esol = ESOL()
-_lipinski = Lipinski()
-_penalized_logp = PenalizedLogP()
+from .functions import (
+    activity_against_target,
+    bertz,
+    esol,
+    is_scaffold,
+    lipinski,
+    logp,
+    molecular_weight,
+    number_of_aromatic_rings,
+    number_of_atoms,
+    number_of_h_acceptors,
+    number_of_h_donors,
+    number_of_heterocycles,
+    number_of_large_rings,
+    number_of_rings,
+    number_of_rotatable_bonds,
+    number_of_stereocenters,
+    plogp,
+    qed,
+    sas,
+    scscore,
+    similarity_to_seed,
+    tpsa,
+)
 
-from ...properties import SmallMoleculeProperty
+from dataclasses import field
+
+# CALLABLE_FUNCTIONS_FACTORY = {}
+
+from ..core import PropertyPredictor, PropertyPredictorConfiguration, CallablePropertyPredictor
+
+# class CallableFactory:
+
+#     @staticmethod
+#     def get(callable: Callable) -> PropertyPredictor:
+#         return Callable
+
+class PlogpParameters(PropertyPredictorConfiguration):
+    a_parameter: int = field(
+        default=0,
+        metadata=dict(description=""),
+    )
+
+class LipinskiParameters(PropertyPredictorConfiguration):
+    a_parameter: int = field(
+        default=0,
+        metadata=dict(description=""),
+    )
+
+class EsolParameters(PropertyPredictorConfiguration):
+    a_parameter: int = field(
+        default=0,
+        metadata=dict(description=""),
+    )
+
+class ScscoreParameters(PropertyPredictorConfiguration):
+    score_scale: int = field(
+        default=5,
+        metadata=dict(description=""),
+    )
+
+    fp_len: int = field(
+        default=1024,
+        metadata=dict(description=""),
+    )
+
+    fp_rad: int = field(
+        default=2,
+        metadata=dict(description=""),
+    )
+
+class SasParameters(PropertyPredictorConfiguration):
+    a_parameter: int = field(
+        default=0,
+        metadata=dict(description=""),
+    )
+
+class BertzParameters(PropertyPredictorConfiguration):
+    a_parameter: int = field(
+        default=0,
+        metadata=dict(description=""),
+    )
+
+class TpsaParameters(PropertyPredictorConfiguration):
+    a_parameter: int = field(
+        default=0,
+        metadata=dict(description=""),
+    )
+
+class LogpParameters(PropertyPredictorConfiguration):
+    a_parameter: int = field(
+        default=0,
+        metadata=dict(description=""),
+    )
+
+class QedParameters(PropertyPredictorConfiguration):
+    a_parameter: int = field(
+        default=0,
+        metadata=dict(description=""),
+    )
+
+class NumberHAcceptorsParameters(PropertyPredictorConfiguration):
+    pass
+
+class NumberAtomsParameters(PropertyPredictorConfiguration):
+    pass
+
+class NumberHDonorsParameters(PropertyPredictorConfiguration):
+    pass
+
+class NumberAromaticRingsParameters(PropertyPredictorConfiguration):
+    pass
+
+class NumberRingsParameters(PropertyPredictorConfiguration):
+    pass
+
+class NumberRotatableBondsParameters(PropertyPredictorConfiguration):
+    pass
+
+class NumberLargeRingsParameters(PropertyPredictorConfiguration):
+    pass
+
+class MolecularWeightParameters(PropertyPredictorConfiguration):
+    pass
+
+class IsScaffoldParameters(PropertyPredictorConfiguration):
+    pass
+
+class NumberHeterocyclesParameters(PropertyPredictorConfiguration):
+    pass
+
+class NumberStereocentersParameters(PropertyPredictorConfiguration):
+    pass
+
+class SimilaritySeedParameters(PropertyPredictorConfiguration):
+    pass
+
+class ActivityAgainstTargetParameters(PropertyPredictorConfiguration):
+    pass
 
 
-def plogp(mol: SmallMolecule) -> float:
+#__________________________________________________________________________________________________
+class Plogp(CallablePropertyPredictor):
     """Calculate the penalized logP of a molecule. This is the logP minus the number of
     rings with > 6 atoms minus the SAS.
-
-    Gómez-Bombarelli, R., Wei, J. N., Duvenaud, D., Hernández-Lobato, J. M., Sánchez-Lengeling, B., Sheberla, D., ... & Aspuru-Guzik, A. (2018).
-    Automatic chemical design using a data-driven continuous representation of molecules.
-    ACS central science, 4(2), 268-276.
-
-    NOTE: Check the initial arXiv for the plogp reference: https://arxiv.org/abs/1610.02415v1
-    """
-    return _penalized_logp(mol)
-
-
-class Plogp(SmallMoleculeProperty):
-    """Calculate the penalized logP of a molecule. This is the logP minus the number of
-    rings with > 6 atoms minus the SAS.
-
-    Gómez-Bombarelli, R., Wei, J. N., Duvenaud, D., Hernández-Lobato, J. M., Sánchez-Lengeling, B., Sheberla, D., ... & Aspuru-Guzik, A. (2018).
-    Automatic chemical design using a data-driven continuous representation of molecules.
-    ACS central science, 4(2), 268-276.
-
-    NOTE: Check the initial arXiv for the plogp reference: https://arxiv.org/abs/1610.02415v1
     """
 
-    def __init__(self) -> None:
-        super().__init__()
-
-    def __call__(self, mol: SmallMolecule) -> float:
-        """
-        Args:
-            mol (SmallMolecule)
-
-        Returns:
-            float: property value
-        """
-        return _penalized_logp(mol)
+    def __init__(self, parameters: PlogpParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=plogp)
 
 
-def lipinski(mol: SmallMolecule) -> int:
-    """
-    Calculate whether a molecule adheres to the Lipinski-rule-of-5.
+class Lipinski(CallablePropertyPredictor):
+    """Calculate whether a molecule adheres to the Lipinski-rule-of-5.
     A crude approximation of druglikeness.
-
-    Lipinski, C. A., Lombardo, F., Dominy, B. W., & Feeney, P. J. (1997).
-    Experimental and computational approaches to estimate solubility and permeability in
-    drug discovery and development settings.
-    Advanced drug delivery reviews, 23(1-3), 3-25.
     """
-    return int(_lipinski(mol)[0])
 
+    def __init__(self, parameters: LipinskiParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=lipinski)
 
-def esol(mol: SmallMolecule) -> float:
+class Esol(CallablePropertyPredictor):
     """Estimate the water solubility of a molecule.
-
-    Delaney, J. S. (2004).
-    ESOL: estimating aqueous solubility directly from molecular structure.
-    Journal of chemical information and computer sciences, 44(3), 1000-1005.
-
     """
-    return _esol(mol)
+
+    def __init__(self, parameters: EsolParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=esol)
 
 
-def scscore(mol: SmallMolecule) -> float:
+class Scscore(CallablePropertyPredictor):
     """Calculate the synthetic complexity score (SCScore) of a molecule.
-
-    Coley, C. W., Rogers, L., Green, W. H., & Jensen, K. F. (2018).
-    SCScore: synthetic complexity learned from a reaction corpus.
-    Journal of chemical information and modeling, 58(2), 252-261.
-
     """
-    return _sccore(mol)
+
+    def __init__(self, parameters: ScscoreParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=scscore)
 
 
-def sas(mol: SmallMolecule) -> float:
-    """Calculate the synthetic accessibility score (SAS) for a molecule
-
-    Ertl, P., & Schuffenhauer, A. (2009).
-    Estimation of synthetic accessibility score of drug-like molecules based on molecular
-    complexity and fragment contributions.
-    Journal of cheminformatics, 1(1), 1-11.
+class Sas(CallablePropertyPredictor):
+    """Calculate the synthetic accessibility score (SAS) for a molecule.
     """
-    return _sas(mol)
 
+    def __init__(self, parameters: SasParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=sas)
 
-def bertz(mol: SmallMolecule) -> float:
+class Bertz(CallablePropertyPredictor):
     """Calculate Bertz index of a molecule.
-
-    Bertz, S. H. (1981).
-    The first general index of molecular complexity.
-    Journal of the American Chemical Society, 103(12), 3599-3601.
     """
-    return _bertz(to_mol(mol))
+
+    def __init__(self, parameters: BertzParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=bertz)
 
 
-def tpsa(mol: SmallMolecule) -> float:
+class Tpsa(CallablePropertyPredictor):
+    """Calculate the total polar surface area of a molecule.
     """
-    Calculate the total polar surface area of a molecule.
 
-    Ertl, P., Rohde, B., & Selzer, P. (2000).
-    Fast calculation of molecular polar surface area as a sum of fragment-based
-    contributions and its application to the prediction of drug transport properties.
-    Journal of medicinal chemistry, 43(20), 3714-3717.
+    def __init__(self, parameters: TpsaParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=tpsa)
+
+
+class Logp(CallablePropertyPredictor):
+    """Calculates the partition coefficient of a molecule.
     """
-    return _tpsa(to_mol(mol))
 
+    def __init__(self, parameters: LogpParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=logp)
 
-def logp(mol: SmallMolecule) -> float:
+class Qed(CallablePropertyPredictor):
+    """Calculate the quantitative estimate of drug-likeness (QED) of a molecule.
     """
-    Calculates the partition coefficient of a molecule.
 
-    Wildman, S. A., & Crippen, G. M. (1999).
-    Prediction of physicochemical parameters by atomic contributions.
-    Journal of chemical information and computer sciences, 39(5), 868-873.
+    def __init__(self, parameters: QedParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=qed)
 
+class NumberHAcceptors(CallablePropertyPredictor):
+    """Calculate number of H acceptors of a molecule.
     """
-    return logP(to_mol(mol))
 
+    def __init__(self, parameters: NumberHAcceptorsParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=number_of_h_acceptors)
 
-def qed(mol: SmallMolecule) -> float:
+class NumberAtoms(CallablePropertyPredictor):
+    """Calculate number of atoms of a molecule.
     """
-    Calculate the quantitative estimate of drug-likeness (QED) of a molecule.
 
-    Bickerton, G. R., Paolini, G. V., Besnard, J., Muresan, S., & Hopkins, A. L. (2012).
-    Quantifying the chemical beauty of drugs.
-    Nature chemistry, 4(2), 90-98.
+    def __init__(self, parameters: NumberAtomsParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=number_of_atoms)
+
+class NumberHDonors(CallablePropertyPredictor):
+    """Calculate number of H donors of a molecule.
     """
-    return _qed(to_mol(mol))
+
+    def __init__(self, parameters: NumberHDonorsParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=number_of_h_donors)
+
+class NumberAromaticRings(CallablePropertyPredictor):
+    """Calculate number of aromatic rings of a molecule.
+    """
+
+    def __init__(self, parameters: NumberAromaticRingsParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=number_of_aromatic_rings)
 
 
-def number_of_h_acceptors(mol: SmallMolecule) -> int:
-    """Calculate number of H acceptors of a molecule."""
-    return num_H_acceptors(to_mol(mol))
+class NumberRings(CallablePropertyPredictor):
+    """Calculate number of rings of a molecule.
+    """
+
+    def __init__(self, parameters: NumberRingsParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=number_of_rings)
 
 
-def number_of_atoms(mol: SmallMolecule) -> int:
-    """Calculate number of atoms of a molecule."""
-    return num_atoms(to_mol(mol))
+class NumberRotatableBonds(CallablePropertyPredictor):
+    """Calculate number of rotatable bonds of a molecule.
+    """
+
+    def __init__(self, parameters: NumberRotatableBondsParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=number_of_rotatable_bonds)
 
 
-def number_of_h_donors(mol: SmallMolecule) -> int:
-    """Calculate number of H donors of a molecule."""
-    return num_H_donors(to_mol(mol))
+class NumberLargeRings(CallablePropertyPredictor):
+    """Calculate the amount of large rings (> 6 atoms) of a molecule.
+    """
+
+    def __init__(self, parameters: NumberLargeRingsParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=number_of_large_rings)
 
 
-def number_of_aromatic_rings(mol: SmallMolecule) -> int:
-    """Calculate number of aromatic rings of a molecule."""
-    return num_aromatic_rings(to_mol(mol))
+class MolecularWeight(CallablePropertyPredictor):
+    """Calculate molecular weight of a molecule.
+    """
+
+    def __init__(self, parameters: MolecularWeightParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=molecular_weight)
 
 
-def number_of_rings(mol: SmallMolecule) -> int:
-    """Calculate number of rings of a molecule."""
-    return num_rings(to_mol(mol))
+class IsScaffold(CallablePropertyPredictor):
+    """Whether a molecule is identical to its Murcko Scaffold.
+    """
+
+    def __init__(self, parameters: IsScaffoldParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=is_scaffold)
 
 
-def number_of_rotatable_bonds(mol: SmallMolecule) -> int:
-    """Calculate number of rotatable bonds of a molecule."""
-    return num_rotatable_bonds(to_mol(mol))
+class NumberHeterocycles(CallablePropertyPredictor):
+    """The amount of heterocycles of a molecule.
+    """
+
+    def __init__(self, parameters: NumberHeterocyclesParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=number_of_heterocycles)
 
 
-def number_of_large_rings(mol: SmallMolecule) -> int:
-    """Calculate the amount of large rings (> 6 atoms) of a molecule."""
-    ringinfo = to_mol(mol).GetRingInfo()
-    return len([x for x in ringinfo.AtomRings() if len(x) > 6])
+class NumberStereocenters(CallablePropertyPredictor):
+    """The amount of stereo centers of a molecule.
+    """
+
+    def __init__(self, parameters: NumberStereocentersParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=number_of_stereocenters)
 
 
-def molecular_weight(mol: SmallMolecule) -> float:
-    """Calculate molecular weight of a molecule."""
-    return mol_weight(to_mol(mol))
-
-
-def is_scaffold(mol: SmallMolecule) -> int:
-    """Whether a molecule is identical to its Murcko Scaffold."""
-    mol = to_mol(mol)
-    smi = Chem.MolToSmiles(mol, canonical=True)
-    return int(smi == MurckoScaffoldSmiles(mol=mol))
-
-
-def number_of_heterocycles(mol: SmallMolecule) -> int:
-    """The amount of heterocycles of a molecule."""
-    return CalcNumHeterocycles(to_mol(mol))
-
-
-def number_of_stereocenters(mol: SmallMolecule) -> int:
-    """The amount of stereo centers of a molecule."""
-    return CalcNumAtomStereoCenters(to_mol(mol))
-
-
-def similarity_to_seed(
-    mol: SmallMolecule, similarity_fn: Callable[[SmallMolecule], Property]
-) -> Property:
+class SimilaritySeed(CallablePropertyPredictor):
     """Calculate the similarity of a molecule to a seed molecule.
-
-    For example:
-    ```py
-    from gt4sd.properties.molecules import similarity_to_seed, get_similarity_fn
-
-    func = get_similarity_fn(target_mol='CCO', fp_key='FCFP4')
-    similarity_to_seed(mol='CCC', similarity_fn=func)
-    ```
-
     """
-    return similarity_fn(to_smiles(mol))
+
+    def __init__(self, parameters: SimilaritySeedParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=similarity_to_seed)
 
 
-def activity_against_target(
-    mol: SmallMolecule, affinity_fn: Callable[[SmallMolecule], Property]
-) -> Property:
+class ActivityAgainstTarget(CallablePropertyPredictor):
     """Calculate the activity of a molecule against a target molecule.
-
-    For example:
-    ```py
-    from gt4sd.properties.molecules import activity_against_target, get_activity_fn
-
-    func = get_activity_fn(target_mol='DRD2')
-    activity_against_target(mol='CCC', affinity_fn=func)
-    ```
-
     """
-    return affinity_fn(to_smiles(mol))
+
+    def __init__(self, parameters: ActivityAgainstTargetParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=activity_against_target)
 
 
-# TODO: Need to put the trained models on COS and implement caching logic
-# _tox21 = Tox21()
-# _organdb = OrganDB()
-# _sider = SIDER()
-# _clintox = ClinTox()

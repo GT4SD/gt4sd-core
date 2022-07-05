@@ -1,99 +1,143 @@
-from ...domains.materials import MacroMolecule
-from .utils import get_descriptor
+from dataclasses import field
+from typing import Any, Callable
 
 
-def length(protein: MacroMolecule) -> int:
-    """Retrieves the number of residues of a protein."""
-    desc = get_descriptor(protein)
-    desc.length()
-    return int(desc.descriptor)
+from ...domains.materials import Property, SmallMolecule, MacroMolecule, Protein
+from .utils import to_mol, to_smiles
+from typing import Dict, Tuple, Type, Union
+
+from .functions import (
+    aliphatic_index,
+    aromaticity,
+    boman_index,
+    charge,
+    charge_density,
+    hydrophobic_ratio,
+    instability,
+    isoelectric_point,
+    length,
+)
+
+from dataclasses import field
+
+from ..core import PropertyPredictor, PropertyPredictorConfiguration, CallablePropertyPredictor
+
+# class CallableFactory:
+
+#     @staticmethod
+#     def get(callable: Callable) -> PropertyPredictor:
+#         return Callable
+
+class LengthParameters(PropertyPredictorConfiguration):
+    pass
+
+class BomanIndexParameters(PropertyPredictorConfiguration):
+    pass
+
+class AliphaticIndexParameters(PropertyPredictorConfiguration):
+    pass
+
+class HydrophobicRatioParameters(PropertyPredictorConfiguration):
+    pass
+
+class ChargeParameters(PropertyPredictorConfiguration):
+    ph: float = field(
+        default=7.4,
+        metadata=dict(description=""),
+    )
+
+    amide: bool = field(
+        default=True,
+        metadata=dict(description=""),
+    )
+    
+class ChargeDensityParameters(PropertyPredictorConfiguration):
+    ph: float = field(
+        default=7.4,
+        metadata=dict(description=""),
+    )
+
+    amide: bool = field(
+        default=True,
+        metadata=dict(description=""),
+    )
+    
+class IsoelectricPointParameters(PropertyPredictorConfiguration):
+    amide: bool = field(
+        default=True,
+        metadata=dict(description=""),
+    )
+    
+class AromaticityParameters(PropertyPredictorConfiguration):
+    pass
+
+class InstabilityParameters(PropertyPredictorConfiguration):
+    pass
 
 
-def boman_index(protein: MacroMolecule) -> float:
+class Length(CallablePropertyPredictor):
+    """Retrieves the number of residues of a protein.
+    """
+
+    def __init__(self, parameters: LengthParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=length)
+
+
+class BomanIndex(CallablePropertyPredictor):
     """Computes the Boman index of a protein (sum of solubility values of all residues).
-
-    Boman, H. G. (2003).
-    Antibacterial peptides: basic facts and emerging concepts.
-    Journal of internal medicine, 254(3), 197-215.
     """
-    desc = get_descriptor(protein)
-    desc.boman_index()
-    return float(desc.descriptor)
 
+    def __init__(self, parameters: BomanIndexParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=boman_index)
 
-def aliphatic_index(protein: MacroMolecule) -> float:
+class AliphaticIndex(CallablePropertyPredictor):
     """Computes the aliphatic index of a protein. Measure of thermal stability.
-
-    Ikai, A. (1980).
-    Thermostability and aliphatic index of globular proteins.
-    The Journal of Biochemistry, 88(6), 1895-1898.
     """
-    desc = get_descriptor(protein)
-    desc.aliphatic_index()
-    return float(desc.descriptor)
 
+    def __init__(self, parameters: AliphaticIndexParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=aliphatic_index)
 
-def hydrophobic_ratio(protein: MacroMolecule) -> float:
-    """Computes the hydrophobicity of a protein, relative freq. of **A,C,F,I,L,M & V**."""
-    desc = get_descriptor(protein)
-    desc.hydrophobic_ratio()
-    return float(desc.descriptor)
+class HydrophobicRatio(CallablePropertyPredictor):
+    """Computes the hydrophobicity of a protein, relative freq. of **A,C,F,I,L,M & V**.
+    """
 
+    def __init__(self, parameters: HydrophobicRatioParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=hydrophobic_ratio)
 
-def charge(protein: MacroMolecule, ph: float = 7.4, amide: bool = True) -> float:
+class Charge(CallablePropertyPredictor):
     """Computes the charge of a protein.
-
-    Bjellqvist, B., Hughes, G. J., Pasquali, C., Paquet, N., Ravier, F., Sanchez, J. C., ... & Hochstrasser, D. (1993).
-    The focusing positions of polypeptides in immobilized pH gradients can be predicted from their amino acid sequences.
-    Electrophoresis, 14(1), 1023-1031.
     """
-    desc = get_descriptor(protein)
-    desc.calculate_charge(ph=ph, amide=amide)
-    return float(desc.descriptor)
 
+    def __init__(self, parameters: ChargeParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=charge)
 
-def charge_density(
-    protein: MacroMolecule, ph: float = 7.4, amide: bool = True
-) -> float:
+class ChargeDensity(CallablePropertyPredictor):
     """Computes the charge density of a protein.
-
-    Bjellqvist, B., Hughes, G. J., Pasquali, C., Paquet, N., Ravier, F., Sanchez, J. C., ... & Hochstrasser, D. (1993).
-    The focusing positions of polypeptides in immobilized pH gradients can be predicted from their amino acid sequences.
-    Electrophoresis, 14(1), 1023-1031.
     """
-    desc = get_descriptor(protein)
-    desc.charge_density(ph=ph, amide=amide)
-    return float(desc.descriptor)
 
+    def __init__(self, parameters: ChargeDensityParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=charge_density)
 
-def isoelectric_point(protein: MacroMolecule, amide: bool = True) -> float:
-    """Computes the isoelectric point of every residue and aggregates."""
-    desc = get_descriptor(protein)
-    desc.isoelectric_point(amide=amide)
-    return float(desc.descriptor)
+class IsoelectricPoint(CallablePropertyPredictor):
+    """Computes the isoelectric point of every residue and aggregates.
+    """
 
+    def __init__(self, parameters: IsoelectricPointParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=isoelectric_point)
 
-def aromaticity(protein: MacroMolecule) -> float:
+class Aromaticity(CallablePropertyPredictor):
     """Computes aromaticity of the protein (relative frequency of Phe+Trp+Tyr).
-
-    Lobry, J. R., & Gautier, C. (1994).
-    Hydrophobicity, expressivity and aromaticity are the major trends of amino-acid usage
-        in 999 Escherichia coli chromosome-encoded genes.
-    Nucleic acids research, 22(15), 3174-3180.
     """
-    desc = get_descriptor(protein)
-    desc.aromaticity()
-    return float(desc.descriptor)
 
+    def __init__(self, parameters: AromaticityParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=aromaticity)
 
-def instability(protein: MacroMolecule) -> float:
+class Instability(CallablePropertyPredictor):
     """Calculates the protein instability.
-
-    Guruprasad, K., Reddy, B. B., & Pandit, M. W. (1990).
-    Correlation between stability of a protein and its dipeptide composition: a novel
-        approach for predicting in vivo stability of a protein from its primary sequence.
-    Protein Engineering, Design and Selection, 4(2), 155-161.
     """
-    desc = get_descriptor(protein)
-    desc.instability_index()
-    return float(desc.descriptor)
+
+    def __init__(self, parameters: InstabilityParameters) -> None:
+        super().__init__(parameters=parameters, callable_fn=instability)
+
+        
+
