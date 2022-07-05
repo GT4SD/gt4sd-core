@@ -57,7 +57,7 @@ def add_tokens_from_lists(
 
     # Finish adding new tokens
     tokenizer.add_tokens(list(all_tokens))
-    tokenizer.update_vocab(all_tokens)
+    tokenizer.update_vocab(all_tokens)  # type:ignore
     logger.info(f"Added {len(tokenizer)-num_tokens} new tokens to tokenizer.")
 
     return tokenizer, properties, train_data, test_data
