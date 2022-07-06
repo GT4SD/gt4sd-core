@@ -21,7 +21,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from dataclasses import field
 
 from ..core import CallablePropertyPredictor, PropertyPredictorConfiguration
 from .functions import (
@@ -57,76 +56,43 @@ from .functions import (
 
 
 class PlogpParameters(PropertyPredictorConfiguration):
-    a_parameter: int = field(
-        default=0,
-        metadata=dict(description=""),
-    )
+    a_parameter: int = 0
 
 
 class LipinskiParameters(PropertyPredictorConfiguration):
-    a_parameter: int = field(
-        default=0,
-        metadata=dict(description=""),
-    )
+    a_parameter: int = 0
 
 
 class EsolParameters(PropertyPredictorConfiguration):
-    a_parameter: int = field(
-        default=0,
-        metadata=dict(description=""),
-    )
+    a_parameter: int = 0
 
 
 class ScscoreParameters(PropertyPredictorConfiguration):
-    score_scale: int = field(
-        default=5,
-        metadata=dict(description=""),
-    )
+    score_scale: int = 5
 
-    fp_len: int = field(
-        default=1024,
-        metadata=dict(description=""),
-    )
+    fp_len: int = 1024
 
-    fp_rad: int = field(
-        default=2,
-        metadata=dict(description=""),
-    )
+    fp_rad: int = 2
 
 
 class SasParameters(PropertyPredictorConfiguration):
-    a_parameter: int = field(
-        default=0,
-        metadata=dict(description=""),
-    )
+    a_parameter: int = 0
 
 
 class BertzParameters(PropertyPredictorConfiguration):
-    a_parameter: int = field(
-        default=0,
-        metadata=dict(description=""),
-    )
+    a_parameter: int = 0
 
 
 class TpsaParameters(PropertyPredictorConfiguration):
-    a_parameter: int = field(
-        default=0,
-        metadata=dict(description=""),
-    )
+    a_parameter: int = 0
 
 
 class LogpParameters(PropertyPredictorConfiguration):
-    a_parameter: int = field(
-        default=0,
-        metadata=dict(description=""),
-    )
+    a_parameter: int = 0
 
 
 class QedParameters(PropertyPredictorConfiguration):
-    a_parameter: int = field(
-        default=0,
-        metadata=dict(description=""),
-    )
+    a_parameter: int = 0
 
 
 class NumberHAcceptorsParameters(PropertyPredictorConfiguration):

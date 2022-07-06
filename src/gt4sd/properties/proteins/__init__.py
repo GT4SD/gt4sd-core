@@ -29,28 +29,37 @@ from ...domains.materials import MacroMolecule, Property, SmallMolecule
 from ..core import CallablePropertyPredictor, PropertyPredictor
 from .core import (
     AliphaticIndex,
+    AliphaticIndexParameters,
     Aromaticity,
+    AromaticityParameters,
     BomanIndex,
+    BomanIndexParameters,
     Charge,
     ChargeDensity,
+    ChargeDensityParameters,
+    ChargeParameters,
     HydrophobicRatio,
+    HydrophobicRatioParameters,
     Instability,
+    InstabilityParameters,
     IsoelectricPoint,
+    IsoelectricPointParameters,
     Length,
+    LengthParameters,
 )
 
 # All functions can be called with either a SMILES or a Mol object.
 PROTEIN_FACTORY: Dict[str, Any] = {
     # Inherent properties
-    "length": Length,
+    "length": (Length, LengthParameters),
     # Rule-based properties
-    "boman_index": BomanIndex,
-    "charge_density": ChargeDensity,
-    "charge": Charge,
-    "aliphaticity": AliphaticIndex,
-    "hydrophobicity": HydrophobicRatio,
-    "isoelectric_point": IsoelectricPoint,
-    "aromaticity": Aromaticity,
-    "instability": Instability,
+    "boman_index": (BomanIndex, BomanIndexParameters),
+    "charge_density": (ChargeDensity, ChargeDensityParameters),
+    "charge": (Charge, ChargeDensityParameters),
+    "aliphaticity": (AliphaticIndex, AliphaticIndexParameters),
+    "hydrophobicity": (HydrophobicRatio, HydrophobicRatioParameters),
+    "isoelectric_point": (IsoelectricPoint, IsoelectricPointParameters),
+    "aromaticity": (Aromaticity, AromaticityParameters),
+    "instability": (Instability, InstabilityParameters),
     # Properties predicted by ML models
 }

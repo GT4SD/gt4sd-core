@@ -23,18 +23,18 @@
 #
 from typing import Any, Callable, Union
 
-from pydantic import BaseModel
+from pydantic import BaseSettings
 
 from ..domains.materials import MacroMolecule, Property, Protein, SmallMolecule
 
 
-class PropertyPredictorConfiguration(BaseModel):
+class PropertyPredictorConfiguration(BaseSettings):
     """Abstract class for property prediction in molecules and proteins."""
 
     pass
 
 
-class PropertyPredictor(BaseModel):
+class PropertyPredictor:
     """Property predictor."""
 
     def __init__(self, parameters: PropertyPredictorConfiguration = None) -> None:
@@ -45,7 +45,7 @@ class PropertyPredictor(BaseModel):
         self.parameters = parameters
 
     @staticmethod
-    def from_json(json_file: str) -> PropertyPredictor:
+    def from_json(json_file: str) -> PropertyPredictorConfiguration:
         """Instantiate from json configuration.
 
         # pydantic from dict

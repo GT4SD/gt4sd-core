@@ -21,7 +21,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from dataclasses import field
 
 from ..core import CallablePropertyPredictor, PropertyPredictorConfiguration
 from .functions import (
@@ -60,34 +59,19 @@ class HydrophobicRatioParameters(PropertyPredictorConfiguration):
 
 
 class ChargeParameters(PropertyPredictorConfiguration):
-    ph: float = field(
-        default=7.4,
-        metadata=dict(description=""),
-    )
+    ph: float = 7.4
 
-    amide: bool = field(
-        default=True,
-        metadata=dict(description=""),
-    )
+    amide: bool = True
 
 
 class ChargeDensityParameters(PropertyPredictorConfiguration):
-    ph: float = field(
-        default=7.4,
-        metadata=dict(description=""),
-    )
+    ph: float = 7.4
 
-    amide: bool = field(
-        default=True,
-        metadata=dict(description=""),
-    )
+    amide: bool = True
 
 
 class IsoelectricPointParameters(PropertyPredictorConfiguration):
-    amide: bool = field(
-        default=True,
-        metadata=dict(description=""),
-    )
+    amide: bool = True
 
 
 class AromaticityParameters(PropertyPredictorConfiguration):
