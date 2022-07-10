@@ -27,20 +27,39 @@ import json
 import random
 import time
 from collections import OrderedDict
-from typing import Any, Dict, List, MutableMapping, Optional, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Dict,
+    List,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+    Set
+)
 
 import numpy as np
 from joblib import load
 from loguru import logger
-
+from transformers import (
+    AlbertForMaskedLM,
+    PreTrainedTokenizerFast,
+    T5EncoderModel,
+    XLNetLMHeadModel,
+    pipeline,
+    PreTrainedTokenizer
+)
 from .processing import (
-    HuggingFaceTransformerEmbedding,
-    ProtAlbertBert,
-    ProtTransXL,
+    Embedder,
     StringEmbedding,
-    TAPEEmbedding,
+    TAPEEmbedder,
     reconstruct_sequence_with_mutation_range,
     sanitize_intervals,
+    sanitize_intervals_with_padding,
+    selection,
+    single_point_crossover,
 )
 
 #: transition matrix representation
@@ -89,13 +108,6 @@ IUPAC_CHARACTER_SET = set(IUPAC_CODES.values())
 IUPAC_MUTATION_MAPPING: TransitionConfiguration = {
     iupac_character: sorted(list(IUPAC_CHARACTER_SET - {iupac_character, "X"}))
     for iupac_character in IUPAC_CHARACTER_SET
-}
-
-PROTEIN_EMBEDDING_CLASS = {
-    "prottrans": ProtTransXL,
-    "tape": TAPEEmbedding,
-    "albert": ProtAlbertBert,
-    "bert": ProtAlbertBert,
 }
 
 
@@ -156,37 +168,104 @@ class Mutations:
         return np.random.choice(targets, size=1, p=probabilities).item()
 
 
-class AASequence:
+class MutationLanguageModel:
     def __init__(
-        self, sequence: str, mutations: Mutations = Mutations(IUPAC_MUTATION_MAPPING)
+        self, mutation_model_path: str, mutation_tokenizer_filepath: str
     ) -> None:
-        """Initialize an AA sequence representation.
-        Args:
-            sequence: AA sequence.
-            mutations: mutations definition. Defaults to uniform sampling of IUPAC AAs.
-        """
-        self.sequence = sequence
-        self.sequence_length = len(sequence)
-        self.mutations = mutations
+        self.mutation_model_path = mutation_model_path
+        self.mutation_tokenizer_filepath = mutation_tokenizer_filepath
+        try:
+            self.mutation_model = XLNetLMHeadModel.from_pretrained(
+                self.mutation_model_path
+            )
+        except NotImplementedError:
+            self.mutation_model = AlbertForMaskedLM.from_pretrained(
+                self.mutation_model_path
+            )
 
-    def mutate(self, maximum_number_of_mutations: int) -> str:
-        """Mutate the sequence in multiple positions.
-        Args:
-            maximum_number_of_mutations: maximum number of mutations.
-        Returns:
-            the mutated sequence.
-        """
-        if maximum_number_of_mutations > self.sequence_length:
-            logger.warning(
-                f"resetting maximum number of mutations ({maximum_number_of_mutations}), since it is higher than sequence length: {self.sequence_length}"
+        self.mutation_model_tokenizer = PreTrainedTokenizerFast(
+            tokenizer_file=self.mutation_tokenizer_filepath,
+            unk_token="[UNK]",
+            sep_token="[SEP]",
+            pad_token="[PAD]",
+            cls_token="[CLS]",
+            mask_token="[MASK]",
+        )
+
+
+class MutationGenerator:
+    def __init__(self, sequence: str) -> None:
+        self.sequence = sequence
+
+    def get_mutations(self, number_of_mutated_sequences: int = 1) -> List[str]:
+        raise NotImplementedError("Implement the method in a sub-class")
+
+
+class MutationGeneratorLanguageModeling(MutationGenerator):
+    def __init__(
+        self,
+        sequence: str,
+        mutation_object: MutationLanguageModel,
+        top_k: int = 2,
+        maximum_number_of_mutations: int = 4,
+    ) -> None:
+        super().__init__(sequence)
+        self.sequence_length = len(sequence)
+        self.mutation_object = mutation_object
+        self.top_k = top_k
+        self.maximum_number_of_mutations = maximum_number_of_mutations
+        self.tokenized_sequence = (
+            self.mutation_object.mutation_model_tokenizer.tokenize(sequence)
+        )
+        self.pipeline = pipeline(
+            "fill-mask",
+            model=self.mutation_object.mutation_model,
+            tokenizer= self.mutation_object.mutation_model_tokenizer,
+            top_k=self.top_k,
+        )
+
+    def get_mutations(self, number_of_mutated_sequences: int = 1) -> List[str]:
+        output: List[str] = []
+        while len(output) <= number_of_mutated_sequences:
+
+            number_of_mutations = random.randint(1, self.maximum_number_of_mutations)
+            positions = sorted(
+                random.sample(range(self.sequence_length), number_of_mutations)
             )
-            maximum_number_of_mutations = self.sequence_length
-        if maximum_number_of_mutations < 1:
-            logger.warning(
-                f"maximum number of mutations can't be lower than 1 ({maximum_number_of_mutations}), resetting to 1"
-            )
-            maximum_number_of_mutations = 1
-        number_of_mutations = random.randint(1, maximum_number_of_mutations)
+
+            tmp_sequence = self.tokenized_sequence.copy()
+            for pos in positions:
+                tmp_sequence[pos] = "[MASK]"
+            tmp_sequence = " ".join(tmp_sequence)
+
+            for out in self.pipeline(tmp_sequence):
+                if len(positions) > 1:
+                    replacement = []
+                    for internal_out in out:
+                        replacement.append(internal_out["token_str"])
+                    tmp_input = np.array(tmp_sequence.split())
+                    tmp_input[positions] = replacement
+                    output.append("".join(tmp_input))
+                else:
+                    output.append("".join(out["sequence"].split()))
+
+        return output
+
+
+class MutationGeneratorTransitionMatrix(MutationGenerator):
+    def __init__(
+        self,
+        sequence: str,
+        mutation_object: Mutations = Mutations(IUPAC_MUTATION_MAPPING),
+        maximum_number_of_mutations: int = 4,
+    ) -> None:
+        super().__init__(sequence)
+        self.sequence_length = len(sequence)
+        self.mutation_object = mutation_object
+        self.maximum_number_of_mutations = maximum_number_of_mutations
+
+    def get_single_sequence_with_mutations(self) -> str:
+        number_of_mutations = random.randint(1, self.maximum_number_of_mutations)
         positions = sorted(
             random.sample(range(self.sequence_length), number_of_mutations)
         )
@@ -194,10 +273,54 @@ class AASequence:
         start_position = -1
         for position in positions:
             mutated_sequence += self.sequence[(start_position + 1) : position]
-            mutated_sequence += self.mutations.mutate(self.sequence[position])
+            mutated_sequence += self.mutation_object.mutate(self.sequence[position])
             start_position = position
         mutated_sequence += self.sequence[(start_position + 1) :]
         return mutated_sequence
+
+    def get_mutations(self, number_of_mutated_sequences: int = 1) -> List[str]:
+        return [
+            self.get_single_sequence_with_mutations()
+            for _ in range(number_of_mutated_sequences)
+        ]
+
+
+class MutationGeneratorFactory:
+    @staticmethod
+    def get_mutation_generator(
+        mutation_object: Union[Mutations, MutationLanguageModel],
+        sequence: str,
+        **mutation_object_parameters: Dict[str, Any],
+    ) -> MutationGenerator:
+        mutation_generator: MutationGenerator
+        if isinstance(mutation_object, MutationLanguageModel):
+            mutation_generator = MutationGeneratorLanguageModeling(
+                sequence=sequence,
+                mutation_object=mutation_object,
+                top_k=int(mutation_object_parameters["top_k"]),
+                maximum_number_of_mutations=int(mutation_object_parameters[
+                    "maximum_number_of_mutations"
+                ]),
+            )
+        elif isinstance(mutation_object, Mutations):
+            mutation_generator = MutationGeneratorTransitionMatrix(
+                sequence=sequence,
+                mutation_object=mutation_object,
+                maximum_number_of_mutations=int(mutation_object_parameters[
+                    "maximum_number_of_mutations"
+                ]),
+            )
+        else:
+            raise ValueError(
+                f"mutations with type: {type(mutation_object)} not supported!"
+            )
+        return mutation_generator
+
+
+MUTATION_GENERATORS: Dict[str, Type[MutationGenerator]] = {
+    "transition-matrix": MutationGeneratorTransitionMatrix,
+    "language-modeling": MutationGeneratorLanguageModeling,
+}
 
 
 class EnzymeOptimizer:
@@ -209,9 +332,10 @@ class EnzymeOptimizer:
         substrate: str,
         product: str,
         sequence: str,
-        protein_embedding_type: str,
-        protein_embedding_path: Optional[str] = None,
-        molecule_embedding: StringEmbedding = HuggingFaceTransformerEmbedding(),
+        protein_embedding: StringEmbedding = TAPEEmbedder(),
+        molecule_embedding: StringEmbedding = Embedder(
+            "seyonec/ChemBERTa-zinc-base-v1", "seyonec/ChemBERTa-zinc-base-v1"
+        ),
         ordering: List[str] = ["substrate", "product", "sequence"],
     ) -> None:
         """Initialize the enzyme designer.
@@ -225,31 +349,6 @@ class EnzymeOptimizer:
             ordering: ordering of the features for the scorer. Defaults to ["substrate", "product", "sequence"].
         Raises:
             ValueError: ordering provided is not feasible.
-        Example:
-            An example optimizing a specific reaction::
-                filepath = f"/path/to/model/scoring_model.pkl"
-                substrate = "NC1=CC=C(N)C=C1"
-                product = "CNC1=CC=C(NC(=O)C2=CC=C(C=C2)C(C)=O)C=C1"
-                sequence = (
-                    "MSIQIKQSTMVRPAEETPNKSLWLSNIDMILRTPYSHTGAVLIYKQPDNNEDNIHPSSSMYFDANILIEALSKA"
-                    "LVPFYPMAGRLKINGDRYEIDCNAEGALFVEAESSHVLEDFGDFRPNDELHRVMVPTCDYSKGISSFPLLMVQLT"
-                    "RFRCGGVSIGFAQHHHVCDGMAHFEFNNSWARIAKGLLPALEPVHDRYLHLRPRNPPQIKYSHSQFEPFVPSLPN"
-                    "ELLDGKTNKSQTLFILSREQINTLKQKLDLSNNTTRLSTYEVVAAHVWRSVSKARGLSDHEEIKLIMPVDGRSRIN"
-                    "NPSLPKGYCGNVVFLAVCTATVGDLSCNPLTDTAGKVQEALKGLDDDYLRSAIDHTESKPGLPVPYMGSPEKTLYPN"
-                    "VLVNSWGRIPYQAMDFGWGSPTFFGISNIFYDGQCFLIPSRDGDGSMTLAINLFSSHLSRFKKYFYDF"
-                )
-                # instantiate the designer
-                designer = EnzymeOptimizer(
-                    scorer_filepath=filepath, substrate=substrate, product=product, sequence=sequence
-                )
-                # with this sequence length every steps takes ~5s
-                # optimize between positions 150 and 405 allowing for a maximum of 5 mutations.
-                results = designer.optimize(
-                    number_of_mutations=5, number_of_steps=10, number_of_samples_per_step=8,
-                    intervals=[(150, 405)]
-                )
-                best_score = results[0]["score"]
-                best_sequence = results[0]["sequence"]
         """
         if len(set(ordering).intersection(SUPPORTED_FEATURE_SET)) < 3:
             raise ValueError(
@@ -261,23 +360,8 @@ class EnzymeOptimizer:
         self.scorer = load(scorer_filepath)
         self.substrate = substrate
         self.product = product
-        self.protein_embedding_type = protein_embedding_type.lower()
-        try:
-            if protein_embedding_type.lower() in ["albert", "bert"]:
-                self.protein_embedding = PROTEIN_EMBEDDING_CLASS.get(
-                    protein_embedding_type.lower(), ProtAlbertBert
-                )(protein_embedding_path)
-            else:
-                self.protein_embedding = PROTEIN_EMBEDDING_CLASS.get(
-                    protein_embedding_type.lower(), TAPEEmbedding
-                )()
-        except TypeError:
-            print(
-                f"check the spelling of the protein embedder, otherwise chooce another one. Here are the protein embedders available {list(PROTEIN_EMBEDDING_CLASS.values())}"
-            )
-            print(
-                f"Here are the protein embedders available {list(PROTEIN_EMBEDDING_CLASS.values())}"
-            )
+
+        self.protein_embedding = protein_embedding
         self.molecule_embedding = molecule_embedding
         self.embedded_vectors = {
             "substrate": self.molecule_embedding.embed_one(self.substrate),
@@ -286,23 +370,63 @@ class EnzymeOptimizer:
         self.sequence = sequence
         self.sequence_length = len(sequence)
 
-    def score_sequence(self, sequence: str) -> float:
+    def extract_fragment_embedding(
+        self, sequence: str, intervals: Optional[List[Tuple[int, int]]]
+    ):
+        """extrcat the embeddings for each fragment in a sequence.
+        Args:
+            sequences: a list of sequences to score.
+            intervals:
+        Returns:
+            a list of dictionaries of sequences and related scores.
+        """
+        fragments: List[str] = []
+        for start, end in intervals:
+            size_fragment = end - start
+            fragments.append("".join(sequence[:size_fragment]))
+            sequence = sequence[size_fragment:]
+        sequence_embedding = np.array(
+            [self.protein_embedding.embed_one(fragment) for fragment in fragments]
+        )
+        sequence_embedding = (
+            sequence_embedding / np.linalg.norm(sequence_embedding)
+        ).mean(axis=0)
+
+        return sequence_embedding
+
+    def score_sequence(
+        self,
+        sequence: str,
+        intervals: Optional[List[Tuple[int, int]]] = None,
+        fragment_embeddings: Optional[bool] = False,
+    ) -> float:
         """Score a given sequence.
         Args:
             sequence: a sequence to score.
+            intervals: list of ranges in the sequence, zero-based
         Returns:
-            score for the sequence.
+            protein sequence embeddings.
         """
-        if self.protein_embedding_type == "prottrans":
+        if type(self.protein_embedding.model) == T5EncoderModel:
             sequence = " ".join(list(sequence))
-        embedded_vectors = {"sequence": self.protein_embedding.embed_one(sequence)}
+        if fragment_embeddings:
+            embedded_vectors = {
+                "sequence": self.extract_fragment_embedding(sequence, intervals)
+            }
+        else:
+            embedded_vectors = {"sequence": self.protein_embedding.embed_one(sequence)}
         embedded_vectors.update(self.embedded_vectors)
         feature_vector = np.concatenate(
             [embedded_vectors[feature] for feature in self._ordering], axis=1
         )
         return self.scorer.predict_proba(feature_vector)[0][1]
 
-    def score_sequences(self, sequences: List[str]) -> List[Dict[str, Any]]:
+    def score_sequences(
+        self,
+        sequences: List[str],
+        intervals: Optional[List[Tuple[int, int]]] = None,
+        fragment_embeddings: Optional[bool] = False,
+    ) -> List[Dict[str, Any]]:
         """Score a given sequence list.
         Args:
             sequences: a list of sequences to score.
@@ -318,10 +442,19 @@ class EnzymeOptimizer:
                 self.embedded_vectors["product"], number_of_sequences, axis=0
             ),
         }
-        if self.protein_embedding_type == "prottrans":
+        if type(self.protein_embedding.model) == T5EncoderModel:
             sequences = [" ".join(list(sequence)) for sequence in sequences]
 
-        embedded_matrices["sequence"] = self.protein_embedding(sequences)
+        if fragment_embeddings:
+            embeddings = []
+            for sequence in sequences:
+                embeddings.append(self.extract_fragment_embedding(sequence, intervals))
+            embedded_matrices["sequence"] = np.array(embeddings)
+
+        else:
+            embedded_matrices["sequence"] = self.protein_embedding.embed_multiple(
+                sequences
+            )
         feature_vector = np.concatenate(
             [embedded_matrices[feature] for feature in self._ordering], axis=1
         )
@@ -332,17 +465,137 @@ class EnzymeOptimizer:
             )
         ]
 
+    def sequence_generation(
+        self,
+        sequence_from_intervals: str,
+        mutation_object: Type[MutationGenerator],
+        initial_population: List[str] = None,
+        number_of_samples_to_generate: int = None,
+    ) -> List[str]:
+        """generate sequences.
+        Args:
+            sequence_from_intervals: orignial sequence extrcated from interval.
+            mutation_object: mutation object
+            initial_population: list of samples,
+            number_of_samples_to_generate: int. number of samples to generate
+        Returns:
+            a list of sequences.
+        """
+        lst_mutated_sequences: List[str] = []
+        if initial_population:
+            for indx in range(len(initial_population)):
+                initial_sequence = initial_population[indx]
+                mutation_object.sequence = initial_sequence
+                lst_mutated_sequences += mutation_object.get_mutations()
+            if number_of_samples_to_generate < len(lst_mutated_sequences):
+                mutation_object.sequence = sequence_from_intervals
+                lst_mutated_sequences += mutation_object.get_mutations(
+                    number_of_samples_to_generate - len(lst_mutated_sequences)
+                )
+        else:
+            lst_mutated_sequences += mutation_object.get_mutations(
+                number_of_mutated_sequences=number_of_samples_to_generate
+            )
+
+        return list(set(lst_mutated_sequences))
+
+    def sequence_evaluation(
+        self,
+        original_sequence_score: float,
+        mutated_sequences_range: List[str],
+        visited_sequences: set,
+        intervals: List[Tuple[int, int]],
+        batch_size: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """evaluate sequences.
+        Args:
+            original_sequence_score: int
+            mutated_sequences_range: list of mutated sequences (just concatenated fragents of sequences)
+            visited_sequences: set of sequences already evaluated in the past optimization steps
+            intervals: list of ranges in the sequence
+            batch_size: number of sequences to evaluated in one round
+        Returns:
+            a list of sequences.
+        """
+        temporary_results: List[Dict[str, Any]] = []
+
+        if not batch_size:
+            batch_size = 8
+
+        lst_mutated_sequences: List[str] = []
+
+        for mutated_fragments in mutated_sequences_range:
+            mutated_sequence = reconstruct_sequence_with_mutation_range(
+                sequence=self.sequence,
+                mutated_sequence_range=mutated_fragments.strip(),
+                intervals=intervals,
+            )
+
+            if mutated_sequence not in visited_sequences:
+                visited_sequences.add(mutated_sequence)
+                lst_mutated_sequences.append(mutated_sequence)
+
+        for i in range(0, len(lst_mutated_sequences), batch_size):
+            temporary_results += [
+                scored_sequence
+                for scored_sequence in self.score_sequences(
+                    lst_mutated_sequences[i : i + batch_size]
+                )
+                if scored_sequence["score"] > original_sequence_score
+            ]
+
+        return visited_sequences, temporary_results
+
+    def selection_crossover(
+        self,
+        sequence_from_intervals: str,
+        tmp_results: List[Dict[str, Any]],
+        number_selected_sequences_per_iteration: int,
+        intervals: List[Tuple[int, int]],
+    ) -> List[str]:
+
+        selected_children = selection(
+            tmp_results, k=number_selected_sequences_per_iteration
+        )
+
+        children: List[str] = []
+        for pos in range(len(selected_children)):
+            selected_child_mutated_fragments = "".join(
+                [self.sequence[start:end] for start, end in intervals]
+            )
+
+            new_child_1, new_child_2 = single_point_crossover(
+                selected_child_mutated_fragments, sequence_from_intervals
+            )
+            children.append(new_child_1)
+            children.append(new_child_2)
+
+        return list(set(children))
+
     def optimize(
         self,
         number_of_mutations: int,
         intervals: Optional[List[Tuple[int, int]]] = None,
         number_of_steps: int = 10,
-        number_of_samples_per_step: int = 32,
+        batch_size: int = 8,
+        full_sequence_embedding: bool = True,
         number_of_sequences: Optional[int] = None,
         seed: int = 42,
         time_budget: Optional[int] = None,
-        mutations: Mutations = Mutations(IUPAC_MUTATION_MAPPING),
+        mutation_generator_type: Union[
+            str, Type[MutationGenerator]
+        ] = MutationGeneratorTransitionMatrix,
+        mutation_generator_parameters: Dict[str, Any] = {
+            "mutation_object": Mutations(IUPAC_MUTATION_MAPPING),
+            "maximum_number_of_mutations": 4,
+        },
+        top_k: Optional[int] = 2,
+        pad_intervals: Optional[bool] = False,
+        population_per_itaration: Optional[int] = None,
+        with_genetic_algorithm: Optional[bool] = False,
+        number_selected_sequences_per_iteration: Optional[int] = 5,
     ) -> List[Dict[str, Any]]:
+
         """Optimize the enzyme given a number of mutations and a range.
         If the range limits are not provided the full sequence is optimized, this might be inefficient.
         The sampling is performing by exploring mutations with a slightly smart random sampling.
@@ -350,11 +603,18 @@ class EnzymeOptimizer:
             number_of_mutations: number of allowed mutations.
             intervals: list of ranges in the sequence, zero-based. Defaults to None, a.k.a. use optimize the full sequence.
             number_of_steps: number of optimization steps. Defaults to 100.
-            number_of_samples_per_step: number of samples sequences per optimization step. Defaults to 32.
+            batch_size: number of sequences to embedded together. Defaults to 8
+            full_sequence_embedding: perform embeddings respect to the full sequence. Defaults to True. False = respect to intervals fragments
             number_of_sequences: number of optimal seuqence returned. Defaults to None, a.k.a, returns all.
             seed: seed for random number generation. Defaults to 42.
             time_budget: maximum allowed runtime in seconds. Defaults to None, a.k.a., no time limit, running for number_of_steps steps.
             mutations: mutations definition. Defaults to uniform sampling of IUPAC AAs.
+            top_k: How many suggested AA to accept. Defaults to top 2.
+            pad_intervals: if True, in case a fragment of sequence has length < 8: it's going to be padded to a length = at least 8
+            population_per_itaration: number of samples sequences per optimization step
+            with_genetic_algorithm: Optimize using a genetic algorith
+            number_selected_sequences_per_iteration: in case of genetic algorithm optimization. Number of samples to select for crossover
+
         Raises:
             ValueError: in case an invalid range is provided.
         Returns:
@@ -362,8 +622,8 @@ class EnzymeOptimizer:
             Note that, when no limit on the returned number of sequences is set, the worst sequence is the original unmutated sequence.
             If the optimization fails, only the original sequence is returned.
         """
-        random.seed(seed)
 
+        random.seed(seed)
         # check if interval is None. In case it is, take as interval the whole sequence
         if intervals is None:
             intervals = [(0, self.sequence_length)]
@@ -372,60 +632,115 @@ class EnzymeOptimizer:
                 intervals
             )  # here we merged and sorted the intervals
 
+        # pad the sequences, to a minimal length of 8
+        if pad_intervals:
+            intervals = sanitize_intervals_with_padding(
+                intervals=intervals, sequence_length=self.sequence_length
+            )
+
         # check that the intervals are in the range of the sequence length
         if intervals[-1][1] > self.sequence_length:
             raise ValueError(
                 "check provided intervals, at least an interval is larger than the sequence length"
             )
 
+        # mutate the sequence from intervals
+        self.maximum_number_of_mutations = number_of_mutations
+
+        if self.maximum_number_of_mutations > self.sequence_length:
+            logger.warning(
+                f"resetting maximum number of mutations ({self.maximum_number_of_mutations}), since it is higher than sequence length: {self.sequence_length}"
+            )
+            self.maximum_number_of_mutations = self.sequence_length
+        if self.maximum_number_of_mutations < 1:
+            logger.warning(
+                f"maximum number of mutations can't be lower than 1 ({self.maximum_number_of_mutations}), resetting to 1"
+            )
+            self.maximum_number_of_mutations = 1
+
+        logger.info(
+            f"maximum number of mutations for the intervals: {self.maximum_number_of_mutations}"
+        )
+
+        # Check if population size is set
+        if not population_per_itaration:
+            population_per_itaration = batch_size
+
         # create a sequence from based on the intervals
         sequence_from_intervals = "".join(
             [self.sequence[start:end] for start, end in intervals]
         )
 
-        # mutate the sequence from intervals
-        aa_sequence_range = AASequence(sequence_from_intervals, mutations=mutations)
-        maximum_number_of_mutations = number_of_mutations
-
-        logger.info(
-            f"maximum number of mutations for the intervals: {maximum_number_of_mutations}"
+        mutation_object = mutation_generator_parameters.pop(
+            "mutation_object", Mutations(IUPAC_MUTATION_MAPPING)
         )
-        scored_original_sequence = {
-            "score": self.score_sequence(self.sequence),
-            "sequence": self.sequence,
-        }
+        if isinstance(mutation_generator_type, str):
+            mutation_generator_type = MUTATION_GENERATORS[mutation_generator_type]
+        elif Type[MutationGenerator] == Type[mutation_generator_type]:
+            mutation_generator_type = mutation_generator_type
+        else:
+            raise ValueError(
+                f"mutation generator with type: {type(mutation_generator_type)} not supported!"
+            )
+
+        if Type[mutation_generator_type] == Type[MutationGeneratorLanguageModeling]:
+            mutation_generator_parameters["top_k"] = top_k
+            del mutation_generator_parameters["maximum_number_of_mutations"]
+
+        mutation_generator = mutation_generator_type(
+            mutation_object=mutation_object,
+            sequence=sequence_from_intervals,
+            **mutation_generator_parameters,
+        )
+
+        if full_sequence_embedding:
+            scored_original_sequence = {
+                "score": self.score_sequence(self.sequence),
+                "sequence": self.sequence,
+            }
+        else:
+            scored_original_sequence = {
+                "score": self.score_sequence(
+                    self.sequence, intervals=intervals, fragment_embeddings=True
+                ),
+                "sequence": self.sequence,
+            }
+
         original_sequence_score = scored_original_sequence["score"]
         logger.info(f"original sequence score: {original_sequence_score}")
         results: List[Dict[str, Any]] = [scored_original_sequence]
-        # slightly smart random sampling
-        visited_sequences = set()
+
+        visited_sequences: Set(str) = set()
         start_time = time.time()
+
+        population: List[str] = []
         for step in range(number_of_steps):
             logger.info(f"optimization step={step + 1}")
-            mutated_sequences = []
 
-            for _ in range(number_of_samples_per_step):
-                mutated_sequence_range = aa_sequence_range.mutate(
-                    maximum_number_of_mutations=maximum_number_of_mutations
-                )
+            updated_visited_sequences, temporary_results = self.sequence_evaluation(
+                original_sequence_score=original_sequence_score,
+                mutated_sequences_range=self.sequence_generation(
+                    sequence_from_intervals=sequence_from_intervals,
+                    mutation_object=mutation_generator,
+                    initial_population=population,
+                    number_of_samples_to_generate=population_per_itaration,
+                ),
+                visited_sequences=visited_sequences,
+                intervals=intervals,
+                batch_size=batch_size,
+            )
 
-                mutated_sequence = reconstruct_sequence_with_mutation_range(
-                    sequence=self.sequence,
-                    mutated_sequence_range=mutated_sequence_range,
+            visited_sequences = updated_visited_sequences
+            results += temporary_results
+
+            if with_genetic_algorithm:
+                population = self.selection_crossover(
+                    sequence_from_intervals,
+                    temporary_results,
+                    number_selected_sequences_per_iteration,
                     intervals=intervals,
                 )
 
-                # make sure we do not revisit
-                if mutated_sequence not in visited_sequences:
-                    visited_sequences.add(mutated_sequence)
-                    mutated_sequences.append(mutated_sequence)
-
-            # add only mutated sequences that are more optimal than the original
-            results += [
-                scored_sequence
-                for scored_sequence in self.score_sequences(mutated_sequences)
-                if scored_sequence["score"] > original_sequence_score
-            ]
             logger.info(
                 f"best score at step={step + 1}: {max([scored_sequence['score'] for scored_sequence in results])}"
             )
@@ -436,9 +751,10 @@ class EnzymeOptimizer:
                         f"used all the given time budget of {time_budget}s, exting optimization loop"
                     )
                     break
-        logger.info(
-            f"optimization completed visiting {len(visited_sequences)} mutated sequences"
-        )
+
+            logger.info(
+                f"optimization completed visiting {len(visited_sequences)} mutated sequences"
+            )
         sorted_results = sorted(
             results, key=lambda result: result["score"], reverse=True
         )[:number_of_sequences]

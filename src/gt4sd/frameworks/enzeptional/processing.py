@@ -23,58 +23,41 @@
 #
 """enzeptional - data processing utilities."""
 
-
 import random
 import warnings
 from abc import ABC
-from collections import defaultdict
-from itertools import chain
-from operator import methodcaller
 from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, Union
-
 import numpy as np
+import os
 import torch
 from tape.datasets import pad_sequences
 from tape.registry import registry
 from tape.tokenizers import TAPETokenizer
 from transformers import (
     AlbertForMaskedLM,
-    AlbertModel,
     AlbertTokenizer,
     AutoModelForMaskedLM,
-    AutoTokenizer,
-    BertModel,
+    BertForMaskedLM,
     BertTokenizer,
     PreTrainedTokenizerFast,
+    RobertaForMaskedLM,
+    RobertaTokenizer,
     T5EncoderModel,
     T5Tokenizer,
     XLNetLMHeadModel,
 )
 
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
-# from ..torch import device_claim
+
 def device_claim(_):
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-def merge_dictionaries(
-    list_of_dictionaries: List[Dict[str, Any]]
-) -> Dict[str, List[Any]]:
-    # initialise defaultdict of lists
-    output = defaultdict(list)
-
-    # iterate dictionary items
-    dictionary_items = map(methodcaller("items"), list_of_dictionaries)
-    for k, v in chain.from_iterable(dictionary_items):
-        output[k].append(v)
-
-    return output
 
 
 T = TypeVar("T")  # used for sample embedding
 
 
-class Embedding(ABC, Generic[T]):
+class AbstractEmbedding(ABC, Generic[T]):
     """Abstract embedding class."""
 
     def embed_one(self, sample: T) -> np.ndarray:
@@ -86,9 +69,9 @@ class Embedding(ABC, Generic[T]):
         Returns:
             embedding vector for the sample.
         """
-        return self.__call__([sample])
+        raise NotImplementedError
 
-    def __call__(self, samples: List[T]) -> np.ndarray:
+    def embed_multiple(self, samples: List[T]) -> np.ndarray:
         """Embed multiple samples sample.
 
         Args:
@@ -100,12 +83,164 @@ class Embedding(ABC, Generic[T]):
         raise NotImplementedError
 
 
-StringEmbedding = Embedding[str]
+StringEmbedding = AbstractEmbedding[str]
 
 
-class TAPEEmbedding(StringEmbedding):
-    """Embed AA sequence using TAPE."""
+class Embedder(StringEmbedding):
+    def __init__(
+        self,
+        model_path: str,
+        tokenizer_path: Optional[str] = None,
+        device: Optional[Union[torch.device, str]] = None,
+    ) -> None:
+        """Initialize the HF transformers embedding class.
+        Args:
+            model_path: relative path of the model in hugginface or in local.
+            tokenizer_path: relative path of the tokenizer in hugginface or in local.
+            device: device where the inference
+                is running either as a dedicated class or a string. If not provided is inferred.
+        """
+        # get device
+        self.device = device_claim(device)
+        try:
+            self.model = AutoModelForMaskedLM.from_pretrained(model_path)
+        except ValueError or RuntimeError:
+            if "Rostlab" in model_path:
+                self.model = T5EncoderModel.from_pretrained(model_path)
+            else:
+                self.model = XLNetLMHeadModel.from_pretrained(model_path)
 
+        self.model = self.model.to(self.device)
+        self.model.eval()
+
+        if type(self.model) == AlbertForMaskedLM:
+            try:
+                self.tokenizer = AlbertTokenizer.from_pretrained(
+                    tokenizer_path, do_lower_case=False
+                )
+            except TypeError:
+                if "Rostlab" not in model_path:
+                    self.tokenizer = PreTrainedTokenizerFast(
+                        tokenizer_file=tokenizer_path,
+                        unk_token="[UNK]",
+                        sep_token="[SEP]",
+                        pad_token="[PAD]",
+                        cls_token="[CLS]",
+                        mask_token="[MASK]",
+                    )
+        elif type(self.model) == BertForMaskedLM:
+            self.tokenizer = BertTokenizer.from_pretrained(
+                tokenizer_path, do_lower_case=False
+            )
+        elif type(self.model) == T5EncoderModel:
+            self.tokenizer = T5Tokenizer.from_pretrained(
+                tokenizer_path, do_lower_case=False
+            )
+        elif type(self.model) == RobertaForMaskedLM:
+            self.tokenizer = RobertaTokenizer.from_pretrained(
+                tokenizer_path, do_lower_case=False
+            )
+        elif type(self.model) == XLNetLMHeadModel:
+            self.tokenizer = PreTrainedTokenizerFast(
+                tokenizer_file=tokenizer_path,
+                unk_token="[UNK]",
+                sep_token="[SEP]",
+                pad_token="[PAD]",
+                cls_token="[CLS]",
+                mask_token="[MASK]",
+            )
+        else:
+            raise ValueError(
+                f"Tokenizer with type: {type(tokenizer_path)} not supported!"
+            )
+
+    def __type__(self):
+        return type(self.model)
+
+    def embed_one(self, sample: str) -> np.ndarray:
+        """Embed one protein sequence.
+        Args:
+            sample: a strings representing a molecule.
+        Returns:
+            a numpy array containing the embedding vector.
+        """
+        if type(self.tokenizer) == TAPETokenizer:
+            return self.embed_multiple([sample])
+
+        else:
+            token_ids = self.tokenizer.encode_plus(
+                sample, add_special_tokens=True, padding=True, return_tensors="pt"
+            )
+            return self.__call__(token_ids)
+
+    def embed_multiple(self, samples: List[str]) -> np.ndarray:
+        """Embed multiple protein sequences.
+        Args:
+            samples: a list of strings representing molecules.
+        Returns:
+            a numpy array containing the embedding vectors.
+        """
+
+        if type(self.tokenizer) == TAPETokenizer:
+            token_ids = {}
+            token_ids["ids"], token_ids["mask"] = zip(
+                *[
+                    [
+                        self.tokenizer.encode(sequence),
+                        np.ones_like(self.tokenizer.encode(sequence)),
+                    ]
+                    for sequence in samples
+                ]
+            )
+        else:
+            token_ids = self.tokenizer.batch_encode_plus(
+                samples, add_special_tokens=True, padding=True
+            )
+
+        return self.__call__(token_ids)
+
+    def __call__(self, token_ids) -> Any:
+
+        if type(self.tokenizer) == TAPETokenizer:
+            input_data = {
+                "input_ids": torch.from_numpy(pad_sequences(token_ids["ids"])).to(
+                    self.device
+                ),
+                "input_mask": torch.from_numpy(pad_sequences(token_ids["mask"])).to(
+                    self.device
+                ),
+            }
+
+        else:
+            input_data = {
+                "input_ids": torch.as_tensor(np.array(token_ids["input_ids"])).to(
+                    self.device
+                ),
+                "attention_mask": torch.as_tensor(
+                    np.array(token_ids["attention_mask"])
+                ).to(self.device),
+            }
+
+        with torch.no_grad():
+            sequence_embeddings = self.model(**input_data)[0].cpu().detach().numpy()
+
+        try:
+            sequence_lenghts = input_data["attention_mask"].sum(1)
+        except KeyError:
+            sequence_lenghts = input_data["input_mask"].sum(1)
+
+        # get average embedding
+        return np.array(
+            [
+                sequence_embedding[:sequence_length].mean(0)
+                for sequence_embedding, sequence_length in zip(  # type:ignore
+                    sequence_embeddings, sequence_lenghts
+                )
+            ]
+        )
+
+
+class TAPEEmbedder(Embedder):
     def __init__(
         self,
         model_type: str = "transformer",
@@ -131,307 +266,6 @@ class TAPEEmbedding(StringEmbedding):
         self.model = self.model.to(self.device)
         self.model.eval()
         self.tokenizer = TAPETokenizer(vocab=aa_vocabulary)
-
-    def _encode_and_mask(self, sequence: str) -> Tuple[Any, Any]:
-        """Encode and mask a sequence.
-        Args:
-            sequence: AA sequence.
-        Returns:
-            a tuple containing the token ids and the mask.
-        """
-        token_ids = self.tokenizer.encode(sequence)
-        return token_ids, np.ones_like(token_ids)
-
-    def __call__(self, samples: List[str]) -> np.ndarray:
-        """Embed multiple protein sequences using TAPE.
-        Args:
-            samples: a list of protein sequences.
-        Returns:
-            a numpy array containing the embedding vectors.
-        """
-        # prepare input
-        token_ids, masks = zip(
-            *[self._encode_and_mask(sequence) for sequence in samples]
-        )
-        input_data = {
-            "input_ids": torch.from_numpy(pad_sequences(token_ids)).to(self.device),
-            "input_mask": torch.from_numpy(pad_sequences(masks)).to(self.device),
-        }
-        sequence_lenghts = input_data["input_mask"].sum(1)
-        sequence_embeddings = self.model(**input_data)[0].cpu().detach().numpy()
-        # get average embedding
-        return np.array(
-            [
-                sequence_embedding[:sequence_length].mean(0)
-                for sequence_embedding, sequence_length in zip(  # type:ignore
-                    sequence_embeddings, sequence_lenghts
-                )
-            ]
-        )
-
-
-class LMEmbedding(StringEmbedding):
-    """Embed a string representation of a molecule using a LM model"""
-
-    def __init__(
-        self,
-        model: str,
-        path_LM_model: str,
-        device: Optional[Union[torch.device, str]] = None,
-    ) -> None:
-        """Initialize the ProtTrans embedding class.
-
-        Args:
-            model_name: Langauge model name.
-            device: device where the inference
-                is running either as a dedicated class or a string. If not provided is inferred.
-        """
-
-        # get device
-        self.device = device_claim(device)
-        # tokenizer and model definition
-
-        self.tokenizer = PreTrainedTokenizerFast(
-            tokenizer_file=f"{path_LM_model}/tokenizer.json",
-            unk_token="[UNK]",
-            sep_token="[SEP]",
-            pad_token="[PAD]",
-            cls_token="[CLS]",
-            mask_token="[MASK]",
-        )
-        if "albert" in model:
-            self.model = AlbertForMaskedLM.from_pretrained(path_LM_model)
-        else:
-            self.model = XLNetLMHeadModel.from_pretrained(path_LM_model)
-
-        self.model = self.model.to(self.device)
-        self.model.eval()
-
-    def __call__(self, samples: List[str]) -> np.ndarray:
-        """Embed multiple protein sequences using ProtTrans Xl model.
-
-        Args:
-            samples: a list of strings representing molecules.
-                        Words/characters in the string mush be separated by a white space
-
-        Returns:
-            a numpy array containing the embedding vectors.
-        """
-
-        # prepare input
-        token_ids = self.tokenizer.batch_encode_plus(
-            samples, add_special_tokens=True, padding=True
-        )
-
-        input_ids = torch.tensor(token_ids["input_ids"]).to(self.device)
-        attention_mask = torch.tensor(token_ids["attention_mask"]).to(self.device)
-        with torch.no_grad():
-            embedding = self.model(input_ids=input_ids, attention_mask=attention_mask)
-        embedding = embedding[0].cpu().detach().numpy()
-        sequence_lenghts = [len(seq) for seq in samples]
-
-        embeddings = np.array(
-            [
-                sequence_embedding[:sequence_length].mean(0)
-                for sequence_embedding, sequence_length in zip(  # type:ignore
-                    embedding, sequence_lenghts
-                )
-            ]
-        )
-
-        embeddings = embeddings / np.linalg.norm(embeddings)
-        embeddings = embeddings.mean(axis=0)
-        return embeddings
-
-
-class ProtTransXL(StringEmbedding):
-    """Embed a string representation of a molecule using a ProtTrans_XLnet model"""
-
-    def __init__(
-        self,
-        model_name: str = "Rostlab/prot_t5_xl_uniref50",
-        device: Optional[Union[torch.device, str]] = None,
-    ) -> None:
-        """Initialize the ProtTrans embedding class.
-
-        Args:
-            model_name: ProtTrans model name.
-            device: device where the inference
-                is running either as a dedicated class or a string. If not provided is inferred.
-        """
-
-        self.model_name = model_name
-        # get device
-        self.device = device_claim(device)
-        # tokenizer and model definition
-        self.tokenizer = T5Tokenizer.from_pretrained(
-            self.model_name, do_lower_case=False
-        )
-        self.model = T5EncoderModel.from_pretrained(self.model_name)
-        self.model = self.model.to(self.device)
-        self.model.eval()
-
-    def __call__(self, samples: List[str]) -> np.ndarray:
-        """Embed multiple protein sequences using ProtTrans Xl model.
-
-        Args:
-            samples: a list of strings representing molecules.
-                        Words/characters in the string mush be separated by a white space
-
-        Returns:
-            a numpy array containing the embedding vectors.
-        """
-
-        # prepare input
-        if len(samples) < 2:
-            token_ids = self.tokenizer.encode_plus(
-                samples, add_special_tokens=True, padding=True, return_tensors="pt"
-            )
-        else:
-            token_ids = self.tokenizer.batch_encode_plus(
-                samples, add_special_tokens=True, padding=True
-            )
-
-        input_ids = torch.tensor(token_ids["input_ids"]).to(self.device)
-        attention_mask = torch.tensor(token_ids["attention_mask"]).to(self.device)
-
-        with torch.no_grad():
-            embedding = self.model(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-            )
-
-        # For feature extraction we recommend to use the encoder embedding
-        sequence_embeddings = embedding.last_hidden_state.cpu().numpy()
-        # decoder_embedding = embedding[0].cpu().numpy()
-
-        sequence_lenghts = attention_mask.sum(1)
-        # get average embedding
-        return np.array(
-            [
-                sequence_embedding[:sequence_length].mean(0)
-                for sequence_embedding, sequence_length in zip(  # type:ignore
-                    sequence_embeddings, sequence_lenghts
-                )
-            ]
-        )
-
-
-class ProtAlbertBert(StringEmbedding):
-    """Embed a string representation of a molecule using an HF transformers model."""
-
-    def __init__(
-        self,
-        model_path: str,
-        device: Optional[Union[torch.device, str]] = None,
-    ) -> None:
-        """Initialize the HF transformers embedding class.
-        Args:
-            model_path: relative path of the model in hugginface.
-            device: device where the inference
-                is running either as a dedicated class or a string. If not provided is inferred.
-        """
-        # get device
-        self.device = device_claim(device)
-        # tokenizer and model definition
-        if "albert" in model_path:
-            self.tokenizer = AlbertTokenizer.from_pretrained(
-                model_path, do_lower_case=False
-            )
-            self.model = AlbertModel.from_pretrained(model_path)
-        else:
-            self.tokenizer = BertTokenizer.from_pretrained(
-                model_path, do_lower_case=False
-            )
-            self.model = BertModel.from_pretrained(model_path)
-        self.model = self.model.to(self.device)
-        self.model.eval()
-
-    def __call__(self, samples: List[str]) -> np.ndarray:
-        """Embed multiple protein sequences using TAPE.
-        Args:
-            samples: a list of strings representing molecules.
-        Returns:
-            a numpy array containing the embedding vectors.
-        """
-        if len(samples) < 2:
-            token_ids = self.tokenizer.encode_plus(
-                samples,
-                add_special_tokens=True,
-                padding="max_length",
-                return_tensors="pt",
-            )
-        else:
-            token_ids = self.tokenizer.batch_encode_plus(
-                samples, add_special_tokens=True, padding="max_length"
-            )
-
-        input_ids = torch.tensor(token_ids["input_ids"]).to(self.device)
-        attention_mask = torch.tensor(token_ids["attention_mask"]).to(self.device)
-
-        with torch.no_grad():
-            embedding = self.model(input_ids=input_ids, attention_mask=attention_mask)
-
-        # For feature extraction we recommend to use the encoder embedding
-        sequence_embeddings = embedding[0].cpu().numpy()
-
-        sequence_lenghts = attention_mask.sum(1)
-        # get average embedding
-        return np.array(
-            [
-                sequence_embedding[:sequence_length].mean(0)
-                for sequence_embedding, sequence_length in zip(  # type:ignore
-                    sequence_embeddings, sequence_lenghts
-                )
-            ]
-        )
-
-
-class HuggingFaceTransformerEmbedding(StringEmbedding):
-    """Embed a string representation of a molecule using an HF transformers model."""
-
-    def __init__(
-        self,
-        model_name: str = "seyonec/ChemBERTa-zinc-base-v1",
-        tokenizer_name: str = "seyonec/ChemBERTa-zinc-base-v1",
-        device: Optional[Union[torch.device, str]] = None,
-    ) -> None:
-        """Initialize the HF transformers embedding class.
-        Args:
-            model_name: model name. Defaults to "seyonec/ChemBERTa-zinc-base-v1".
-            tokenizer_name: tokenizer name. Defaults to "seyonec/ChemBERTa-zinc-base-v1".
-            device: device where the inference
-                is running either as a dedicated class or a string. If not provided is inferred.
-        """
-        # get device
-        self.device = device_claim(device)
-        # tokenizer and model definition
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForMaskedLM.from_pretrained(tokenizer_name)
-        self.model = self.model.to(self.device)
-        self.model.eval()
-
-    def __call__(self, samples: List[str]) -> np.ndarray:
-        """Embed multiple protein sequences using TAPE.
-        Args:
-            samples: a list of strings representing molecules.
-        Returns:
-            a numpy array containing the embedding vectors.
-        """
-        # get the CLS token representation from each SMILES.
-        return (
-            self.model(
-                **{
-                    key: tensor.to(self.device)
-                    for key, tensor in self.tokenizer(
-                        samples, return_tensors="pt", padding=True
-                    ).items()
-                }
-            )[0][:, 0, :]
-            .detach()
-            .cpu()
-            .numpy()
-        )
 
 
 def mutate_sequence_with_variant(sequence: str, variant: str) -> str:
@@ -532,7 +366,7 @@ def sanitize_intervals_with_padding(
 
 def reconstruct_sequence_with_mutation_range(
     sequence: str, mutated_sequence_range: str, intervals: List[Tuple[int, int]]
-):
+) -> str:
     """Reconstruct a sequence replacing in given positions sub-sequences from a mutated range.
 
     Args:
@@ -544,19 +378,13 @@ def reconstruct_sequence_with_mutation_range(
         reconstructed sequence.
     """
     # create the mutated sequence, considering sorted intervals
-    mutated_range_offset = 0  # offset with respect to the mutated_sequence_range
-    mutated_sequence_offset = 0  # offset with respect to the full mutated sequence.
-    mutated_sequence = ""
+    mutated_sequence = list(sequence)
+    # split fragments by intervals
     for start, end in intervals:
-        mutated_sequence += sequence[mutated_sequence_offset:start]
-        chunk_length = end - start + 1
-        mutated_sequence += mutated_sequence_range[
-            mutated_range_offset : mutated_range_offset + chunk_length
-        ]
-        mutated_range_offset += chunk_length
-        mutated_sequence_offset = end + 1
-    mutated_sequence += sequence[end + 1 :]
-    return mutated_sequence
+        size_fragment = end - start
+        mutated_sequence[start:end] = list(mutated_sequence_range[:size_fragment])
+        mutated_sequence_range = mutated_sequence_range[size_fragment:]
+    return "".join(mutated_sequence)
 
 
 def selection(scores: List[Dict[str, Any]], k: int = 20) -> List[Any]:

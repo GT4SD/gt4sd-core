@@ -23,73 +23,62 @@
 #
 
 import warnings
-
-import pandas as pd
-
-# from gt4sd.frameworks.enzeptional.genetic_algorithm import (
-#     EnzymeOptimizerGeneticAlgorithm,
-# )
-from gt4sd.frameworks.enzeptional import genetic_algorithm_LM
+import pkg_resources
+from gt4sd.frameworks.enzeptional import core
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
-filepath = "/Users/yna/PhD/enzeptional/scorers/short_seq_tape.pkl"
+filepath = pkg_resources.resource_filename(
+    "gt4sd",
+    "frameworks/enzeptional/tests/scorer.pkl",
+)
+
 
 substrate = "NC1=CC=C(N)C=C1"
 product = "CNC1=CC=C(NC(=O)C2=CC=C(C=C2)C(C)=O)C=C1"
-sequence = "EGALFVEAESSHVLEDFGDFRPNDELHRVMVPTCDYSKGISSFPLLMVQLT"
+sequence = "EGALFVEAESSHVLEDFGDFRPNDELHRVMVPTCDYSKGISSFPLLMVQLTAESSHVLEDFGDFRPNVMVPTCDYSKGISSFPLLMVQLMVPTCDY"
 
-mutation_path = "/Users/yna/PhD/enzeptional/gt4sd-core/src/gt4sd/frameworks/enzeptional/tests/mutation_scheme.json"
+mutation_path = pkg_resources.resource_filename(
+    "gt4sd",
+    "frameworks/enzeptional/tests/mutation_scheme.json",
+)
 
-
-
-# Initialize the Enzyme Designer
-# designer = core.EnzymeOptimizer(
-#     scorer_filepath=filepath,
-#     substrate=substrate,
-#     product=product,
-#     sequence=sequence,
-#     protein_embedding_type="prottrans",
-#     protein_embedding_path="prottrans",
-# )
-
-designer = genetic_algorithm_LM.EnzymeOptimizerGeneticAlgorithm(
+designer = core.EnzymeOptimizer(
     scorer_filepath=filepath,
     substrate=substrate,
     product=product,
     sequence=sequence,
-    protein_embedding_path="tape",
-    protein_embedding_type="tape",
-    mutation_model_type="albert",
-    mutation_model_path="/Users/yna/PhD/enzeptional/models/albert_from_scratch",
+    protein_embedding=core.Embedder(
+        "Rostlab/prot_t5_xl_uniref50", "Rostlab/prot_t5_xl_uniref50"
+    ),
 )
 
+mutation_model = pkg_resources.resource_filename(
+    "gt4sd",
+    "frameworks/enzeptional/tests/mutation_model",
+)
 
+mutation_model_tokenizer = pkg_resources.resource_filename(
+    "gt4sd",
+    "frameworks/enzeptional/tests/mutation_model/tokenizer.json",
+)
 
-
-# Optimize the Enzyme Designer
-# results = designer.optimize(
-#     number_of_mutations=2,
-#     number_of_steps=1,
-#     intervals=[(10, 15), (18, 24)],
-#     number_of_samples_per_step=2,
-#     mutations=Mutations.from_json(mutation_path),
-# )
+mutation_object = core.MutationLanguageModel(mutation_model, mutation_model_tokenizer)
 
 results = designer.optimize(
-    number_of_mutations=2,
-    number_of_steps=1,
-    intervals=[(10, 15), (18, 24)],
-    pad_intervals=True,
+    number_of_mutations=1,
+    intervals=[(5, 19), (25, 40)],
+    number_of_steps=2,
+    full_sequence_embedding=True,
+    top_k=1,
+    mutation_generator_type="language-modeling",
+    batch_size=2,
+    mutation_generator_parameters={
+        "maximum_number_of_mutations": 4,
+        "mutation_object": mutation_object,
+    },
     population_per_itaration=5,
-    number_selection_per_iteration=2,
+    with_genetic_algorithm=True,
+    number_selected_sequences_per_iteration=1,
 )
-
-
-
-result_path = "/PATH_TO_SAVE_RESULTS"
-df = pd.DataFrame(results)
-print(df)
-# df.to_csv(result_path, encoding="utf-8", index=False)
-
