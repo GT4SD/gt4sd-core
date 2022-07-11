@@ -34,10 +34,11 @@ from typing import (
     MutableMapping,
     Optional,
     Sequence,
+    Set,
     Tuple,
     Type,
     Union,
-    Set
+    Callable
 )
 
 import numpy as np
@@ -49,17 +50,17 @@ from transformers import (
     T5EncoderModel,
     XLNetLMHeadModel,
     pipeline,
-    PreTrainedTokenizer
 )
+
 from .processing import (
+    CrossoverGenerator,
     Embedder,
+    SelectionGenerator,
     StringEmbedding,
     TAPEEmbedder,
     reconstruct_sequence_with_mutation_range,
     sanitize_intervals,
     sanitize_intervals_with_padding,
-    selection,
-    single_point_crossover,
 )
 
 #: transition matrix representation
@@ -220,7 +221,7 @@ class MutationGeneratorLanguageModeling(MutationGenerator):
         self.pipeline = pipeline(
             "fill-mask",
             model=self.mutation_object.mutation_model,
-            tokenizer= self.mutation_object.mutation_model_tokenizer,
+            tokenizer=self.mutation_object.mutation_model_tokenizer,
             top_k=self.top_k,
         )
 
@@ -290,25 +291,23 @@ class MutationGeneratorFactory:
     def get_mutation_generator(
         mutation_object: Union[Mutations, MutationLanguageModel],
         sequence: str,
-        **mutation_object_parameters: Dict[str, Any],
+        **mutation_object_parameters: int,
     ) -> MutationGenerator:
         mutation_generator: MutationGenerator
         if isinstance(mutation_object, MutationLanguageModel):
             mutation_generator = MutationGeneratorLanguageModeling(
                 sequence=sequence,
                 mutation_object=mutation_object,
-                top_k=int(mutation_object_parameters["top_k"]),
-                maximum_number_of_mutations=int(mutation_object_parameters[
-                    "maximum_number_of_mutations"
-                ]),
+                top_k=mutation_object_parameters["top_k"],
+                maximum_number_of_mutations=
+                    mutation_object_parameters["maximum_number_of_mutations"],
             )
         elif isinstance(mutation_object, Mutations):
             mutation_generator = MutationGeneratorTransitionMatrix(
                 sequence=sequence,
                 mutation_object=mutation_object,
-                maximum_number_of_mutations=int(mutation_object_parameters[
-                    "maximum_number_of_mutations"
-                ]),
+                maximum_number_of_mutations=
+                    mutation_object_parameters["maximum_number_of_mutations"],
             )
         else:
             raise ValueError(
@@ -320,6 +319,19 @@ class MutationGeneratorFactory:
 MUTATION_GENERATORS: Dict[str, Type[MutationGenerator]] = {
     "transition-matrix": MutationGeneratorTransitionMatrix,
     "language-modeling": MutationGeneratorLanguageModeling,
+}
+
+CROSSOVER_GENERATOR: Dict[str, Union[Callable[[Any, Any], Tuple[str, str]], Callable[[Any, Any, Any], Tuple[str, str]]]] = {
+    "single_point": lambda a_sequence, another_sequence: CrossoverGenerator().single_point_crossover(
+        a_sequence, another_sequence
+    ),
+    "uniform": lambda a_sequence, another_sequence, probability: CrossoverGenerator().uniform_crossover(
+        a_sequence, another_sequence, probability
+    ),
+}
+
+SELECTION_GENERATOR: Dict[str, Callable[[Any, Any], List[Any]]]  = {
+    "generic": lambda scores, k: SelectionGenerator().selection(scores, k)
 }
 
 
@@ -371,12 +383,12 @@ class EnzymeOptimizer:
         self.sequence_length = len(sequence)
 
     def extract_fragment_embedding(
-        self, sequence: str, intervals: Optional[List[Tuple[int, int]]]
+        self, sequence: str, intervals: List[Tuple[int, int]]
     ):
         """extrcat the embeddings for each fragment in a sequence.
         Args:
             sequences: a list of sequences to score.
-            intervals:
+            intervals: list of ranges in the sequence, zero-based
         Returns:
             a list of dictionaries of sequences and related scores.
         """
@@ -397,7 +409,7 @@ class EnzymeOptimizer:
     def score_sequence(
         self,
         sequence: str,
-        intervals: Optional[List[Tuple[int, int]]] = None,
+        intervals: List[Tuple[int, int]] = None,
         fragment_embeddings: Optional[bool] = False,
     ) -> float:
         """Score a given sequence.
@@ -424,7 +436,7 @@ class EnzymeOptimizer:
     def score_sequences(
         self,
         sequences: List[str],
-        intervals: Optional[List[Tuple[int, int]]] = None,
+        intervals: List[Tuple[int, int]] = None,
         fragment_embeddings: Optional[bool] = False,
     ) -> List[Dict[str, Any]]:
         """Score a given sequence list.
@@ -470,7 +482,7 @@ class EnzymeOptimizer:
         sequence_from_intervals: str,
         mutation_object: Type[MutationGenerator],
         initial_population: List[str] = None,
-        number_of_samples_to_generate: int = None,
+        number_of_samples_to_generate: int = 1,
     ) -> List[str]:
         """generate sequences.
         Args:
@@ -506,7 +518,7 @@ class EnzymeOptimizer:
         visited_sequences: set,
         intervals: List[Tuple[int, int]],
         batch_size: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
+    ) -> Tuple[Set[Any], List[Dict[str, Any]]]:
         """evaluate sequences.
         Args:
             original_sequence_score: int
@@ -550,13 +562,17 @@ class EnzymeOptimizer:
         self,
         sequence_from_intervals: str,
         tmp_results: List[Dict[str, Any]],
-        number_selected_sequences_per_iteration: int,
         intervals: List[Tuple[int, int]],
+        selection_method: str,
+        top_k_selection: Optional[int],
+        crossover_method: str,
+        crossover_probability: Optional[float],
     ) -> List[str]:
 
-        selected_children = selection(
-            tmp_results, k=number_selected_sequences_per_iteration
-        )
+        crossover = CROSSOVER_GENERATOR.get(crossover_method)
+        selection = SELECTION_GENERATOR.get(selection_method)
+        
+        selected_children = selection(tmp_results, top_k_selection)
 
         children: List[str] = []
         for pos in range(len(selected_children)):
@@ -564,9 +580,17 @@ class EnzymeOptimizer:
                 [self.sequence[start:end] for start, end in intervals]
             )
 
-            new_child_1, new_child_2 = single_point_crossover(
-                selected_child_mutated_fragments, sequence_from_intervals
-            )
+            if crossover_probability and crossover_method == "uniform":
+                new_child_1, new_child_2 = crossover(
+                    selected_child_mutated_fragments,
+                    sequence_from_intervals,
+                    crossover_probability,
+                )
+            else:
+                new_child_1, new_child_2 = crossover(
+                    selected_child_mutated_fragments, sequence_from_intervals
+                )
+
             children.append(new_child_1)
             children.append(new_child_2)
 
@@ -575,12 +599,13 @@ class EnzymeOptimizer:
     def optimize(
         self,
         number_of_mutations: int,
-        intervals: Optional[List[Tuple[int, int]]] = None,
+        intervals: List[Tuple[int, int]] = None,
         number_of_steps: int = 10,
         batch_size: int = 8,
         full_sequence_embedding: bool = True,
         number_of_sequences: Optional[int] = None,
         seed: int = 42,
+        minimum_interval_length: int = 8,
         time_budget: Optional[int] = None,
         mutation_generator_type: Union[
             str, Type[MutationGenerator]
@@ -593,7 +618,10 @@ class EnzymeOptimizer:
         pad_intervals: Optional[bool] = False,
         population_per_itaration: Optional[int] = None,
         with_genetic_algorithm: Optional[bool] = False,
-        number_selected_sequences_per_iteration: Optional[int] = 5,
+        selection_method: str = "generic",
+        top_k_selection: Optional[int] = None,
+        crossover_method: str = "single_point",
+        crossover_probability: Optional[float] = None,
     ) -> List[Dict[str, Any]]:
 
         """Optimize the enzyme given a number of mutations and a range.
@@ -613,7 +641,7 @@ class EnzymeOptimizer:
             pad_intervals: if True, in case a fragment of sequence has length < 8: it's going to be padded to a length = at least 8
             population_per_itaration: number of samples sequences per optimization step
             with_genetic_algorithm: Optimize using a genetic algorith
-            number_selected_sequences_per_iteration: in case of genetic algorithm optimization. Number of samples to select for crossover
+            selection_method: in case of genetic algorithm optimization. selection method with number of samples to select for crossover Defaults=5
 
         Raises:
             ValueError: in case an invalid range is provided.
@@ -635,7 +663,9 @@ class EnzymeOptimizer:
         # pad the sequences, to a minimal length of 8
         if pad_intervals:
             intervals = sanitize_intervals_with_padding(
-                intervals=intervals, sequence_length=self.sequence_length
+                intervals=intervals,
+                sequence_length=self.sequence_length,
+                minimum_interval_length=minimum_interval_length,
             )
 
         # check that the intervals are in the range of the sequence length
@@ -710,7 +740,7 @@ class EnzymeOptimizer:
         logger.info(f"original sequence score: {original_sequence_score}")
         results: List[Dict[str, Any]] = [scored_original_sequence]
 
-        visited_sequences: Set(str) = set()
+        visited_sequences: Set[str] = set()
         start_time = time.time()
 
         population: List[str] = []
@@ -737,8 +767,11 @@ class EnzymeOptimizer:
                 population = self.selection_crossover(
                     sequence_from_intervals,
                     temporary_results,
-                    number_selected_sequences_per_iteration,
                     intervals=intervals,
+                    selection_method=selection_method,
+                    top_k_selection=top_k_selection,
+                    crossover_method=crossover_method,
+                    crossover_probability=crossover_probability,
                 )
 
             logger.info(

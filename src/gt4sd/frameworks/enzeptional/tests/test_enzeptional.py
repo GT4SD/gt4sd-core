@@ -23,7 +23,9 @@
 #
 
 import warnings
+
 import pkg_resources
+
 from gt4sd.frameworks.enzeptional import core
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -38,11 +40,6 @@ filepath = pkg_resources.resource_filename(
 substrate = "NC1=CC=C(N)C=C1"
 product = "CNC1=CC=C(NC(=O)C2=CC=C(C=C2)C(C)=O)C=C1"
 sequence = "EGALFVEAESSHVLEDFGDFRPNDELHRVMVPTCDYSKGISSFPLLMVQLTAESSHVLEDFGDFRPNVMVPTCDYSKGISSFPLLMVQLMVPTCDY"
-
-mutation_path = pkg_resources.resource_filename(
-    "gt4sd",
-    "frameworks/enzeptional/tests/mutation_scheme.json",
-)
 
 designer = core.EnzymeOptimizer(
     scorer_filepath=filepath,
@@ -80,5 +77,7 @@ results = designer.optimize(
     },
     population_per_itaration=5,
     with_genetic_algorithm=True,
-    number_selected_sequences_per_iteration=1,
+    top_k_selection=1,
+    selection_method="generic",
+    crossover_method="single_point",
 )

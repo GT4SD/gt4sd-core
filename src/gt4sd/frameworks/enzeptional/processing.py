@@ -23,12 +23,13 @@
 #
 """enzeptional - data processing utilities."""
 
+from os import PathLike
 import random
 import warnings
 from abc import ABC
 from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, Union
+
 import numpy as np
-import os
 import torch
 from tape.datasets import pad_sequences
 from tape.registry import registry
@@ -47,12 +48,9 @@ from transformers import (
     XLNetLMHeadModel,
 )
 
+from ..torch import device_claim
+
 warnings.simplefilter(action="ignore", category=FutureWarning)
-
-
-def device_claim(_):
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 T = TypeVar("T")  # used for sample embedding
 
@@ -90,7 +88,7 @@ class Embedder(StringEmbedding):
     def __init__(
         self,
         model_path: str,
-        tokenizer_path: Optional[str] = None,
+        tokenizer_path: Union[str, PathLike[Any]],
         device: Optional[Union[torch.device, str]] = None,
     ) -> None:
         """Initialize the HF transformers embedding class.
@@ -295,21 +293,26 @@ def sanitize_intervals(intervals: List[Tuple[int, int]]) -> List[Tuple[int, int]
     Returns:
         sorted and non overlapping intervals.
     """
-    sorted_intervals = sorted(intervals, key=lambda interval: interval[0])
-    merged_intervals = []
-    previous = sorted_intervals[0]
-    for pos in range(1, len(sorted_intervals)):
-        current = sorted_intervals[pos]
-        previous_end = previous[1]
-        if current[0] <= previous_end:
-            previous_end = max(previous_end, current[1])
-            previous = (previous[0], previous_end)
-            if pos == len(sorted_intervals) - 1:
+    if len(intervals) > 1:
+        sorted_intervals = sorted(intervals, key=lambda interval: interval[0])
+        merged_intervals = []
+        previous = sorted_intervals[0]
+        for pos in range(1, len(sorted_intervals)):
+            current = sorted_intervals[pos]
+            previous_end = previous[1]
+            if current[0] <= previous_end:
+                previous_end = max(previous_end, current[1])
+                previous = (previous[0], previous_end)
+                if pos == len(sorted_intervals) - 1:
+                    merged_intervals.append(previous)
+            else:
                 merged_intervals.append(previous)
-        else:
-            merged_intervals.append(previous)
-            merged_intervals.append(current)
-    return merged_intervals
+                previous = current
+                if pos == len(sorted_intervals) - 1:
+                    merged_intervals.append(current)
+        return sorted(list(set(merged_intervals)))
+    else:
+        return intervals
 
 
 def round_up(number):
@@ -317,7 +320,9 @@ def round_up(number):
 
 
 def sanitize_intervals_with_padding(
-    intervals: List[Tuple[int, int]], sequence_length: int = 64
+    intervals: List[Tuple[int, int]],
+    sequence_length: int = 64,
+    minimum_interval_length: int = 8,
 ) -> List[Tuple[int, int]]:
     """Sanitize intervals padding the intervals that contain less then 8 AAs to 8.
 
@@ -332,8 +337,8 @@ def sanitize_intervals_with_padding(
     padded_intervals = []
     for start, end in clean_intervals:
         diff = end - start
-        if diff < 8:
-            to_pad = round_up((8 - diff) / 2)
+        if diff < minimum_interval_length:
+            to_pad = round_up((minimum_interval_length - diff) / 2)
             if start - to_pad < 0:
                 new_start = 0
                 if end + to_pad > sequence_length:
@@ -345,7 +350,7 @@ def sanitize_intervals_with_padding(
                         new_end = end + to_pad
 
                 padded_intervals.append((new_start, new_end))
-                if new_end - new_start < 8:
+                if new_end - new_start < minimum_interval_length:
                     warnings.warn("Warning. an dinterval has less than 8 AA")
             else:
                 if end + to_pad > sequence_length:
@@ -355,7 +360,7 @@ def sanitize_intervals_with_padding(
                     else:
                         new_start = start - to_pad
                     padded_intervals.append((new_start, new_end))
-                    if new_end - new_start < 8:
+                    if new_end - new_start < minimum_interval_length:
                         warnings.warn("Warning. an dinterval has less than 8 AA")
                 else:
                     padded_intervals.append((start - to_pad, end + to_pad))
@@ -387,67 +392,71 @@ def reconstruct_sequence_with_mutation_range(
     return "".join(mutated_sequence)
 
 
-def selection(scores: List[Dict[str, Any]], k: int = 20) -> List[Any]:
-    """Select the top k mutated sequences based on the score
+class SelectionGenerator:
+    def __init__(self) -> None:
+        pass
 
-    Args:
-        scores: dictionary containing sequences and scores.
-        K: number of top sequences to return
-
-    return:
-        retuen the top K sequences
-
-    """
-
-    res = list(sorted(scores, key=lambda d: d["score"], reverse=True))[:k]
-
-    return res
-
-
-def single_point_crossover(sequence_1: str, sequence_2: str) -> Tuple[str, str]:
-    """Given two sequences perform a single point crossover
-
-    Args:
-        sequence_1: a sequence.
-        sequence_2: a sequence
-
-    Returns:
-        return two sequences that are the crossover of the input sequences
-    """
-
-    # select crossover point that is not at the end of the string
-    random_point = random.randint(1, len(sequence_1) - 2)
-    new_sequence_1 = "".join(
-        np.append(sequence_1[:random_point], sequence_2[random_point:])
-    )
-    new_sequence_2 = "".join(
-        np.append(sequence_1[random_point:], sequence_2[:random_point])
-    )
-    return new_sequence_1, new_sequence_2
+    def selection(
+        self, scores: List[Dict[str, Any]], k: Optional[int] = None
+    ) -> List[Any]:
+        """Select the top k mutated sequences based on the score
+        Args:
+            scores: dictionary containing sequences and scores.
+            k: number of top sequences to return.
+        return:
+            The top k sequences
+        """
+        return list(sorted(scores, key=lambda d: d["score"], reverse=True))[:k]
 
 
-def uniform_crossover(
-    sequence_1: List[str], sequence_2: List[str], p: float
-) -> Tuple[str, str]:
-    """Given two sequences perform an uniform crossover
+class CrossoverGenerator:
+    def __init__(self) -> None:
+        pass
 
-    Args:
-        sequence_1: a sequence.
-        sequence_2: a sequence.
-        p: threshold probability of exchange of an AA between the two input sequences
+    def single_point_crossover(
+        self, a_sequence: str, another_sequence: str
+    ) -> Tuple[str, str]:
+        """Given two sequences perform a single point crossover
 
-    Returns:
-        return two sequences that are the crossover of the input sequences
-    """
+        Args:
+            a_sequence: a sequence.
+            another_sequence: a sequence
 
-    sequence_1 = sequence_1
-    sequence_2 = sequence_2
+        Returns:
+            return two sequences that are the crossover of the input sequences
+        """
 
-    for pos in range(len(sequence_1)):
-        tmp_prob = random.uniform(0, 1)
-        if tmp_prob > p:
-            tmp = sequence_1[pos]
-            sequence_1[pos] = sequence_2[pos]
-            sequence_2[pos] = tmp
+        # select crossover point that is not at the end of the string
+        random_point = random.randint(1, len(a_sequence) - 2)
+        new_sequence_1 = "".join(
+            np.append(a_sequence[:random_point], another_sequence[random_point:])
+        )
+        new_sequence_2 = "".join(
+            np.append(another_sequence[:random_point], a_sequence[random_point:])
+        )
+        return new_sequence_1, new_sequence_2
 
-    return "".join(sequence_1), "".join(sequence_2)
+    def uniform_crossover(
+        self, a_sequence: str, another_sequence: str, threshold_probability: float
+    ) -> Tuple[str, str]:
+        """Given two sequences perform an uniform crossover
+
+        Args:
+            a_sequence: a sequence.
+            another_sequence: a sequence.
+            threshold_probability: threshold probability of exchange of an AA between the two input sequences
+
+        Returns:
+            return two sequences that are the crossover of the input sequences
+        """
+        list_a_sequence = list(a_sequence)
+        list_another_sequence= list(another_sequence)
+
+        for pos in range(len(list_a_sequence)):
+            tmp_prob = random.uniform(0, 1)
+            if tmp_prob > threshold_probability:
+                tmp = list_a_sequence[pos]
+                list_a_sequence[pos] = list_another_sequence[pos]
+                list_another_sequence[pos] = tmp
+
+        return "".join(list_a_sequence), "".join(list_another_sequence)
