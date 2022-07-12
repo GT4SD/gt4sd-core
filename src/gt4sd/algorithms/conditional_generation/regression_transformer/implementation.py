@@ -37,26 +37,10 @@ from terminator.tokenization import InferenceBertTokenizer
 from transformers import AutoConfig, AutoModelWithLMHead, XLNetLMHeadModel
 
 from ....domains.materials import Sequence, validate_molecules
-from ....frameworks.torch import device_claim
+from ....frameworks.torch import device_claim, map_tensor_dict
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
-
-
-def map_tensor_dict(
-    tensor_dict: Dict[str, torch.Tensor], device: torch.device
-) -> Dict[str, torch.Tensor]:
-    """
-    Maps a dictionary of tensors to a specific device.
-
-    Args:
-        tensor_dict: A dictionary of tensors.
-        device: The device to map the tensors to.
-
-    Returns:
-        A dictionary of tensors mapped to the device.
-    """
-    return {key: tensor.to(device) for key, tensor in tensor_dict.items()}
 
 
 class ConditionalGenerator:
