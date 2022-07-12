@@ -28,7 +28,7 @@ from itertools import cycle, islice
 from typing import List
 
 from rdkit import Chem
-from molecule_generation import ModelWrapper
+from molecule_generation import VaeWrapper
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -81,7 +81,7 @@ class MoLeRGenerator:
         ]
         # generate molecules
         logger.info("running MoLeR...")
-        with ModelWrapper(
+        with VaeWrapper(
             self.resources_path,
             beam_size=self.beam_size,
             seed=self._seed,
