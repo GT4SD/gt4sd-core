@@ -43,6 +43,22 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
+def map_tensor_dict(
+    tensor_dict: Dict[str, torch.Tensor], device: torch.device
+) -> Dict[str, torch.Tensor]:
+    """
+    Maps a dictionary of tensors to a specific device.
+
+    Args:
+        tensor_dict: A dictionary of tensors.
+        device: The device to map the tensors to.
+
+    Returns:
+        A dictionary of tensors mapped to the device.
+    """
+    return {key: tensor.to(device) for key, tensor in tensor_dict.items()}
+
+
 class ConditionalGenerator:
     """Main interface for a regression transformer."""
 
@@ -348,7 +364,7 @@ class ConditionalGenerator:
         input_ids = inputs["input_ids"].cpu()
 
         # Forward pass
-        outputs = self.model(inputs)
+        outputs = self.model(map_tensor_dict(inputs, self.device))
 
         # Obtain the singular predictions
         prediction = self.search(outputs["logits"].detach())
@@ -420,7 +436,7 @@ class ConditionalGenerator:
         input_ids = inputs["input_ids"].clone()
 
         # Forward pass
-        outputs = self.model(inputs)
+        outputs = self.model(map_tensor_dict(inputs, self.device))
         # Obtain model predictions via the search method
         predictions = self.search(outputs["logits"].detach()).squeeze()
         # Combine predictions with the static part to obtain the full sequences
@@ -439,7 +455,7 @@ class ConditionalGenerator:
         }
 
         # Pass through model
-        property_outputs = self.model(prediction_input)
+        property_outputs = self.model(map_tensor_dict(prediction_input, self.device))
         # It's a design choice to go with greedy predictions here
         predictions = torch.argmax(property_outputs["logits"].detach(), dim=-1)
         # Obtain floating predictions
