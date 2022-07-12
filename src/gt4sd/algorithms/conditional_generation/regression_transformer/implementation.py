@@ -37,7 +37,7 @@ from terminator.tokenization import InferenceBertTokenizer
 from transformers import AutoConfig, AutoModelWithLMHead, XLNetLMHeadModel
 
 from ....domains.materials import Sequence, validate_molecules
-from ....frameworks.torch import device_claim
+from ....frameworks.torch import device_claim, map_tensor_dict
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -348,7 +348,7 @@ class ConditionalGenerator:
         input_ids = inputs["input_ids"].cpu()
 
         # Forward pass
-        outputs = self.model(inputs)
+        outputs = self.model(map_tensor_dict(inputs, self.device))
 
         # Obtain the singular predictions
         prediction = self.search(outputs["logits"].detach())
@@ -420,7 +420,7 @@ class ConditionalGenerator:
         input_ids = inputs["input_ids"].clone()
 
         # Forward pass
-        outputs = self.model(inputs)
+        outputs = self.model(map_tensor_dict(inputs, self.device))
         # Obtain model predictions via the search method
         predictions = self.search(outputs["logits"].detach()).squeeze()
         # Combine predictions with the static part to obtain the full sequences
@@ -439,7 +439,7 @@ class ConditionalGenerator:
         }
 
         # Pass through model
-        property_outputs = self.model(prediction_input)
+        property_outputs = self.model(map_tensor_dict(prediction_input, self.device))
         # It's a design choice to go with greedy predictions here
         predictions = torch.argmax(property_outputs["logits"].detach(), dim=-1)
         # Obtain floating predictions
