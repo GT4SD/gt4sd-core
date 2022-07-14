@@ -422,9 +422,9 @@ class ConditionalGenerator:
         # Forward pass
         outputs = self.model(map_tensor_dict(inputs, self.device))
         # Obtain model predictions via the search method
-        predictions = self.search(outputs["logits"].detach()).squeeze()
+        predictions = self.search(outputs["logits"].detach()).squeeze().cpu()
         # Combine predictions with the static part to obtain the full sequences
-        generations = input_ids
+        generations = input_ids.cpu()
         generations[generations == self.tokenizer.mask_token_id] = predictions[
             generations == self.tokenizer.mask_token_id
         ]
