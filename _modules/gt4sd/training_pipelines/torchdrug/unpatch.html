@@ -214,7 +214,6 @@
     <span class="n">TensorDataset</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">OLD_TORCH</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">sane_datasets</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">Dataset</span><span class="p">,</span>
     <span class="n">ChainDataset</span><span class="p">,</span>
@@ -224,17 +223,17 @@
     <span class="n">TensorDataset</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">pkg_resources</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">version</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
-    <span class="s2">&quot;1.11&quot;</span>
-<span class="p">):</span>
-    <span class="n">OLD_TORCH</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="kn">from</span> <span class="nn">torch.utils.data.dataset</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># type: ignore</span>
-        <span class="n">DFIterDataPipe</span><span class="p">,</span>
-        <span class="n">IterDataPipe</span><span class="p">,</span>
-        <span class="n">MapDataPipe</span><span class="p">,</span>
-    <span class="p">)</span>
+<span class="n">torch_version</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">pkg_resources</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
 
-    <span class="n">sane_datasets</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">DFIterDataPipe</span><span class="p">,</span> <span class="n">IterDataPipe</span><span class="p">,</span> <span class="n">MapDataPipe</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">torch_version</span> <span class="o">&lt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.12&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch_version</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.10&quot;</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">torch.utils.data.dataset</span> <span class="kn">import</span> <span class="n">DFIterDataPipe</span>  <span class="c1"># type: ignore</span>
+
+    <span class="n">sane_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DFIterDataPipe</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">torch_version</span> <span class="o">&lt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.12&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch_version</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.11&quot;</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">torch.utils.data.dataset</span> <span class="kn">import</span> <span class="n">IterDataPipe</span><span class="p">,</span> <span class="n">MapDataPipe</span>  <span class="c1"># type: ignore</span>
+
+    <span class="n">sane_datasets</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">IterDataPipe</span><span class="p">,</span> <span class="n">MapDataPipe</span><span class="p">])</span>
 
 
 <span class="n">sane_schedulers</span> <span class="o">=</span> <span class="p">[</span>
@@ -276,8 +275,10 @@
     <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Subset</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">TensorDataset</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
 
-    <span class="k">if</span> <span class="n">OLD_TORCH</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">torch_version</span> <span class="o">&lt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.12&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch_version</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.10&quot;</span><span class="p">):</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">DFIterDataPipe</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">if</span> <span class="n">torch_version</span> <span class="o">&lt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.12&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch_version</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.11&quot;</span><span class="p">):</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">IterDataPipe</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">MapDataPipe</span> <span class="o">=</span> <span class="n">sane_datasets</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
 
