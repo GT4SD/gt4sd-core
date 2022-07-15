@@ -52,7 +52,6 @@ from torch.utils.data.dataset import (
     TensorDataset,
 )
 
-OLD_TORCH: bool = False
 sane_datasets = [
     Dataset,
     ChainDataset,
@@ -62,17 +61,17 @@ sane_datasets = [
     TensorDataset,
 ]
 
-if version.parse(pkg_resources.get_distribution("torch").version) <= version.parse(
-    "1.11"
-):
-    OLD_TORCH = True
-    from torch.utils.data.dataset import (  # type: ignore
-        DFIterDataPipe,
-        IterDataPipe,
-        MapDataPipe,
-    )
+torch_version = version.parse(pkg_resources.get_distribution("torch").version)
 
-    sane_datasets.extend([DFIterDataPipe, IterDataPipe, MapDataPipe])
+if torch_version < version.parse("1.12") and torch_version >= version.parse("1.10"):
+    from torch.utils.data.dataset import DFIterDataPipe  # type: ignore
+
+    sane_datasets.append(DFIterDataPipe)
+
+if torch_version < version.parse("1.12") and torch_version >= version.parse("1.11"):
+    from torch.utils.data.dataset import IterDataPipe, MapDataPipe  # type: ignore
+
+    sane_datasets.extend([IterDataPipe, MapDataPipe])
 
 
 sane_schedulers = [
@@ -114,8 +113,10 @@ def fix_datasets(sane_datasets: List[Dataset]) -> None:
     torch.utils.data.dataset.Subset = sane_datasets[4]  # type: ignore
     torch.utils.data.dataset.TensorDataset = sane_datasets[5]  # type: ignore
 
-    if OLD_TORCH:
+    if torch_version < version.parse("1.12") and torch_version >= version.parse("1.10"):
         torch.utils.data.dataset.DFIterDataPipe = sane_datasets[6]  # type: ignore
+
+    if torch_version < version.parse("1.12") and torch_version >= version.parse("1.11"):
         torch.utils.data.dataset.IterDataPipe = sane_datasets[7]  # type: ignore
         torch.utils.data.dataset.MapDataPipe = sane_datasets[8]  # type: ignore
 

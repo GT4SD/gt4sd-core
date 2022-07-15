@@ -23,7 +23,7 @@
 #
 """Generic utils for pytorch."""
 
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import torch
 
@@ -37,7 +37,7 @@ def get_gpu_device_names() -> List[str]:
     gpu_device_names = []
     if torch.cuda.is_available():
         gpu_device_names = [
-            "cuda:{index}" for index in range(torch.cuda.device_count())
+            f"cuda:{index}" for index in range(torch.cuda.device_count())
         ]
     return gpu_device_names
 
@@ -67,8 +67,8 @@ def device_claim(device: Optional[Union[torch.device, str]] = None) -> torch.dev
     Satidfy a device claim.
 
     Args:
-        device: device where the inference
-            is running either as a dedicated class or a string. If not provided is inferred.
+        device: device where the inference is running either as a dedicated class or
+            a string. If not provided is inferred.
 
     Returns:
         torch.device: the claimed device or a default one.
@@ -95,3 +95,19 @@ def get_device_from_tensor(tensor: torch.Tensor) -> torch.device:
     device_id = tensor.get_device()
     device = "cpu" if device_id < 0 else f"cuda:{device_id}"
     return device_claim(device)
+
+
+def map_tensor_dict(
+    tensor_dict: Dict[str, torch.Tensor], device: torch.device
+) -> Dict[str, torch.Tensor]:
+    """
+    Maps a dictionary of tensors to a specific device.
+
+    Args:
+        tensor_dict: A dictionary of tensors.
+        device: The device to map the tensors to.
+
+    Returns:
+        A dictionary of tensors mapped to the device.
+    """
+    return {key: tensor.to(device) for key, tensor in tensor_dict.items()}
