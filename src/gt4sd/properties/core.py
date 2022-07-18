@@ -23,21 +23,27 @@
 #
 from typing import Any, Callable, Union
 
-from pydantic import BaseSettings
+from pydantic import BaseModel
+from typing import Optional
+from ..domains.materials import (
+    MacroMolecule,
+    PropertyValue,
+    Protein,
+    SmallMolecule,
+    Molecule,
+)
 
-from ..domains.materials import MacroMolecule, Property, Protein, SmallMolecule
 
-
-class PropertyPredictorConfiguration(BaseSettings):
-    """Abstract class for property prediction in molecules and proteins."""
+class PropertyConfiguration(BaseModel):
+    """Abstract class for property computation."""
 
     pass
 
 
-class PropertyPredictor:
-    """Property predictor."""
+class Property:
+    """Property base class."""
 
-    def __init__(self, parameters: PropertyPredictorConfiguration = None) -> None:
+    def __init__(self, parameters: PropertyConfiguration = None) -> None:
         """
         Args:
             parameters
@@ -45,7 +51,7 @@ class PropertyPredictor:
         self.parameters = parameters
 
     @staticmethod
-    def from_json(json_file: str) -> PropertyPredictorConfiguration:
+    def from_json(json_file: str) -> PropertyConfiguration:
         """Instantiate from json configuration.
 
         # pydantic from dict
@@ -54,8 +60,9 @@ class PropertyPredictor:
             json_file (str): configuration file
 
         Returns:
-            PropertyPredictor
+            Property
         """
+        # TODO: Not exactly sure how to
         pass
 
     def to_json(self) -> str:
@@ -64,12 +71,13 @@ class PropertyPredictor:
         Returns:
             str: json file
         """
+        # TODO
         pass
 
-    def __call__(self, sample: Any) -> Property:
+    def __call__(self, sample: Any) -> PropertyValue:
         """generic call method for all properties.
 
-        pp = PropertyPredictor(params)
+        pp = Property(params)
         property_value = pp(sample)
 
         Args:
@@ -78,44 +86,46 @@ class PropertyPredictor:
         Returns:
             Property:
         """
-        pass
+        raise NotImplementedError
 
 
-class CallablePropertyPredictor(PropertyPredictor):
+class CallableProperty(Property):
     def __init__(
-        self, parameters: PropertyPredictorConfiguration, callable_fn: Callable
+        self,
+        callable_fn: Callable,
+        parameters: Optional[PropertyConfiguration] = None,
     ) -> None:
         self.callable_fn = callable_fn
         super().__init__(parameters=parameters)
 
-    def __call__(
-        self, sample: Union[SmallMolecule, MacroMolecule, Protein]
-    ) -> Property:
+    def __call__(self, sample: Molecule) -> Property:
         """generic call method for all properties.
 
-        pp = PropertyPredictor(params)
-        property_value = pp(sample)
+        ```python
+        scorer = Property(params)
+        property_value = scorer(sample)
+        ```
 
         Args:
-            sample: input string (SMILES)
+            sample: input string.
 
         Returns:
-            Property: callable function to compute a generic property
+            Property: callable function to compute a generic property.
         """
         return self.callable_fn(sample)
 
 
-class SmallMoleculeProperty(PropertyPredictor):
+class SmallMoleculeProperty(Property):
     def __init__(self) -> None:
         super().__init__()
 
     def __call__(self, molecule: SmallMolecule) -> Property:
-        pass
+        raise NotImplementedError
 
 
-class ProteinProperty(PropertyPredictor):
+class ProteinProperty(Property):
     def __init__(self) -> None:
         super().__init__()
 
     def __call__(self, protein: MacroMolecule) -> Property:
-        pass
+        raise NotImplementedError

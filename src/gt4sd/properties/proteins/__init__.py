@@ -21,45 +21,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Any, Callable, Dict, Union
+from typing import Callable, Dict, Union
 
 from rdkit.Chem import Mol
 
-from ...domains.materials import MacroMolecule, Property, SmallMolecule
-from ..core import CallablePropertyPredictor, PropertyPredictor
+from ...domains.materials import MacroMolecule, PropertyValue, SmallMolecule
+from ..core import CallableProperty, Property
 from .core import (
     AliphaticIndex,
-    AliphaticIndexParameters,
+    AmideParameter,
+    AmidePhParameters,
     Aromaticity,
-    AromaticityParameters,
     BomanIndex,
-    BomanIndexParameters,
     Charge,
     ChargeDensity,
-    ChargeDensityParameters,
-    ChargeParameters,
     HydrophobicRatio,
-    HydrophobicRatioParameters,
     Instability,
-    InstabilityParameters,
     IsoelectricPoint,
-    IsoelectricPointParameters,
     Length,
-    LengthParameters,
+    MolecularWeight,
 )
 
 # All functions can be called with either a SMILES or a Mol object.
-PROTEIN_FACTORY: Dict[str, Any] = {
+PROTEIN_FACTORY: Dict[str, PropertyValue] = {
     # Inherent properties
-    "length": (Length, LengthParameters),
+    "length": (Length),
+    "weight": (MolecularWeight),
     # Rule-based properties
-    "boman_index": (BomanIndex, BomanIndexParameters),
-    "charge_density": (ChargeDensity, ChargeDensityParameters),
-    "charge": (Charge, ChargeDensityParameters),
-    "aliphaticity": (AliphaticIndex, AliphaticIndexParameters),
-    "hydrophobicity": (HydrophobicRatio, HydrophobicRatioParameters),
-    "isoelectric_point": (IsoelectricPoint, IsoelectricPointParameters),
-    "aromaticity": (Aromaticity, AromaticityParameters),
-    "instability": (Instability, InstabilityParameters),
+    "boman_index": (BomanIndex),
+    "charge_density": (ChargeDensity, AmidePhParameters),
+    "charge": (Charge, AmidePhParameters),
+    "aliphaticity": (AliphaticIndex),
+    "hydrophobicity": (HydrophobicRatio),
+    "isoelectric_point": (IsoelectricPoint, AmideParameter),
+    "aromaticity": (Aromaticity),
+    "instability": (Instability),
     # Properties predicted by ML models
 }

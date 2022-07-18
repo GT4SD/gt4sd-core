@@ -32,6 +32,13 @@ def length(protein: MacroMolecule) -> int:
     return int(desc.descriptor)
 
 
+def molecular_weight(protein: MacroMolecule, amide: bool = False) -> float:
+    """Computes the molecular weight of a protein."""
+    desc = get_descriptor(protein)
+    desc.calculate_MW(amide=amide)
+    return float(desc.descriptor)
+
+
 def boman_index(protein: MacroMolecule) -> float:
     """Computes the Boman index of a protein (sum of solubility values of all residues).
 
@@ -63,7 +70,7 @@ def hydrophobic_ratio(protein: MacroMolecule) -> float:
     return float(desc.descriptor)
 
 
-def charge(protein: MacroMolecule, ph: float = 7.4, amide: bool = True) -> float:
+def charge(protein: MacroMolecule, ph: float = 7.4, amide: bool = False) -> float:
     """Computes the charge of a protein.
 
     Bjellqvist, B., Hughes, G. J., Pasquali, C., Paquet, N., Ravier, F., Sanchez, J. C., ... & Hochstrasser, D. (1993).
@@ -76,7 +83,7 @@ def charge(protein: MacroMolecule, ph: float = 7.4, amide: bool = True) -> float
 
 
 def charge_density(
-    protein: MacroMolecule, ph: float = 7.4, amide: bool = True
+    protein: MacroMolecule, ph: float = 7.4, amide: bool = False
 ) -> float:
     """Computes the charge density of a protein.
 
@@ -89,7 +96,7 @@ def charge_density(
     return float(desc.descriptor)
 
 
-def isoelectric_point(protein: MacroMolecule, amide: bool = True) -> float:
+def isoelectric_point(protein: MacroMolecule, amide: bool = False) -> float:
     """Computes the isoelectric point of every residue and aggregates."""
     desc = get_descriptor(protein)
     desc.isoelectric_point(amide=amide)

@@ -24,11 +24,11 @@
 
 from typing import Any, Dict, Type
 
-from .core import CallablePropertyPredictor, PropertyPredictor
+from .core import CallableProperty, Property
 from .molecules import MOLECULE_FACTORY
 from .proteins import PROTEIN_FACTORY
 
-PROPERTY_PREDICTION_FACTORY: Dict[str, Any] = {}
+PROPERTY_FACTORY: Dict[str, Any] = {}
 
-PROPERTY_PREDICTION_FACTORY.update(MOLECULE_FACTORY)
-PROPERTY_PREDICTION_FACTORY.update(PROTEIN_FACTORY)
+PROPERTY_FACTORY.update(MOLECULE_FACTORY)
+PROPERTY_FACTORY.update(PROTEIN_FACTORY)

@@ -130,6 +130,7 @@ def get_sequence(protein: MacroMolecule) -> str:
     """
     if isinstance(protein, str):
         seq = protein.upper().strip()
+        return seq
     elif isinstance(protein, Chem.Mol):
         seq = Chem.MolToFASTA(protein).split()
     else:
