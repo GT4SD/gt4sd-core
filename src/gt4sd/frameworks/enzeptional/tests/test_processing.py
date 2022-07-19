@@ -26,6 +26,7 @@
 from gt4sd.frameworks.enzeptional.processing import (
     reconstruct_sequence_with_mutation_range,
     sanitize_intervals,
+    sanitize_intervals_with_padding,
 )
 
 
@@ -34,6 +35,16 @@ def test_sanitize_intervals():
         (-5, 12),
         (13, 14),
     ]
+
+
+def test_sanitize_intervals_padding():
+    assert sanitize_intervals_with_padding([(13, 14), (44, 45)]) == [(9, 18), (40, 49)]
+
+
+def test_sanitize_intervals_padding_with_sequence_length():
+    assert sanitize_intervals_with_padding(
+        [(13, 14), (44, 45)], sequence_length=45
+    ) == [(9, 18), (36, 45)]
 
 
 def test_reconstruct_sequence_with_mutation_range():
