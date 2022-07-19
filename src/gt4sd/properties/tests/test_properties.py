@@ -27,12 +27,16 @@ from typing import Any, Dict
 import numpy as np
 
 from gt4sd.properties.molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
+from gt4sd.properties.molecules.core import SimilaritySeed
 from gt4sd.properties.proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
+from gt4sd.properties.proteins.core import Charge
+from gt4sd.properties import PropertyPredictorRegistry
+
 
 protein = "KFLIYQMECSTMIFGL"
 protein_ground_truths = {
     "length": 16,
-    "weight": 1924.36,
+    "protein_weight": 1924.36,
     "boman_index": -0.534375,
     "aliphaticity": 97.5,
     "hydrophobicity": 0.5625,
@@ -48,7 +52,7 @@ seed = "CCO"
 target = "drd2"
 molecule_ground_truths = {
     "plogp": 0.25130060815905964,
-    "weight": 186.05199999999996,
+    "molecular_weight": 186.05199999999996,
     "lipinski": 1,
     "esol": -2.6649954522215555,
     "scscore": 4.391860681753299,
@@ -77,16 +81,16 @@ protein_further_ground_truths = {"charge": 1.123}
 
 
 def test_properties():
-    def test_property(
+    def _test_property(
         prop_key: str, label: float, factory: Dict[str, Any], sample: str
     ):
         property_class, parameters_class = factory[prop_key]
         function = property_class(parameters_class())
-        assert np.allclose(function(sample), label)
+        assert np.isclose(function(sample), label)
 
     # test protein properties
     for prop, value in protein_ground_truths.items():
-        test_property(
+        _test_property(
             prop_key=prop,
             label=value,
             factory=PROTEIN_PROPERTY_PREDICTOR_FACTORY,
@@ -95,7 +99,7 @@ def test_properties():
 
     # test molecule properties
     for prop, value in molecule_ground_truths.items():
-        test_property(
+        _test_property(
             prop_key=prop,
             label=value,
             factory=MOLECULE_PROPERTY_PREDICTOR_FACTORY,
@@ -107,7 +111,7 @@ def test_properties():
         "similarity_seed"
     ]
     function = property_class(parameters_class(smiles=seed))
-    assert np.allclose(
+    assert np.isclose(
         function(molecule), molecule_further_ground_truths["similarity_seed"]
     )
 
@@ -115,10 +119,20 @@ def test_properties():
         "activity_against_target"
     ]
     function = property_class(parameters_class(target=target))
-    assert np.allclose(
+    assert np.isclose(
         function(molecule), molecule_further_ground_truths["activity_against_target"]
     )
 
     property_class, parameters_class = PROTEIN_PROPERTY_PREDICTOR_FACTORY["charge"]
     function = property_class(parameters_class(amide=True, ph=5.0))
-    assert np.allclose(function(protein), protein_further_ground_truths["charge"])
+    assert np.isclose(function(protein), protein_further_ground_truths["charge"])
+
+
+def test_property_predictor_registry():
+    predictor = PropertyPredictorRegistry.get_property_predictor("similarity_seed", {"smiles" : seed})
+    assert isinstance(predictor, SimilaritySeed)
+    assert np.isclose(predictor(molecule), molecule_further_ground_truths["similarity_seed"])
+    predictor = PropertyPredictorRegistry.get_property_predictor("charge", {"amide" : "True", "ph": 5.0})
+    assert isinstance(predictor, Charge)
+    assert np.isclose(predictor(protein), protein_further_ground_truths["charge"])
+    assert len(PropertyPredictorRegistry.list_available()) == len(PROTEIN_PROPERTY_PREDICTOR_FACTORY) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY)

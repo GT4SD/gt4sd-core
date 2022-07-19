@@ -57,7 +57,7 @@ MOLECULE_PROPERTY_PREDICTOR_FACTORY: Dict[
     str, Tuple[Type[PropertyPredictor], Type[PropertyPredictorParameters]]
 ] = {
     # inherent properties
-    "weight": (MolecularWeight, PropertyPredictorParameters),
+    "molecular_weight": (MolecularWeight, PropertyPredictorParameters),
     "number_of_aromatic_rings": (NumberAromaticRings, PropertyPredictorParameters),
     "number_of_h_acceptors": (NumberHAcceptors, PropertyPredictorParameters),
     "number_of_h_donors": (NumberHDonors, PropertyPredictorParameters),

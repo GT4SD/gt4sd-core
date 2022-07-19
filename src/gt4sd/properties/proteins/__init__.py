@@ -45,7 +45,7 @@ PROTEIN_PROPERTY_PREDICTOR_FACTORY: Dict[
 ] = {
     # inherent properties
     "length": (Length, PropertyPredictorParameters),
-    "weight": (MolecularWeight, AmideConfiguration),
+    "protein_weight": (MolecularWeight, AmideConfiguration),
     # rule-based properties
     "boman_index": (BomanIndex, PropertyPredictorParameters),
     "charge_density": (ChargeDensity, AmidePhConfiguration),
