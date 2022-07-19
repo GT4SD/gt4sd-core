@@ -24,10 +24,10 @@
 from typing import Callable
 
 from rdkit import Chem
-from modlamp.descriptors import GlobalDescriptor
-from tdc import Oracle
-from tdc.chem_utils.oracle.oracle import fp2fpfunc
-from tdc.metadata import download_oracle_names
+from modlamp.descriptors import GlobalDescriptor  # type: ignore
+from tdc import Oracle  # type: ignore
+from tdc.chem_utils.oracle.oracle import fp2fpfunc  # type: ignore
+from tdc.metadata import download_oracle_names  # type: ignore
 
 from .core import MacroMolecule, Property, SmallMolecule
 

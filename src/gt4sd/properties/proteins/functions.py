@@ -70,7 +70,7 @@ def hydrophobic_ratio(protein: MacroMolecule) -> float:
     return float(desc.descriptor)
 
 
-def charge(protein: MacroMolecule, ph: float = 7.4, amide: bool = False) -> float:
+def charge(protein: MacroMolecule, ph: float = 7.0, amide: bool = False) -> float:
     """Computes the charge of a protein.
 
     Bjellqvist, B., Hughes, G. J., Pasquali, C., Paquet, N., Ravier, F., Sanchez, J. C., ... & Hochstrasser, D. (1993).
@@ -83,7 +83,7 @@ def charge(protein: MacroMolecule, ph: float = 7.4, amide: bool = False) -> floa
 
 
 def charge_density(
-    protein: MacroMolecule, ph: float = 7.4, amide: bool = False
+    protein: MacroMolecule, ph: float = 7.0, amide: bool = False
 ) -> float:
     """Computes the charge density of a protein.
 
