@@ -26,12 +26,11 @@ from typing import Any, Dict
 
 import numpy as np
 
+from gt4sd.properties import PropertyPredictorRegistry
 from gt4sd.properties.molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.molecules.core import SimilaritySeed
 from gt4sd.properties.proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.proteins.core import Charge
-from gt4sd.properties import PropertyPredictorRegistry
-
 
 protein = "KFLIYQMECSTMIFGL"
 protein_ground_truths = {
@@ -129,10 +128,18 @@ def test_properties():
 
 
 def test_property_predictor_registry():
-    predictor = PropertyPredictorRegistry.get_property_predictor("similarity_seed", {"smiles" : seed})
+    predictor = PropertyPredictorRegistry.get_property_predictor(
+        "similarity_seed", {"smiles": seed}
+    )
     assert isinstance(predictor, SimilaritySeed)
-    assert np.isclose(predictor(molecule), molecule_further_ground_truths["similarity_seed"])
-    predictor = PropertyPredictorRegistry.get_property_predictor("charge", {"amide" : "True", "ph": 5.0})
+    assert np.isclose(
+        predictor(molecule), molecule_further_ground_truths["similarity_seed"]
+    )
+    predictor = PropertyPredictorRegistry.get_property_predictor(
+        "charge", {"amide": "True", "ph": 5.0}
+    )
     assert isinstance(predictor, Charge)
     assert np.isclose(predictor(protein), protein_further_ground_truths["charge"])
-    assert len(PropertyPredictorRegistry.list_available()) == len(PROTEIN_PROPERTY_PREDICTOR_FACTORY) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY)
+    assert len(PropertyPredictorRegistry.list_available()) == len(
+        PROTEIN_PROPERTY_PREDICTOR_FACTORY
+    ) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY)
