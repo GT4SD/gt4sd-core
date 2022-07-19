@@ -24,6 +24,7 @@
 from typing import Dict
 
 from rdkit.Chem import Mol
+
 from ...domains.materials import PropertyValue
 from ..core import CallableProperty, Property, PropertyConfiguration
 from .core import (

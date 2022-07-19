@@ -21,38 +21,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Any, Callable, Union
+from typing import Any, Callable
 
 from pydantic import BaseModel
-from typing import Optional
+
 from ..domains.materials import (
     MacroMolecule,
-    PropertyValue,
-    Protein,
-    SmallMolecule,
     Molecule,
+    PropertyValue,
+    SmallMolecule,
 )
 
 
 class PropertyConfiguration(BaseModel):
     """Abstract class for property computation."""
-
-    # def __repr__(self):
-    #     """Print class name, object ID and all attributes."""
-    #     attrs = ''
-
-    #     for attr in dir(self):
-    #         if attr.startswith('__') or attr in dir(BaseModel):
-    #             continue
-    #         attrs += f"\n\t{attr}={eval(f'self.{attr}')}"
-
-    #     return "<{klass} @{id:x}{attrs}\n>".format(
-    #         klass=self.__class__.__name__, id=id(self) & 0xFFFFFF, attrs=attrs
-    #     )
-
-
-class EmptyConfiguration(PropertyConfiguration):
-    """Empty property configuration, renamed for clarity."""
 
     pass
 
@@ -83,13 +65,14 @@ class Property:
         pass
 
     def to_json(self) -> str:
-        """Convert instance PropertyPrediction in json configuration.
+        """Convert instance Property in json configuration.
 
         Returns:
-            str: json file
+            str: json file.
         """
-        # TODO
-        pass
+        params = {"name": type(self).__name__}
+        params.update(self.parameters.dict())
+        return params
 
     def __call__(self, sample: Any) -> PropertyValue:
         """generic call method for all properties.
@@ -168,7 +151,3 @@ class ProteinProperty(Property):
 
     def __call__(self, protein: MacroMolecule) -> Property:
         raise NotImplementedError
-
-
-class ArbitraryConfig:
-    arbitrary_types_allowed = True

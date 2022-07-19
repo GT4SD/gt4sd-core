@@ -21,17 +21,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-import pydantic
 from paccmann_generator.drug_evaluators import SCScore
+
 from ..core import (
     CallableConfigurableProperty,
     CallableProperty,
     PropertyConfiguration,
     SmallMolecule,
-    ArbitraryConfig,
 )
+from ..utils import get_activity_fn, get_similarity_fn
 from .functions import (
-    activity_against_target,
     bertz,
     esol,
     is_scaffold,
@@ -50,11 +49,8 @@ from .functions import (
     plogp,
     qed,
     sas,
-    scscore,
-    similarity_to_seed,
     tpsa,
 )
-from ..utils import get_similarity_fn
 
 
 # Parameter classes
@@ -64,14 +60,16 @@ class ScscoreConfiguration(PropertyConfiguration):
     fp_rad: int = 2
 
 
-@pydantic.dataclasses.dataclass(config=ArbitraryConfig)
 class SimilaritySeedParameters(PropertyConfiguration):
-    # seed: SmallMolecule
+    seed: SmallMolecule
     fp_key: str = "ECFP4"
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class ActivityAgainstTargetParameters(PropertyConfiguration):
-    pass
+    target: str
 
 
 # Property classes
@@ -273,8 +271,10 @@ class SimilaritySeed(CallableProperty):
         )
 
 
-class ActivityAgainstTarget(CallableConfigurableProperty):
+class ActivityAgainstTarget(CallableProperty):
     """Calculate the activity of a molecule against a target molecule."""
 
     def __init__(self, parameters: ActivityAgainstTargetParameters) -> None:
-        super().__init__(callable_fn=activity_against_target, parameters=parameters)
+        super().__init__(
+            callable_fn=get_activity_fn(target=parameters.target), parameters=parameters
+        )

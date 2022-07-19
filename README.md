@@ -281,6 +281,32 @@ gt4sd-upload --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4
 **NOTE:** GT4SD can be configured to upload models to a custom or self-hosted COS.
 An example on self-hosting locally a COS (minio) where to upload your models can be found [here](https://gt4sd.github.io/gt4sd-core/source/gt4sd_server_upload_md.html).
 
+
+### Computing properties
+
+You can compute properties of your generated samples using the `gt4sd.properties` submodule:
+
+```python
+>>>from gt4sd.properties.molecules import MOLECULE_FACTORY
+>>>Property, params = MOLECULE_FACTORY['similarity_seed']
+>>>sim = Prop(params(seed='C1=CC(=CC(=C1)Br)CN')
+>>>sim('CCO')
+0.0333
+>>># Let's inspect what other parameters we can set for similarity measuring
+>>>params(seed='')
+SimilaritySeedParameters(seed='', fp_key='ECFP4')
+>>># Let's use another fingerprint (ECFP6)
+>>>sim = Prop(params(seed='C1=CC(=CC(=C1)Br)CN', fp_key='ECFP6')
+>>>sim('CCO')
+0.029411764705882353
+>>># Other properties are simpler and do not have any configurable parameters
+>>>qed = Prop(params())
+>>>qed('CCO')
+0.4068
+>>>params()
+PropertyConfiguration()
+```
+
 ### Additional examples
 
 Find more examples in [notebooks](./notebooks)

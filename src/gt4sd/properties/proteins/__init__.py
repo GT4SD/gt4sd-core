@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Callable, Dict, Union, Tuple
+from typing import Callable, Dict, Tuple, Union
 
 from rdkit.Chem import Mol
 
