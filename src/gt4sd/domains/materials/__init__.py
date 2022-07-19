@@ -30,9 +30,7 @@ import pandas as pd
 from rdkit import Chem
 from rdkit.Chem import Mol
 
-from gt4sd.exceptions import InvalidItem
-
-# TODO setting to str directly requires no wrapping, so wrong strings could be passed
+# TODO: setting to str directly requires no wrapping, so wrong strings could be passed
 Protein = str  # NewType('Protein', str)
 SMILES = str  # NewType('SMILES', str)
 SmallMolecule = Union[SMILES, Mol]
@@ -41,14 +39,6 @@ Omics = Union[np.ndarray, pd.Series]
 PAG = SMILES
 Molecule = Union[SmallMolecule, MacroMolecule]
 Sequence = str
-PropertyValue = Union[float, int, Dict[str, Any]]
-
-
-def check_smiles(smiles: SMILES):
-    try:
-        pass  # TODO
-    except Exception:
-        raise InvalidItem(title="invalid SMILES", detail="Validation as SMILES failed.")
 
 
 def validate_molecules(

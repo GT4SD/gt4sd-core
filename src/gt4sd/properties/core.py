@@ -21,133 +21,94 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Any, Callable
+from typing import Any, Callable, Dict, Union
 
 from pydantic import BaseModel
 
-from ..domains.materials import (
-    MacroMolecule,
-    Molecule,
-    PropertyValue,
-    SmallMolecule,
-)
+PropertyValue = Union[float, int, Dict[str, Any]]
 
 
-class PropertyConfiguration(BaseModel):
+class PropertyPredictorParameters(BaseModel):
     """Abstract class for property computation."""
 
     pass
 
 
-class Property:
-    """Property base class."""
+class PropertyPredictor:
+    """PropertyPredictor base class."""
 
-    def __init__(self, parameters: PropertyConfiguration = None) -> None:
-        """
+    def __init__(
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
+    ) -> None:
+        """Construct a PropertyPredictor using the related parameters.
         Args:
-            parameters
+            parameters: parameters to configure the predictor.
         """
         self.parameters = parameters
 
-    @staticmethod
-    def from_json(json_file: str) -> PropertyConfiguration:
-        """Instantiate from json configuration.
-
-        # pydantic from dict
-
-        Args:
-            json_file (str): configuration file
-
-        Returns:
-            Property
-        """
-        # TODO: Not exactly sure how to
-        pass
-
-    def to_json(self) -> str:
-        """Convert instance Property in json configuration.
-
-        Returns:
-            str: json file.
-        """
-        params = {"name": type(self).__name__}
-        params.update(self.parameters.dict())
-        return params
-
     def __call__(self, sample: Any) -> PropertyValue:
-        """generic call method for all properties.
-
-        pp = Property(params)
-        property_value = pp(sample)
+        """Call the PropertyPredictor.
 
         Args:
-            sample:
+            sample: a sample to use for predicting the property of interest.
 
         Returns:
             Property:
+
+        Example:
+            An example for predicting properties::
+
+                property_predictor = PropertyPredictor(parameters)
+                value = property_predictor(sample)
         """
         raise NotImplementedError
 
 
-class CallableProperty(Property):
-    """Property class that calls a callable function."""
+class CallablePropertyPredictor(PropertyPredictor):
+    """Property predictor based on a callable."""
 
     def __init__(
         self,
         callable_fn: Callable,
-        parameters: PropertyConfiguration,
+        parameters: PropertyPredictorParameters = PropertyPredictorParameters(),
     ) -> None:
         self.callable_fn = callable_fn
         super().__init__(parameters=parameters)
 
-    def __call__(self, sample: Molecule) -> Property:
-        """generic call method for all properties.
-
-        ```python
-        scorer = Property(params)
-        property_value = scorer(sample)
-        ```
+    def __call__(self, sample: Any) -> PropertyValue:
+        """Call the PropertyPredictor.
 
         Args:
-            sample: input string.
+            sample: a sample to use for predicting the property of interest.
 
         Returns:
-            Property: callable function to compute a generic property.
+            Property:
+
+        Example:
+            An example for predicting properties::
+
+                property_predictor = CallablePropertyPredictor(callable_fn=lambda a: id(a), parameters)
+                value = property_predictor(sample)
         """
         return self.callable_fn(sample)
 
 
-class CallableConfigurableProperty(CallableProperty):
-    """Property class that calls a callable function with parameters as keyword args."""
+class ConfigurableCallablePropertyPredictor(CallablePropertyPredictor):
+    """Property predictor based on a callable that is configured using the provided parameters."""
 
-    def __call__(self, sample: Molecule) -> Property:
-        """generic call method for all properties.
-
-        ```python
-        scorer = Property(params)
-        property_value = scorer(sample)
-        ```
+    def __call__(self, sample: Any) -> PropertyValue:
+        """Call the PropertyPredictor.
 
         Args:
-            sample: input string.
+            sample: a sample to use for predicting the property of interest.
 
         Returns:
-            Property: callable function to compute a generic property.
+            Property:
+
+        Example:
+            An example for predicting properties::
+
+                property_predictor = CallablePropertyPredictor(callable_fn=lambda a, b: id(a), parameters)
+                value = property_predictor(sample)
         """
         return self.callable_fn(sample, **self.parameters.dict())
-
-
-class SmallMoleculeProperty(Property):
-    def __init__(self) -> None:
-        super().__init__()
-
-    def __call__(self, molecule: SmallMolecule) -> Property:
-        raise NotImplementedError
-
-
-class ProteinProperty(Property):
-    def __init__(self) -> None:
-        super().__init__()
-
-    def __call__(self, protein: MacroMolecule) -> Property:
-        raise NotImplementedError

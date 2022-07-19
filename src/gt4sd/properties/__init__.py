@@ -21,14 +21,44 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+from typing import Any, Dict, List, Tuple, Type
 
-from typing import Any, Dict, Type
+from .core import PropertyPredictor, PropertyPredictorParameters
+from .molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
+from .proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 
-from .core import CallableProperty, Property
-from .molecules import MOLECULE_FACTORY
-from .proteins import PROTEIN_FACTORY
+PROPERTY_PREDICTOR_FACTORY: Dict[str, Any] = {
+    **MOLECULE_PROPERTY_PREDICTOR_FACTORY,
+    **PROTEIN_PROPERTY_PREDICTOR_FACTORY,
+}
+AVAILABLE_PROPERTY_PREDICTORS = sorted(PROPERTY_PREDICTOR_FACTORY.keys())
 
-PROPERTY_FACTORY: Dict[str, Any] = {}
 
-PROPERTY_FACTORY.update(MOLECULE_FACTORY)
-PROPERTY_FACTORY.update(PROTEIN_FACTORY)
+class PropertyPredictorRegistry:
+    """A registry for property predictors."""
+
+    @staticmethod
+    def get_property_predictor_parameters_schema(name: str) -> Dict[str, Any]:
+        try:
+            _, parameters_class = PROPERTY_PREDICTOR_FACTORY[name]
+            return parameters_class().schema()
+        except KeyError:
+            raise ValueError(
+                f"Property predictor name={name} not supported. Pick one from {AVAILABLE_PROPERTY_PREDICTORS}"
+            )
+
+    @staticmethod
+    def get_property_predictor(
+        name: str, parameters: Dict[str, Any]
+    ) -> PropertyPredictor:
+        try:
+            property_class, parameters_class = PROPERTY_PREDICTOR_FACTORY[name]
+            return property_class(parameters_class(**parameters))
+        except KeyError:
+            raise ValueError(
+                f"Property predictor name={name} not supported. Pick one from {AVAILABLE_PROPERTY_PREDICTORS}"
+            )
+
+    @staticmethod
+    def list_available() -> List[str]:
+        return AVAILABLE_PROPERTY_PREDICTORS

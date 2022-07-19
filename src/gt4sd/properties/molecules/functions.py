@@ -47,7 +47,7 @@ from paccmann_generator.drug_evaluators import (  # SIDER,; ClinTox,; OrganDB,; 
 from rdkit.Chem.rdMolDescriptors import CalcNumAtomStereoCenters, CalcNumHeterocycles
 from rdkit.Chem.Scaffolds.MurckoScaffold import MurckoScaffoldSmiles
 
-from ..core import Property, SmallMolecule
+from ...domains.materials import SmallMolecule
 from ..utils import to_mol, to_smiles
 
 # Instantiate classes for faster inference
@@ -225,30 +225,26 @@ def similarity_to_seed(
 ) -> float:
     """Calculate the similarity of a molecule to a seed molecule.
 
-    For example:
-    ```py
-    from gt4sd.properties.molecules import similarity_to_seed, get_similarity_fn
+    Example:
+        An example::
 
-    func = get_similarity_fn(target_mol='CCO', fp_key='FCFP4')
-    similarity_to_seed(mol='CCC', similarity_fn=func)
-    ```
-
+            from gt4sd.properties.molecules import similarity_to_seed, get_similarity_fn
+            func = get_similarity_fn(target_mol='CCO', fp_key='FCFP4')
+            similarity_to_seed(mol='CCC', similarity_fn=func)
     """
     return similarity_fn(to_smiles(mol))
 
 
 def activity_against_target(
-    mol: SmallMolecule, affinity_fn: Callable[[SmallMolecule], Property]
+    mol: SmallMolecule, affinity_fn: Callable[[SmallMolecule], float]
 ) -> float:
     """Calculate the activity of a molecule against a target molecule.
 
-    For example:
-    ```py
-    from gt4sd.properties.molecules import activity_against_target, get_activity_fn
+    Example:
+        An example::
 
-    func = get_activity_fn(target_mol='DRD2')
-    activity_against_target(mol='CCC', affinity_fn=func)
-    ```
-
+            from gt4sd.properties.molecules import activity_against_target, get_activity_fn
+            func = get_activity_fn(target_mol='DRD2')
+            activity_against_target(mol='CCC', affinity_fn=func)
     """
     return affinity_fn(to_smiles(mol))

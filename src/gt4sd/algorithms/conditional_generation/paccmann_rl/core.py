@@ -32,7 +32,7 @@ from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
 from typing_extensions import Protocol, runtime_checkable
 
-from ....domains.materials import Omics, Protein, SmallMolecule
+from ....domains.materials import SMILES, Omics, Protein
 from ....exceptions import InvalidItem
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
@@ -46,7 +46,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 T = TypeVar("T", Protein, Omics)
-S = TypeVar("S", bound=SmallMolecule)
+S = TypeVar("S", bound=SMILES)
 Targeted = Callable[[T], Iterable[Any]]
 
 
@@ -127,7 +127,7 @@ class PaccMannRL(GeneratorAlgorithm[S, T]):
 
 
 @ApplicationsRegistry.register_algorithm_application(PaccMannRL)
-class PaccMannRLProteinBasedGenerator(AlgorithmConfiguration[SmallMolecule, Protein]):
+class PaccMannRLProteinBasedGenerator(AlgorithmConfiguration[SMILES, Protein]):
     """
     Configuration to generate compounds with high affinity to a target protein.
 
@@ -185,7 +185,7 @@ class PaccMannRLProteinBasedGenerator(AlgorithmConfiguration[SmallMolecule, Prot
             samples_per_protein=self.batch_size,
         )
 
-    def validate_item(self, item: str) -> SmallMolecule:
+    def validate_item(self, item: str) -> SMILES:
         """Check that item is a valid SMILES.
 
         Args:
@@ -206,11 +206,11 @@ class PaccMannRLProteinBasedGenerator(AlgorithmConfiguration[SmallMolecule, Prot
                 title="InvalidSMILES",
                 detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
             )
-        return SmallMolecule(item)
+        return SMILES(item)
 
 
 @ApplicationsRegistry.register_algorithm_application(PaccMannRL)
-class PaccMannRLOmicBasedGenerator(AlgorithmConfiguration[SmallMolecule, Omics]):
+class PaccMannRLOmicBasedGenerator(AlgorithmConfiguration[SMILES, Omics]):
     """
     Configuration to generate compounds with low IC50 for a target omics profile.
 
@@ -268,7 +268,7 @@ class PaccMannRLOmicBasedGenerator(AlgorithmConfiguration[SmallMolecule, Omics])
             samples_per_profile=self.batch_size,
         )
 
-    def validate_item(self, item: str) -> SmallMolecule:
+    def validate_item(self, item: str) -> SMILES:
         """Check that item is a valid SMILES.
 
         Args:
@@ -289,4 +289,4 @@ class PaccMannRLOmicBasedGenerator(AlgorithmConfiguration[SmallMolecule, Omics])
                 title="InvalidSMILES",
                 detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
             )
-        return SmallMolecule(item)
+        return SMILES(item)

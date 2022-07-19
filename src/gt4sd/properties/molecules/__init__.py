@@ -21,12 +21,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Dict
+from typing import Dict, Tuple, Type
 
-from rdkit.Chem import Mol
-
-from ...domains.materials import PropertyValue
-from ..core import CallableProperty, Property, PropertyConfiguration
+from ..core import PropertyPredictor, PropertyPredictorParameters
 from .core import (
     ActivityAgainstTarget,
     ActivityAgainstTargetParameters,
@@ -55,32 +52,34 @@ from .core import (
     Tpsa,
 )
 
-# All functions can be called with either a SMILES or a Mol object.
-MOLECULE_FACTORY: Dict[str, PropertyValue] = {
-    # Inherent properties
-    "weight": (MolecularWeight, PropertyConfiguration),
-    "number_of_aromatic_rings": (NumberAromaticRings, PropertyConfiguration),
-    "number_of_h_acceptors": (NumberHAcceptors, PropertyConfiguration),
-    "number_of_h_donors": (NumberHDonors, PropertyConfiguration),
-    "number_of_atoms": (NumberAtoms, PropertyConfiguration),
-    "number_of_rings": (NumberRings, PropertyConfiguration),
-    "number_of_rotatable_bonds": (NumberRotatableBonds, PropertyConfiguration),
-    "number_of_large_rings": (NumberLargeRings, PropertyConfiguration),
-    "number_of_heterocycles": (NumberHeterocycles, PropertyConfiguration),
-    "number_of_stereocenters": (NumberStereocenters, PropertyConfiguration),
-    "is_scaffold": (IsScaffold, PropertyConfiguration),
-    # Rule-based properties
-    "bertz": (Bertz, PropertyConfiguration),
-    "tpsa": (Tpsa, PropertyConfiguration),
-    "logp": (Logp, PropertyConfiguration),
-    "qed": (Qed, PropertyConfiguration),
-    "plogp": (Plogp, PropertyConfiguration),
-    "penalized_logp": (Plogp, PropertyConfiguration),
-    "lipinski": (Lipinski, PropertyConfiguration),
-    "sas": (Sas, PropertyConfiguration),
-    "esol": (Esol, PropertyConfiguration),
+# NOTE: all functions can be called with either a SMILES or a rdkit.Chem.Mol object.
+MOLECULE_PROPERTY_PREDICTOR_FACTORY: Dict[
+    str, Tuple[Type[PropertyPredictor], Type[PropertyPredictorParameters]]
+] = {
+    # inherent properties
+    "weight": (MolecularWeight, PropertyPredictorParameters),
+    "number_of_aromatic_rings": (NumberAromaticRings, PropertyPredictorParameters),
+    "number_of_h_acceptors": (NumberHAcceptors, PropertyPredictorParameters),
+    "number_of_h_donors": (NumberHDonors, PropertyPredictorParameters),
+    "number_of_atoms": (NumberAtoms, PropertyPredictorParameters),
+    "number_of_rings": (NumberRings, PropertyPredictorParameters),
+    "number_of_rotatable_bonds": (NumberRotatableBonds, PropertyPredictorParameters),
+    "number_of_large_rings": (NumberLargeRings, PropertyPredictorParameters),
+    "number_of_heterocycles": (NumberHeterocycles, PropertyPredictorParameters),
+    "number_of_stereocenters": (NumberStereocenters, PropertyPredictorParameters),
+    "is_scaffold": (IsScaffold, PropertyPredictorParameters),
+    # rule-based properties
+    "bertz": (Bertz, PropertyPredictorParameters),
+    "tpsa": (Tpsa, PropertyPredictorParameters),
+    "logp": (Logp, PropertyPredictorParameters),
+    "qed": (Qed, PropertyPredictorParameters),
+    "plogp": (Plogp, PropertyPredictorParameters),
+    "penalized_logp": (Plogp, PropertyPredictorParameters),
+    "lipinski": (Lipinski, PropertyPredictorParameters),
+    "sas": (Sas, PropertyPredictorParameters),
+    "esol": (Esol, PropertyPredictorParameters),
     "similarity_seed": (SimilaritySeed, SimilaritySeedParameters),
-    # Properties predicted by ML models
+    # properties predicted by models
     "scscore": (Scscore, ScscoreConfiguration),
     "activity_against_target": (ActivityAgainstTarget, ActivityAgainstTargetParameters),
 }

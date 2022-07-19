@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from ..core import MacroMolecule
+from ...domains.materials import MacroMolecule
 from ..utils import get_descriptor
 
 

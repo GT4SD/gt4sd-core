@@ -22,13 +22,9 @@
 # SOFTWARE.
 #
 from paccmann_generator.drug_evaluators import SCScore
+from pydantic import Field
 
-from ..core import (
-    CallableConfigurableProperty,
-    CallableProperty,
-    PropertyConfiguration,
-    SmallMolecule,
-)
+from ..core import CallablePropertyPredictor, PropertyPredictorParameters
 from ..utils import get_activity_fn, get_similarity_fn
 from .functions import (
     bertz,
@@ -53,58 +49,55 @@ from .functions import (
 )
 
 
-# Parameter classes
-class ScscoreConfiguration(PropertyConfiguration):
+# NOTE: property prediction parameters
+class ScscoreConfiguration(PropertyPredictorParameters):
     score_scale: int = 5
     fp_len: int = 1024
     fp_rad: int = 2
 
 
-class SimilaritySeedParameters(PropertyConfiguration):
-    seed: SmallMolecule
+class SimilaritySeedParameters(PropertyPredictorParameters):
+    smiles: str = Field(..., example="c1ccccc1")
     fp_key: str = "ECFP4"
 
-    class Config:
-        arbitrary_types_allowed = True
+
+class ActivityAgainstTargetParameters(PropertyPredictorParameters):
+    target: str = Field(..., example="drd2", description="name of the target.")
 
 
-class ActivityAgainstTargetParameters(PropertyConfiguration):
-    target: str
-
-
-# Property classes
-class Plogp(CallableConfigurableProperty):
+# NOTE: property prediction classes
+class Plogp(CallablePropertyPredictor):
     """Calculate the penalized logP of a molecule. This is the logP minus the number of
     rings with > 6 atoms minus the SAS.
     """
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=plogp, parameters=parameters)
 
 
-class Lipinski(CallableConfigurableProperty):
+class Lipinski(CallablePropertyPredictor):
     """Calculate whether a molecule adheres to the Lipinski-rule-of-5.
     A crude approximation of druglikeness.
     """
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=lipinski, parameters=parameters)
 
 
-class Esol(CallableConfigurableProperty):
+class Esol(CallablePropertyPredictor):
     """Estimate the water solubility of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=esol, parameters=parameters)
 
 
-class Scscore(CallableProperty):
+class Scscore(CallablePropertyPredictor):
     """Calculate the synthetic complexity score (SCScore) of a molecule."""
 
     def __init__(
@@ -115,163 +108,163 @@ class Scscore(CallableProperty):
         )
 
 
-class Sas(CallableConfigurableProperty):
+class Sas(CallablePropertyPredictor):
     """Calculate the synthetic accessibility score (SAS) for a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=sas, parameters=parameters)
 
 
-class Bertz(CallableConfigurableProperty):
+class Bertz(CallablePropertyPredictor):
     """Calculate Bertz index of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=bertz, parameters=parameters)
 
 
-class Tpsa(CallableConfigurableProperty):
+class Tpsa(CallablePropertyPredictor):
     """Calculate the total polar surface area of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=tpsa, parameters=parameters)
 
 
-class Logp(CallableConfigurableProperty):
+class Logp(CallablePropertyPredictor):
     """Calculates the partition coefficient of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=logp, parameters=parameters)
 
 
-class Qed(CallableConfigurableProperty):
+class Qed(CallablePropertyPredictor):
     """Calculate the quantitative estimate of drug-likeness (QED) of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=qed, parameters=parameters)
 
 
-class NumberHAcceptors(CallableConfigurableProperty):
+class NumberHAcceptors(CallablePropertyPredictor):
     """Calculate number of H acceptors of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=number_of_h_acceptors, parameters=parameters)
 
 
-class NumberAtoms(CallableConfigurableProperty):
+class NumberAtoms(CallablePropertyPredictor):
     """Calculate number of atoms of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=number_of_atoms, parameters=parameters)
 
 
-class NumberHDonors(CallableConfigurableProperty):
+class NumberHDonors(CallablePropertyPredictor):
     """Calculate number of H donors of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=number_of_h_donors, parameters=parameters)
 
 
-class NumberAromaticRings(CallableConfigurableProperty):
+class NumberAromaticRings(CallablePropertyPredictor):
     """Calculate number of aromatic rings of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=number_of_aromatic_rings, parameters=parameters)
 
 
-class NumberRings(CallableConfigurableProperty):
+class NumberRings(CallablePropertyPredictor):
     """Calculate number of rings of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=number_of_rings, parameters=parameters)
 
 
-class NumberRotatableBonds(CallableConfigurableProperty):
+class NumberRotatableBonds(CallablePropertyPredictor):
     """Calculate number of rotatable bonds of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=number_of_rotatable_bonds, parameters=parameters)
 
 
-class NumberLargeRings(CallableConfigurableProperty):
+class NumberLargeRings(CallablePropertyPredictor):
     """Calculate the amount of large rings (> 6 atoms) of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=number_of_large_rings, parameters=parameters)
 
 
-class MolecularWeight(CallableConfigurableProperty):
+class MolecularWeight(CallablePropertyPredictor):
     """Calculate molecular weight of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=molecular_weight, parameters=parameters)
 
 
-class IsScaffold(CallableConfigurableProperty):
+class IsScaffold(CallablePropertyPredictor):
     """Whether a molecule is identical to its Murcko Scaffold."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=is_scaffold, parameters=parameters)
 
 
-class NumberHeterocycles(CallableConfigurableProperty):
+class NumberHeterocycles(CallablePropertyPredictor):
     """The amount of heterocycles of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=number_of_heterocycles, parameters=parameters)
 
 
-class NumberStereocenters(CallableConfigurableProperty):
+class NumberStereocenters(CallablePropertyPredictor):
     """The amount of stereo centers of a molecule."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=number_of_stereocenters, parameters=parameters)
 
 
-class SimilaritySeed(CallableProperty):
+class SimilaritySeed(CallablePropertyPredictor):
     """Calculate the similarity of a molecule to a seed molecule."""
 
     def __init__(self, parameters: SimilaritySeedParameters) -> None:
         super().__init__(
             callable_fn=get_similarity_fn(
-                target_mol=parameters.seed, fp_key=parameters.fp_key
+                target_mol=parameters.smiles, fp_key=parameters.fp_key
             ),
             parameters=parameters,
         )
 
 
-class ActivityAgainstTarget(CallableProperty):
+class ActivityAgainstTarget(CallablePropertyPredictor):
     """Calculate the activity of a molecule against a target molecule."""
 
     def __init__(self, parameters: ActivityAgainstTargetParameters) -> None:

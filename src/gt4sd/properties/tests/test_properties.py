@@ -26,8 +26,8 @@ from typing import Any, Dict
 
 import numpy as np
 
-from gt4sd.properties.molecules import MOLECULE_FACTORY
-from gt4sd.properties.proteins import PROTEIN_FACTORY
+from gt4sd.properties.molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
+from gt4sd.properties.proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 
 protein = "KFLIYQMECSTMIFGL"
 protein_ground_truths = {
@@ -80,36 +80,43 @@ def test_properties():
     def test_property(
         prop_key: str, label: float, factory: Dict[str, Any], sample: str
     ):
-        PropertyClass, params = factory[prop_key]
-        function = PropertyClass(params())
-        print(prop_key, function(sample), label)
+        property_class, parameters_class = factory[prop_key]
+        function = property_class(parameters_class())
         assert np.allclose(function(sample), label)
 
     # test protein properties
     for prop, value in protein_ground_truths.items():
         test_property(
-            prop_key=prop, label=value, factory=PROTEIN_FACTORY, sample=protein
+            prop_key=prop,
+            label=value,
+            factory=PROTEIN_PROPERTY_PREDICTOR_FACTORY,
+            sample=protein,
         )
 
     # test molecule properties
     for prop, value in molecule_ground_truths.items():
         test_property(
-            prop_key=prop, label=value, factory=MOLECULE_FACTORY, sample=molecule
+            prop_key=prop,
+            label=value,
+            factory=MOLECULE_PROPERTY_PREDICTOR_FACTORY,
+            sample=molecule,
         )
 
     # test further molecule properties
-    PropertyClass, params = MOLECULE_FACTORY["similarity_seed"]
-    function = PropertyClass(params(seed=seed))
+    property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY["similarity_seed"]
+    function = property_class(parameters_class(smiles=seed))
     assert np.allclose(
         function(molecule), molecule_further_ground_truths["similarity_seed"]
     )
 
-    PropertyClass, params = MOLECULE_FACTORY["activity_against_target"]
-    function = PropertyClass(params(target=target))
+    property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY[
+        "activity_against_target"
+    ]
+    function = property_class(parameters_class(target=target))
     assert np.allclose(
         function(molecule), molecule_further_ground_truths["activity_against_target"]
     )
 
-    PropertyClass, params = PROTEIN_FACTORY["charge"]
-    function = PropertyClass(params(amide=True, ph=5.0))
+    property_class, parameters_class = PROTEIN_PROPERTY_PREDICTOR_FACTORY["charge"]
+    function = property_class(parameters_class(amide=True, ph=5.0))
     assert np.allclose(function(protein), protein_further_ground_truths["charge"])

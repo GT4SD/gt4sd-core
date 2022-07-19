@@ -21,7 +21,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from ..core import CallableConfigurableProperty, PropertyConfiguration
+from pydantic import Field
+
+from ..core import (
+    CallablePropertyPredictor,
+    ConfigurableCallablePropertyPredictor,
+    PropertyPredictorParameters,
+)
 from .functions import (
     aliphatic_index,
     aromaticity,
@@ -36,97 +42,106 @@ from .functions import (
 )
 
 
-# Parameter classes
-class AmideConfiguration(PropertyConfiguration):
-    amide: bool = False  # whether the sequences are C-terminally amidated.
+# NOTE: property prediction parameters
+class AmideConfiguration(PropertyPredictorParameters):
+    amide: bool = Field(
+        False,
+        example=False,
+        description="whether the sequences are C-terminally amidated.",
+    )
 
 
-class PhConfiguration(PropertyConfiguration):
+class PhConfiguration(PropertyPredictorParameters):
     ph: float = 7.0
 
 
-class AmidePhConfiguration(AmideConfiguration, PhConfiguration):
-    pass
+class AmidePhConfiguration(PropertyPredictorParameters):
+    amide: bool = Field(
+        False,
+        example=False,
+        description="whether the sequences are C-terminally amidated.",
+    )
+    ph: float = 7.0
 
 
-# Property classes
-class Length(CallableConfigurableProperty):
+# NOTE: property prediction classes
+class Length(CallablePropertyPredictor):
     """Retrieves the number of residues of a protein."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=length, parameters=parameters)
 
 
-class MolecularWeight(CallableConfigurableProperty):
+class MolecularWeight(ConfigurableCallablePropertyPredictor):
     """Computes the molecular weight of a protein."""
 
     def __init__(self, parameters: AmideConfiguration) -> None:
         super().__init__(callable_fn=molecular_weight, parameters=parameters)
 
 
-class BomanIndex(CallableConfigurableProperty):
+class BomanIndex(CallablePropertyPredictor):
     """Computes the Boman index of a protein (sum of solubility values of all residues)."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=boman_index, parameters=parameters)
 
 
-class AliphaticIndex(CallableConfigurableProperty):
+class AliphaticIndex(CallablePropertyPredictor):
     """Computes the aliphatic index of a protein. Measure of thermal stability."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=aliphatic_index, parameters=parameters)
 
 
-class HydrophobicRatio(CallableConfigurableProperty):
+class HydrophobicRatio(CallablePropertyPredictor):
     """Computes the hydrophobicity of a protein, relative freq. of **A,C,F,I,L,M & V**."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=hydrophobic_ratio, parameters=parameters)
 
 
-class Charge(CallableConfigurableProperty):
+class Charge(ConfigurableCallablePropertyPredictor):
     """Computes the charge of a protein."""
 
     def __init__(self, parameters: AmidePhConfiguration) -> None:
         super().__init__(callable_fn=charge, parameters=parameters)
 
 
-class ChargeDensity(CallableConfigurableProperty):
+class ChargeDensity(ConfigurableCallablePropertyPredictor):
     """Computes the charge density of a protein."""
 
     def __init__(self, parameters: AmidePhConfiguration) -> None:
         super().__init__(callable_fn=charge_density, parameters=parameters)
 
 
-class IsoelectricPoint(CallableConfigurableProperty):
+class IsoelectricPoint(ConfigurableCallablePropertyPredictor):
     """Computes the isoelectric point of every residue and aggregates."""
 
     def __init__(self, parameters: AmideConfiguration) -> None:
         super().__init__(callable_fn=isoelectric_point, parameters=parameters)
 
 
-class Aromaticity(CallableConfigurableProperty):
+class Aromaticity(CallablePropertyPredictor):
     """Computes aromaticity of the protein (relative frequency of Phe+Trp+Tyr)."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=aromaticity, parameters=parameters)
 
 
-class Instability(CallableConfigurableProperty):
+class Instability(CallablePropertyPredictor):
     """Calculates the protein instability."""
 
     def __init__(
-        self, parameters: PropertyConfiguration = PropertyConfiguration()
+        self, parameters: PropertyPredictorParameters = PropertyPredictorParameters()
     ) -> None:
         super().__init__(callable_fn=instability, parameters=parameters)

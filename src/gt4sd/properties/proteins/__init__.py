@@ -21,12 +21,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Callable, Dict, Tuple, Union
+from typing import Dict, Tuple, Type
 
-from rdkit.Chem import Mol
-
-from ...domains.materials import MacroMolecule, PropertyValue, SmallMolecule
-from ..core import CallableProperty, Property, PropertyConfiguration
+from ..core import PropertyPredictor, PropertyPredictorParameters
 from .core import (
     AliphaticIndex,
     AmideConfiguration,
@@ -42,21 +39,21 @@ from .core import (
     MolecularWeight,
 )
 
-# All functions can be called with either a SMILES or a Mol object.
-PROTEIN_FACTORY: Dict[
-    str, Union[CallableProperty, Tuple[CallableProperty, PropertyConfiguration]]
+# NOTE: all functions can be called with either an AA sequence or a rdkit.Chem.Mol object.
+PROTEIN_PROPERTY_PREDICTOR_FACTORY: Dict[
+    str, Tuple[Type[PropertyPredictor], Type[PropertyPredictorParameters]]
 ] = {
-    # Inherent properties
-    "length": (Length, PropertyConfiguration),
+    # inherent properties
+    "length": (Length, PropertyPredictorParameters),
     "weight": (MolecularWeight, AmideConfiguration),
-    # Rule-based properties
-    "boman_index": (BomanIndex, PropertyConfiguration),
+    # rule-based properties
+    "boman_index": (BomanIndex, PropertyPredictorParameters),
     "charge_density": (ChargeDensity, AmidePhConfiguration),
     "charge": (Charge, AmidePhConfiguration),
-    "aliphaticity": (AliphaticIndex, PropertyConfiguration),
-    "hydrophobicity": (HydrophobicRatio, PropertyConfiguration),
+    "aliphaticity": (AliphaticIndex, PropertyPredictorParameters),
+    "hydrophobicity": (HydrophobicRatio, PropertyPredictorParameters),
     "isoelectric_point": (IsoelectricPoint, AmideConfiguration),
-    "aromaticity": (Aromaticity, PropertyConfiguration),
-    "instability": (Instability, PropertyConfiguration),
-    # Properties predicted by ML models
+    "aromaticity": (Aromaticity, PropertyPredictorParameters),
+    "instability": (Instability, PropertyPredictorParameters),
+    # properties predicted by ML models
 }
