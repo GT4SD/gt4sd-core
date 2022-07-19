@@ -103,7 +103,9 @@ def test_properties():
         )
 
     # test further molecule properties
-    property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY["similarity_seed"]
+    property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY[
+        "similarity_seed"
+    ]
     function = property_class(parameters_class(smiles=seed))
     assert np.allclose(
         function(molecule), molecule_further_ground_truths["similarity_seed"]
