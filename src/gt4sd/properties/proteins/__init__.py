@@ -21,16 +21,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Callable, Dict, Union
+from typing import Callable, Dict, Union, Tuple
 
 from rdkit.Chem import Mol
 
 from ...domains.materials import MacroMolecule, PropertyValue, SmallMolecule
-from ..core import CallableProperty, Property
+from ..core import CallableProperty, Property, PropertyConfiguration
 from .core import (
     AliphaticIndex,
-    AmideParameter,
-    AmidePhParameters,
+    AmideConfiguration,
+    AmidePhConfiguration,
     Aromaticity,
     BomanIndex,
     Charge,
@@ -43,18 +43,20 @@ from .core import (
 )
 
 # All functions can be called with either a SMILES or a Mol object.
-PROTEIN_FACTORY: Dict[str, PropertyValue] = {
+PROTEIN_FACTORY: Dict[
+    str, Union[CallableProperty, Tuple[CallableProperty, PropertyConfiguration]]
+] = {
     # Inherent properties
-    "length": (Length),
-    "weight": (MolecularWeight),
+    "length": (Length, PropertyConfiguration),
+    "weight": (MolecularWeight, AmideConfiguration),
     # Rule-based properties
-    "boman_index": (BomanIndex),
-    "charge_density": (ChargeDensity, AmidePhParameters),
-    "charge": (Charge, AmidePhParameters),
-    "aliphaticity": (AliphaticIndex),
-    "hydrophobicity": (HydrophobicRatio),
-    "isoelectric_point": (IsoelectricPoint, AmideParameter),
-    "aromaticity": (Aromaticity),
-    "instability": (Instability),
+    "boman_index": (BomanIndex, PropertyConfiguration),
+    "charge_density": (ChargeDensity, AmidePhConfiguration),
+    "charge": (Charge, AmidePhConfiguration),
+    "aliphaticity": (AliphaticIndex, PropertyConfiguration),
+    "hydrophobicity": (HydrophobicRatio, PropertyConfiguration),
+    "isoelectric_point": (IsoelectricPoint, AmideConfiguration),
+    "aromaticity": (Aromaticity, PropertyConfiguration),
+    "instability": (Instability, PropertyConfiguration),
     # Properties predicted by ML models
 }

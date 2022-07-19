@@ -37,6 +37,23 @@ from ..domains.materials import (
 class PropertyConfiguration(BaseModel):
     """Abstract class for property computation."""
 
+    # def __repr__(self):
+    #     """Print class name, object ID and all attributes."""
+    #     attrs = ''
+
+    #     for attr in dir(self):
+    #         if attr.startswith('__') or attr in dir(BaseModel):
+    #             continue
+    #         attrs += f"\n\t{attr}={eval(f'self.{attr}')}"
+
+    #     return "<{klass} @{id:x}{attrs}\n>".format(
+    #         klass=self.__class__.__name__, id=id(self) & 0xFFFFFF, attrs=attrs
+    #     )
+
+
+class EmptyConfiguration(PropertyConfiguration):
+    """Empty property configuration, renamed for clarity."""
+
     pass
 
 
@@ -90,10 +107,12 @@ class Property:
 
 
 class CallableProperty(Property):
+    """Property class that calls a callable function."""
+
     def __init__(
         self,
         callable_fn: Callable,
-        parameters: Optional[PropertyConfiguration] = None,
+        parameters: PropertyConfiguration,
     ) -> None:
         self.callable_fn = callable_fn
         super().__init__(parameters=parameters)
@@ -115,6 +134,26 @@ class CallableProperty(Property):
         return self.callable_fn(sample)
 
 
+class CallableConfigurableProperty(CallableProperty):
+    """Property class that calls a callable function with parameters as keyword args."""
+
+    def __call__(self, sample: Molecule) -> Property:
+        """generic call method for all properties.
+
+        ```python
+        scorer = Property(params)
+        property_value = scorer(sample)
+        ```
+
+        Args:
+            sample: input string.
+
+        Returns:
+            Property: callable function to compute a generic property.
+        """
+        return self.callable_fn(sample, **self.parameters.dict())
+
+
 class SmallMoleculeProperty(Property):
     def __init__(self) -> None:
         super().__init__()
@@ -129,3 +168,7 @@ class ProteinProperty(Property):
 
     def __call__(self, protein: MacroMolecule) -> Property:
         raise NotImplementedError
+
+
+class ArbitraryConfig:
+    arbitrary_types_allowed = True

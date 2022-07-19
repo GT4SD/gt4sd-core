@@ -221,8 +221,8 @@ def number_of_stereocenters(mol: SmallMolecule) -> int:
 
 
 def similarity_to_seed(
-    mol: SmallMolecule, similarity_fn: Callable[[SmallMolecule], Property]
-) -> Property:
+    mol: SmallMolecule, similarity_fn: Callable[[SmallMolecule], float]
+) -> float:
     """Calculate the similarity of a molecule to a seed molecule.
 
     For example:
@@ -239,7 +239,7 @@ def similarity_to_seed(
 
 def activity_against_target(
     mol: SmallMolecule, affinity_fn: Callable[[SmallMolecule], Property]
-) -> Property:
+) -> float:
     """Calculate the activity of a molecule against a target molecule.
 
     For example:
@@ -252,10 +252,3 @@ def activity_against_target(
 
     """
     return affinity_fn(to_smiles(mol))
-
-
-# TODO: Need to put the trained models on COS and implement caching logic
-# _tox21 = Tox21()
-# _organdb = OrganDB()
-# _sider = SIDER()
-# _clintox = ClinTox()

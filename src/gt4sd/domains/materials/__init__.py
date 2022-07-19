@@ -41,7 +41,7 @@ Omics = Union[np.ndarray, pd.Series]
 PAG = SMILES
 Molecule = Union[SmallMolecule, MacroMolecule]
 Sequence = str
-Property = Union[float, int, Dict[str, Any]]
+PropertyValue = Union[float, int, Dict[str, Any]]
 
 
 def check_smiles(smiles: SMILES):

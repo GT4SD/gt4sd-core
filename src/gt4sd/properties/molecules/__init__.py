@@ -21,84 +21,65 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Any, Dict
+from typing import Dict
 
 from rdkit.Chem import Mol
-
-from ..core import CallablePropertyPredictor, PropertyPredictor
+from ...domains.materials import PropertyValue
+from ..core import CallableProperty, Property, PropertyConfiguration
 from .core import (
     ActivityAgainstTarget,
     ActivityAgainstTargetParameters,
     Bertz,
-    BertzParameters,
     Esol,
-    EsolParameters,
     IsScaffold,
-    IsScaffoldParameters,
     Lipinski,
-    LipinskiParameters,
     Logp,
-    LogpParameters,
     MolecularWeight,
-    MolecularWeightParameters,
     NumberAromaticRings,
-    NumberAromaticRingsParameters,
     NumberAtoms,
-    NumberAtomsParameters,
     NumberHAcceptors,
-    NumberHAcceptorsParameters,
     NumberHDonors,
-    NumberHDonorsParameters,
     NumberHeterocycles,
-    NumberHeterocyclesParameters,
     NumberLargeRings,
-    NumberLargeRingsParameters,
     NumberRings,
-    NumberRingsParameters,
     NumberRotatableBonds,
-    NumberRotatableBondsParameters,
     NumberStereocenters,
-    NumberStereocentersParameters,
     Plogp,
-    PlogpParameters,
     Qed,
-    QedParameters,
     Sas,
-    SasParameters,
     Scscore,
-    ScscoreParameters,
+    ScscoreConfiguration,
     SimilaritySeed,
     SimilaritySeedParameters,
     Tpsa,
-    TpsaParameters,
 )
 
 # All functions can be called with either a SMILES or a Mol object.
-MOLECULE_FACTORY: Dict[str, Any] = {
+MOLECULE_FACTORY: Dict[str, PropertyValue] = {
     # Inherent properties
-    "activity_against_target": (ActivityAgainstTarget, ActivityAgainstTargetParameters),
-    "molecular_weight": (MolecularWeight, MolecularWeightParameters),
-    "number_of_aromatic_rings": (NumberAromaticRings, NumberAromaticRingsParameters),
-    "number_of_h_acceptors": (NumberHAcceptors, NumberHAcceptorsParameters),
-    "number_of_h_donors": (NumberHDonors, NumberHDonorsParameters),
-    "number_of_atoms": (NumberAtoms, NumberAtomsParameters),
-    "number_of_rings": (NumberRings, NumberRingsParameters),
-    "number_of_rotatable_bonds": (NumberRotatableBonds, NumberRotatableBondsParameters),
-    "number_of_large_rings": (NumberLargeRings, NumberLargeRingsParameters),
-    "number_of_heterocycles": (NumberHeterocycles, NumberHeterocyclesParameters),
-    "number_of_stereocenters": (NumberStereocenters, NumberStereocentersParameters),
-    "is_scaffold": (IsScaffold, IsScaffoldParameters),
+    "weight": (MolecularWeight, PropertyConfiguration),
+    "number_of_aromatic_rings": (NumberAromaticRings, PropertyConfiguration),
+    "number_of_h_acceptors": (NumberHAcceptors, PropertyConfiguration),
+    "number_of_h_donors": (NumberHDonors, PropertyConfiguration),
+    "number_of_atoms": (NumberAtoms, PropertyConfiguration),
+    "number_of_rings": (NumberRings, PropertyConfiguration),
+    "number_of_rotatable_bonds": (NumberRotatableBonds, PropertyConfiguration),
+    "number_of_large_rings": (NumberLargeRings, PropertyConfiguration),
+    "number_of_heterocycles": (NumberHeterocycles, PropertyConfiguration),
+    "number_of_stereocenters": (NumberStereocenters, PropertyConfiguration),
+    "is_scaffold": (IsScaffold, PropertyConfiguration),
     # Rule-based properties
-    "bertz": (Bertz, BertzParameters),
-    "tpsa": (Tpsa, TpsaParameters),
-    "logp": (Logp, LogpParameters),
-    "qed": (Qed, QedParameters),
-    "plogp": (Plogp, PlogpParameters),
-    "penalized_logp": (Plogp, PlogpParameters),
-    "lipinski": (Lipinski, LipinskiParameters),
-    "sas": (Sas, SasParameters),
-    "esol": (Esol, EsolParameters),
+    "bertz": (Bertz, PropertyConfiguration),
+    "tpsa": (Tpsa, PropertyConfiguration),
+    "logp": (Logp, PropertyConfiguration),
+    "qed": (Qed, PropertyConfiguration),
+    "plogp": (Plogp, PropertyConfiguration),
+    "penalized_logp": (Plogp, PropertyConfiguration),
+    "lipinski": (Lipinski, PropertyConfiguration),
+    "sas": (Sas, PropertyConfiguration),
+    "esol": (Esol, PropertyConfiguration),
     "similarity_seed": (SimilaritySeed, SimilaritySeedParameters),
     # Properties predicted by ML models
-    "scscore": (Scscore, ScscoreParameters),
+    "scscore": (Scscore, ScscoreConfiguration),
+    "activity_against_target": (ActivityAgainstTarget, ActivityAgainstTargetParameters),
 }
