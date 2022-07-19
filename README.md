@@ -287,24 +287,29 @@ An example on self-hosting locally a COS (minio) where to upload your models can
 You can compute properties of your generated samples using the `gt4sd.properties` submodule:
 
 ```python
->>>from gt4sd.properties.molecules import MOLECULE_FACTORY
->>>Property, params = MOLECULE_FACTORY['similarity_seed']
->>>sim = Prop(params(seed='C1=CC(=CC(=C1)Br)CN')
->>>sim('CCO')
+>>>from gt4sd.properties import PropertyPredictorRegistry
+>>>similarity_predictor = PropertyPredictorRegistry.get_property_predictor("similarity_seed", {"smiles" : "C1=CC(=CC(=C1)Br)CN"})
+>>>similarity_predictor("CCO")
 0.0333
->>># Let's inspect what other parameters we can set for similarity measuring
->>>params(seed='')
-SimilaritySeedParameters(seed='', fp_key='ECFP4')
->>># Let's use another fingerprint (ECFP6)
->>>sim = Prop(params(seed='C1=CC(=CC(=C1)Br)CN', fp_key='ECFP6')
->>>sim('CCO')
-0.029411764705882353
->>># Other properties are simpler and do not have any configurable parameters
->>>qed = Prop(params())
+>>># let's inspect what other parameters we can set for similarity measuring
+>>>similarity_predictor = PropertyPredictorRegistry.get_property_predictor("similarity_seed", {"smiles" : "C1=CC(=CC(=C1)Br)CN", "fp_key": "ECFP6"})
+>>>similarity_predictor("CCO")
+>>># inspect parameters
+>>>PropertyPredictorRegistry.get_property_predictor_parameters_schema("similarity_seed")
+'{"title": "SimilaritySeedParameters", "description": "Abstract class for property computation.", "type": "object", "properties": {"smiles": {"title": "Smiles", "example": "c1ccccc1", "type": "string"}, "fp_key": {"title": "Fp Key", "default": "ECFP4", "type": "string"}}, "required": ["smiles"]}'
+>>># predict other properties
+>>>qed = PropertyPredictorRegistry.get_property_predictor("qed")
 >>>qed('CCO')
 0.4068
->>>params()
-PropertyConfiguration()
+>>># list properties
+>>>PropertyPredictorRegistry.list_available()
+['activity_against_target',
+ 'aliphaticity',
+ ...
+ 'scscore',
+ 'similarity_seed',
+ 'tpsa',
+ 'weight']
 ```
 
 ### Additional examples

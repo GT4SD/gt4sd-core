@@ -21,9 +21,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Any, Dict, List, Tuple, Type
+from typing import Any, Dict, List
 
-from .core import PropertyPredictor, PropertyPredictorParameters
+from .core import PropertyPredictor
 from .molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
 from .proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 
@@ -41,7 +41,7 @@ class PropertyPredictorRegistry:
     def get_property_predictor_parameters_schema(name: str) -> Dict[str, Any]:
         try:
             _, parameters_class = PROPERTY_PREDICTOR_FACTORY[name]
-            return parameters_class().schema()
+            return parameters_class.schema_json()
         except KeyError:
             raise ValueError(
                 f"Property predictor name={name} not supported. Pick one from {AVAILABLE_PROPERTY_PREDICTORS}"
@@ -49,7 +49,7 @@ class PropertyPredictorRegistry:
 
     @staticmethod
     def get_property_predictor(
-        name: str, parameters: Dict[str, Any]
+        name: str, parameters: Dict[str, Any] = {}
     ) -> PropertyPredictor:
         try:
             property_class, parameters_class = PROPERTY_PREDICTOR_FACTORY[name]
