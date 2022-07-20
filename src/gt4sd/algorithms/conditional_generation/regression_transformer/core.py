@@ -32,8 +32,9 @@ from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar, U
 
 from typing_extensions import Protocol, runtime_checkable
 
-from ....domains.materials import Molecule, Property, Sequence
+from ....domains.materials import Molecule, Sequence
 from ....exceptions import InvalidItem
+from ....properties.core import PropertyValue
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
 from .implementation import ChemicalLanguageRT, ConditionalGenerator, ProteinLanguageRT
@@ -42,7 +43,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 T = TypeVar("T", bound=Sequence)
-S = TypeVar("S", Property, Molecule)
+S = TypeVar("S", PropertyValue, Molecule)
 Targeted = Callable[[T], Iterable[Any]]
 
 

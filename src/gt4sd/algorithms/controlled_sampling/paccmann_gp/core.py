@@ -33,7 +33,7 @@ from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
 from typing_extensions import Protocol, runtime_checkable
 
-from ....domains.materials import SmallMolecule, validate_molecules
+from ....domains.materials import SMILES, validate_molecules
 from ....exceptions import InvalidItem
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.paccmann.core import PaccMannSavingArguments
@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 T = TypeVar("T", bound=Any)
-S = TypeVar("S", bound=SmallMolecule)
+S = TypeVar("S", bound=SMILES)
 Targeted = Callable[[T], Iterable[Any]]
 
 
@@ -131,7 +131,7 @@ class PaccMannGP(GeneratorAlgorithm[S, T]):
 
 
 @ApplicationsRegistry.register_algorithm_application(PaccMannGP)
-class PaccMannGPGenerator(AlgorithmConfiguration[SmallMolecule, Any]):
+class PaccMannGPGenerator(AlgorithmConfiguration[SMILES, Any]):
     """
     Configuration to generate compounds controlling molecules properties.
 
@@ -255,7 +255,7 @@ class PaccMannGPGenerator(AlgorithmConfiguration[SmallMolecule, Any]):
             maximum_number_of_sampling_steps=self.maximum_number_of_sampling_steps,
         )
 
-    def validate_item(self, item: str) -> SmallMolecule:
+    def validate_item(self, item: str) -> SMILES:
         """Check that item is a valid SMILES.
 
         Args:
@@ -276,7 +276,7 @@ class PaccMannGPGenerator(AlgorithmConfiguration[SmallMolecule, Any]):
                 title="InvalidSMILES",
                 detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
             )
-        return SmallMolecule(item)
+        return SMILES(item)
 
     @classmethod
     def get_filepath_mappings_for_training_pipeline_arguments(

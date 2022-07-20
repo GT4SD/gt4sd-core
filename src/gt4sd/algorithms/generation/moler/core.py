@@ -30,7 +30,7 @@ import logging
 from dataclasses import field
 from typing import Any, ClassVar, Dict, Optional, TypeVar
 
-from ....domains.materials import SmallMolecule, validate_molecules
+from ....domains.materials import SMILES, validate_molecules
 from ....exceptions import InvalidItem
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
 from ...registry import ApplicationsRegistry
@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 T = type(None)
-S = TypeVar("S", bound=SmallMolecule)
+S = TypeVar("S", bound=SMILES)
 
 
 class MoLeR(GeneratorAlgorithm[S, T]):
@@ -105,7 +105,7 @@ class MoLeR(GeneratorAlgorithm[S, T]):
 
 
 @ApplicationsRegistry.register_algorithm_application(MoLeR)
-class MoLeRDefaultGenerator(AlgorithmConfiguration[SmallMolecule, Any]):
+class MoLeRDefaultGenerator(AlgorithmConfiguration[SMILES, Any]):
     """Configuration to generate compounds using default parameters of MoLeR."""
 
     algorithm_type: ClassVar[str] = "generation"
@@ -161,7 +161,7 @@ class MoLeRDefaultGenerator(AlgorithmConfiguration[SmallMolecule, Any]):
             num_workers=self.num_workers,
         )
 
-    def validate_item(self, item: str) -> SmallMolecule:
+    def validate_item(self, item: str) -> SMILES:
         """Check that item is a valid SMILES.
 
         Args:
@@ -182,4 +182,4 @@ class MoLeRDefaultGenerator(AlgorithmConfiguration[SmallMolecule, Any]):
                 title="InvalidSMILES",
                 detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
             )
-        return SmallMolecule(item)
+        return SMILES(item)

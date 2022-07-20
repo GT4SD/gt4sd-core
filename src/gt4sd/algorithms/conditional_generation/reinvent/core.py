@@ -25,7 +25,7 @@ import logging
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
-from ....domains.materials import SmallMolecule, validate_molecules
+from ....domains.materials import SMILES, validate_molecules
 from ....exceptions import InvalidItem
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
@@ -152,7 +152,7 @@ class ReinventGenerator(AlgorithmConfiguration[str, str]):
             max_sequence_length=self.max_sequence_length,
         )
 
-    def validate_item(self, item: str) -> SmallMolecule:
+    def validate_item(self, item: str) -> SMILES:
         """Check that item is a valid SMILES.
 
         Args:
@@ -171,4 +171,4 @@ class ReinventGenerator(AlgorithmConfiguration[str, str]):
                 title="InvalidSMILES",
                 detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
             )
-        return SmallMolecule(item)
+        return SMILES(item)

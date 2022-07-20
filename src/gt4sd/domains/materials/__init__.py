@@ -23,30 +23,22 @@
 #
 """Types, classes, validation, etc. for the material domain."""
 
-from typing import List, NewType, Tuple, Union
+from typing import Any, Dict, List, NewType, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from rdkit import Chem
+from rdkit.Chem import Mol
 
-from gt4sd.exceptions import InvalidItem
-
-# TODO setting to str directly requires no wrapping, so wrong strings could be passed
+# TODO: setting to str directly requires no wrapping, so wrong strings could be passed
 Protein = str  # NewType('Protein', str)
 SMILES = str  # NewType('SMILES', str)
-SmallMolecule = SMILES
+SmallMolecule = Union[SMILES, Mol]
+MacroMolecule = Union[Protein, Mol]
 Omics = Union[np.ndarray, pd.Series]
 PAG = SMILES
-Molecule = Union[SmallMolecule, Protein]
+Molecule = Union[SmallMolecule, MacroMolecule]
 Sequence = str
-Property = float
-
-
-def check_smiles(smiles: SMILES):
-    try:
-        pass  # TODO
-    except Exception:
-        raise InvalidItem(title="invalid SMILES", detail="Validation as SMILES failed.")
 
 
 def validate_molecules(

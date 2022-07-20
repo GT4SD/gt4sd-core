@@ -281,6 +281,37 @@ gt4sd-upload --training_pipeline_name paccmann-vae-trainer --model_path /tmp/gt4
 **NOTE:** GT4SD can be configured to upload models to a custom or self-hosted COS.
 An example on self-hosting locally a COS (minio) where to upload your models can be found [here](https://gt4sd.github.io/gt4sd-core/source/gt4sd_server_upload_md.html).
 
+
+### Computing properties
+
+You can compute properties of your generated samples using the `gt4sd.properties` submodule:
+
+```python
+>>>from gt4sd.properties import PropertyPredictorRegistry
+>>>similarity_predictor = PropertyPredictorRegistry.get_property_predictor("similarity_seed", {"smiles" : "C1=CC(=CC(=C1)Br)CN"})
+>>>similarity_predictor("CCO")
+0.0333
+>>># let's inspect what other parameters we can set for similarity measuring
+>>>similarity_predictor = PropertyPredictorRegistry.get_property_predictor("similarity_seed", {"smiles" : "C1=CC(=CC(=C1)Br)CN", "fp_key": "ECFP6"})
+>>>similarity_predictor("CCO")
+>>># inspect parameters
+>>>PropertyPredictorRegistry.get_property_predictor_parameters_schema("similarity_seed")
+'{"title": "SimilaritySeedParameters", "description": "Abstract class for property computation.", "type": "object", "properties": {"smiles": {"title": "Smiles", "example": "c1ccccc1", "type": "string"}, "fp_key": {"title": "Fp Key", "default": "ECFP4", "type": "string"}}, "required": ["smiles"]}'
+>>># predict other properties
+>>>qed = PropertyPredictorRegistry.get_property_predictor("qed")
+>>>qed('CCO')
+0.4068
+>>># list properties
+>>>PropertyPredictorRegistry.list_available()
+['activity_against_target',
+ 'aliphaticity',
+ ...
+ 'scscore',
+ 'similarity_seed',
+ 'tpsa',
+ 'weight']
+```
+
 ### Additional examples
 
 Find more examples in [notebooks](./notebooks)

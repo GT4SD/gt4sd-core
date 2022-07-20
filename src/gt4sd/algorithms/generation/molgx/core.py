@@ -36,14 +36,14 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 if EXTRAS_ENABLED:
-    from ....domains.materials import SmallMolecule, validate_molecules
+    from ....domains.materials import SMILES, validate_molecules
     from ....exceptions import InvalidItem
     from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
     from ...registry import ApplicationsRegistry
     from .implementation import MolGXGenerator
 
     T = type(None)
-    S = TypeVar("S", bound=SmallMolecule)
+    S = TypeVar("S", bound=SMILES)
 
     class MolGX(GeneratorAlgorithm[S, T]):
         """MolGX Algorithm."""
@@ -133,7 +133,7 @@ if EXTRAS_ENABLED:
             return super().sample(number_of_items=number_of_items)
 
     @ApplicationsRegistry.register_algorithm_application(MolGX)
-    class MolGXQM9Generator(AlgorithmConfiguration[SmallMolecule, Any]):
+    class MolGXQM9Generator(AlgorithmConfiguration[SMILES, Any]):
         """Configuration to generate compounds with given HOMO and LUMO energies."""
 
         algorithm_type: ClassVar[str] = "generation"
@@ -222,7 +222,7 @@ if EXTRAS_ENABLED:
                 tag_name="qm9",
             )
 
-        def validate_item(self, item: str) -> SmallMolecule:
+        def validate_item(self, item: str) -> SMILES:
             """Check that item is a valid SMILES.
 
             Args:
@@ -243,7 +243,7 @@ if EXTRAS_ENABLED:
                     title="InvalidSMILES",
                     detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
                 )
-            return SmallMolecule(item)
+            return SMILES(item)
 
 else:
     logger.warning("install AMD_analytcs extras to use MolGX")
