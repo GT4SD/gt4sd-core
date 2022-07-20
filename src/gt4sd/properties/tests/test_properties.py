@@ -85,7 +85,7 @@ def test_properties():
     ):
         property_class, parameters_class = factory[prop_key]
         function = property_class(parameters_class())
-        assert np.isclose(function(sample), label)
+        assert np.isclose(function(sample), label)  # type: ignore
 
     # test protein properties
     for prop, value in protein_ground_truths.items():
@@ -110,7 +110,7 @@ def test_properties():
         "similarity_seed"
     ]
     function = property_class(parameters_class(smiles=seed))
-    assert np.isclose(
+    assert np.isclose(  # type: ignore
         function(molecule), molecule_further_ground_truths["similarity_seed"]
     )
 
@@ -118,13 +118,13 @@ def test_properties():
         "activity_against_target"
     ]
     function = property_class(parameters_class(target=target))
-    assert np.isclose(
+    assert np.isclose(  # type: ignore
         function(molecule), molecule_further_ground_truths["activity_against_target"]
     )
 
     property_class, parameters_class = PROTEIN_PROPERTY_PREDICTOR_FACTORY["charge"]
     function = property_class(parameters_class(amide=True, ph=5.0))
-    assert np.isclose(function(protein), protein_further_ground_truths["charge"])
+    assert np.isclose(function(protein), protein_further_ground_truths["charge"])  # type: ignore
 
 
 def test_property_predictor_registry():
@@ -132,14 +132,14 @@ def test_property_predictor_registry():
         "similarity_seed", {"smiles": seed}
     )
     assert isinstance(predictor, SimilaritySeed)
-    assert np.isclose(
+    assert np.isclose(  # type: ignore
         predictor(molecule), molecule_further_ground_truths["similarity_seed"]
     )
     predictor = PropertyPredictorRegistry.get_property_predictor(
         "charge", {"amide": "True", "ph": 5.0}
     )
     assert isinstance(predictor, Charge)
-    assert np.isclose(predictor(protein), protein_further_ground_truths["charge"])
+    assert np.isclose(predictor(protein), protein_further_ground_truths["charge"])  # type: ignore
     assert len(PropertyPredictorRegistry.list_available()) == len(
         PROTEIN_PROPERTY_PREDICTOR_FACTORY
     ) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY)
