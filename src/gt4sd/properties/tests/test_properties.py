@@ -110,16 +110,16 @@ def test_properties():
         "similarity_seed"
     ]
     function = property_class(parameters_class(smiles=seed))
-    assert np.isclose(  # type: ignore
-        function(molecule), molecule_further_ground_truths["similarity_seed"]
+    assert np.isclose(
+        function(molecule), molecule_further_ground_truths["similarity_seed"]  # type: ignore
     )
 
     property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY[
         "activity_against_target"
     ]
     function = property_class(parameters_class(target=target))
-    assert np.isclose(  # type: ignore
-        function(molecule), molecule_further_ground_truths["activity_against_target"]
+    assert np.isclose(
+        function(molecule), molecule_further_ground_truths["activity_against_target"]  # type: ignore
     )
 
     property_class, parameters_class = PROTEIN_PROPERTY_PREDICTOR_FACTORY["charge"]
@@ -132,8 +132,8 @@ def test_property_predictor_registry():
         "similarity_seed", {"smiles": seed}
     )
     assert isinstance(predictor, SimilaritySeed)
-    assert np.isclose(  # type: ignore
-        predictor(molecule), molecule_further_ground_truths["similarity_seed"]
+    assert np.isclose(
+        predictor(molecule), molecule_further_ground_truths["similarity_seed"]  # type: ignore
     )
     predictor = PropertyPredictorRegistry.get_property_predictor(
         "charge", {"amide": "True", "ph": 5.0}
