@@ -22,18 +22,20 @@
 # SOFTWARE.
 #
 """Test for properties."""
-from typing import Any, Dict
-
 import numpy as np
+import pytest
 
-from gt4sd.properties import PropertyPredictorRegistry
+from gt4sd.properties import PROPERTY_PREDICTOR_FACTORY, PropertyPredictorRegistry
 from gt4sd.properties.molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.molecules.core import SimilaritySeed
 from gt4sd.properties.proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.proteins.core import Charge
 
 protein = "KFLIYQMECSTMIFGL"
-protein_ground_truths = {
+molecule = "C1=CC(=CC(=C1)Br)CN"
+seed = "CCO"
+target = "drd2"
+ground_truths = {
     "length": 16,
     "protein_weight": 1924.36,
     "boman_index": -0.534375,
@@ -44,12 +46,6 @@ protein_ground_truths = {
     "isoelectric_point": 6.125,
     "aromaticity": 0.1875,
     "instability": 36.8375,
-}
-
-molecule = "C1=CC(=CC(=C1)Br)CN"
-seed = "CCO"
-target = "drd2"
-molecule_ground_truths = {
     "plogp": 0.25130060815905964,
     "molecular_weight": 186.05199999999996,
     "lipinski": 1,
@@ -79,33 +75,17 @@ molecule_further_ground_truths = {
 protein_further_ground_truths = {"charge": 1.123}
 
 
-def test_properties():
-    def _test_property(
-        prop_key: str, label: float, factory: Dict[str, Any], sample: str
-    ):
-        property_class, parameters_class = factory[prop_key]
-        function = property_class(parameters_class())
-        assert np.isclose(function(sample), label)  # type: ignore
+@pytest.mark.parametrize(
+    "property_key", [(property_key) for property_key in ground_truths.keys()]
+)
+def test_property(property_key):
+    property_class, parameters_class = PROPERTY_PREDICTOR_FACTORY[property_key]
+    function = property_class(parameters_class())
+    sample = protein if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY else molecule
+    assert np.isclose(function(sample), ground_truths[property_key])  # type: ignore
 
-    # test protein properties
-    for prop, value in protein_ground_truths.items():
-        _test_property(
-            prop_key=prop,
-            label=value,
-            factory=PROTEIN_PROPERTY_PREDICTOR_FACTORY,
-            sample=protein,
-        )
 
-    # test molecule properties
-    for prop, value in molecule_ground_truths.items():
-        _test_property(
-            prop_key=prop,
-            label=value,
-            factory=MOLECULE_PROPERTY_PREDICTOR_FACTORY,
-            sample=molecule,
-        )
-
-    # test further molecule properties
+def test_similarity_seed():
     property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY[
         "similarity_seed"
     ]
@@ -114,6 +94,8 @@ def test_properties():
         function(molecule), molecule_further_ground_truths["similarity_seed"]  # type: ignore
     )
 
+
+def test_activity_against_target():
     property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY[
         "activity_against_target"
     ]
@@ -122,6 +104,8 @@ def test_properties():
         function(molecule), molecule_further_ground_truths["activity_against_target"]  # type: ignore
     )
 
+
+def test_charge_with_arguments():
     property_class, parameters_class = PROTEIN_PROPERTY_PREDICTOR_FACTORY["charge"]
     function = property_class(parameters_class(amide=True, ph=5.0))
     assert np.isclose(function(protein), protein_further_ground_truths["charge"])  # type: ignore
