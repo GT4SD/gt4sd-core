@@ -183,30 +183,22 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Types, classes, validation, etc. for the material domain.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">Mol</span>
 
-<span class="kn">from</span> <span class="nn">gt4sd.exceptions</span> <span class="kn">import</span> <span class="n">InvalidItem</span>
-
-<span class="c1"># TODO setting to str directly requires no wrapping, so wrong strings could be passed</span>
+<span class="c1"># TODO: setting to str directly requires no wrapping, so wrong strings could be passed</span>
 <span class="n">Protein</span> <span class="o">=</span> <span class="nb">str</span>  <span class="c1"># NewType(&#39;Protein&#39;, str)</span>
 <span class="n">SMILES</span> <span class="o">=</span> <span class="nb">str</span>  <span class="c1"># NewType(&#39;SMILES&#39;, str)</span>
-<span class="n">SmallMolecule</span> <span class="o">=</span> <span class="n">SMILES</span>
+<span class="n">SmallMolecule</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">SMILES</span><span class="p">,</span> <span class="n">Mol</span><span class="p">]</span>
+<span class="n">MacroMolecule</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Protein</span><span class="p">,</span> <span class="n">Mol</span><span class="p">]</span>
 <span class="n">Omics</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]</span>
 <span class="n">PAG</span> <span class="o">=</span> <span class="n">SMILES</span>
-<span class="n">Molecule</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">SmallMolecule</span><span class="p">,</span> <span class="n">Protein</span><span class="p">]</span>
+<span class="n">Molecule</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">SmallMolecule</span><span class="p">,</span> <span class="n">MacroMolecule</span><span class="p">]</span>
 <span class="n">Sequence</span> <span class="o">=</span> <span class="nb">str</span>
-<span class="n">Property</span> <span class="o">=</span> <span class="nb">float</span>
-
-
-<div class="viewcode-block" id="check_smiles"><a class="viewcode-back" href="../../../api/gt4sd.domains.materials.html#gt4sd.domains.materials.check_smiles">[docs]</a><span class="k">def</span> <span class="nf">check_smiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">:</span> <span class="n">SMILES</span><span class="p">):</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">pass</span>  <span class="c1"># TODO</span>
-    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">InvalidItem</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;invalid SMILES&quot;</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Validation as SMILES failed.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="validate_molecules"><a class="viewcode-back" href="../../../api/gt4sd.domains.materials.html#gt4sd.domains.materials.validate_molecules">[docs]</a><span class="k">def</span> <span class="nf">validate_molecules</span><span class="p">(</span>
