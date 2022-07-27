@@ -1,6 +1,5 @@
 import ast
 import copy
-import os
 from typing import Any, Callable, Dict, List, Tuple, Union
 
 import numpy as np
@@ -9,14 +8,13 @@ import torch.nn as nn
 import torch_geometric.data as gd
 from rdkit import RDLogger
 from rdkit.Chem.rdchem import Mol as RDMol
-from ruamel.yaml import YAML
 from torch import Tensor
 from torch.utils.data import Dataset
 
 import gt4sd.frameworks.gflownet.model.mxmnet as mxmnet
 from gt4sd.frameworks.gflownet.data.qm9 import QM9Dataset
-from gt4sd.frameworks.gflownet.env.graph_building_env import GraphBuildingEnv
-from gt4sd.frameworks.gflownet.env.mol_building_env import MolBuildingEnvContext
+from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
+from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
 from gt4sd.frameworks.gflownet.loss.trajectory_balance import TrajectoryBalance
 from gt4sd.frameworks.gflownet.model.graph_transformer import GraphTransformerGFN
 from gt4sd.frameworks.gflownet.train.core import (
@@ -44,8 +42,10 @@ class QM9GapTask(GFNTask):
         temperature_distribution: str,
         temperature_parameters: Tuple[float],
         wrap_model: Callable[[nn.Module], nn.Module] = None,
+        device: str = "cuda",
     ):
         self._wrap_model = wrap_model
+        self.device = device
         self.models = self.load_task_models()
         self.dataset = dataset
         self.temperature_sample_dist = temperature_distribution
@@ -86,7 +86,7 @@ class QM9GapTask(GFNTask):
             gap_model.load_state_dict(state_dict)
         except FileNotFoundError:
             pass
-        gap_model.cuda()
+        gap_model.to(self.device)
         gap_model, self.device = self._wrap_model(gap_model)
         return {"mxmnet_gap": gap_model}
 
@@ -198,6 +198,7 @@ class QM9GapTrainer(GFNTrainer):
             hps["temperature_sample_dist"],
             ast.literal_eval(hps["temperature_dist_params"]),
             wrap_model=self._wrap_model_mp,
+            device=self.device,
         )
 
         self.mb_size = hps["global_batch_size"]

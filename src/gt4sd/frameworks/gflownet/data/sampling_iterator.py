@@ -143,7 +143,8 @@ class SamplingIterator(IterableDataset):
                     preds, m_is_valid = self.task.compute_flat_rewards(mols)
                     # The task may decide some of the mols are invalid, we have to again filter those
                     valid_idcs = valid_idcs[m_is_valid]
-                    pred_reward[valid_idcs - num_offline] = preds
+                    _preds = torch.tensor(preds, dtype=torch.float32)
+                    pred_reward[valid_idcs - num_offline] = _preds
                     is_valid[num_offline:] = False
                     is_valid[valid_idcs] = True
                     flat_rewards += list(pred_reward)

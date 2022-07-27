@@ -7,9 +7,10 @@ import torch_geometric.data as gd
 from rdkit.Chem.rdchem import Mol as RDMol
 from torch import Tensor
 from torch.utils.data import DataLoader, Dataset
+from torch.utils.tensorboard import SummaryWriter
 
 from gt4sd.frameworks.gflownet.data.sampling_iterator import SamplingIterator
-from gt4sd.frameworks.gflownet.env.graph_building_env import (
+from gt4sd.frameworks.gflownet.envs.graph_building_env import (
     GraphActionCategorical,
     GraphBuildingEnv,
     GraphBuildingEnvContext,
@@ -96,9 +97,9 @@ class GFNTrainer:
         self.ctx: GraphBuildingEnvContext
         self.task: GFNTask
         self.algo: GFNAlgorithm
+        self.device: str = device
 
         self.hps = {**self.default_hps(), **hps}
-        self.device = device
         self.num_workers: int = self.hps.get("num_data_loader_workers", 0)
         self.setup()
 
@@ -181,22 +182,25 @@ class GFNTrainer:
         """
         self.model.to(self.device)
         self.sampling_model.to(self.device)
+
         epoch_length = len(self.training_data)
+
         train_dl = self.build_training_data_loader()
         valid_dl = self.build_validation_data_loader()
+
         for it, batch in zip(range(1, 1 + self.hps["num_training_steps"]), train_dl):
             epoch_idx = it // epoch_length
             batch_idx = it % epoch_length
-            batch = batch.astype("float")
-            info = self.train_batch(batch.to(self.device), epoch_idx, batch_idx)
+            batch = batch.to(self.device)
+            info = self.train_batch(batch, epoch_idx, batch_idx)
             self.log(info, it, "train")
 
             if it % self.hps["validate_every"] == 0:
                 for batch in valid_dl:
-                    info = self.evaluate_batch(
-                        batch.to(self.device), epoch_idx, batch_idx
-                    )
+                    batch = batch.to(self.device)
+                    info = self.evaluate_batch(batch, epoch_idx, batch_idx)
                     self.log(info, it, "valid")
+
                 torch.save(
                     {
                         "models_state_dict": [self.model.state_dict()],
@@ -207,8 +211,6 @@ class GFNTrainer:
 
     def log(self, info, index, key):
         if not hasattr(self, "_summary_writer"):
-            self._summary_writer = torch.utils.tensorboard.SummaryWriter(
-                self.hps["log_dir"]
-            )
+            self._summary_writer = SummaryWriter(self.hps["log_dir"])
         for k, v in info.items():
             self._summary_writer.add_scalar(f"{key}_{k}", v, index)

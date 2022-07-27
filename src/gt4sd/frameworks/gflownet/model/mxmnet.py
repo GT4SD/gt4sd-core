@@ -1,35 +1,48 @@
+import inspect
+import math
+from collections import OrderedDict
+from math import pi as PI
+from operator import itemgetter
+
+import numpy as np
+import torch
+import torch.nn as nn
+from rdkit.Chem import AllChem
+from scipy import special as sp
+from scipy.optimize import brentq
+from torch.nn import Linear, Sequential
+from torch_geometric.data import Data
+from torch_geometric.nn import global_add_pool, radius
+from torch_geometric.utils import add_self_loops, remove_self_loops
+from torch_scatter import scatter
+from torch_sparse import SparseTensor
+
+try:
+    import sympy as sym
+except ImportError:
+    sym = None
+
 # type: ignore
 # flake8: noqa
 # yapf: disable
 """This code is extracted from https://github.com/zetayue/MXMNet
 
 There are some minor API fixes, plus:
-- an rdkit_conformation(mol, n, addHs) function that finds the lowest
-  energy conformation of a molecule
-- a mol2graph function that convers an RDMol to a torch geometric Data
-  instance that can be fed to MXMNet (this includes computing its
-  conformation according to rdkit)
+- an rdkit_conformation(mol, n, addHs) function that finds the lowest energy conformation of a molecule
+- a mol2graph function that convers an RDMol to a torch geometric Data instance that can be fed to MXMNet (this includes computing its conformation according to rdkit)
 both these functions return None if no valid conformation is found.
 """
 
-
-import math
-
-import torch
-import torch.nn as nn
-from torch_geometric.nn import global_add_pool, radius
-from torch_geometric.utils import add_self_loops, remove_self_loops
-from torch_scatter import scatter
-from torch_sparse import SparseTensor
-
 HAR2EV = 27.2113825435
 KCALMOL2EV = 0.04336414
+
 
 class Config(object):
     def __init__(self, dim, n_layer, cutoff):
         self.dim = dim
         self.n_layer = n_layer
         self.cutoff = cutoff
+
 
 class MXMNet(nn.Module):
     def __init__(self, config: Config, num_spherical=7, num_radial=6, envelope_exponent=5):
@@ -69,10 +82,9 @@ class MXMNet(nn.Module):
         row, col = edge_index
 
         value = torch.arange(row.size(0), device=row.device)
-        adj_t = SparseTensor(row=col, col=row, value=value,
-                             sparse_sizes=(num_nodes, num_nodes))
+        adj_t = SparseTensor(row=col, col=row, value=value, sparse_sizes=(num_nodes, num_nodes))
 
-        #Compute the node indices for two-hop angles
+        # Compute the node indices for two-hop angles
         adj_t_row = adj_t[row]
         num_triplets = adj_t_row.set_value(None).sum(dim=1).to(torch.long)
 
@@ -85,7 +97,7 @@ class MXMNet(nn.Module):
         idx_kj = adj_t_row.storage.value()[mask]
         idx_ji_1 = adj_t_row.storage.row()[mask]
 
-        #Compute the node indices for one-hop angles
+        # Compute the node indices for one-hop angles
         adj_t_col = adj_t[col]
 
         num_pairs = adj_t_col.set_value(None).sum(dim=1).to(torch.long)
@@ -97,7 +109,6 @@ class MXMNet(nn.Module):
         idx_jj = adj_t_col.storage.value()
 
         return idx_i_1, idx_j, idx_k, idx_kj, idx_ji_1, idx_i_2, idx_j1, idx_j2, idx_jj, idx_ji_2
-
 
     def forward(self, data):
         x = data.x
@@ -156,35 +167,6 @@ class MXMNet(nn.Module):
         # Readout
         output = global_add_pool(node_sum, batch)
         return output.view(-1)
-
-import glob
-import inspect
-import os
-import os.path as osp
-import shutil
-from collections import OrderedDict
-from math import pi as PI
-from math import sqrt
-from operator import itemgetter
-
-import numpy as np
-import sympy as sym
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from scipy import special as sp
-from scipy.optimize import brentq
-from torch.nn import Linear, ModuleList, Parameter, Sequential
-from torch_geometric.data import Data, InMemoryDataset, download_url, extract_zip
-from torch_geometric.io import read_txt_array
-from torch_geometric.utils import add_self_loops, remove_self_loops, sort_edge_index
-from torch_scatter import scatter
-from torch_sparse import coalesce
-
-try:
-    import sympy as sym
-except ImportError:
-    sym = None
 
 
 class EMA:
@@ -247,24 +229,23 @@ def compute_idx(pos, edge_index):
     d_ij = torch.norm(abs(pos_j - pos_i), dim=-1, keepdim=False).unsqueeze(-1) + 1e-5
     v_ji = (pos_i - pos_j) / d_ij
 
-    unique, counts = torch.unique(edge_index[0], sorted=True, return_counts=True) #Get central values
-    full_index = torch.arange(0, edge_index[0].size()[0]).cuda().int() #init full index
-    #print('full_index', full_index)
+    unique, counts = torch.unique(edge_index[0], sorted=True, return_counts=True)  # Get central values
+    full_index = torch.arange(0, edge_index[0].size()[0]).cuda().int()  # init full index
 
-    #Compute 1
+    # Compute 1
     repeat = torch.repeat_interleave(counts, counts)
-    counts_repeat1 = torch.repeat_interleave(full_index, repeat) #0,...,0,1,...,1,...
+    counts_repeat1 = torch.repeat_interleave(full_index, repeat)  # 0,...,0,1,...,1,...
 
-    #Compute 2
-    split = torch.split(full_index, counts.tolist()) #split full index
-    index2 = list(edge_index[0].data.cpu().numpy()) #get repeat index
-    counts_repeat2 = torch.cat(itemgetter(*index2)(split), dim=0) #0,1,2,...,0,1,2,..
+    # Compute 2
+    split = torch.split(full_index, counts.tolist())  # split full index
+    index2 = list(edge_index[0].data.cpu().numpy())  # get repeat index
+    counts_repeat2 = torch.cat(itemgetter(*index2)(split), dim=0)  # 0,1,2,...,0,1,2,..
 
-    #Compute angle embeddings
+    # Compute angle embeddings
     v1 = v_ji[counts_repeat1.long()]
     v2 = v_ji[counts_repeat2.long()]
 
-    angle = (v1*v2).sum(-1).unsqueeze(-1)
+    angle = (v1 * v2).sum(-1).unsqueeze(-1)
     angle = torch.clamp(angle, min=-1.0, max=1.0) + 1e-6 + 1.0
 
     return counts_repeat1.long(), counts_repeat2.long(), angle
@@ -317,17 +298,13 @@ def bessel_basis(n, k):
     for order in range(n):
         bess_basis_tmp = []
         for i in range(k):
-            bess_basis_tmp += [
-                sym.simplify(normalizer[order][i] *
-                             f[order].subs(x, zeros[order, i] * x))
-            ]
+            bess_basis_tmp += [sym.simplify(normalizer[order][i] * f[order].subs(x, zeros[order, i] * x))]
         bess_basis += [bess_basis_tmp]
     return bess_basis
 
 
 def sph_harm_prefactor(k, m):
-    return ((2 * k + 1) * np.math.factorial(k - abs(m)) /
-            (4 * np.pi * np.math.factorial(k + abs(m))))**0.5
+    return ((2 * k + 1) * np.math.factorial(k - abs(m)) / (4 * np.pi * np.math.factorial(k + abs(m))))**0.5
 
 
 def associated_legendre_polynomials(k, zero_m_only=True):
@@ -339,18 +316,14 @@ def associated_legendre_polynomials(k, zero_m_only=True):
         P_l_m[1][0] = z
 
         for j in range(2, k):
-            P_l_m[j][0] = sym.simplify(((2 * j - 1) * z * P_l_m[j - 1][0] -
-                                        (j - 1) * P_l_m[j - 2][0]) / j)
+            P_l_m[j][0] = sym.simplify(((2 * j - 1) * z * P_l_m[j - 1][0] - (j - 1) * P_l_m[j - 2][0]) / j)
         if not zero_m_only:
             for i in range(1, k):
                 P_l_m[i][i] = sym.simplify((1 - 2 * i) * P_l_m[i - 1][i - 1])
                 if i + 1 < k:
-                    P_l_m[i + 1][i] = sym.simplify(
-                        (2 * i + 1) * z * P_l_m[i][i])
+                    P_l_m[i + 1][i] = sym.simplify((2 * i + 1) * z * P_l_m[i][i])
                 for j in range(i + 2, k):
-                    P_l_m[j][i] = sym.simplify(
-                        ((2 * j - 1) * z * P_l_m[j - 1][i] -
-                         (i + j - 1) * P_l_m[j - 2][i]) / (j - i))
+                    P_l_m[j][i] = sym.simplify(((2 * j - 1) * z * P_l_m[j - 1][i] - (i + j - 1) * P_l_m[j - 2][i]) / (j - i))
 
     return P_l_m
 
@@ -377,14 +350,10 @@ def real_sph_harm(k, zero_m_only=True, spherical_coordinates=True):
             phi = sym.symbols('phi')
             for i in range(len(S_m)):
                 S_m[i] = S_m[i].subs(x,
-                                     sym.sin(theta) * sym.cos(phi)).subs(
-                                         y,
-                                         sym.sin(theta) * sym.sin(phi))
+                                     sym.sin(theta) * sym.cos(phi)).subs(y, sym.sin(theta) * sym.sin(phi))
             for i in range(len(C_m)):
                 C_m[i] = C_m[i].subs(x,
-                                     sym.sin(theta) * sym.cos(phi)).subs(
-                                         y,
-                                         sym.sin(theta) * sym.sin(phi))
+                                     sym.sin(theta) * sym.cos(phi)).subs(y, sym.sin(theta) * sym.sin(phi))
 
     Y_func_l_m = [['0'] * (2 * j + 1) for j in range(k)]
     for i in range(k):
@@ -452,8 +421,7 @@ class Envelope(torch.nn.Module):
 
 
 class SphericalBasisLayer(torch.nn.Module):
-    def __init__(self, num_spherical, num_radial, cutoff=5.0,
-                 envelope_exponent=5):
+    def __init__(self, num_spherical, num_radial, cutoff=5.0, envelope_exponent=5):
         super(SphericalBasisLayer, self).__init__()
         assert num_radial <= 64
         self.num_spherical = num_spherical
@@ -491,20 +459,17 @@ class SphericalBasisLayer(torch.nn.Module):
         return out
 
 
-
 msg_special_args = set([
     'edge_index',
     'edge_index_i',
     'edge_index_j',
     'size',
     'size_i',
-    'size_j',
-])
+    'size_j'])
 
 aggr_special_args = set([
     'index',
-    'dim_size',
-])
+    'dim_size'])
 
 update_special_args = set([])
 
@@ -569,10 +534,7 @@ class MessagePassing(torch.nn.Module):
         elif size[index] is None:
             size[index] = tensor.size(self.node_dim)
         elif size[index] != tensor.size(self.node_dim):
-            raise ValueError(
-                (f'Encountered node tensor with size '
-                 f'{tensor.size(self.node_dim)} in dimension {self.node_dim}, '
-                 f'but expected size {size[index]}.'))
+            raise ValueError((f'Encountered node tensor with size {tensor.size(self.node_dim)} in dimension {self.node_dim}, but expected size {size[index]}.'))
 
     def __collect__(self, edge_index, size, kwargs):
         i, j = (0, 1) if self.flow == "target_to_source" else (1, 0)
@@ -699,13 +661,11 @@ class MessagePassing(torch.nn.Module):
 
         return inputs
 
-import copy
-
-from rdkit import Chem
-from rdkit.Chem import AllChem
 
 params = AllChem.ETKDGv3()
 params.useSmallRingTorsions = True
+
+
 def rdkit_conformation(mol, n=5, addHs=False):
     if addHs:
         mol = AllChem.AddHs(mol)
@@ -714,7 +674,8 @@ def rdkit_conformation(mol, n=5, addHs=False):
     for i in range(len(confs)):
         mp = AllChem.MMFFGetMoleculeProperties(mol, mmffVariant='MMFF94s')
         ff = AllChem.MMFFGetMoleculeForceField(mol, mp, confId=i)
-        if ff is None: continue
+        if ff is None:
+            continue
         e = ff.CalcEnergy()
         if e < minc:
             minc = e
@@ -727,20 +688,21 @@ def rdkit_conformation(mol, n=5, addHs=False):
         return torch.tensor(pos)
     return None
 
+
 def mol2graph(mol):
     mol = AllChem.AddHs(mol)
     N = mol.GetNumAtoms()
     try:
         pos = rdkit_conformation(mol)
         assert pos is not None, 'no conformations found'
-    except Exception as e:
+    except Exception:
         return None
     types = {'H': 0, 'C': 1, 'N': 2, 'O': 3, 'F': 4}
     type_idx = []
     for atom in mol.GetAtoms():
         type_idx.append(types[atom.GetSymbol()])
 
-    row, col, edge_type = [], [], []
+    row, col = [], []  # ,edge_type = [], [], []
     for bond in mol.GetBonds():
         start, end = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
         row += [start, end]
@@ -753,6 +715,7 @@ def mol2graph(mol):
     x = torch.tensor(type_idx).to(torch.float)
     data = Data(x=x, pos=pos, edge_index=edge_index)
     return data
+
 
 class Global_MP(MessagePassing):
 

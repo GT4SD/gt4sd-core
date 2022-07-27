@@ -1,4 +1,5 @@
 import os
+
 import pandas as pd
 
 data_path = "/"
@@ -62,7 +63,7 @@ for file in os.listdir(data_path):
         data.append((atoms, coordinates))  # A tuple with the atoms and its coordinates
         smiles.append(smile)  # The SMILES representation
         properties.append(prop)  # The molecules properties
-    except:
+    except ValueError:
         print(path)
     i += 1
 
