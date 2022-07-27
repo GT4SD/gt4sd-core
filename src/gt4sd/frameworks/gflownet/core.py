@@ -26,7 +26,7 @@
 
 from abc import abstractmethod
 from argparse import ArgumentParser
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Tuple
 
 import torch
 from torch import nn
@@ -35,7 +35,7 @@ from torch.distributions import Distribution
 
 class GFlowNetBaseModel(nn.Module):
     """Base model class. GFN is a generative policy at its core.
-    \pi(a' | s') - given the actual state (a partial molecular graph) select the best action (basic building block for molecules).
+    pi(a' | s') - given the actual state (a partial molecular graph) select the best action (basic building block for molecules).
     p(s' | s, a) - transition distribution.
     The implementation for molecules relyes on graph-based models.
     The general idea is to start with the empty state, and add a basic building block at each (state, action) trajectory step.

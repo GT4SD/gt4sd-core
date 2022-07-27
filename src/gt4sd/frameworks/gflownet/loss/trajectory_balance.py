@@ -9,7 +9,7 @@ import torch_geometric.data as gd
 from torch import Tensor
 from torch_scatter import scatter
 
-from gt4sd.frameworks.gflownet.env.graph_building_env import (
+from gt4sd.frameworks.gflownet.envs.graph_building_env import (
     GraphActionCategorical,
     GraphActionType,
     GraphBuildingEnv,
@@ -407,6 +407,9 @@ class TrajectoryBalance:
             / (invalid_mask.sum() + 1e-4),
             "logZ": Z.mean(),
         }
+        # print(loss)
+        # for i in info:
+        #     print(i, info[i])
 
         if not torch.isfinite(traj_losses).all():
             raise ValueError("loss is not finite")

@@ -22,7 +22,6 @@ class QM9Dataset(Dataset):
         elif xyz_file is not None:
             self.load_tar(xyz_file)
 
-        print(self.df)
         rng = np.random.default_rng(split_seed)
         idcs = np.arange(
             len(self.df)
@@ -35,8 +34,7 @@ class QM9Dataset(Dataset):
             self.idcs = idcs[int(np.floor(ratio * len(self.df))) :]
 
     def get_stats(self, percentile=0.95):
-        y = self.df[self.target]
-        y = y.astype("float")
+        y = self.df[self.target].astype(float)
         return y.min(), y.max(), np.sort(y)[int(y.shape[0] * percentile)]
 
     def load_tar(self, xyz_file):
