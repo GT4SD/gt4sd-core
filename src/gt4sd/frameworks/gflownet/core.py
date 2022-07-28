@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Base classes for Generative Flow Networks (https://arxiv.org/abs/2111.09266).
+"""Core for Generative Flow Networks (https://arxiv.org/abs/2111.09266).
 """
 
 from abc import abstractmethod
@@ -31,6 +31,8 @@ from typing import Any, Dict, Tuple
 import torch
 from torch import nn
 from torch.distributions import Distribution
+
+from gt4sd.frameworks.gflownet.train.core import GFNTrainer
 
 
 class GFlowNetBaseModel(nn.Module):
@@ -42,6 +44,7 @@ class GFlowNetBaseModel(nn.Module):
     """
 
     steps: int
+    trainer: GFNTrainer
 
     def __init__(self, name: str, data: Dict[str, str], *args, **kwargs) -> None:
         """Construct GFlowNetBaseModel.
