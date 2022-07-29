@@ -1,3 +1,26 @@
+#
+# MIT License
+#
+# Copyright (c) 2022 GT4SD team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 import copy
 from itertools import count
 from typing import Any, Dict, List, Tuple
@@ -10,6 +33,8 @@ from torch import Tensor
 from torch_scatter import scatter
 
 from gt4sd.frameworks.gflownet.envs.graph_building_env import (
+    Graph,
+    GraphAction,
     GraphActionCategorical,
     GraphActionType,
     GraphBuildingEnv,
@@ -27,7 +52,11 @@ class TrajectoryBalanceModel(nn.Module):
 
 
 class TrajectoryBalance:
-    """ """
+    """TB implementation, see
+    "Trajectory Balance: Improved Credit Assignment in GFlowNets Nikolay Malkin, Moksh Jain,
+    Emmanuel Bengio, Chen Sun, Yoshua Bengio"
+    https://arxiv.org/abs/2201.13259.
+    """
 
     def __init__(
         self,
@@ -35,35 +64,22 @@ class TrajectoryBalance:
         ctx: GraphBuildingEnvContext,
         rng: np.random.RandomState,
         hps: Dict[str, Any],
-        max_len=None,
-        max_nodes=None,
+        max_len: int = None,
+        max_nodes: int = None,
     ):
-        """TB implementation, see
-        "Trajectory Balance: Improved Credit Assignment in GFlowNets Nikolay Malkin, Moksh Jain,
-        Emmanuel Bengio, Chen Sun, Yoshua Bengio"
-        https://arxiv.org/abs/2201.13259
-
-        Hyperparameters used:
-        random_action_prob: float, probability of taking a uniform random action when sampling
-        illegal_action_logreward: float, log(R) given to the model for non-sane end states or illegal actions
-        bootstrap_own_reward: bool, if True, uses the .reward batch data to predict rewards for sampled data
-        tb_epsilon: float, if not None, adds this epsilon in the numerator and denominator of the log-ratio
-        reward_loss_multiplier: float, multiplying constant for the bootstrap loss.
-
-        Parameters
-        ----------
-        env: GraphBuildingEnv
-            A graph environment.
-        ctx: GraphBuildingEnvContext
-            A context.
-        rng: np.random.RandomState
-            rng used to take random actions
-        hps: Dict[str, Any]
-            Hyperparameter dictionary, see above for used keys.
-        max_len: int
-            If not None, ends trajectories of more than max_len steps.
-        max_nodes: int
-            If not None, ends trajectories of graphs with more than max_nodes steps (illegal action).
+        """
+        Args
+            env: a graph environment.
+            ctx: a context.
+            rng: rng used to take random actions.
+            hps: hyperparameter dictionary, see above for used keys.
+                - random_action_prob: float, probability of taking a uniform random action when sampling.
+                - illegal_action_logreward: float, log(R) given to the model for non-sane end states or illegal actions.
+                - bootstrap_own_reward: bool, if True, uses the .reward batch data to predict rewards for sampled data.
+                - tb_epsilon: float, if not None, adds this epsilon in the numerator and denominator of the log-ratio.
+                - reward_loss_multiplier: float, multiplying constant for the bootstrap loss.
+            max_len: if not None, ends trajectories of more than max_len steps.
+            max_nodes: if not None, ends trajectories of graphs with more than max_nodes steps (illegal action).
         """
         self.ctx = ctx
         self.env = env
@@ -109,28 +125,26 @@ class TrajectoryBalance:
 
     def create_training_data_from_own_samples(
         self, model: TrajectoryBalanceModel, n: int, cond_info: Tensor
-    ):
-        """Generate trajectories by sampling a model
+    ) -> List[Dict]:
+        """Generate trajectories by sampling a model.
 
-        Parameters
-        ----------
-        model: TrajectoryBalanceModel
-           The model being sampled
-        graphs: List[Graph]
-            List of N Graph endpoints
-        cond_info: torch.tensor
-            Conditional information, shape (N, n_info)
-        Returns
-        -------
-        data: List[Dict]
-           A list of trajectories. Each trajectory is a dict with keys
-           - trajs: List[Tuple[Graph, GraphAction]]
-           - reward_pred: float, -100 if an illegal action is taken, predicted R(x) if bootstrapping, None otherwise
-           - fwd_logprob: log Z + sum logprobs P_F
-           - bck_logprob: sum logprobs P_B
-           - logZ: predicted log Z
-           - loss: predicted loss (if bootstrapping)
-           - is_valid: is the generated graph valid according to the env & ctx
+        Args:
+            model: TrajectoryBalanceModel
+            The model being sampled
+            graphs: List[Graph]
+                List of N Graph endpoints
+            cond_info: torch.tensor
+                Conditional information, shape (N, n_info)
+
+        Returns:
+            data: a list of trajectories. Each trajectory is a dict with keys.
+                - trajs: List[Tuple[Graph, GraphAction]].
+                - reward_pred: float, -100 if an illegal action is taken, predicted R(x) if bootstrapping, None otherwise.
+                - fwd_logprob: log Z + sum logprobs P_F.
+                - bck_logprob: sum logprobs P_B.
+                - logZ: predicted log Z.
+                - loss: predicted loss (if bootstrapping).
+                - is_valid: is the generated graph valid according to the env & ctx.
         """
         ctx = self.ctx
         env = self.env
@@ -242,38 +256,36 @@ class TrajectoryBalance:
                 data[i]["loss"] = (numerator - denominator).pow(2)
         return data
 
-    def create_training_data_from_graphs(self, graphs):
-        """Generate trajectories from known endpoints
+    def create_training_data_from_graphs(
+        self, graphs: List[Graph]
+    ) -> List[Dict[str, List[tuple[Graph, GraphAction]]]]:
+        """Generate trajectories from known endpoints.
 
-        Parameters
-        ----------
-        graphs: List[Graph]
-            List of Graph endpoints
+        Args:
+        graphs: list of Graph endpoints.
 
-        Returns
-        -------
-        trajs: List[Dict{'traj': List[tuple[Graph, GraphAction]]}]
-           A list of trajectories.
+        Returns:
+        trajs: a list of trajectories.
         """
         return [{"traj": generate_forward_trajectory(i)} for i in graphs]
 
-    def construct_batch(self, trajs, cond_info, rewards):
-        """Construct a batch from a list of trajectories and their information
+    def construct_batch(
+        self,
+        trajs: List[List[tuple[Graph, GraphAction]]],
+        cond_info: torch.Tensor,
+        rewards: torch.Tensor,
+    ):
+        """Construct a batch from a list of trajectories and their information.
 
-        Parameters
-        ----------
-        trajs: List[List[tuple[Graph, GraphAction]]]
-            A list of N trajectories.
-        cond_info: Tensor
-            The conditional info that is considered for each trajectory. Shape (N, n_info)
-        rewards: Tensor
-            The transformed reward (e.g. R(x) ** beta) for each trajectory. Shape (N,)
+        Args:
+            trajs: a list of N trajectories.
+            cond_info: the conditional info that is considered for each trajectory. Shape (N, n_info).
+            rewards: the transformed reward (e.g. R(x) ** beta) for each trajectory. Shape (N,).
 
-        Returns
-        -------
-        batch: gd.Batch
-             A (CPU) Batch object with relevant attributes added
+        Returns:
+            batch: a (CPU) Batch object with relevant attributes added.
         """
+
         torch_graphs = [
             self.ctx.graph_to_Data(i[0]) for tj in trajs for i in tj["traj"]
         ]
@@ -303,18 +315,16 @@ class TrajectoryBalance:
 
     def compute_batch_losses(
         self, model: TrajectoryBalanceModel, batch: gd.Batch, num_bootstrap: int = 0
-    ):
-        """Compute the losses over trajectories contained in the batch
+    ) -> tuple[torch.Tensor, Dict]:
+        """Compute the losses over trajectories contained in the batch.
 
-        Parameters
-        ----------
-        model: TrajectoryBalanceModel
-           A GNN taking in a batch of graphs as input as per constructed by `self.construct_batch`.
-           Must have a `logZ` attribute, itself a model, which predicts log of Z(cond_info)
-        batch: gd.Batch
-          batch of graphs inputs as per constructed by `self.construct_batch`
-        num_bootstrap: int
-          the number of trajectories for which the reward loss is computed. Ignored if 0."""
+        Args:
+            model: a GNN taking in a batch of graphs as input as per constructed by self.construct_batch.
+            Must have a `logZ` attribute, itself a model, which predicts log of Z(cond_info)
+            batch: batch of graphs inputs as per constructed by self.construct_batch.
+            num_bootstrap: the number of trajectories for which the reward loss is computed. Ignored if 0.
+        """
+
         dev = batch.x.device
         # A single trajectory is comprised of many graphs
         num_trajs = int(batch.traj_lens.shape[0])
@@ -407,9 +417,6 @@ class TrajectoryBalance:
             / (invalid_mask.sum() + 1e-4),
             "logZ": Z.mean(),
         }
-        # print(loss)
-        # for i in info:
-        #     print(i, info[i])
 
         if not torch.isfinite(traj_losses).all():
             raise ValueError("loss is not finite")
