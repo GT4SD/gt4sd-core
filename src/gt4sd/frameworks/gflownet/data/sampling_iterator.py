@@ -1,18 +1,43 @@
+#
+# MIT License
+#
+# Copyright (c) 2022 GT4SD team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 import numpy as np
 import torch
 import torch.nn as nn
 from rdkit import RDLogger
 from torch.utils.data import Dataset, IterableDataset
 
+from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnvContext
+from gt4sd.frameworks.gflownet.loss.trajectory_balance import TrajectoryBalance
+from gt4sd.frameworks.gflownet.train.core import GFNTask
+
 
 class SamplingIterator(IterableDataset):
     """This class allows us to parallelise and train faster.
-
     By separating sampling data/the model and building torch geometric
     graphs from training the model, we can do the former in different
     processes, which is much faster since much of graph construction
     is CPU-bound.
-
     """
 
     def __init__(
@@ -20,32 +45,26 @@ class SamplingIterator(IterableDataset):
         dataset: Dataset,
         model: nn.Module,
         batch_size: int,
-        ctx,
-        algo,
-        task,
-        device,
-        ratio=0.5,
-        stream=True,
+        ctx: GraphBuildingEnvContext,
+        algo: TrajectoryBalance,
+        task: GFNTask,
+        device: str = "cuda",
+        ratio: float = 0.5,
+        stream: bool = True,
     ):
-        """Parameters
-        ----------
-        dataset: Dataset
-            A dataset instance
-        model: nn.Module
-            The model we sample from (must be on CUDA already or share_memory() must be called so that
-            parameters are synchronized between each worker)
-        batch_size: int
-            The number of trajectories, each trajectory will be comprised of many graphs, so this is
-            _not_ the batch size in terms of the number of graphs (that will depend on the task)
-        algo:
-            The training algorithm, e.g. a TrajectoryBalance instance
-        task: ConditionalTask
-        ratio: float
-            The ratio of offline trajectories in the batch.
-        stream: bool
-            If True, data is sampled iid for every batch. Otherwise, this is a normal in-order
-            dataset iterator.
-
+        """
+        Args:
+            dataset: a dataset instance.
+            model: the model we sample from (must be on CUDA already or share_memory() must be called so that
+                parameters are synchronized between each worker).
+            batch_size: the number of trajectories, each trajectory will be comprised of many graphs, so this is
+                _not_ the batch size in terms of the number of graphs (that will depend on the task).
+            ctx: the graph environment.
+            algo: the training algorithm, e.g. a TrajectoryBalance instance.
+            task: ConditionalTask
+            ratio: the ratio of offline trajectories in the batch.
+            stream: if true, data is sampled iid for every batch. Otherwise, this is a normal in-order
+                dataset iterator.
         """
         self.data = dataset
         self.model = model

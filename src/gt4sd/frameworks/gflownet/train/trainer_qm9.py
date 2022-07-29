@@ -1,3 +1,26 @@
+#
+# MIT License
+#
+# Copyright (c) 2022 GT4SD team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 import ast
 import copy
 from typing import Any, Callable, Dict, List, Tuple, Union
@@ -34,8 +57,6 @@ def thermometer(v: Tensor, n_bins=50, vmin=0, vmax=1) -> Tensor:
 
 
 class QM9GapTask(GFNTask):
-    """This class captures conditional information generation and reward transforms"""
-
     def __init__(
         self,
         dataset: Dataset,
@@ -44,6 +65,15 @@ class QM9GapTask(GFNTask):
         wrap_model: Callable[[nn.Module], nn.Module] = None,
         device: str = "cuda",
     ):
+        """This class captures conditional information generation and reward transforms.
+
+        Args:
+            dataset:
+            temperature_distribution:
+            temperature_parameters:
+            wrap_model:
+            device:
+        """
         self._wrap_model = wrap_model
         self.device = device
         self.models = self.load_task_models()
@@ -56,7 +86,7 @@ class QM9GapTask(GFNTask):
         self._rtrans = "unit+95p"  # TODO: hyperparameter
 
     def flat_reward_transform(self, y: Union[float, Tensor]) -> FlatRewards:
-        """Transforms a target quantity y (e.g. the LUMO energy in QM9) to a positive reward scalar"""
+        """Transforms a target quantity y (e.g. the LUMO energy in QM9) to a positive reward scalar."""
         y = np.array(y)
         y = y.astype("float")
         if self._rtrans == "exp":
@@ -218,6 +248,7 @@ class QM9GapTrainer(GFNTrainer):
         }[hps["clip_grad_type"]]
 
     def step(self, loss: Tensor):
+        # check nans, check loss smaller than threshold
         loss.backward()
         for i in self.model.parameters():
             self.clip_grad_callback(i)

@@ -1,3 +1,26 @@
+#
+# MIT License
+#
+# Copyright (c) 2022 GT4SD team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 from typing import List, Tuple
 
 import networkx as nx
@@ -17,13 +40,13 @@ from gt4sd.frameworks.gflownet.envs.graph_building_env import (
 
 
 class MolBuildingEnvContext(GraphBuildingEnvContext):
-    """A specification of what is being generated for a GraphBuildingEnv
-
+    """A specification of what is being generated for a GraphBuildingEnv.
     This context specifies how to create molecules atom-by-atom (and attribute-by-attribute).
-
     """
 
-    def __init__(self, atoms=["H", "C", "N", "O", "F"], num_cond_dim=0):
+    def __init__(
+        self, atoms: List[str] = ["H", "C", "N", "O", "F"], num_cond_dim: int = 0
+    ):
         # idx 0 has to coincide with the default value
         self.atom_attr_values = {
             "v": atoms,
@@ -119,7 +142,7 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
         self.device = torch.device("cpu")
 
     def aidx_to_GraphAction(self, g: gd.Data, action_idx: Tuple[int, int, int]):
-        """Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction"""
+        """Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction."""
         act_type, act_row, act_col = [int(i) for i in action_idx]
         t = self.action_type_order[act_type]
         if t is GraphActionType.Stop:
@@ -146,7 +169,7 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
     def GraphAction_to_aidx(
         self, g: gd.Data, action: GraphAction
     ) -> Tuple[int, int, int]:
-        """Translate a GraphAction to an index tuple"""
+        """Translate a GraphAction to an index tuple."""
         if action.action is GraphActionType.Stop:
             row = col = 0
         elif action.action is GraphActionType.AddNode:

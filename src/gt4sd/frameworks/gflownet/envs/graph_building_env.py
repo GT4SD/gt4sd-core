@@ -1,7 +1,30 @@
+#
+# MIT License
+#
+# Copyright (c) 2022 GT4SD team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 import copy
 import enum
 from collections import defaultdict
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Pair, Tuple, Union
 
 import networkx as nx
 import numpy as np
@@ -63,28 +86,21 @@ class GraphAction:
     def __init__(
         self,
         action: GraphActionType,
-        source=None,
-        target=None,
-        value=None,
-        attr=None,
-        relabel=None,
+        source: int = None,
+        target: int = None,
+        value: Any = None,
+        attr: str = None,
+        relabel: int = None,
     ):
-        """A single graph-building action
+        """A single graph-building action.
 
-        Parameters
-        ----------
-        action: GraphActionType
-            the action type
-        source: int
-            the source node this action is applied on
-        target: int, optional
-            the target node (i.e. if specified this is an edge action)
-        attr: str, optional
-            the set attribute of a node/edge
-        value: Any, optional
-            the value (e.g. new node type) applied
-        relabel: int, optional
-            for AddNode actions, relabels the new node with that id
+        Args:
+            action: the action type.
+            source: the source node this action is applied on.
+            target: the target node (i.e. if specified this is an edge action).
+            attr: the set attribute of a node/edge.
+            value: the value (e.g. new node type) applied.
+            relabel: for AddNode actions, relabels the new node with that id.
         """
         self.action = action
         self.source = source
@@ -103,8 +119,7 @@ class GraphAction:
 
 
 class GraphBuildingEnv:
-    """
-    A Graph building environment which induces a DAG state space, compatible with GFlowNet.
+    """A Graph building environment which induces a DAG state space, compatible with GFlowNet.
     Supports forward and backward actions, with a `parents` function that list parents of
     forward actions.
 
@@ -113,22 +128,23 @@ class GraphBuildingEnv:
     Edges and nodes are created with _implicit_ default attribute
     values (e.g. chirality, single/double bondness) so that:
         - an agent gets to do an extra action to set that attribute, but only
-          if it is still default-valued (DAG property preserved)
+        if it is still default-valued (DAG property preserved)
         - we can generate a legal action for any attribute that isn't a default one.
     """
 
-    def __init__(self, allow_add_edge=True, allow_node_attr=True, allow_edge_attr=True):
-        """A graph building environment instance
+    def __init__(
+        self,
+        allow_add_edge: bool = True,
+        allow_node_attr: bool = True,
+        allow_edge_attr: bool = True,
+    ):
+        """A graph building environment instance.
 
-        Parameters
-        ----------
-        allow_add_edge: bool
-            if True, allows this action and computes AddEdge parents (i.e. if False, this
-            env only allows for tree generation)
-        allow_node_attr: bool
-            if True, allows this action and computes SetNodeAttr parents
-        allow_edge_attr: bool
-            if True, allows this action and computes SetEdgeAttr parents
+        Args:
+            allow_add_edge: if True, allows this action and computes AddEdge parents (i.e. if False, this
+                env only allows for tree generation).
+            allow_node_attr: if True, allows this action and computes SetNodeAttr parents.
+            allow_edge_attr: if True, allows this action and computes SetEdgeAttr parents.
         """
         self.allow_add_edge = allow_add_edge
         self.allow_node_attr = allow_node_attr
@@ -140,17 +156,12 @@ class GraphBuildingEnv:
     def step(self, g: Graph, action: GraphAction) -> Graph:
         """Step forward the given graph state with an action
 
-        Parameters
-        ----------
-        g: Graph
-            the graph to be modified
-        action: GraphAction
-            the action taken on the graph, indices must match
+        Args:
+            g: the graph to be modified.
+            action: the action taken on the graph, indices must match.
 
-        Returns
-        -------
-        gp: Graph
-            the new graph
+        Returns:
+            gp: the new graph.
         """
         gp = g.copy()
         if action.action is GraphActionType.AddEdge:
@@ -199,22 +210,19 @@ class GraphBuildingEnv:
 
         return gp
 
-    def parents(self, g: Graph):
-        """List possible parents of graph `g`
+    def parents(self, g: Graph) -> List[Pair(GraphAction, Graph)]:
+        """List possible parents of graph g.
 
-        Parameters
-        ----------
-        g: Graph
-            graph
+        Args:
+            g: graph
 
-        Returns
-        -------
-        parents: List[Pair(GraphAction, Graph)]
-            The list of parent-action pairs that lead to `g`.
+        Returns:
+            parents: the list of parent-action pairs that lead to g.
         """
         raise ValueError(
             "reimplement me with GraphAction!"
         )  # also get rid of relabel...
+
         parents = []
         # Count node degrees
         degree = defaultdict(int)
@@ -272,8 +280,8 @@ class GraphBuildingEnv:
                 )
         return parents
 
-    def count_backward_transitions(self, g: Graph):
-        """Counts the number of parents of g without checking for isomorphisms"""
+    def count_backward_transitions(self, g: Graph) -> int:
+        """Counts the number of parents of g without checking for isomorphisms."""
         c = 0
         deg = [g.degree[i] for i in range(len(g.nodes))]
         for a, b in g.edges:
@@ -302,7 +310,7 @@ class GraphBuildingEnv:
 def generate_forward_trajectory(
     g: Graph, max_nodes: int = None
 ) -> List[Tuple[Graph, GraphAction]]:
-    """Sample (uniformly) a trajectory that generates `g`"""
+    """Sample (uniformly) a trajectory that generates g."""
     # TODO: should this be a method of GraphBuildingEnv? handle set_node_attr flags and so on?
     gn = Graph()
     # Choose an arbitrary starting point, add to the stack
@@ -397,51 +405,47 @@ def generate_forward_trajectory(
 
 
 class GraphActionCategorical:
+    """A multi-type Categorical compatible with generating structured actions.
+
+    What is meant by type here is that there are multiple types of
+    mutually exclusive actions, e.g. AddNode and AddEdge are
+    mutually exclusive, but since their logits will be produced by
+    different variable-sized tensors (corresponding to different
+    elements of the graph, e.g. nodes or edges) it is inconvient
+    to stack them all into one single Categorical. This class
+    provides this convenient interaction between torch_geometric
+    Batch objects and lists of logit tensors.
+    """
+
     def __init__(
         self,
         graphs: gd.Batch,
         logits: List[torch.Tensor],
-        keys: List[str],
+        keys: List[Union[str, None]],
         types: List[GraphActionType],
         deduplicate_edge_index=True,
     ):
-        """A multi-type Categorical compatible with generating structured actions.
-
-        What is meant by type here is that there are multiple types of
-        mutually exclusive actions, e.g. AddNode and AddEdge are
-        mutually exclusive, but since their logits will be produced by
-        different variable-sized tensors (corresponding to different
-        elements of the graph, e.g. nodes or edges) it is inconvient
-        to stack them all into one single Categorical. This class
-        provides this convenient interaction between torch_geometric
-        Batch objects and lists of logit tensors.
-
-        Parameters
-        ----------
-        graphs: Batch
-            A Batch of graphs to which the logits correspond
-        logits: List[Tensor]
-            A list of tensors of shape `(n, m)` representing logits
-            over a variable number of graph elements (e.g. nodes) for
-            which there are `m` possible actions. `n` should thus be
-            equal to the sum of the number of such elements for each
-            graph in the Batch object. The length of the `logits` list
-            should thus be equal to the number of element types (in
-            other words there should be one tensor per type).
-        keys: List[Union[str, None]]
-            The keys corresponding to the Graph elements for each
-            tensor in the logits list. Used to extract the `_batch`
-            and slice attributes. For example, if the first logit
-            tensor is a per-node action logit, and the second is a
-            per-edge, `keys` could be `['x', 'edge_index']`. If
-            keys[i] is None, the corresponding logits are assumed to
-            be graph-level (i.e. if there are `k` graphs in the Batch
-            object, this logit tensor would have shape `(k, m)`)
-        types: List[GraphActionType]
-           The action type each logit corresponds to.
-        deduplicate_edge_index: bool, default=True
-           If true, this means that the 'edge_index' keys have been reduced
-           by e_i[::2] (presumably because the graphs are undirected)
+        """
+        Args:
+            graphs: a Batch of graphs to which the logits correspond.
+            logits: a list of tensors of shape `(n, m)` representing logits
+                over a variable number of graph elements (e.g. nodes) for
+                which there are `m` possible actions. `n` should thus be
+                equal to the sum of the number of such elements for each
+                graph in the Batch object. The length of the `logits` list
+                should thus be equal to the number of element types (in
+                other words there should be one tensor per type).
+            keys: the keys corresponding to the Graph elements for each
+                tensor in the logits list. Used to extract the `_batch`
+                and slice attributes. For example, if the first logit
+                tensor is a per-node action logit, and the second is a
+                per-edge, `keys` could be `['x', 'edge_index']`. If
+                keys[i] is None, the corresponding logits are assumed to
+                be graph-level (i.e. if there are `k` graphs in the Batch
+                object, this logit tensor would have shape `(k, m)`).
+            types: the action type each logit corresponds to.
+            deduplicate_edge_index: if true, this means that the 'edge_index' keys have been reduced
+            by e_i[::2] (presumably because the graphs are undirected).
         """
         # TODO: handle legal action masks? (e.g. can't add a node attr to a node that already has an attr)
         self.num_graphs = graphs.num_graphs
@@ -498,7 +502,7 @@ class GraphActionCategorical:
         return self
 
     def logsoftmax(self):
-        """Compute log-probabilities given logits"""
+        """Compute log-probabilities given logits."""
         if self.logprobs is not None:
             return self.logprobs
         # Use the `subtract by max` trick to avoid precision errors:
@@ -593,7 +597,7 @@ class GraphActionCategorical:
         return actions
 
     def log_prob(self, actions: List[Tuple[int, int, int]]):
-        """The log-probability of a list of action tuples"""
+        """The log-probability of a list of action tuples."""
         logprobs = self.logsoftmax()
         return torch.stack(
             [
@@ -604,57 +608,46 @@ class GraphActionCategorical:
 
 
 class GraphBuildingEnvContext:
-    """A context class defines what the graphs are, how they map to and from data"""
+    """A context class defines what the graphs are, how they map to and from data."""
 
     device: torch.device
 
     def aidx_to_GraphAction(
         self, g: gd.Data, action_idx: Tuple[int, int, int]
     ) -> GraphAction:
-        """Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction
-        Parameters
-        ----------
-        g: gd.Data
-            The graph to which the action is being applied
-        action_idx: Tuple[int, int, int]
-            The tensor indices for the corresponding action
+        """Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction.
 
-        Returns
-        -------
-        action: GraphAction
-            A graph action that could be applied to the original graph coressponding to g.
+        Args:
+            g: the graph to which the action is being applied.
+            action_idx: the tensor indices for the corresponding action.
+
+        Returns:
+            action: a graph action that could be applied to the original graph coressponding to g.
         """
         raise NotImplementedError()
 
     def GraphAction_to_aidx(
         self, g: gd.Data, action: GraphAction
     ) -> Tuple[int, int, int]:
-        """Translate a GraphAction to an action index (e.g. from a GraphActionCategorical)
-        Parameters
-        ----------
-        g: gd.Data
-            The graph to which the action is being applied
-        action: GraphAction
-            A graph action that could be applied to the original graph coressponding to g.
+        """Translate a GraphAction to an action index (e.g. from a GraphActionCategorical).
 
-        Returns
-        -------
-        action_idx: Tuple[int, int, int]
-            The tensor indices for the corresponding action
+        Args:
+            g: the graph to which the action is being applied.
+            action: a graph action that could be applied to the original graph coressponding to g.
+
+        Returns:
+            action_idx: the tensor indices for the corresponding action.
         """
         raise NotImplementedError()
 
     def graph_to_Data(self, g: Graph) -> gd.Data:
-        """Convert a networkx Graph to a torch geometric Data instance
-        Parameters
-        ----------
-        g: Graph
-            A graph instance.
+        """Convert a networkx Graph to a torch geometric Data instance.
 
-        Returns
-        -------
-        torch_g: gd.Data
-            The corresponding torch_geometric graph.
+        Args:
+            g: a graph instance.
+
+        Returns:
+            torch_g: the corresponding torch_geometric graph.
         """
         raise NotImplementedError()
 
@@ -663,15 +656,11 @@ class GraphBuildingEnvContext:
         instance.  This exists so that environment contexts can set
         custom batching attributes, e.g. by using `follow_batch`.
 
-        Parameters
-        ----------
-        graphs: List[gd.Data]
-            Graph instances
+        Args:
+            graphs: graph instances.
 
-        Returns
-        -------
-        batch: gd.Batch
-            The corresponding batch.
+        Returns:
+            batch: the corresponding batch.
         """
         return gd.Batch.from_data_list(graphs)
 
@@ -679,15 +668,11 @@ class GraphBuildingEnvContext:
         """Verifies whether a graph is sane according to the context. This can
         catch, e.g. impossible molecules.
 
-        Parameters
-        ----------
-        g: Graph
-            A graph.
+        Args:
+            g: a graph.
 
-        Returns
-        -------
-        is_sane: bool:
-            True if the environment considers g to be sane.
+        Returns:
+            is_sane: true if the environment considers g to be sane.
         """
         raise NotImplementedError()
 
@@ -695,14 +680,10 @@ class GraphBuildingEnvContext:
         """Verifies whether a graph is sane according to the context. This can
         catch, e.g. impossible molecules.
 
-        Parameters
-        ----------
-        mol: Mol
-            An RDKit molecule
+        Args:
+            mol: an RDKit molecule.
 
-        Returns
-        -------
-        g: Graph
-            The corresponding Graph representation of that molecule.
+        Returns:
+            g: the corresponding Graph representation of that molecule.
         """
         raise NotImplementedError()

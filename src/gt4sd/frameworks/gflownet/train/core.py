@@ -1,3 +1,26 @@
+#
+# MIT License
+#
+# Copyright (c) 2022 GT4SD team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 import pathlib
 from typing import Any, Dict, List, NewType, Optional, Tuple
 
@@ -29,21 +52,16 @@ class GFNAlgorithm:
     def compute_batch_losses(
         self, model: nn.Module, batch: gd.Batch, num_bootstrap: Optional[int] = 0
     ) -> Tuple[Tensor, Dict[str, Tensor]]:
-        """Computes the loss for a batch of data, and proves logging informations
-        Parameters
-        ----------
-        model: nn.Module
-            The model being trained or evaluated
-        batch: gd.Batch
-            A batch of graphs
-        num_bootstrap: Optional[int]
-            The number of trajectories with reward targets in the batch (if applicable).
-        Returns
-        -------
-        loss: Tensor
-            The loss for that batch
-        info: Dict[str, Tensor]
-            Logged information about model predictions.
+        """Computes the loss for a batch of data, and proves logging informations.
+
+        Args:
+            model: the model being trained or evaluated.
+            batch: a batch of graphs.
+            num_bootstrap: the number of trajectories with reward targets in the batch (if applicable).
+
+        Returns:
+            loss: the loss for that batch.
+            info: logged information about model predictions.
         """
         raise NotImplementedError()
 
@@ -54,17 +72,12 @@ class GFNTask:
     ) -> RewardScalar:
         """Combines a minibatch of reward signal vectors and conditional information into a scalar reward.
 
-        Parameters
-        ----------
-        cond_info: Dict[str, Tensor]
-            A dictionary with various conditional informations (e.g. temperature)
-        flat_reward: FlatRewards
-            A 2d tensor where each row represents a series of flat rewards.
+        Args:
+            cond_info: a dictionary with various conditional informations (e.g. temperature).
+            flat_reward: a 2d tensor where each row represents a series of flat rewards.
 
-        Returns
-        -------
-        reward: RewardScalar
-            A 1d tensor, a scalar reward for each minibatch entry.
+        Returns:
+            reward: a 1d tensor, a scalar reward for each minibatch entry.
         """
         raise NotImplementedError()
 
@@ -177,9 +190,10 @@ class GFNTrainer:
         return {k: v.item() if hasattr(v, "item") else v for k, v in info.items()}
 
     def run(self):
-        """Trains the GFN for `num_training_steps` minibatches, performing
-        validation every `validate_every` minibatches.
+        """Trains the GFN for num_training_steps minibatches, performing
+        validation every validate_every minibatches.
         """
+
         self.model.to(self.device)
         self.sampling_model.to(self.device)
 

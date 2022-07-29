@@ -22,4 +22,4 @@
 # SOFTWARE.
 #
 
-# implement original loss for GFN
+# generic dataset for GFN. This is a base class for all datasets.
