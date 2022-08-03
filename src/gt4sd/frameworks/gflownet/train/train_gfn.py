@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import logging
 import pathlib
 from typing import Any, Dict, List, NewType, Optional, Tuple
 
@@ -40,6 +41,9 @@ from gt4sd.frameworks.gflownet.envs.graph_building_env import (
 )
 from gt4sd.frameworks.gflownet.util import wrap_model_mp
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
 # This type represents an unprocessed list of reward signals/conditioning information
 FlatRewards = NewType("FlatRewards", Tensor)  # type: ignore
 
@@ -48,7 +52,7 @@ FlatRewards = NewType("FlatRewards", Tensor)  # type: ignore
 RewardScalar = NewType("RewardScalar", Tensor)  # type: ignore
 
 
-class GFNAlgorithm:
+class GFlowNetAlgorithm:
     def compute_batch_losses(
         self, model: nn.Module, batch: gd.Batch, num_bootstrap: Optional[int] = 0
     ) -> Tuple[Tensor, Dict[str, Tensor]]:
@@ -66,7 +70,7 @@ class GFNAlgorithm:
         raise NotImplementedError()
 
 
-class GFNTask:
+class GFlowNetTask:
     def cond_info_to_reward(
         self, cond_info: Dict[str, Tensor], flat_reward: FlatRewards
     ) -> RewardScalar:
@@ -82,23 +86,18 @@ class GFNTask:
         raise NotImplementedError()
 
     def compute_flat_rewards(self, mols: List[RDMol]) -> Tuple[RewardScalar, Tensor]:
-        """Compute the flat rewards of mols according the the tasks' proxies
+        """Compute the flat rewards of mols according the the tasks' proxies.
 
-        Parameters
-        ----------
-        mols: List[RDMol]
-            A list of RDKit molecules.
-        Returns
-        -------
-        reward: RewardScalar
-            A 1d tensor, a scalar reward for each molecule.
-        is_valid: Tensor
-            A 1d tensor, a boolean indicating whether the molecule is valid.
+        Args:
+            mols: a list of RDKit molecules.
+        Returns:
+            reward: a 1d tensor, a scalar reward for each molecule.
+            is_valid: a 1d tensor, a boolean indicating whether the molecule is valid.
         """
         raise NotImplementedError()
 
 
-class GFNTrainer:
+class GFlowNetTrainer:
     def __init__(self, hps: Dict[str, Any], device: torch.device):
         # self.setup should at least set these up:
         self.training_data: Dataset
@@ -108,8 +107,8 @@ class GFNTrainer:
         self.mb_size: int
         self.env: GraphBuildingEnv
         self.ctx: GraphBuildingEnvContext
-        self.task: GFNTask
-        self.algo: GFNAlgorithm
+        self.task: GFlowNetTask
+        self.algo: GFlowNetAlgorithm
         self.device: str = device
 
         self.hps = {**self.default_hps(), **hps}

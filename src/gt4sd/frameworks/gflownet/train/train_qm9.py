@@ -40,10 +40,10 @@ from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
 from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
 from gt4sd.frameworks.gflownet.loss.trajectory_balance import TrajectoryBalance
 from gt4sd.frameworks.gflownet.model.graph_transformer import GraphTransformerGFN
-from gt4sd.frameworks.gflownet.train.core import (
+from gt4sd.frameworks.gflownet.train.train_gfn import (
     FlatRewards,
-    GFNTask,
-    GFNTrainer,
+    GFlowNetTask,
+    GFlowNetTrainer,
     RewardScalar,
 )
 
@@ -56,7 +56,8 @@ def thermometer(v: Tensor, n_bins=50, vmin=0, vmax=1) -> Tensor:
     ) / gap
 
 
-class QM9GapTask(GFNTask):
+# TODO: training_pipeline for tasks (QM9))
+class QM9GapTask(GFlowNetTask):
     def __init__(
         self,
         dataset: Dataset,
@@ -151,7 +152,7 @@ class QM9GapTask(GFNTask):
         return RewardScalar(preds), is_valid
 
 
-class QM9GapTrainer(GFNTrainer):
+class QM9GapTrainer(GFlowNetTrainer):
     def default_hps(self) -> Dict[str, Any]:
         return {
             "bootstrap_own_reward": False,
@@ -181,6 +182,7 @@ class QM9GapTrainer(GFNTrainer):
         RDLogger.DisableLog("rdApp.*")
         self.rng = np.random.default_rng(142857)
         self.env = GraphBuildingEnv()
+        # TODO: support to infer environment objects from dataset
         self.ctx = MolBuildingEnvContext(["H", "C", "N", "F", "O"], num_cond_dim=32)
 
         self.training_data = QM9Dataset(hps["qm9_h5_path"], train=True, target="gap")

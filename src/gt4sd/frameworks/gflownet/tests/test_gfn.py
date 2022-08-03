@@ -23,7 +23,7 @@
 #
 import torch
 
-from gt4sd.frameworks.gflownet.train.trainer_qm9 import QM9GapTrainer
+from gt4sd.frameworks.gflownet.train.train_qm9 import QM9GapTrainer
 
 
 def test_qm9():
@@ -34,6 +34,7 @@ def test_qm9():
         "log_dir": "./",
         "num_training_steps": 100,
         "validate_every": -1,
+        "type": "transformer_graph",
     }
     trial = QM9GapTrainer(config_file, torch.device("cpu"))
     trial.run()

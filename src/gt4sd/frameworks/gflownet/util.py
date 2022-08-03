@@ -25,8 +25,8 @@ import queue
 import threading
 
 import torch
-import torch.nn as nn
 import torch.multiprocessing as mp
+import torch.nn as nn
 
 
 class MPModelPlaceholder:

@@ -21,15 +21,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import logging
+
 import numpy as np
 import torch
 import torch.nn as nn
-from rdkit import RDLogger
 from torch.utils.data import Dataset, IterableDataset
 
 from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnvContext
 from gt4sd.frameworks.gflownet.loss.trajectory_balance import TrajectoryBalance
-from gt4sd.frameworks.gflownet.train.core import GFNTask
+from gt4sd.frameworks.gflownet.train.train_gfn import GFlowNetTask
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 class SamplingIterator(IterableDataset):
@@ -47,7 +51,7 @@ class SamplingIterator(IterableDataset):
         batch_size: int,
         ctx: GraphBuildingEnvContext,
         algo: TrajectoryBalance,
-        task: GFNTask,
+        task: GFlowNetTask,
         device: str = "cuda",
         ratio: float = 0.5,
         stream: bool = True,
@@ -79,7 +83,7 @@ class SamplingIterator(IterableDataset):
         self.stream = stream
 
     def _idx_iterator(self):
-        RDLogger.DisableLog("rdApp.*")
+
         if self.stream:
             # If we're streaming data, just sample `offline_batch_size` indices
             while True:

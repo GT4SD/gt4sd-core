@@ -21,3 +21,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+from typing import Any, Dict
+
+from gt4sd.frameworks.gflownet.model.graph_transformer import GraphTransformer
+from gt4sd.frameworks.gflownet.model.mxmnet import MXMNet
+
+MODEL_FACTORY: Dict[str, Any] = {
+    "graph_transformer": GraphTransformer,
+    "mxmnet": MXMNet,
+}
