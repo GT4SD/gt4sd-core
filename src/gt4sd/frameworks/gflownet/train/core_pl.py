@@ -33,9 +33,11 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
 from gt4sd.frameworks.gflownet.arg_parser.parser import parse_arguments_from_config
+from gt4sd.frameworks.gflownet.data import build_dataset_and_architecture
 from gt4sd.frameworks.gflownet.data.data_module import GFlowNetDataModule
-from gt4sd.frameworks.gflownet.data.dataset import build_dataset_and_architecture
+from gt4sd.frameworks.gflownet.envs import build_env_context
 from gt4sd.frameworks.gflownet.model.module import GFlowNetModule
+from gt4sd.frameworks.gflownet.train import build_task
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
@@ -62,8 +64,16 @@ def train_gflownet(configuration: Dict[str, Any]) -> None:
         hparams,
     )
 
+    env, ctx = build_env_context(hparams["env"], hparams["context"])
+    task = build_task(hparams["task"])
+
     dm = GFlowNetDataModule(
         dataset,
+        env,
+        ctx,
+        task,
+        algo=getattr(arguments, "algorithm", "trajectory_balance"),
+        model=getattr(arguments, "model_name", "graph_transformer"),
         batch_size=getattr(arguments, "batch_size", 64),
         validation_split=getattr(arguments, "validation_split", None),
         validation_indices_file=getattr(arguments, "validation_indices_file", None),

@@ -257,8 +257,10 @@ class QM9GapTrainer(GFlowNetTrainer):
 
         self.opt.step()
         self.opt.zero_grad()
+
         self.opt_Z.step()
         self.opt_Z.zero_grad()
+
         self.lr_sched.step()
         self.lr_sched_Z.step()
 

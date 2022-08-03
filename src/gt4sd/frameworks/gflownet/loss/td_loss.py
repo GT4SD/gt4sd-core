@@ -23,3 +23,7 @@
 #
 
 # implement original loss for GFN
+
+
+class TDLoss:
+    pass

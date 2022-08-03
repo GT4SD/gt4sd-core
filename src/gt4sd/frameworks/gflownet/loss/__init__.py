@@ -21,3 +21,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+from typing import Any, Dict, str
+
+from gt4sd.frameworks.gflownet.loss.td_loss import TDLoss
+from gt4sd.frameworks.gflownet.loss.trajectory_balance import TrajectoryBalance
+
+ALGORITHM_FACTORY: Dict[str, Any] = {
+    "trajectory_balance": TrajectoryBalance,
+    "td_loss": TDLoss,
+}

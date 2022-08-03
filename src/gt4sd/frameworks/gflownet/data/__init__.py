@@ -27,3 +27,7 @@ from torch.utils.data import Dataset
 class DatasetWithReward(Dataset):
     def flat_reward_transform(self, r):
         pass
+
+
+def build_dataset_and_architecture():
+    pass

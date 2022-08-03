@@ -36,6 +36,7 @@ import torch_geometric.data as gd
 from torch import Tensor
 from torch.utils.tensorboard import SummaryWriter
 
+from gt4sd.frameworks.gflownet.loss import ALGORITHM_FACTORY
 from gt4sd.frameworks.gflownet.model import MODEL_FACTORY
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
@@ -69,6 +70,7 @@ class GFlowNetModule(pl.LightningModule):
     def __init__(
         self,
         architecture: str = "graph_transformer",
+        algorithm: str = "trajectory_balance",
         lr: float = 1e-4,
         test_output_path: str = "./test",
         **kwargs,
@@ -86,8 +88,7 @@ class GFlowNetModule(pl.LightningModule):
         self.save_hyperparameters()
 
         self.model = MODEL_FACTORY[architecture]
-
-        self.algo: GFlowNetAlgorithm = kwargs["algo"]
+        self.algo = ALGORITHM_FACTORY[algorithm]
 
         self.lr = lr
         self.test_output_path = test_output_path
