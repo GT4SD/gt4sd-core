@@ -29,17 +29,16 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch_geometric.data as gd
-from rdkit import RDLogger
 from rdkit.Chem.rdchem import Mol as RDMol
 from torch import Tensor
 from torch.utils.data import Dataset
 
-import gt4sd.frameworks.gflownet.model.mxmnet as mxmnet
-from gt4sd.frameworks.gflownet.data.qm9 import QM9Dataset
+import gt4sd.frameworks.gflownet.models.mxmnet as mxmnet
+from gt4sd.frameworks.gflownet.dataloader.qm9 import QM9Dataset
 from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
 from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
 from gt4sd.frameworks.gflownet.loss.trajectory_balance import TrajectoryBalance
-from gt4sd.frameworks.gflownet.model.graph_transformer import GraphTransformerGFN
+from gt4sd.frameworks.gflownet.models.graph_transformer import GraphTransformerGFN
 from gt4sd.frameworks.gflownet.train.train_gfn import (
     FlatRewards,
     GFlowNetTask,
@@ -179,7 +178,6 @@ class QM9GapTrainer(GFlowNetTrainer):
 
     def setup(self):
         hps = self.hps
-        RDLogger.DisableLog("rdApp.*")
         self.rng = np.random.default_rng(142857)
         self.env = GraphBuildingEnv()
         # TODO: support to infer environment objects from dataset

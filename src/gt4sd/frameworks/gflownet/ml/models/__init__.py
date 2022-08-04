@@ -21,47 +21,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import List
+from typing import Any, Dict
 
-from gt4sd.frameworks.gflownet.data.dataset import GFlowNetDataset
+from gt4sd.frameworks.gflownet.models.graph_transformer import GraphTransformer
+from gt4sd.frameworks.gflownet.models.mxmnet import MXMNet
 
-PROPERTIES: List[str] = [
-    "rA",
-    "rB",
-    "rC",
-    "mu",
-    "alpha",
-    "homo",
-    "lumo",
-    "gap",
-    "r2",
-    "zpve",
-    "U0",
-    "U",
-    "H",
-    "G",
-    "Cv",
-]
-
-
-class QM9Dataset(GFlowNetDataset):
-    def __init__(
-        self,
-        h5_file: str = None,
-        xyz_file: str = None,
-        train: bool = True,
-        target: str = "gap",
-        split_seed: int = 142857,
-        ratio: float = 0.9,
-        properties: List[str] = PROPERTIES,
-    ) -> None:
-        """QM9 dataset."""
-        super().__init__(
-            h5_file=h5_file,
-            xyz_file=xyz_file,
-            train=train,
-            target=target,
-            split_seed=split_seed,
-            ratio=ratio,
-            properties=properties,
-        )
+MODEL_FACTORY: Dict[str, Any] = {
+    "graph_transformer": GraphTransformer,
+    "mxmnet": MXMNet,
+}

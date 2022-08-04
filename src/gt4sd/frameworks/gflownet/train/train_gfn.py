@@ -33,7 +33,7 @@ from torch import Tensor
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.tensorboard import SummaryWriter
 
-from gt4sd.frameworks.gflownet.data.sampling_iterator import SamplingIterator
+from gt4sd.frameworks.gflownet.dataloader.sampling_iterator import SamplingIterator
 from gt4sd.frameworks.gflownet.envs.graph_building_env import (
     GraphActionCategorical,
     GraphBuildingEnv,

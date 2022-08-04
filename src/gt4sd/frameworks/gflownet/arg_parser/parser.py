@@ -29,7 +29,7 @@ import sentencepiece as _sentencepiece
 from pytorch_lightning import Trainer
 
 from gt4sd.frameworks.gflownet.arg_parser.utils import convert_string_to_class
-from gt4sd.frameworks.gflownet.model import MODEL_FACTORY
+from gt4sd.frameworks.gflownet.models import MODEL_FACTORY
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece

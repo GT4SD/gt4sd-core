@@ -37,7 +37,7 @@ from torch import Tensor
 from torch.utils.tensorboard import SummaryWriter
 
 from gt4sd.frameworks.gflownet.loss import ALGORITHM_FACTORY
-from gt4sd.frameworks.gflownet.model import MODEL_FACTORY
+from gt4sd.frameworks.gflownet.models import MODEL_FACTORY
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece

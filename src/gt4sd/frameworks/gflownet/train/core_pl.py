@@ -33,10 +33,10 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
 from gt4sd.frameworks.gflownet.arg_parser.parser import parse_arguments_from_config
-from gt4sd.frameworks.gflownet.data import build_dataset_and_architecture
-from gt4sd.frameworks.gflownet.data.data_module import GFlowNetDataModule
+from gt4sd.frameworks.gflownet.dataloader import build_dataset_and_architecture
+from gt4sd.frameworks.gflownet.dataloader.data_module import GFlowNetDataModule
 from gt4sd.frameworks.gflownet.envs import build_env_context
-from gt4sd.frameworks.gflownet.model.module import GFlowNetModule
+from gt4sd.frameworks.gflownet.ml.module import GFlowNetModule
 from gt4sd.frameworks.gflownet.train import build_task
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
@@ -47,7 +47,7 @@ logger.addHandler(logging.NullHandler())
 
 
 def train_gflownet(configuration: Dict[str, Any]) -> None:
-    """Train a granular given a configuration.
+    """Train a gflownet given a configuration.
     Args:
         configuration: a configuration dictionary.
     """
@@ -111,5 +111,5 @@ def train_gflownet(configuration: Dict[str, Any]) -> None:
 
 
 def train_gflownet_main() -> None:
-    """Train a granular module parsing arguments from config and standard input."""
+    """Train a gflownet module parsing arguments from config and standard input."""
     train_gflownet(configuration=vars(parse_arguments_from_config()))

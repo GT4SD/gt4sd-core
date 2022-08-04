@@ -34,15 +34,15 @@ import torch_geometric.data as gd
 from rdkit.Chem.rdchem import Mol as RDMol
 from torch.utils.data import DataLoader  # , Subset, random_split
 
-from gt4sd.frameworks.gflownet.data.dataset import GFlowNetDataset
-from gt4sd.frameworks.gflownet.data.sampling_iterator import SamplingIterator
+from gt4sd.frameworks.gflownet.dataloader.dataset import GFlowNetDataset
+from gt4sd.frameworks.gflownet.dataloader.sampling_iterator import SamplingIterator
 from gt4sd.frameworks.gflownet.envs.graph_building_env import (
     GraphActionCategorical,
     GraphBuildingEnv,
     GraphBuildingEnvContext,
 )
 from gt4sd.frameworks.gflownet.loss import ALGORITHM_FACTORY
-from gt4sd.frameworks.gflownet.model import MODEL_FACTORY
+from gt4sd.frameworks.gflownet.ml import MODEL_FACTORY
 from gt4sd.frameworks.gflownet.util import wrap_model_mp
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
