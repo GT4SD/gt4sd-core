@@ -334,6 +334,7 @@ Beyond implementing various generative modeling inference and training pipelines
 - [TAPE](https://github.com/songlab-cal/tape): encoder modules compatible with the protein language models.
 - [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as training pipelines for the generative VAEs.
 - [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from [HuggingFace Models](https://huggingface.co/models)
+- [GFlowNets](https://github.com/recursionpharma/gflownet): training and inference pipeline for [Generative Flow Networks](https://yoshuabengio.org/2022/03/05/generative-flow-networks/)
 
 ## References
 
