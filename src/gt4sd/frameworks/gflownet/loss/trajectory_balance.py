@@ -32,7 +32,7 @@ import torch_geometric.data as gd
 from torch import Tensor
 from torch_scatter import scatter
 
-from gt4sd.frameworks.gflownet.envs.graph_building_env import (
+from ..envs.graph_building_env import (
     Graph,
     GraphAction,
     GraphActionCategorical,

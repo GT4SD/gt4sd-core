@@ -24,7 +24,7 @@
 """Data module for granular."""
 
 import logging
-from typing import Dict, List, NewType, Optional, Tensor, Tuple
+from typing import Any, Dict, List, NewType, Optional, Tensor, Tuple
 
 import sentencepiece as _sentencepiece
 import numpy as np
@@ -34,16 +34,16 @@ import torch_geometric.data as gd
 from rdkit.Chem.rdchem import Mol as RDMol
 from torch.utils.data import DataLoader  # , Subset, random_split
 
-from gt4sd.frameworks.gflownet.dataloader.dataset import GFlowNetDataset
-from gt4sd.frameworks.gflownet.dataloader.sampling_iterator import SamplingIterator
-from gt4sd.frameworks.gflownet.envs.graph_building_env import (
+from ..envs.graph_building_env import (
     GraphActionCategorical,
     GraphBuildingEnv,
     GraphBuildingEnvContext,
 )
-from gt4sd.frameworks.gflownet.loss import ALGORITHM_FACTORY
-from gt4sd.frameworks.gflownet.ml import MODEL_FACTORY
-from gt4sd.frameworks.gflownet.util import wrap_model_mp
+from ..loss import ALGORITHM_FACTORY
+from ..ml import MODEL_FACTORY
+from ..util import wrap_model_mp
+from .dataset import GFlowNetDataset
+from .sampling_iterator import SamplingIterator
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
@@ -60,6 +60,8 @@ RewardScalar = NewType("RewardScalar", Tensor)  # type: ignore
 
 
 class GFlowNetTask:
+    """We consider the task as part of the dataset (environment)"""
+
     def cond_info_to_reward(
         self, cond_info: Dict[str, Tensor], flat_reward: FlatRewards
     ) -> RewardScalar:
@@ -155,6 +157,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         ll = self.dataset.get_len_df()
         ixs = np.arange(ll)
         rng.shuffle(ixs)
+
         # TODO: use Subset
         self.ix_train = ixs[: int(np.floor(ratio * ll))]
         self.ix_test = ixs[int(np.floor(ratio * ll)) :]
@@ -170,6 +173,14 @@ class GFlowNetDataModule(pl.LightningDataModule):
         """Prepare testing dataset."""
         self.test_dataset = dataset
         self.test_dataset.set_indexes(self.ixs_test)
+
+    def default_hps(self) -> Dict[str, Any]:
+        raise NotImplementedError()
+
+    def setup(self):
+        raise NotImplementedError()
+
+    #     """Setup the data module.
 
     # def setup(self, stage: Optional[str] = None) -> None:
     #     """Setup the data module.

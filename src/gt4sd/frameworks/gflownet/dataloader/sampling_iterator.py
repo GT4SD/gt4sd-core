@@ -29,9 +29,9 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, IterableDataset
 
-from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnvContext
-from gt4sd.frameworks.gflownet.loss.trajectory_balance import TrajectoryBalance
-from gt4sd.frameworks.gflownet.train.train_gfn import GFlowNetTask
+from ..dataloader.data_module import GFlowNetTask
+from ..envs.graph_building_env import GraphBuildingEnvContext
+from ..loss.trajectory_balance import TrajectoryBalance
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

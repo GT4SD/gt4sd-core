@@ -96,7 +96,7 @@ class GFlowNetTask:
         """
         raise NotImplementedError()
 
-
+## remove this class
 class GFlowNetTrainer:
     def __init__(self, hps: Dict[str, Any], device: torch.device):
         # self.setup should at least set these up:

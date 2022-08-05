@@ -32,12 +32,12 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
-from gt4sd.frameworks.gflownet.arg_parser.parser import parse_arguments_from_config
-from gt4sd.frameworks.gflownet.dataloader import build_dataset_and_architecture
-from gt4sd.frameworks.gflownet.dataloader.data_module import GFlowNetDataModule
-from gt4sd.frameworks.gflownet.envs import build_env_context
-from gt4sd.frameworks.gflownet.ml.module import GFlowNetModule
-from gt4sd.frameworks.gflownet.train import build_task
+from ..arg_parser.parser import parse_arguments_from_config
+from ..dataloader import build_dataset
+from ..dataloader.data_module import GFlowNetDataModule
+from ..envs import build_env_context
+from ..ml.module import GFlowNetModule
+from ..train import build_task
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
@@ -46,28 +46,30 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-def train_gflownet(configuration: Dict[str, Any]) -> None:
+def train_gflownet(
+    configuration: Dict[str, Any],
+    module_model: GFlowNetModule,
+    module_data: GFlowNetDataModule,
+) -> None:
     """Train a gflownet given a configuration.
     Args:
         configuration: a configuration dictionary.
+        module_model: a gflownet module compatible with lightning.
+        module_data: a gflownet data module compatible with lightning.
     """
     arguments = Namespace(**configuration)
 
-    hparams = configuration
-    model_type = hparams["type"].lower()
-    dataset, architecture = build_dataset_and_architecture(
-        hparams["name"],
-        hparams["data_path"],
-        hparams["data_file"],
-        hparams["dataset_type"],
-        hparams["type"],
-        hparams,
+    dataset = build_dataset(
+        name=getattr(arguments, "name"),
+        configuration=configuration,
     )
 
-    env, ctx = build_env_context(hparams["env"], hparams["context"])
-    task = build_task(hparams["task"])
+    env, ctx = build_env_context(
+        env=getattr(arguments, "env"), context=getattr(arguments, "context")
+    )
+    task = build_task(task=getattr(arguments, "task"))
 
-    dm = GFlowNetDataModule(
+    dm = module_data(
         dataset,
         env,
         ctx,
@@ -83,11 +85,12 @@ def train_gflownet(configuration: Dict[str, Any]) -> None:
     )
     dm.prepare_data()
 
-    module = GFlowNetModule(
-        architecture=model_type,
+    module = module_model(
+        architecture=getattr(arguments, "model_name", "graph_transformer"),
         lr=getattr(arguments, "lr", 0.0001),
         test_output_path=getattr(arguments, "test_output_path", "./test"),
     )
+
     tensorboard_logger = TensorBoardLogger(
         "logs", name=getattr(arguments, "basename", "default")
     )

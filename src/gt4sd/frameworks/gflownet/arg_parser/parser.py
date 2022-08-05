@@ -28,8 +28,8 @@ from typing import Any, Dict, Optional
 import sentencepiece as _sentencepiece
 from pytorch_lightning import Trainer
 
-from gt4sd.frameworks.gflownet.arg_parser.utils import convert_string_to_class
-from gt4sd.frameworks.gflownet.models import MODEL_FACTORY
+from ..ml.models import MODEL_FACTORY
+from .utils import convert_string_to_class
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece

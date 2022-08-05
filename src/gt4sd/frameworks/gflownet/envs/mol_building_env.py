@@ -31,7 +31,7 @@ import torch_geometric.data as gd
 from rdkit.Chem import Mol
 from rdkit.Chem.rdchem import BondType, ChiralType
 
-from gt4sd.frameworks.gflownet.envs.graph_building_env import (
+from ..envs.graph_building_env import (
     Graph,
     GraphAction,
     GraphActionType,

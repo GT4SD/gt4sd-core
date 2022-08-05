@@ -27,13 +27,12 @@ import json
 import logging
 from argparse import Namespace
 from dataclasses import dataclass, field
-from re import M
 from typing import Any, Dict, Optional, Tuple
 
 import sentencepiece as _sentencepiece
 from pytorch_lightning import LightningDataModule, LightningModule
 
-from ....frameworks.gflownet.dataloader import build_dataset_and_architecture
+from ....frameworks.gflownet.dataloader import build_dataset
 from ....frameworks.gflownet.dataloader.data_module import GFlowNetDataModule
 from ....frameworks.gflownet.envs import build_env_context
 from ....frameworks.gflownet.ml.module import GFlowNetModule
@@ -81,7 +80,7 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
 
         arguments = Namespace(**configuration)
 
-        dataset, architecture = build_dataset_and_architecture(
+        dataset = build_dataset(
             arguments.name,
             arguments.data_path,
             arguments.data_file,

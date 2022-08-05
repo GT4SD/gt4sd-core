@@ -27,7 +27,7 @@ import torch_geometric.data as gd
 import torch_geometric.nn as gnn
 from torch_geometric.utils import add_self_loops
 
-from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphActionCategorical
+from ...envs.graph_building_env import GraphActionCategorical
 
 
 def mlp(n_in, n_hid, n_out, n_layer, act=nn.LeakyReLU):

@@ -36,8 +36,8 @@ import torch_geometric.data as gd
 from torch import Tensor
 from torch.utils.tensorboard import SummaryWriter
 
-from gt4sd.frameworks.gflownet.loss import ALGORITHM_FACTORY
-from gt4sd.frameworks.gflownet.models import MODEL_FACTORY
+from ....frameworks.gflownet.loss import ALGORITHM_FACTORY
+from ....frameworks.gflownet.ml.models import MODEL_FACTORY
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
@@ -47,6 +47,8 @@ logger.addHandler(logging.NullHandler())
 
 
 class GFlowNetAlgorithm:
+    """We consider the algorithm (objective structure) as part of the model."""
+
     def compute_batch_losses(
         self, model: nn.Module, batch: gd.Batch, num_bootstrap: Optional[int] = 0
     ) -> Tuple[Tensor, Dict[str, Tensor]]:

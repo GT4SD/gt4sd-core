@@ -33,18 +33,18 @@ from rdkit.Chem.rdchem import Mol as RDMol
 from torch import Tensor
 from torch.utils.data import Dataset
 
-import gt4sd.frameworks.gflownet.models.mxmnet as mxmnet
-from gt4sd.frameworks.gflownet.dataloader.qm9 import QM9Dataset
+import gt4sd.frameworks.gflownet.ml.models.mxmnet as mxmnet
+from examples.gflownet.dateset_qm9 import QM9Dataset
+from gt4sd.frameworks.gflownet.dataloader.data_module import (
+    FlatRewards,
+    GFlowNetTask,
+    RewardScalar,
+)
 from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
 from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
 from gt4sd.frameworks.gflownet.loss.trajectory_balance import TrajectoryBalance
-from gt4sd.frameworks.gflownet.models.graph_transformer import GraphTransformerGFN
-from gt4sd.frameworks.gflownet.train.train_gfn import (
-    FlatRewards,
-    GFlowNetTask,
-    GFlowNetTrainer,
-    RewardScalar,
-)
+from gt4sd.frameworks.gflownet.ml.models.graph_transformer import GraphTransformerGFN
+from gt4sd.frameworks.gflownet.ml.module import GFlowNetModule
 
 
 def thermometer(v: Tensor, n_bins=50, vmin=0, vmax=1) -> Tensor:
@@ -55,8 +55,9 @@ def thermometer(v: Tensor, n_bins=50, vmin=0, vmax=1) -> Tensor:
     ) / gap
 
 
-# TODO: training_pipeline for tasks (QM9))
+# define task
 class QM9GapTask(GFlowNetTask):
+    """Define task for QM9 dataset."""
     def __init__(
         self,
         dataset: Dataset,
@@ -128,7 +129,7 @@ class QM9GapTask(GFlowNetTask):
             beta = self.rng.uniform(*self.temperature_dist_params, n).astype(np.float32)
         elif self.temperature_sample_dist == "beta":
             beta = self.rng.beta(*self.temperature_dist_params, n).astype(np.float32)
-        beta_enc = thermometer(torch.tensor(beta), 32, 0, 32)  # TODO: hyperparameters
+        beta_enc = thermometer(torch.tensor(beta), 32, 0, 32)
         return {"beta": torch.tensor(beta), "encoding": beta_enc}
 
     def cond_info_to_reward(
@@ -151,7 +152,7 @@ class QM9GapTask(GFlowNetTask):
         return RewardScalar(preds), is_valid
 
 
-class QM9GapTrainer(GFlowNetTrainer):
+class QM9Module(GFlowNetModule):
     def default_hps(self) -> Dict[str, Any]:
         return {
             "bootstrap_own_reward": False,
