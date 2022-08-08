@@ -22,6 +22,24 @@
 # SOFTWARE.
 #
 
+from typing import Tuple
 
-def build_env_context():
-    pass
+from .graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
+from .mol_building_env import MolBuildingEnvContext
+
+
+# convert to a factory/registry
+def build_env_context(
+    environment_name: str = "graph_building_env",
+    context_name="graph_building_env_context",
+) -> Tuple[GraphBuildingEnv, GraphBuildingEnvContext]:
+    env, context = None, None
+    if environment_name == "graph_building_env":
+        env = GraphBuildingEnv
+
+    if context_name == "graph_building_env_context":
+        context = GraphBuildingEnvContext
+    elif context_name == "mol_building_env_context":
+        context = MolBuildingEnvContext
+
+    return env, context

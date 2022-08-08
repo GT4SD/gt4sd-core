@@ -29,19 +29,11 @@ from typing import Any, Dict, List, NewType, Optional, Tensor, Tuple
 import sentencepiece as _sentencepiece
 import numpy as np
 import pytorch_lightning as pl
-import torch
-import torch_geometric.data as gd
 from rdkit.Chem.rdchem import Mol as RDMol
 from torch.utils.data import DataLoader  # , Subset, random_split
 
-from ..envs.graph_building_env import (
-    GraphActionCategorical,
-    GraphBuildingEnv,
-    GraphBuildingEnvContext,
-)
-from ..loss import ALGORITHM_FACTORY
-from ..ml import MODEL_FACTORY
-from ..util import wrap_model_mp
+from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
+from ..ml.models import MODEL_FACTORY
 from .dataset import GFlowNetDataset
 from .sampling_iterator import SamplingIterator
 
@@ -89,16 +81,19 @@ class GFlowNetTask:
 
 
 class GFlowNetDataModule(pl.LightningDataModule):
-    """Data module from gflownet."""
+    """Data module from gflownet.
+    We assume to have a model and algorithm factory/registry. The user should provide
+    a dataset, environment, context for the environment, and task.
+    """
 
     def __init__(
         self,
         dataset: GFlowNetDataset,
-        env: GraphBuildingEnv,
-        ctx: GraphBuildingEnvContext,
+        environment: GraphBuildingEnv,
+        context: GraphBuildingEnvContext,
         task: GFlowNetTask,
-        algo: str,
-        model: str,
+        algorithm: Any,
+        model: Any,
         sampling_model: str,
         validation_split: Optional[float] = None,
         validation_indices_file: Optional[str] = None,
@@ -115,31 +110,27 @@ class GFlowNetDataModule(pl.LightningDataModule):
 
         Args:
             dataset: dataset.
-            env: environment for graph building.
-            ctx: context env.
+            environment: environment for graph building.
+            context: context env.
             task: generic task.
-            algo: loss function.
+            algorithm: loss function.
             model: model type.
             sampling_model:
-            validation_split: proportion used for validation. Defaults to None,
-                a.k.a., use indices file if provided otherwise uses half of the data for validation.
-            validation_indices_file: indices to use for validation. Defaults to None, a.k.a.,
-                use validation split proportion, if not provided uses half of the data for validation.
-            stratified_batch_file: stratified batch file for sampling. Defaults to None, a.k.a.,
-                no stratified sampling.
-            stratified_value_name: stratified value name. Defaults to None, a.k.a.,
-                no stratified sampling. Needed in case a stratified batch file is provided.
-            sampling_iterator: sampling iterator to use. Defaults to None.
+            validation_split: proportion used for validation.
+            validation_indices_file: indices to use for validation.
+            stratified_batch_file: stratified batch file for sampling.
+            stratified_value_name: stratified value name.
+            sampling_iterator: sampling iterator to use.
             batch_size: batch size.
             num_workers: number of workers.
             device: device.
         """
         super().__init__()
-        self.model = MODEL_FACTORY[model]
+        self.model = model
         self.sampling_model = MODEL_FACTORY[sampling_model]
-        self.algo = ALGORITHM_FACTORY[algo]
-        self.env = env
-        self.ctx = ctx
+        self.algo = algorithm
+        self.env = environment
+        self.ctx = context
         self.task = task
         self.dataset = dataset
 
@@ -163,6 +154,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         self.ix_test = ixs[int(np.floor(ratio * ll)) :]
 
         self.prepare_train_data()
+        self.prepare_test_data()
 
     def prepare_train_data(self, dataset: GFlowNetDataset) -> None:
         """Prepare training dataset."""
@@ -236,15 +228,6 @@ class GFlowNetDataModule(pl.LightningDataModule):
     #     ][stratified_value_name].values
     #     stratified_data_tensor = torch.from_numpy(stratified_data)
     #     return StratifiedSampler(targets=stratified_data_tensor, batch_size=batch_size)
-
-    def _wrap_model_mp(self, model):
-        """Wraps a nn.Module instance so that it can be shared to `DataLoader` workers."""
-        if self.num_workers > 0:
-            placeholder = wrap_model_mp(
-                model, self.num_workers, cast_types=(gd.Batch, GraphActionCategorical)
-            )
-            return placeholder, torch.device("cpu")
-        return model, self.device
 
     def train_dataloader(self) -> DataLoader:
         """Get a training data loader.

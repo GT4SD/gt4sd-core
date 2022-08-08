@@ -109,14 +109,30 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     # parser Pytorch Trainer arguments
     parser = Trainer.add_argparse_args(parser)
 
+    # parse the arguments
+    parser.add_argument("--algorithm", type=str, default="trajectory_balance")
+    parser.add_argument("--context", type=str, default=None)
+    parser.add_argument("--dataset", type=str, default="qm9")
+    parser.add_argument("--environment", type=str, default=None)
+    parser.add_argument("--model", type=str, default="graph_transfomer_gfn")
+    parser.add_argument("--task", type=str, default="qm9")
+
     # adding basename as the name of the run
-    parser.add_argument("--model_name", type=str)
+    parser.add_argument("--epoch", type=int)
     parser.add_argument("--basename", type=str)
     parser.add_argument("--batch_size", type=int)
     parser.add_argument("--num_workers", type=int)
     parser.add_argument("--lr", type=float)
+
     parser.add_argument("--validation_split", type=float, default=None)
     parser.add_argument("--validation_indices_file", type=str)
+    parser.add_argument("--stratified_batch_file", type=str)
+    parser.add_argument("--stratified_value_name", type=str)
+    parser.add_argument("--checkpoint_every_n_val_epochs", type=str)
+    parser.add_argument("--trainer_log_every_n_steps", type=str)
+    parser.add_argument("--trainer_flush_logs_every_n_steps", type=str)
+    parser.add_argument("--test_output_path", type=str)
+
     args_dictionary = vars(parser.parse_args(remaining_argv))
     result.update({k: v for k, v in args_dictionary.items() if v is not None})
     result_namespace = argparse.Namespace(**result)

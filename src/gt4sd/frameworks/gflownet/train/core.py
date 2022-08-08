@@ -25,17 +25,22 @@
 
 import logging
 from argparse import Namespace
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import sentencepiece as _sentencepiece
+import numpy as np
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
 from ..arg_parser.parser import parse_arguments_from_config
 from ..dataloader import build_dataset
-from ..dataloader.data_module import GFlowNetDataModule
+from ..dataloader.data_module import GFlowNetDataModule, GFlowNetTask
+from ..dataloader.dataset import GFlowNetDataset
 from ..envs import build_env_context
+from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
+from ..loss import ALGORITHM_FACTORY
+from ..ml.models import MODEL_FACTORY
 from ..ml.module import GFlowNetModule
 from ..train import build_task
 
@@ -48,34 +53,55 @@ logger.addHandler(logging.NullHandler())
 
 def train_gflownet(
     configuration: Dict[str, Any],
-    module_model: GFlowNetModule,
-    module_data: GFlowNetDataModule,
+    dataset: Optional[GFlowNetDataset] = None,
+    environment: Optional[GraphBuildingEnv] = None,
+    context: Optional[GraphBuildingEnvContext] = None,
+    task: Optional[GFlowNetTask] = None,
 ) -> None:
-    """Train a gflownet given a configuration.
+    """Train a gflownet given a configuration and lightning modules.
+    dataset, enviroment, context and task are optional. The defaults are small molecules compatible.
+
     Args:
         configuration: a configuration dictionary.
-        module_model: a gflownet module compatible with lightning.
-        module_data: a gflownet data module compatible with lightning.
+        dataset: a dataset compatible with lightning.
+        environment: an environment compatible with lightning.
+        context: an environment context compatible with lightning.
+        task: a task compatible with lightning.
     """
+
     arguments = Namespace(**configuration)
 
-    dataset = build_dataset(
-        name=getattr(arguments, "name"),
-        configuration=configuration,
+    rng = np.random.default_rng(142857)
+
+    if not dataset:
+        dataset = build_dataset(
+            dataset=getattr(arguments, "dataset"),
+            configuration=configuration,
+        )
+    if not (environment or context):
+        environment, context = build_env_context(
+            environment_name=getattr(arguments, "environment"),
+            context_name=getattr(arguments, "context"),
+        )
+    if not task:
+        task = build_task(task=getattr(arguments, "task"))
+
+    algorithm = ALGORITHM_FACTORY[getattr(arguments, "algorithm")](
+        environment, context, rng, arguments, max_nodes=9
+    )
+    model = MODEL_FACTORY[getattr(arguments, "model")](
+        context,
+        num_emb=getattr(arguments, "num_emb"),
+        num_layers=getattr(arguments, "num_layers"),
     )
 
-    env, ctx = build_env_context(
-        env=getattr(arguments, "env"), context=getattr(arguments, "context")
-    )
-    task = build_task(task=getattr(arguments, "task"))
-
-    dm = module_data(
-        dataset,
-        env,
-        ctx,
-        task,
-        algo=getattr(arguments, "algorithm", "trajectory_balance"),
-        model=getattr(arguments, "model_name", "graph_transformer"),
+    dm = GFlowNetDataModule(
+        dataset=dataset,
+        environment=environment,
+        context=context,
+        task=task,
+        algorithm=algorithm,
+        model=model,
         batch_size=getattr(arguments, "batch_size", 64),
         validation_split=getattr(arguments, "validation_split", None),
         validation_indices_file=getattr(arguments, "validation_indices_file", None),
@@ -85,8 +111,13 @@ def train_gflownet(
     )
     dm.prepare_data()
 
-    module = module_model(
-        architecture=getattr(arguments, "model_name", "graph_transformer"),
+    module = GFlowNetModule(
+        dataset=dataset,
+        environment=environment,
+        context=context,
+        task=task,
+        algorithm=algorithm,
+        model=model,
         lr=getattr(arguments, "lr", 0.0001),
         test_output_path=getattr(arguments, "test_output_path", "./test"),
     )

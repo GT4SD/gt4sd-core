@@ -29,5 +29,5 @@ class DatasetWithReward(Dataset):
         pass
 
 
-def build_dataset(name: str, *args, **kwargs):
+def build_dataset(dataset: str, *args, **kwargs):
     pass
