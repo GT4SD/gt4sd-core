@@ -30,7 +30,6 @@ import os
 from typing import Any, Dict, List, Optional, Tuple
 
 import sentencepiece as _sentencepiece
-import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
 import torch
@@ -39,15 +38,9 @@ import torch_geometric.data as gd
 from torch import Tensor
 from torch.utils.tensorboard import SummaryWriter
 
-from gt4sd.frameworks.gflownet.dataloader.data_module import GFlowNetTask
-from gt4sd.frameworks.gflownet.dataloader.dataset import GFlowNetDataset
-from gt4sd.frameworks.gflownet.envs.graph_building_env import (
-    GraphActionCategorical,
-    GraphBuildingEnv,
-    GraphBuildingEnvContext,
-)
-
-from ..util import wrap_model_mp
+from ..dataloader.data_module import GFlowNetTask
+from ..dataloader.dataset import GFlowNetDataset
+from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
@@ -81,12 +74,13 @@ class GFlowNetModule(pl.LightningModule):
 
     def __init__(
         self,
+        configuration: Dict[str, Any],
         dataset: GFlowNetDataset,
         environment: GraphBuildingEnv,
         context: GraphBuildingEnvContext,
         task: GFlowNetTask,
         algorithm: GFlowNetAlgorithm,
-        model: Any,
+        model: nn.Module,
         lr: float = 1e-4,
         test_output_path: str = "./test",
         **kwargs,
@@ -94,6 +88,10 @@ class GFlowNetModule(pl.LightningModule):
         """Construct GFNModule.
 
         Args:
+            dataset: the dataset to use.
+            environment: the environment to use.
+            context: the context to use.
+            task: the task to solve.
             model: architecture (graph_transformer or mxmnet).
             algorithm: algorithm (trajectory_balance or td_loss).
             lr: learning rate for Adam optimizer. Defaults to 1e-4.
@@ -104,7 +102,7 @@ class GFlowNetModule(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
 
-        self.hps = self.default_hps()
+        self.hps = configuration
         self.env = environment
         self.ctx = context
         self.dataset = dataset
@@ -112,53 +110,14 @@ class GFlowNetModule(pl.LightningModule):
         self.model = model
         self.algo = algorithm
 
-        self.task = task(
-            self.dataset,
-            self.hps["temperature_sample_dist"],
-            ast.literal_eval(self.hps["temperature_dist_params"]),
-            wrap_model=self._wrap_model_mp,
-            device=self.hps["device"],
-        )
+        self.task = task
 
         self.lr = lr
         self.test_output_path = test_output_path
 
-    def default_hps(self) -> Dict[str, Any]:
-        return {
-            "bootstrap_own_reward": False,
-            "learning_rate": 1e-4,
-            "global_batch_size": 64,
-            "num_emb": 128,
-            "num_layers": 4,
-            "tb_epsilon": None,
-            "illegal_action_logreward": -50,
-            "reward_loss_multiplier": 1,
-            "temperature_sample_dist": "uniform",
-            "temperature_dist_params": "(.5, 32)",
-            "weight_decay": 1e-8,
-            "num_data_loader_workers": 8,
-            "momentum": 0.9,
-            "adam_eps": 1e-8,
-            "lr_decay": 20000,
-            "Z_lr_decay": 20000,
-            "clip_grad_type": "norm",
-            "clip_grad_param": 10,
-            "random_action_prob": 0.001,
-            "sampling_tau": 0.0,
-        }
+        self.rng = self.hps["rng"]
 
-    def _wrap_model_mp(self, model):
-        """Wraps a nn.Module instance so that it can be shared to `DataLoader` workers."""
-        if self.num_workers > 0:
-            placeholder = wrap_model_mp(
-                model, self.num_workers, cast_types=(gd.Batch, GraphActionCategorical)
-            )
-            return placeholder, torch.device("cpu")
-        return model, self.device
-
-    def setup(self):
-        hps = self.hps
-        self.rng = np.random.default_rng(142857)
+    def setup(self, stage: Optional[str]) -> None:
 
         # Separate Z parameters from non-Z to allow for LR decay on the former
         Z_params = list(self.model.logZ.parameters())
@@ -168,30 +127,30 @@ class GFlowNetModule(pl.LightningModule):
 
         self.opt = torch.optim.Adam(
             non_Z_params,
-            hps["learning_rate"],
-            (hps["momentum"], 0.999),
-            weight_decay=hps["weight_decay"],
-            eps=hps["adam_eps"],
+            self.hps["learning_rate"],
+            (self.hps["momentum"], 0.999),
+            weight_decay=self.hps["weight_decay"],
+            eps=self.hps["adam_eps"],
         )
-        self.opt_Z = torch.optim.Adam(Z_params, hps["learning_rate"], (0.9, 0.999))
+        self.opt_Z = torch.optim.Adam(Z_params, self.hps["learning_rate"], (0.9, 0.999))
 
         self.lr_sched = torch.optim.lr_scheduler.LambdaLR(
-            self.opt, lambda steps: 2 ** (-steps / hps["lr_decay"])
+            self.opt, lambda steps: 2 ** (-steps / self.hps["lr_decay"])
         )
         self.lr_sched_Z = torch.optim.lr_scheduler.LambdaLR(
-            self.opt_Z, lambda steps: 2 ** (-steps / hps["Z_lr_decay"])
+            self.opt_Z, lambda steps: 2 ** (-steps / self.hps["Z_lr_decay"])
         )
 
-        self.sampling_tau = hps["sampling_tau"]
+        self.sampling_tau = self.hps["sampling_tau"]
         if self.sampling_tau > 0:
             self.sampling_model = copy.deepcopy(self.model)
         else:
             self.sampling_model = self.model
-        eps = hps["tb_epsilon"]
-        hps["tb_epsilon"] = ast.literal_eval(eps) if isinstance(eps, str) else eps
+        eps = self.hps["tb_epsilon"]
+        self.hps["tb_epsilon"] = ast.literal_eval(eps) if isinstance(eps, str) else eps
 
-        self.mb_size = hps["global_batch_size"]
-        self.clip_grad_param = hps["clip_grad_param"]
+        self.mb_size = self.hps["global_batch_size"]
+        self.clip_grad_param = self.hps["clip_grad_param"]
         self.clip_grad_callback = {
             "value": (
                 lambda params: torch.nn.utils.clip_grad_value_(
@@ -204,7 +163,7 @@ class GFlowNetModule(pl.LightningModule):
                 )
             ),
             "none": (lambda x: None),
-        }[hps["clip_grad_type"]]
+        }[self.hps["clip_grad_type"]]
 
     def gradient_step(self, loss: Tensor):
         # check nans, check loss smaller than threshold

@@ -23,11 +23,8 @@
 #
 from typing import Any, Dict
 
-from gt4sd.frameworks.gflownet.models.graph_transformer import (
-    GraphTransformer,
-    GraphTransformerGFN,
-)
-from gt4sd.frameworks.gflownet.models.mxmnet import MXMNet
+from ..models.graph_transformer import GraphTransformer, GraphTransformerGFN
+from ..models.mxmnet import MXMNet
 
 MODEL_FACTORY: Dict[str, Any] = {
     "graph_transformer": GraphTransformer,

@@ -29,7 +29,6 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, IterableDataset
 
-from ..dataloader.data_module import GFlowNetTask
 from ..envs.graph_building_env import GraphBuildingEnvContext
 from ..loss.trajectory_balance import TrajectoryBalance
 
@@ -52,7 +51,7 @@ class SamplingIterator(IterableDataset):
         batch_size: int,
         ctx: GraphBuildingEnvContext,
         algo: TrajectoryBalance,
-        task: GFlowNetTask,
+        task: nn.Module,
         device: str = "cuda",
         ratio: float = 0.5,
         stream: bool = True,

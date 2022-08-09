@@ -24,7 +24,7 @@
 import copy
 import enum
 from collections import defaultdict
-from typing import Any, Dict, List, Pair, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import networkx as nx
 import numpy as np
@@ -210,75 +210,75 @@ class GraphBuildingEnv:
 
         return gp
 
-    def parents(self, g: Graph) -> List[Pair(GraphAction, Graph)]:
-        """List possible parents of graph g.
+    # def parents(self, g: Graph) -> List[Pair(GraphAction, Graph)]:
+    #     """List possible parents of graph g.
 
-        Args:
-            g: graph
+    #     Args:
+    #         g: graph
 
-        Returns:
-            parents: the list of parent-action pairs that lead to g.
-        """
-        raise ValueError(
-            "reimplement me with GraphAction!"
-        )  # also get rid of relabel...
+    #     Returns:
+    #         parents: the list of parent-action pairs that lead to g.
+    #     """
+    #     raise ValueError(
+    #         "reimplement me with GraphAction!"
+    #     )  # also get rid of relabel...
 
-        parents = []
-        # Count node degrees
-        degree = defaultdict(int)
-        for a, b in g.edges:
-            degree[a] += 1
-            degree[b] += 1
+    #     parents = []
+    #     # Count node degrees
+    #     degree = defaultdict(int)
+    #     for a, b in g.edges:
+    #         degree[a] += 1
+    #         degree[b] += 1
 
-        def add_parent(a, new_g):
-            # Only add parent if the proposed parent `new_g` is not isomorphic
-            # to already identified parents
-            for ap, gp in parents:
-                # Here we are relying on the dict equality operator for nodes and edges
-                if is_isomorphic(new_g, gp, lambda a, b: a == b, lambda a, b: a == b):
-                    return
-            parents.append((a, new_g))
+    #     def add_parent(a, new_g):
+    #         # Only add parent if the proposed parent `new_g` is not isomorphic
+    #         # to already identified parents
+    #         for ap, gp in parents:
+    #             # Here we are relying on the dict equality operator for nodes and edges
+    #             if is_isomorphic(new_g, gp, lambda a, b: a == b, lambda a, b: a == b):
+    #                 return
+    #         parents.append((a, new_g))
 
-        for a, b in g.edges:
-            if degree[a] > 1 and degree[b] > 1 and len(g.edges[(a, b)]) == 0:
-                # Can only remove edges connected to non-leaves and without
-                # attributes (the agent has to remove the attrs, then remove
-                # the edge)
-                new_g = graph_without_edge(g, (a, b))
-                if nx.algorithms.is_connected(new_g):
-                    add_parent((self.add_edge, a, b), new_g)
-            for k in g.edges[(a, b)]:
-                add_parent(
-                    (self.set_edge_attr, (a, b), k, g.edges[(a, b)][k]),
-                    graph_without_edge_attr(g, (a, b), k),
-                )
+    #     for a, b in g.edges:
+    #         if degree[a] > 1 and degree[b] > 1 and len(g.edges[(a, b)]) == 0:
+    #             # Can only remove edges connected to non-leaves and without
+    #             # attributes (the agent has to remove the attrs, then remove
+    #             # the edge)
+    #             new_g = graph_without_edge(g, (a, b))
+    #             if nx.algorithms.is_connected(new_g):
+    #                 add_parent((self.add_edge, a, b), new_g)
+    #         for k in g.edges[(a, b)]:
+    #             add_parent(
+    #                 (self.set_edge_attr, (a, b), k, g.edges[(a, b)][k]),
+    #                 graph_without_edge_attr(g, (a, b), k),
+    #             )
 
-        for i in g.nodes:
-            # Can only remove leaf nodes and without attrs (except 'v'),
-            # and without edges with attrs.
-            if degree[i] == 1 and len(g.nodes[i]) == 1:
-                edge = list(g.edges(i))[0]  # There should only be one since deg == 1
-                if len(g.edges[edge]) == 0:
-                    anchor = edge[0] if edge[1] == i else edge[1]
-                    new_g = graph_without_node(g, i)
-                    add_parent(
-                        (self.add_node, anchor, g.nodes[i]["v"], {"relabel": i}), new_g
-                    )
-            if len(g.nodes) == 1:
-                # The final node is degree 0, need this special case to remove it
-                # and end up with S0, the empty graph root
-                add_parent(
-                    (self.add_node, None, g.nodes[i]["v"], {"relabel": i}),
-                    graph_without_node(g, i),
-                )
-            for k in g.nodes[i]:
-                if k == "v":
-                    continue
-                add_parent(
-                    (self.set_node_attr, i, k, g.nodes[i][k]),
-                    graph_without_node_attr(g, i, k),
-                )
-        return parents
+    #     for i in g.nodes:
+    #         # Can only remove leaf nodes and without attrs (except 'v'),
+    #         # and without edges with attrs.
+    #         if degree[i] == 1 and len(g.nodes[i]) == 1:
+    #             edge = list(g.edges(i))[0]  # There should only be one since deg == 1
+    #             if len(g.edges[edge]) == 0:
+    #                 anchor = edge[0] if edge[1] == i else edge[1]
+    #                 new_g = graph_without_node(g, i)
+    #                 add_parent(
+    #                     (self.add_node, anchor, g.nodes[i]["v"], {"relabel": i}), new_g
+    #                 )
+    #         if len(g.nodes) == 1:
+    #             # The final node is degree 0, need this special case to remove it
+    #             # and end up with S0, the empty graph root
+    #             add_parent(
+    #                 (self.add_node, None, g.nodes[i]["v"], {"relabel": i}),
+    #                 graph_without_node(g, i),
+    #             )
+    #         for k in g.nodes[i]:
+    #             if k == "v":
+    #                 continue
+    #             add_parent(
+    #                 (self.set_node_attr, i, k, g.nodes[i][k]),
+    #                 graph_without_node_attr(g, i, k),
+    #             )
+    #     return parents
 
     def count_backward_transitions(self, g: Graph) -> int:
         """Counts the number of parents of g without checking for isomorphisms."""

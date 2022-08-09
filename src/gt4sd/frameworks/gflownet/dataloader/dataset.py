@@ -52,7 +52,15 @@ class GFlowNetDataset(Dataset):
             properties: properties.
         """
         if h5_file is not None:
-            self.df = pd.HDFStore(h5_file, "r")["df"]
+            import pickle
+
+            # problem with python 3.8 and 3.7
+            # pickle on 3.8 uses prot 5
+            pickle.HIGHEST_PROTOCOL = 5
+            self.df = pd.HDFStore(
+                h5_file,
+                "r",
+            )["df"]
         elif xyz_file is not None:
             self.load_tar(xyz_file)
 

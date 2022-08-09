@@ -23,9 +23,11 @@
 #
 import argparse
 import configparser
+from email.policy import default
 from typing import Any, Dict, Optional
 
 import sentencepiece as _sentencepiece
+import numpy as np
 from pytorch_lightning import Trainer
 
 from ..ml.models import MODEL_FACTORY
@@ -113,8 +115,10 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     parser.add_argument("--algorithm", type=str, default="trajectory_balance")
     parser.add_argument("--context", type=str, default=None)
     parser.add_argument("--dataset", type=str, default="qm9")
+    parser.add_argument("--dataset_path", type=str, default="/Users/ggi/GFN/qm9.h5")
     parser.add_argument("--environment", type=str, default=None)
-    parser.add_argument("--model", type=str, default="graph_transfomer_gfn")
+    parser.add_argument("--model", type=str, default="graph_transformer_gfn")
+    parser.add_argument("--sampling_model", type=str, default="graph_transformer_gfn")
     parser.add_argument("--task", type=str, default="qm9")
 
     # adding basename as the name of the run
@@ -132,6 +136,13 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     parser.add_argument("--trainer_log_every_n_steps", type=str)
     parser.add_argument("--trainer_flush_logs_every_n_steps", type=str)
     parser.add_argument("--test_output_path", type=str)
+
+    parser.add_argument("--log_dir", type=str, default="/Users/ggi/GFN/log/")
+    parser.add_argument("--num_training_steps", type=int, default=1000)
+    parser.add_argument("--validate_every", type=int, default=1000)
+
+    parser.add_argument("--rng", type=int, default=np.random.default_rng(142857))
+    parser.add_argument("--device", type=str, default="cpu")
 
     args_dictionary = vars(parser.parse_args(remaining_argv))
     result.update({k: v for k, v in args_dictionary.items() if v is not None})

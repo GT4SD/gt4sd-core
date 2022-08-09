@@ -62,13 +62,12 @@ class TrajectoryBalance:
         self,
         env: GraphBuildingEnv,
         ctx: GraphBuildingEnvContext,
-        rng: np.random.RandomState,
         hps: Dict[str, Any],
         max_len: int = None,
-        max_nodes: int = None,
     ):
         """
         Args
+            hps: hyperparameters.
             env: a graph environment.
             ctx: a context.
             rng: rng used to take random actions.
@@ -83,9 +82,9 @@ class TrajectoryBalance:
         """
         self.ctx = ctx
         self.env = env
-        self.rng = rng
+        self.rng = hps["rng"]
         self.max_len = max_len
-        self.max_nodes = max_nodes
+        self.max_nodes = hps["max_nodes"]
         self.random_action_prob = hps["random_action_prob"]
         self.illegal_action_logreward = hps["illegal_action_logreward"]
         self.bootstrap_own_reward = hps["bootstrap_own_reward"]
@@ -258,7 +257,7 @@ class TrajectoryBalance:
 
     def create_training_data_from_graphs(
         self, graphs: List[Graph]
-    ) -> List[Dict[str, List[tuple[Graph, GraphAction]]]]:
+    ) -> List[Dict[str, List[Tuple[Graph, GraphAction]]]]:
         """Generate trajectories from known endpoints.
 
         Args:
@@ -271,7 +270,7 @@ class TrajectoryBalance:
 
     def construct_batch(
         self,
-        trajs: List[List[tuple[Graph, GraphAction]]],
+        trajs: List[List[Tuple[Graph, GraphAction]]],
         cond_info: torch.Tensor,
         rewards: torch.Tensor,
     ):
@@ -315,7 +314,7 @@ class TrajectoryBalance:
 
     def compute_batch_losses(
         self, model: TrajectoryBalanceModel, batch: gd.Batch, num_bootstrap: int = 0
-    ) -> tuple[torch.Tensor, Dict]:
+    ) -> Tuple[torch.Tensor, Dict]:
         """Compute the losses over trajectories contained in the batch.
 
         Args:

@@ -23,12 +23,12 @@
 #
 """Train module implementation."""
 
+import ast
 import logging
 from argparse import Namespace
 from typing import Any, Dict, Optional
 
 import sentencepiece as _sentencepiece
-import numpy as np
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -56,7 +56,7 @@ def train_gflownet(
     dataset: Optional[GFlowNetDataset] = None,
     environment: Optional[GraphBuildingEnv] = None,
     context: Optional[GraphBuildingEnvContext] = None,
-    task: Optional[GFlowNetTask] = None,
+    _task: Optional[GFlowNetTask] = None,
 ) -> None:
     """Train a gflownet given a configuration and lightning modules.
     dataset, enviroment, context and task are optional. The defaults are small molecules compatible.
@@ -71,23 +71,23 @@ def train_gflownet(
 
     arguments = Namespace(**configuration)
 
-    rng = np.random.default_rng(142857)
-
-    if not dataset:
-        dataset = build_dataset(
-            dataset=getattr(arguments, "dataset"),
-            configuration=configuration,
-        )
-    if not (environment or context):
-        environment, context = build_env_context(
-            environment_name=getattr(arguments, "environment"),
-            context_name=getattr(arguments, "context"),
-        )
-    if not task:
-        task = build_task(task=getattr(arguments, "task"))
+    # if not dataset:
+    #     dataset = build_dataset(
+    #         dataset=getattr(arguments, "dataset"),
+    #         configuration=configuration,
+    #     )
+    # if not (environment or context):
+    #     environment, context = build_env_context(
+    #         environment_name=getattr(arguments, "environment"),
+    #         context_name=getattr(arguments, "context"),
+    #     )
+    # if not task:
+    #     task = build_task(task=getattr(arguments, "task"))
 
     algorithm = ALGORITHM_FACTORY[getattr(arguments, "algorithm")](
-        environment, context, rng, arguments, max_nodes=9
+        environment,
+        context,
+        configuration,
     )
     model = MODEL_FACTORY[getattr(arguments, "model")](
         context,
@@ -95,13 +95,23 @@ def train_gflownet(
         num_layers=getattr(arguments, "num_layers"),
     )
 
+    task = _task(
+        model,
+        dataset,
+        configuration["temperature_sample_dist"],
+        ast.literal_eval(configuration["temperature_dist_params"]),
+        device=configuration["device"],
+    )
+
     dm = GFlowNetDataModule(
+        configuration=configuration,
         dataset=dataset,
         environment=environment,
         context=context,
         task=task,
         algorithm=algorithm,
         model=model,
+        sampling_model=getattr(arguments, "sampling_model"),
         batch_size=getattr(arguments, "batch_size", 64),
         validation_split=getattr(arguments, "validation_split", None),
         validation_indices_file=getattr(arguments, "validation_indices_file", None),
@@ -112,6 +122,7 @@ def train_gflownet(
     dm.prepare_data()
 
     module = GFlowNetModule(
+        configuration=configuration,
         dataset=dataset,
         environment=environment,
         context=context,
@@ -144,6 +155,47 @@ def train_gflownet(
     trainer.fit(module, dm)
 
 
-def train_gflownet_main() -> None:
+def train_gflownet_main(
+    configuration: Dict[str, Any],
+    dataset: Optional[GFlowNetDataset] = None,
+    environment: Optional[GraphBuildingEnv] = None,
+    context: Optional[GraphBuildingEnvContext] = None,
+    _task: Optional[GFlowNetTask] = None,
+) -> None:
     """Train a gflownet module parsing arguments from config and standard input."""
-    train_gflownet(configuration=vars(parse_arguments_from_config()))
+
+    def default_hps() -> Dict[str, Any]:
+        return {
+            "bootstrap_own_reward": False,
+            "learning_rate": 1e-4,
+            "global_batch_size": 64,
+            "num_emb": 128,
+            "num_layers": 4,
+            "tb_epsilon": None,
+            "illegal_action_logreward": -50,
+            "reward_loss_multiplier": 1,
+            "temperature_sample_dist": "uniform",
+            "temperature_dist_params": "(.5, 32)",
+            "weight_decay": 1e-8,
+            "num_data_loader_workers": 8,
+            "momentum": 0.9,
+            "adam_eps": 1e-8,
+            "lr_decay": 20000,
+            "Z_lr_decay": 20000,
+            "clip_grad_type": "norm",
+            "clip_grad_param": 10,
+            "random_action_prob": 0.001,
+            "sampling_tau": 0.0,
+            "max_nodes": 9,
+        }
+
+    configuration.update(default_hps())
+    configuration.update(vars(parse_arguments_from_config()))
+
+    train_gflownet(
+        configuration=configuration,
+        dataset=dataset,
+        environment=environment,
+        context=context,
+        _task=_task,
+    )

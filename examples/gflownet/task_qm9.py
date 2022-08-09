@@ -60,6 +60,7 @@ class QM9GapTask(GFlowNetTask):
     """Define task for QM9 dataset."""
     def __init__(
         self,
+        reward_model: nn.Module, # this is set to self.model 
         dataset: Dataset,
         temperature_distribution: str,
         temperature_parameters: Tuple[float],
@@ -69,7 +70,8 @@ class QM9GapTask(GFlowNetTask):
         """This class captures conditional information generation and reward transforms.
 
         Args:
-            dataset:
+            reward_model: The model that is used to generate the conditional reward.
+            dataset: 
             temperature_distribution:
             temperature_parameters:
             wrap_model:
@@ -77,15 +79,19 @@ class QM9GapTask(GFlowNetTask):
         """
         self._wrap_model = wrap_model
         self.device = device
-        self.models = self.load_task_models()
+        # fix this
+        if reward_model:
+            self.models = reward_model
+        else:
+            self.models = self.load_task_models()
         self.dataset = dataset
         self.temperature_sample_dist = temperature_distribution
         self.temperature_dist_params = temperature_parameters
-        # TODO: fix interface
+        
         self._min, self._max, self._percentile_95 = self.dataset.get_stats(percentile=0.05)  # type: ignore
         self._width = self._max - self._min
-        self._rtrans = "unit+95p"  # TODO: hyperparameter
-
+        self._rtrans = "unit+95p"  
+        
     def flat_reward_transform(self, y: Union[float, Tensor]) -> FlatRewards:
         """Transforms a target quantity y (e.g. the LUMO energy in QM9) to a positive reward scalar."""
         y = np.array(y)
@@ -109,9 +115,10 @@ class QM9GapTask(GFlowNetTask):
         elif self._rtrans == "unit+95p":
             return (1 - rp + (1 - self._percentile_95)) * self._width + self._min
 
-    def load_task_models(self):
+    def load_task_models(self) -> Dict[str, nn.Module]:
+        """Loads the models for the task.
+        """
         gap_model = mxmnet.MXMNet(mxmnet.Config(128, 6, 5.0))
-        # TODO: this path should be part of the config?
         try:
             state_dict = torch.load("/data/chem/qm9/mxmnet_gap_model.pt")
             gap_model.load_state_dict(state_dict)

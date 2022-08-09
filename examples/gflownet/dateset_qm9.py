@@ -51,8 +51,6 @@ class QM9Dataset(GFlowNetDataset):
         xyz_file: str = None,
         train: bool = True,
         target: str = "gap",
-        split_seed: int = 142857,
-        ratio: float = 0.9,
         properties: List[str] = PROPERTIES,
     ) -> None:
         """QM9 dataset."""
@@ -61,7 +59,5 @@ class QM9Dataset(GFlowNetDataset):
             xyz_file=xyz_file,
             train=train,
             target=target,
-            split_seed=split_seed,
-            ratio=ratio,
             properties=properties,
         )

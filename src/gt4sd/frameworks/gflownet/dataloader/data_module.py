@@ -24,16 +24,24 @@
 """Data module for granular."""
 
 import logging
-from typing import Any, Dict, List, NewType, Optional, Tensor, Tuple
+from typing import Any, Dict, List, NewType, Optional, Tuple
 
 import sentencepiece as _sentencepiece
 import numpy as np
 import pytorch_lightning as pl
+import torch
+import torch.nn as nn
+import torch_geometric.data as gd
 from rdkit.Chem.rdchem import Mol as RDMol
 from torch.utils.data import DataLoader  # , Subset, random_split
 
-from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
+from ..envs.graph_building_env import (
+    GraphActionCategorical,
+    GraphBuildingEnv,
+    GraphBuildingEnvContext,
+)
 from ..ml.models import MODEL_FACTORY
+from ..util import wrap_model_mp
 from .dataset import GFlowNetDataset
 from .sampling_iterator import SamplingIterator
 
@@ -44,18 +52,21 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 # This type represents an unprocessed list of reward signals/conditioning information
-FlatRewards = NewType("FlatRewards", Tensor)  # type: ignore
+FlatRewards = NewType("FlatRewards", torch.tensor)  # type: ignore
 
 # This type represents the outcome for a multi-objective task of
 # converting FlatRewards to a scalar, e.g. (sum R_i omega_i) ** beta
-RewardScalar = NewType("RewardScalar", Tensor)  # type: ignore
+RewardScalar = NewType("RewardScalar", torch.tensor)  # type: ignore
 
 
 class GFlowNetTask:
+    def __init__():
+        pass
+
     """We consider the task as part of the dataset (environment)"""
 
     def cond_info_to_reward(
-        self, cond_info: Dict[str, Tensor], flat_reward: FlatRewards
+        self, cond_info: Dict[str, torch.Tensor], flat_reward: FlatRewards
     ) -> RewardScalar:
         """Combines a minibatch of reward signal vectors and conditional information into a scalar reward.
 
@@ -68,7 +79,9 @@ class GFlowNetTask:
         """
         raise NotImplementedError()
 
-    def compute_flat_rewards(self, mols: List[RDMol]) -> Tuple[RewardScalar, Tensor]:
+    def compute_flat_rewards(
+        self, mols: List[RDMol]
+    ) -> Tuple[RewardScalar, torch.Tensor]:
         """Compute the flat rewards of mols according the the tasks' proxies.
 
         Args:
@@ -79,6 +92,15 @@ class GFlowNetTask:
         """
         raise NotImplementedError()
 
+    def _wrap_model_mp(self, model):
+        """Wraps a nn.Module instance so that it can be shared to `DataLoader` workers."""
+        if self.num_workers > 0:
+            placeholder = wrap_model_mp(
+                model, self.num_workers, cast_types=(gd.Batch, GraphActionCategorical)
+            )
+            return placeholder, torch.device("cpu")
+        return model, self.device
+
 
 class GFlowNetDataModule(pl.LightningDataModule):
     """Data module from gflownet.
@@ -88,12 +110,13 @@ class GFlowNetDataModule(pl.LightningDataModule):
 
     def __init__(
         self,
+        configuration: Dict[str, Any],
         dataset: GFlowNetDataset,
         environment: GraphBuildingEnv,
         context: GraphBuildingEnvContext,
         task: GFlowNetTask,
-        algorithm: Any,
-        model: Any,
+        algorithm: nn.Module,
+        model: nn.Module,
         sampling_model: str,
         validation_split: Optional[float] = None,
         validation_indices_file: Optional[str] = None,
@@ -103,7 +126,6 @@ class GFlowNetDataModule(pl.LightningDataModule):
         batch_size: int = 64,
         num_workers: int = 1,
         device: str = "cuda",
-        seed: int = 142857,
         ratio: float = 0.9,
     ) -> None:
         """Construct GFlowNetDataModule.
@@ -131,20 +153,22 @@ class GFlowNetDataModule(pl.LightningDataModule):
         self.algo = algorithm
         self.env = environment
         self.ctx = context
-        self.task = task
         self.dataset = dataset
+        self.hps = configuration
 
-        self.mb_size: int
+        self.task = task
+
         self.batch_size = batch_size
         self.validation_split = validation_split
         self.validation_indices_file = validation_indices_file
         self.num_workers = num_workers
-        self.device = device
         self.stratified_batch_file = stratified_batch_file
         self.stratified_value_name = stratified_value_name
         self.sampling_iterator = sampling_iterator
 
-        rng = np.random.default_rng(seed)
+        self.device = self.hps["device"]
+        rng = self.hps["rng"]
+
         ll = self.dataset.get_len_df()
         ixs = np.arange(ll)
         rng.shuffle(ixs)
@@ -153,24 +177,21 @@ class GFlowNetDataModule(pl.LightningDataModule):
         self.ix_train = ixs[: int(np.floor(ratio * ll))]
         self.ix_test = ixs[int(np.floor(ratio * ll)) :]
 
-        self.prepare_train_data()
-        self.prepare_test_data()
+        self.prepare_train_data(dataset)
+        self.prepare_test_data(dataset)
 
     def prepare_train_data(self, dataset: GFlowNetDataset) -> None:
         """Prepare training dataset."""
         self.train_dataset = dataset
-        self.train_dataset.set_indexes(self.ixs_train)
+        self.train_dataset.set_indexes(self.ix_train)
 
     def prepare_test_data(self, dataset: GFlowNetDataset) -> None:
         """Prepare testing dataset."""
         self.test_dataset = dataset
-        self.test_dataset.set_indexes(self.ixs_test)
+        self.test_dataset.set_indexes(self.ix_test)
 
-    def default_hps(self) -> Dict[str, Any]:
-        raise NotImplementedError()
-
-    def setup(self):
-        raise NotImplementedError()
+    def setup(self, stage: Optional[str]) -> None:
+        pass
 
     #     """Setup the data module.
 
