@@ -34,15 +34,18 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
 from ..arg_parser.parser import parse_arguments_from_config
-from ..dataloader import build_dataset
+
+# from ..dataloader import build_dataset
 from ..dataloader.data_module import GFlowNetDataModule, GFlowNetTask
 from ..dataloader.dataset import GFlowNetDataset
-from ..envs import build_env_context
+
+# from ..envs import build_env_context
 from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
 from ..loss import ALGORITHM_FACTORY
 from ..ml.models import MODEL_FACTORY
 from ..ml.module import GFlowNetModule
-from ..train import build_task
+
+# from ..train import build_task
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
@@ -112,12 +115,7 @@ def train_gflownet(
         algorithm=algorithm,
         model=model,
         sampling_model=getattr(arguments, "sampling_model"),
-        batch_size=getattr(arguments, "batch_size", 64),
-        validation_split=getattr(arguments, "validation_split", None),
-        validation_indices_file=getattr(arguments, "validation_indices_file", None),
-        stratified_batch_file=getattr(arguments, "stratified_batch_file", None),
-        stratified_value_name=getattr(arguments, "stratified_value_name", None),
-        num_workers=getattr(arguments, "num_workers", 1),
+        sampling_iterator=getattr(arguments, "sampling_iterator", True),
     )
     dm.prepare_data()
 
@@ -129,8 +127,6 @@ def train_gflownet(
         task=task,
         algorithm=algorithm,
         model=model,
-        lr=getattr(arguments, "lr", 0.0001),
-        test_output_path=getattr(arguments, "test_output_path", "./test"),
     )
 
     tensorboard_logger = TensorBoardLogger(
@@ -187,11 +183,16 @@ def train_gflownet_main(
             "random_action_prob": 0.001,
             "sampling_tau": 0.0,
             "max_nodes": 9,
+            "num_offline": 10,
+            "sampling_iterator": True,
+            "ratio": 0.9,
         }
 
+    # add default configuration
     configuration.update(default_hps())
+    # add user configuration
     configuration.update(vars(parse_arguments_from_config()))
-
+    # train gflownet
     train_gflownet(
         configuration=configuration,
         dataset=dataset,

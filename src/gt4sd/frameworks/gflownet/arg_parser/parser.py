@@ -124,20 +124,20 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     # adding basename as the name of the run
     parser.add_argument("--epoch", type=int)
     parser.add_argument("--basename", type=str)
-    parser.add_argument("--batch_size", type=int)
-    parser.add_argument("--num_workers", type=int)
-    parser.add_argument("--lr", type=float)
+    parser.add_argument("--batch_size", type=int, default=64)
+    parser.add_argument("--num_workers", type=int, default=8)
+    parser.add_argument("--lr", type=float, default=0.0001)
 
-    parser.add_argument("--validation_split", type=float, default=None)
+    parser.add_argument("--validation_split", type=float)
     parser.add_argument("--validation_indices_file", type=str)
     parser.add_argument("--stratified_batch_file", type=str)
     parser.add_argument("--stratified_value_name", type=str)
     parser.add_argument("--checkpoint_every_n_val_epochs", type=str)
     parser.add_argument("--trainer_log_every_n_steps", type=str)
     parser.add_argument("--trainer_flush_logs_every_n_steps", type=str)
-    parser.add_argument("--test_output_path", type=str)
+    parser.add_argument("--test_output_path", type=str, default="./test")
 
-    parser.add_argument("--log_dir", type=str, default="/Users/ggi/GFN/log/")
+    parser.add_argument("--log_dir", type=str, default="./log/")
     parser.add_argument("--num_training_steps", type=int, default=1000)
     parser.add_argument("--validate_every", type=int, default=1000)
 

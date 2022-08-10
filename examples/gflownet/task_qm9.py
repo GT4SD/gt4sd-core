@@ -21,9 +21,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-import ast
-import copy
-from typing import Any, Callable, Dict, List, Tuple, Union
+
+from typing import Callable, Dict, List, Tuple, Union
 
 import numpy as np
 import torch
@@ -34,17 +33,11 @@ from torch import Tensor
 from torch.utils.data import Dataset
 
 import gt4sd.frameworks.gflownet.ml.models.mxmnet as mxmnet
-from examples.gflownet.dateset_qm9 import QM9Dataset
 from gt4sd.frameworks.gflownet.dataloader.data_module import (
     FlatRewards,
     GFlowNetTask,
     RewardScalar,
 )
-from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
-from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
-from gt4sd.frameworks.gflownet.loss.trajectory_balance import TrajectoryBalance
-from gt4sd.frameworks.gflownet.ml.models.graph_transformer import GraphTransformerGFN
-from gt4sd.frameworks.gflownet.ml.module import GFlowNetModule
 
 
 def thermometer(v: Tensor, n_bins=50, vmin=0, vmax=1) -> Tensor:
@@ -58,9 +51,10 @@ def thermometer(v: Tensor, n_bins=50, vmin=0, vmax=1) -> Tensor:
 # define task
 class QM9GapTask(GFlowNetTask):
     """Define task for QM9 dataset."""
+
     def __init__(
         self,
-        reward_model: nn.Module, # this is set to self.model 
+        reward_model: nn.Module,  # this is set to self.model
         dataset: Dataset,
         temperature_distribution: str,
         temperature_parameters: Tuple[float],
@@ -71,12 +65,13 @@ class QM9GapTask(GFlowNetTask):
 
         Args:
             reward_model: The model that is used to generate the conditional reward.
-            dataset: 
+            dataset:
             temperature_distribution:
             temperature_parameters:
-            wrap_model:
-            device:
+            wrap_model: a wrapper function that is applied to the model. #TODO: do we need it with lightning?
+            device: cpu or cuda
         """
+        
         self._wrap_model = wrap_model
         self.device = device
         # fix this
@@ -87,11 +82,11 @@ class QM9GapTask(GFlowNetTask):
         self.dataset = dataset
         self.temperature_sample_dist = temperature_distribution
         self.temperature_dist_params = temperature_parameters
-        
+
         self._min, self._max, self._percentile_95 = self.dataset.get_stats(percentile=0.05)  # type: ignore
         self._width = self._max - self._min
-        self._rtrans = "unit+95p"  
-        
+        self._rtrans = "unit+95p"
+
     def flat_reward_transform(self, y: Union[float, Tensor]) -> FlatRewards:
         """Transforms a target quantity y (e.g. the LUMO energy in QM9) to a positive reward scalar."""
         y = np.array(y)
@@ -116,16 +111,15 @@ class QM9GapTask(GFlowNetTask):
             return (1 - rp + (1 - self._percentile_95)) * self._width + self._min
 
     def load_task_models(self) -> Dict[str, nn.Module]:
-        """Loads the models for the task.
-        """
+        """Loads the models for the task."""
         gap_model = mxmnet.MXMNet(mxmnet.Config(128, 6, 5.0))
         try:
-            state_dict = torch.load("/data/chem/qm9/mxmnet_gap_model.pt")
+            state_dict = torch.load("/ckpt/mxmnet_gap_model.pt")
             gap_model.load_state_dict(state_dict)
         except FileNotFoundError:
             pass
         gap_model.to(self.device)
-        gap_model, self.device = self._wrap_model(gap_model)
+        #gap_model = self._wrap_model(gap_model)
         return {"mxmnet_gap": gap_model}
 
     def sample_conditional_information(self, n):
@@ -153,8 +147,10 @@ class QM9GapTask(GFlowNetTask):
             return RewardScalar(torch.zeros((0,))), is_valid
         batch = gd.Batch.from_data_list([i for i in graphs if i is not None])
         batch.to(self.device)
+
+        # sample model
         preds = self.models["mxmnet_gap"](batch).reshape((-1,)).data.cpu() / mxmnet.HAR2EV  # type: ignore[attr-defined]
         preds[preds.isnan()] = 1
         preds = self.flat_reward_transform(preds).clip(1e-4, 2)
-        return RewardScalar(preds), is_valid
         
+        return RewardScalar(preds), is_valid

@@ -60,6 +60,8 @@ RewardScalar = NewType("RewardScalar", torch.tensor)  # type: ignore
 
 
 class GFlowNetTask:
+    """Abstract class for a generic task."""
+
     def __init__():
         pass
 
@@ -79,9 +81,7 @@ class GFlowNetTask:
         """
         raise NotImplementedError()
 
-    def compute_flat_rewards(
-        self, mols: List[RDMol]
-    ) -> Tuple[RewardScalar, torch.Tensor]:
+    def compute_flat_rewards(self, x: List[Any]) -> Tuple[RewardScalar, torch.Tensor]:
         """Compute the flat rewards of mols according the the tasks' proxies.
 
         Args:
@@ -98,8 +98,8 @@ class GFlowNetTask:
             placeholder = wrap_model_mp(
                 model, self.num_workers, cast_types=(gd.Batch, GraphActionCategorical)
             )
-            return placeholder, torch.device("cpu")
-        return model, self.device
+            return placeholder
+        return model
 
 
 class GFlowNetDataModule(pl.LightningDataModule):
@@ -118,15 +118,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         algorithm: nn.Module,
         model: nn.Module,
         sampling_model: str,
-        validation_split: Optional[float] = None,
-        validation_indices_file: Optional[str] = None,
-        stratified_batch_file: Optional[str] = None,
-        stratified_value_name: Optional[str] = None,
-        sampling_iterator: Optional[str] = None,
-        batch_size: int = 64,
-        num_workers: int = 1,
-        device: str = "cuda",
-        ratio: float = 0.9,
+        sampling_iterator: Optional[bool] = True,
     ) -> None:
         """Construct GFlowNetDataModule.
 
@@ -138,93 +130,67 @@ class GFlowNetDataModule(pl.LightningDataModule):
             algorithm: loss function.
             model: model type.
             sampling_model:
-            validation_split: proportion used for validation.
-            validation_indices_file: indices to use for validation.
-            stratified_batch_file: stratified batch file for sampling.
-            stratified_value_name: stratified value name.
             sampling_iterator: sampling iterator to use.
-            batch_size: batch size.
-            num_workers: number of workers.
-            device: device.
         """
         super().__init__()
+        self.hps = configuration
+
         self.model = model
         self.sampling_model = MODEL_FACTORY[sampling_model]
         self.algo = algorithm
         self.env = environment
         self.ctx = context
         self.dataset = dataset
-        self.hps = configuration
-
         self.task = task
 
-        self.batch_size = batch_size
-        self.validation_split = validation_split
-        self.validation_indices_file = validation_indices_file
-        self.num_workers = num_workers
-        self.stratified_batch_file = stratified_batch_file
-        self.stratified_value_name = stratified_value_name
         self.sampling_iterator = sampling_iterator
 
+        self.batch_size = self.hps["batch_size"]
+        self.num_workers = self.hps["num_workers"]
+
+        # self.validation_split = self.hps["validation_split"]
+        # self.validation_indices_file = self.hps["validation_indices_file"]
+        # self.stratified_batch_file = self.hps["stratified_batch_file"]
+        # self.stratified_value_name = self.hps["stratified_value_name"]
+
         self.device = self.hps["device"]
-        rng = self.hps["rng"]
+        self.rng = self.hps["rng"]
+        self.ratio = self.hps["ratio"]
+        self.mb_size = self.hps["global_batch_size"]
 
-        ll = self.dataset.get_len_df()
-        ixs = np.arange(ll)
-        rng.shuffle(ixs)
-
-        # TODO: use Subset
-        self.ix_train = ixs[: int(np.floor(ratio * ll))]
-        self.ix_test = ixs[int(np.floor(ratio * ll)) :]
-
-        self.prepare_train_data(dataset)
-        self.prepare_test_data(dataset)
-
-    def prepare_train_data(self, dataset: GFlowNetDataset) -> None:
-        """Prepare training dataset."""
-        self.train_dataset = dataset
-        self.train_dataset.set_indexes(self.ix_train)
-
-    def prepare_test_data(self, dataset: GFlowNetDataset) -> None:
-        """Prepare testing dataset."""
-        self.test_dataset = dataset
-        self.test_dataset.set_indexes(self.ix_test)
+    def prepare_data(self) -> None:
+        """Prepare training and test dataset."""
+        self.train_dataset = self.dataset
+        self.test_dataset = self.dataset
 
     def setup(self, stage: Optional[str]) -> None:
-        pass
+        """Setup the data module.
+        Args:
+            stage: stage considered, unused. Defaults to None.
+        """
 
-    #     """Setup the data module.
+        ll = self.dataset.get_len()
+        ixs = np.arange(ll)
+        self.rng.shuffle(ixs)
 
-    # def setup(self, stage: Optional[str] = None) -> None:
-    #     """Setup the data module.
+        # TODO: use Subset?
+        self.ix_train = ixs[: int(np.floor(self.ratio * ll))]
+        self.ix_test = ixs[int(np.floor(self.ratio * ll)) :]
 
-    #     Args:
-    #         stage: stage considered, unused. Defaults to None.
-    #     """
+        if stage == "fit" or stage is None:
+            self.train_dataset.set_indexes(self.ix_train)
+        if stage == "test" or stage is None:
+            self.test_dataset.set_indexes(self.ix_test)
 
-    #     if self.validation_indices_file is None and self.validation_split is None:
-    #         self.validation_split = 0.5
-    #     if self.validation_indices_file:
-    #         val_indices = (
-    #             pd.read_csv(self.validation_indices_file).values.flatten().tolist()
-    #         )
-    #         train_indices = [
-    #             i for i in range(len(self.train_dataset)) if i not in val_indices
-    #         ]
-    #         self.train_data = Subset(self.train_dataset, train_indices)
-    #         self.val_data = Subset(self.train_dataset, val_indices)
-
-    #     else:
-    #         val = int(len(self.train_dataset) * cast(float, (self.validation_split)))
-    #         train = len(self.train_dataset) - val
-    #         self.train_data, self.val_data = random_split(
-    #             self.train_dataset, [train, val]
-    #         )
-    #     logger.info(f"number of data points used for training: {len(self.train_data)}")
-    #     logger.info(f"number of data points used for validation: {len(self.val_data)}")
-    #     logger.info(
-    #         f"validation proportion: {len(self.val_data) / (len(self.val_data) + len(self.train_data))}"
-    #     )
+        logger.info(
+            f"number of data points used for training: {len(self.train_dataset)}"
+        )
+        logger.info(
+            f"number of data points used for validation: {len(self.test_dataset)}"
+        )
+        logger.info(
+            f"validation proportion: {len(self.test_dataset) / (len(self.test_dataset) + len(self.train_dataset))}"
+        )
 
     # @staticmethod
     # def get_stratified_batch_sampler(
@@ -257,15 +223,15 @@ class GFlowNetDataModule(pl.LightningDataModule):
             a training data loader.
         """
         if self.sampling_iterator:
-            model, dev = self._wrap_model_mp(self.model)
+            # model, dev = self._wrap_model_mp(self.model)
             iterator = SamplingIterator(
                 self.train_dataset,
-                model,
+                self.model,
                 self.mb_size * 2,
                 self.ctx,
                 self.algo,
                 self.task,
-                dev,
+                self.device,
             )
         else:
             iterator = self.train_dataset
@@ -283,15 +249,15 @@ class GFlowNetDataModule(pl.LightningDataModule):
             a validation data loader.
         """
         if self.sampling_iterator:
-            model, dev = self._wrap_model_mp(self.model)
+            # model, dev = self._wrap_model_mp(self.model)
             iterator = SamplingIterator(
                 self.test_dataset,
-                model,
+                self.model,
                 self.mb_size,
                 self.ctx,
                 self.algo,
                 self.task,
-                dev,
+                self.device,
                 ratio=1,
                 stream=False,
             )

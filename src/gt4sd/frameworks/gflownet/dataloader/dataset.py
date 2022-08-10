@@ -37,7 +37,6 @@ class GFlowNetDataset(Dataset):
         self,
         h5_file: str = None,
         xyz_file: str = None,
-        train: bool = True,
         target: str = "gap",
         properties: List[str] = [],
     ) -> None:
@@ -66,12 +65,13 @@ class GFlowNetDataset(Dataset):
 
         self.target = target
         self.properties = properties
+        self.len = len(self.df)
 
     def set_indexes(self, ixs):
         self.idcs = ixs
 
-    def get_len_df(self):
-        return len(self.df)
+    def get_len(self):
+        return self.len
 
     def get_stats(self, percentile: float = 0.95) -> Tuple[float, float, np.array]:
         """Get the stats of the dataset.

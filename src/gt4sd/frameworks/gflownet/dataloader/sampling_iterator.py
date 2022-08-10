@@ -89,6 +89,7 @@ class SamplingIterator(IterableDataset):
             Batch of indexes.
         """
         bs = self.offline_batch_size
+
         if self.stream:
             # If we're streaming data, just sample `offline_batch_size` indices
             # CHECK: shouldn't this be online_batch_size?
@@ -243,7 +244,7 @@ class SamplingIterator(IterableDataset):
         """Build batch using online and offline data."""
         worker_info = torch.utils.data.get_worker_info()
         wid = worker_info.id if worker_info is not None else 0
-        # set seed
+        # set seed for each worker
         seed = np.random.default_rng(142857 + wid)
         self.rng = seed
         self.algo.rng = seed

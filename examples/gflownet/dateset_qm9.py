@@ -49,7 +49,6 @@ class QM9Dataset(GFlowNetDataset):
         self,
         h5_file: str = None,
         xyz_file: str = None,
-        train: bool = True,
         target: str = "gap",
         properties: List[str] = PROPERTIES,
     ) -> None:
@@ -57,7 +56,6 @@ class QM9Dataset(GFlowNetDataset):
         super().__init__(
             h5_file=h5_file,
             xyz_file=xyz_file,
-            train=train,
             target=target,
             properties=properties,
         )

@@ -81,9 +81,6 @@ class GFlowNetModule(pl.LightningModule):
         task: GFlowNetTask,
         algorithm: GFlowNetAlgorithm,
         model: nn.Module,
-        lr: float = 1e-4,
-        test_output_path: str = "./test",
-        **kwargs,
     ) -> None:
         """Construct GFNModule.
 
@@ -112,77 +109,10 @@ class GFlowNetModule(pl.LightningModule):
 
         self.task = task
 
-        self.lr = lr
-        self.test_output_path = test_output_path
+        self.lr = self.hps["lr"]
+        self.test_output_path = self.hps["test_output_path"]
 
         self.rng = self.hps["rng"]
-
-    def setup(self, stage: Optional[str]) -> None:
-
-        # Separate Z parameters from non-Z to allow for LR decay on the former
-        Z_params = list(self.model.logZ.parameters())
-        non_Z_params = [
-            i for i in self.model.parameters() if all(id(i) != id(j) for j in Z_params)
-        ]
-
-        self.opt = torch.optim.Adam(
-            non_Z_params,
-            self.hps["learning_rate"],
-            (self.hps["momentum"], 0.999),
-            weight_decay=self.hps["weight_decay"],
-            eps=self.hps["adam_eps"],
-        )
-        self.opt_Z = torch.optim.Adam(Z_params, self.hps["learning_rate"], (0.9, 0.999))
-
-        self.lr_sched = torch.optim.lr_scheduler.LambdaLR(
-            self.opt, lambda steps: 2 ** (-steps / self.hps["lr_decay"])
-        )
-        self.lr_sched_Z = torch.optim.lr_scheduler.LambdaLR(
-            self.opt_Z, lambda steps: 2 ** (-steps / self.hps["Z_lr_decay"])
-        )
-
-        self.sampling_tau = self.hps["sampling_tau"]
-        if self.sampling_tau > 0:
-            self.sampling_model = copy.deepcopy(self.model)
-        else:
-            self.sampling_model = self.model
-        eps = self.hps["tb_epsilon"]
-        self.hps["tb_epsilon"] = ast.literal_eval(eps) if isinstance(eps, str) else eps
-
-        self.mb_size = self.hps["global_batch_size"]
-        self.clip_grad_param = self.hps["clip_grad_param"]
-        self.clip_grad_callback = {
-            "value": (
-                lambda params: torch.nn.utils.clip_grad_value_(
-                    params, self.clip_grad_param
-                )
-            ),
-            "norm": (
-                lambda params: torch.nn.utils.clip_grad_norm_(
-                    params, self.clip_grad_param
-                )
-            ),
-            "none": (lambda x: None),
-        }[self.hps["clip_grad_type"]]
-
-    def gradient_step(self, loss: Tensor):
-        # check nans, check loss smaller than threshold
-        loss.backward()
-        for i in self.model.parameters():
-            self.clip_grad_callback(i)
-
-        self.opt.step()
-        self.opt.zero_grad()
-
-        self.opt_Z.step()
-        self.opt_Z.zero_grad()
-
-        self.lr_sched.step()
-        self.lr_sched_Z.step()
-
-        if self.sampling_tau > 0:
-            for a, b in zip(self.model.parameters(), self.sampling_model.parameters()):
-                b.data.mul_(self.sampling_tau).add_(a.data * (1 - self.sampling_tau))
 
     def training_step(
         self, batch: gd.Batch, epoch_idx: int, batch_idx: int
@@ -221,6 +151,23 @@ class GFlowNetModule(pl.LightningModule):
         self.gradient_step(loss)
 
         return {"loss": loss, "logs": logs}
+
+    def training_step_end(self, batch_parts):
+        for i in self.model.parameters():
+            self.clip_grad_callback(i)
+
+        # self.opt.step()
+        # self.opt.zero_grad()
+
+        # self.opt_Z.step()
+        # self.opt_Z.zero_grad()
+
+        self.lr_sched.step()
+        self.lr_sched_Z.step()
+
+        if self.sampling_tau > 0:
+            for a, b in zip(self.model.parameters(), self.sampling_model.parameters()):
+                b.data.mul_(self.sampling_tau).add_(a.data * (1 - self.sampling_tau))
 
     def validation_step(
         self, batch: gd.Batch, epoch_idx: int = 0, batch_idx: int = 0
@@ -271,11 +218,18 @@ class GFlowNetModule(pl.LightningModule):
         )
         return {"loss": loss, "logs": logs}
 
+    def prediction_step(self, batch):
+        """Inference step implementation."""
+        pass
+
     def log(self, info, index, key):
         if not hasattr(self, "_summary_writer"):
             self._summary_writer = SummaryWriter(self.hps["log_dir"])
         for k, v in info.items():
             self._summary_writer.add_scalar(f"{key}_{k}", v, index)
+
+    def train_epoch_end(self, outputs: List[Dict[str, Any]]):
+        pass
 
     # change the following to new implementation
     def test_epoch_end(self, outputs: List[Dict[str, Any]]) -> None:  # type:ignore
@@ -314,10 +268,57 @@ class GFlowNetModule(pl.LightningModule):
         pd.to_pickle(z, f"{self.test_output_path}{os.path.sep}z_build.pkl")
         pd.to_pickle(targets, f"{self.test_output_path}{os.path.sep}targets.pkl")
 
-    def configure_optimizers(self) -> torch.optim.Optimizer:
+    def configure_optimizers(self):
         """Configure optimizers.
 
         Returns:
             an optimizer, currently only Adam is supported.
         """
-        return torch.optim.Adam(self.parameters(), lr=self.lr)
+        # Separate Z parameters from non-Z to allow for LR decay on the former
+        Z_params = list(self.model.logZ.parameters())
+        non_Z_params = [
+            i for i in self.model.parameters() if all(id(i) != id(j) for j in Z_params)
+        ]
+
+        self.opt = torch.optim.Adam(
+            non_Z_params,
+            self.hps["learning_rate"],
+            (self.hps["momentum"], 0.999),
+            weight_decay=self.hps["weight_decay"],
+            eps=self.hps["adam_eps"],
+        )
+        self.opt_Z = torch.optim.Adam(Z_params, self.hps["learning_rate"], (0.9, 0.999))
+
+        self.lr_sched = torch.optim.lr_scheduler.LambdaLR(
+            self.opt, lambda steps: 2 ** (-steps / self.hps["lr_decay"])
+        )
+        self.lr_sched_Z = torch.optim.lr_scheduler.LambdaLR(
+            self.opt_Z, lambda steps: 2 ** (-steps / self.hps["Z_lr_decay"])
+        )
+
+        self.sampling_tau = self.hps["sampling_tau"]
+        if self.sampling_tau > 0:
+            self.sampling_model = copy.deepcopy(self.model)
+        else:
+            self.sampling_model = self.model
+        eps = self.hps["tb_epsilon"]
+        self.hps["tb_epsilon"] = ast.literal_eval(eps) if isinstance(eps, str) else eps
+
+        self.mb_size = self.hps["global_batch_size"]
+        self.clip_grad_param = self.hps["clip_grad_param"]
+
+        self.clip_grad_callback = {
+            "value": (
+                lambda params: torch.nn.utils.clip_grad_value_(
+                    params, self.clip_grad_param
+                )
+            ),
+            "norm": (
+                lambda params: torch.nn.utils.clip_grad_norm_(
+                    params, self.clip_grad_param
+                )
+            ),
+            "none": (lambda x: None),
+        }[self.hps["clip_grad_type"]]
+
+        return [self.opt, self.opt_Z]
