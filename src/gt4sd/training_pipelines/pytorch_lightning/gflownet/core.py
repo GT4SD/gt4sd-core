@@ -97,12 +97,6 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
             env,
             ctx,
             task,
-            batch_size=arguments.batch_size,
-            validation_split=arguments.validation_split,
-            validation_indices_file=arguments.validation_indices_file,
-            stratified_batch_file=arguments.stratified_batch_file,
-            stratified_value_name=arguments.stratified_value_name,
-            num_workers=arguments.num_workers,
         )
         dm.prepare_data()
 

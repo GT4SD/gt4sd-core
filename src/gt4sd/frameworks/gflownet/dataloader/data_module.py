@@ -189,11 +189,9 @@ class GFlowNetDataModule(pl.LightningDataModule):
         logger.info(
             f"number of data points used for training: {len(self.train_dataset)}"
         )
+        logger.info(f"number of data points used for testing: {len(self.test_dataset)}")
         logger.info(
-            f"number of data points used for validation: {len(self.test_dataset)}"
-        )
-        logger.info(
-            f"validation proportion: {len(self.test_dataset) / (len(self.test_dataset) + len(self.train_dataset))}"
+            f"testing proportion: {len(self.test_dataset) / (len(self.test_dataset) + len(self.train_dataset))}"
         )
 
     # @staticmethod

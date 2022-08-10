@@ -142,7 +142,7 @@ def train_gflownet(
         auto_lr_find=True,
         log_every_n_steps=getattr(arguments, "trainer_log_every_n_steps", 50),
         callbacks=[checkpoint_callback],
-        max_epochs=getattr(arguments, "epoch", 1),
+        max_epochs=getattr(arguments, "epoch", 10),
         flush_logs_every_n_steps=getattr(
             arguments, "trainer_flush_logs_every_n_steps", 100
         ),
@@ -164,7 +164,7 @@ def train_gflownet_main(
         return {
             "bootstrap_own_reward": False,
             "learning_rate": 1e-4,
-            "global_batch_size": 8,
+            "global_batch_size": 16,
             "num_emb": 128,
             "num_layers": 4,
             "tb_epsilon": None,

@@ -113,6 +113,9 @@ class GFlowNetModule(pl.LightningModule):
         self.test_output_path = self.hps["test_output_path"]
 
         self.rng = self.hps["rng"]
+        self.mb_size = self.hps["global_batch_size"]
+        self.clip_grad_param = self.hps["clip_grad_param"]
+        self.sampling_tau = self.hps["sampling_tau"]
 
     def training_step(
         self, batch: gd.Batch, optimizer_idx: int, batch_idx: int
@@ -142,7 +145,7 @@ class GFlowNetModule(pl.LightningModule):
 
         # logs for step
         _logs = {f"train/{k}": v for k, v in logs.items()}
-        self.log_dict(_logs, on_epoch=False, prog_bar=False)
+        self.log_dict(_logs, on_step=True, on_epoch=True, prog_bar=True)
 
         # logs per epoch
         logs_epoch = {f"train_epoch/{k}": v for k, v in logs.items()}
@@ -155,20 +158,11 @@ class GFlowNetModule(pl.LightningModule):
         for i in self.model.parameters():
             self.clip_grad_callback(i)
 
-        # self.opt.step()
-        # self.opt.zero_grad()
-
-        # self.opt_Z.step()
-        # self.opt_Z.zero_grad()
-
-        self.lr_sched.step()
-        self.lr_sched_Z.step()
-
         if self.sampling_tau > 0:
             for a, b in zip(self.model.parameters(), self.sampling_model.parameters()):
                 b.data.mul_(self.sampling_tau).add_(a.data * (1 - self.sampling_tau))
 
-    def validation_step(self, batch: gd.Batch, batch_idx: int = 0) -> Dict[str, Any]:
+    def validation_step(self, batch: gd.Batch, batch_idx: int) -> Dict[str, Any]:
         """Validation step implementation.
 
         Args:
@@ -186,7 +180,10 @@ class GFlowNetModule(pl.LightningModule):
         logs.update({"total_loss": loss})
 
         self.log_dict(
-            {f"val/{k}": v for k, v in logs.items()}, on_epoch=True, prog_bar=True
+            {f"val/{k}": v for k, v in logs.items()},
+            on_step=True,
+            on_epoch=True,
+            prog_bar=False,
         )
         return {"loss": loss, "logs": logs}
 
@@ -211,19 +208,16 @@ class GFlowNetModule(pl.LightningModule):
         logs.update({"total_loss": loss})
 
         self.log_dict(
-            {f"test/{k}": v for k, v in logs.items()}, on_epoch=True, prog_bar=True
+            {f"test/{k}": v for k, v in logs.items()},
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
         )
         return {"loss": loss, "logs": logs}
 
     def prediction_step(self, batch):
         """Inference step implementation."""
         pass
-
-    # def log(self, info, index, key):
-    #     if not hasattr(self, "_summary_writer"):
-    #         self._summary_writer = SummaryWriter(self.hps["log_dir"])
-    #     for k, v in info.items():
-    #         self._summary_writer.add_scalar(f"{key}_{k}", v, index)
 
     def train_epoch_end(self, outputs: List[Dict[str, Any]]):
         pass
@@ -241,6 +235,7 @@ class GFlowNetModule(pl.LightningModule):
         targets = {}
         z_keys = [key for key in outputs[0]["z"]]
         targets_keys = [key for key in outputs[0]["targets"]]
+
         for key in z_keys:
             z[key] = (
                 torch.cat(
@@ -293,16 +288,13 @@ class GFlowNetModule(pl.LightningModule):
             self.opt_Z, lambda steps: 2 ** (-steps / self.hps["Z_lr_decay"])
         )
 
-        self.sampling_tau = self.hps["sampling_tau"]
         if self.sampling_tau > 0:
             self.sampling_model = copy.deepcopy(self.model)
         else:
             self.sampling_model = self.model
+
         eps = self.hps["tb_epsilon"]
         self.hps["tb_epsilon"] = ast.literal_eval(eps) if isinstance(eps, str) else eps
-
-        self.mb_size = self.hps["global_batch_size"]
-        self.clip_grad_param = self.hps["clip_grad_param"]
 
         self.clip_grad_callback = {
             "value": (
@@ -318,6 +310,4 @@ class GFlowNetModule(pl.LightningModule):
             "none": (lambda x: None),
         }[self.hps["clip_grad_type"]]
 
-        # TODO: add scheduler
-
-        return [self.opt, self.opt_Z]
+        return [self.opt, self.opt_Z], [self.lr_sched, self.lr_sched_Z]
