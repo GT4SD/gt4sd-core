@@ -97,9 +97,9 @@ class GFlowNetModule(pl.LightningModule):
         """
 
         super().__init__()
+        self.hps = configuration
         self.save_hyperparameters()
 
-        self.hps = configuration
         self.env = environment
         self.ctx = context
         self.dataset = dataset
@@ -115,7 +115,7 @@ class GFlowNetModule(pl.LightningModule):
         self.rng = self.hps["rng"]
 
     def training_step(
-        self, batch: gd.Batch, epoch_idx: int, batch_idx: int
+        self, batch: gd.Batch, optimizer_idx: int, batch_idx: int
     ) -> Dict[str, Any]:
         """Training step implementation.
 
@@ -138,17 +138,16 @@ class GFlowNetModule(pl.LightningModule):
                 for k, v in info.items()
             }
         )
-        logs.update({"total_loss": loss})
+        logs.update({"total_loss": loss.item()})
 
-        self.log_dict(
-            {f"train/{k}": v for k, v in logs.items()}, on_epoch=False, prog_bar=False
-        )
+        # logs for step
+        _logs = {f"train/{k}": v for k, v in logs.items()}
+        self.log_dict(_logs, on_epoch=False, prog_bar=False)
 
+        # logs per epoch
         logs_epoch = {f"train_epoch/{k}": v for k, v in logs.items()}
         logs_epoch["step"] = self.current_epoch
         self.log_dict(logs_epoch, on_step=False, on_epoch=True, prog_bar=False)
-
-        self.gradient_step(loss)
 
         return {"loss": loss, "logs": logs}
 
@@ -169,9 +168,7 @@ class GFlowNetModule(pl.LightningModule):
             for a, b in zip(self.model.parameters(), self.sampling_model.parameters()):
                 b.data.mul_(self.sampling_tau).add_(a.data * (1 - self.sampling_tau))
 
-    def validation_step(
-        self, batch: gd.Batch, epoch_idx: int = 0, batch_idx: int = 0
-    ) -> Dict[str, Any]:
+    def validation_step(self, batch: gd.Batch, batch_idx: int = 0) -> Dict[str, Any]:
         """Validation step implementation.
 
         Args:
@@ -222,11 +219,11 @@ class GFlowNetModule(pl.LightningModule):
         """Inference step implementation."""
         pass
 
-    def log(self, info, index, key):
-        if not hasattr(self, "_summary_writer"):
-            self._summary_writer = SummaryWriter(self.hps["log_dir"])
-        for k, v in info.items():
-            self._summary_writer.add_scalar(f"{key}_{k}", v, index)
+    # def log(self, info, index, key):
+    #     if not hasattr(self, "_summary_writer"):
+    #         self._summary_writer = SummaryWriter(self.hps["log_dir"])
+    #     for k, v in info.items():
+    #         self._summary_writer.add_scalar(f"{key}_{k}", v, index)
 
     def train_epoch_end(self, outputs: List[Dict[str, Any]]):
         pass
@@ -320,5 +317,7 @@ class GFlowNetModule(pl.LightningModule):
             ),
             "none": (lambda x: None),
         }[self.hps["clip_grad_type"]]
+
+        # TODO: add scheduler
 
         return [self.opt, self.opt_Z]

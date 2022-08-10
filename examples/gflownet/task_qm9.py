@@ -32,7 +32,7 @@ from rdkit.Chem.rdchem import Mol as RDMol
 from torch import Tensor
 from torch.utils.data import Dataset
 
-import gt4sd.frameworks.gflownet.ml.models.mxmnet as mxmnet
+from gt4sd.frameworks.gflownet.ml.models.mxmnet import MXMNet, MXMNetConfig, mol2graph, HAR2EV
 from gt4sd.frameworks.gflownet.dataloader.data_module import (
     FlatRewards,
     GFlowNetTask,
@@ -53,11 +53,11 @@ class QM9GapTask(GFlowNetTask):
     """Define task for QM9 dataset."""
 
     def __init__(
-        self,
-        reward_model: nn.Module,  # this is set to self.model
+        self,  # this is set to self.model
         dataset: Dataset,
         temperature_distribution: str,
         temperature_parameters: Tuple[float],
+        reward_model: nn.Module = None,
         wrap_model: Callable[[nn.Module], nn.Module] = None,
         device: str = "cuda",
     ):
@@ -76,9 +76,9 @@ class QM9GapTask(GFlowNetTask):
         self.device = device
         # fix this
         if reward_model:
-            self.models = reward_model
+            self.model = {"model_task": reward_model}
         else:
-            self.models = self.load_task_models()
+            self.model = self.load_task_models()
         self.dataset = dataset
         self.temperature_sample_dist = temperature_distribution
         self.temperature_dist_params = temperature_parameters
@@ -112,7 +112,7 @@ class QM9GapTask(GFlowNetTask):
 
     def load_task_models(self) -> Dict[str, nn.Module]:
         """Loads the models for the task."""
-        gap_model = mxmnet.MXMNet(mxmnet.Config(128, 6, 5.0))
+        gap_model = MXMNet(MXMNetConfig(128, 6, 5.0))
         try:
             state_dict = torch.load("/ckpt/mxmnet_gap_model.pt")
             gap_model.load_state_dict(state_dict)
@@ -120,7 +120,7 @@ class QM9GapTask(GFlowNetTask):
             pass
         gap_model.to(self.device)
         #gap_model = self._wrap_model(gap_model)
-        return {"mxmnet_gap": gap_model}
+        return {"model_task": gap_model}
 
     def sample_conditional_information(self, n):
         beta = None
@@ -141,15 +141,18 @@ class QM9GapTask(GFlowNetTask):
         return RewardScalar(flat_reward ** cond_info["beta"])
 
     def compute_flat_rewards(self, mols: List[RDMol]) -> Tuple[RewardScalar, Tensor]:
-        graphs = [mxmnet.mol2graph(i) for i in mols]  # type: ignore[attr-defined]
+        """Computes the flat rewards for a list of molecules."""
+        graphs = [mol2graph(i) for i in mols]  # type: ignore[attr-defined]
         is_valid = torch.tensor([i is not None for i in graphs]).bool()
         if not is_valid.any():
             return RewardScalar(torch.zeros((0,))), is_valid
+
         batch = gd.Batch.from_data_list([i for i in graphs if i is not None])
         batch.to(self.device)
 
         # sample model
-        preds = self.models["mxmnet_gap"](batch).reshape((-1,)).data.cpu() / mxmnet.HAR2EV  # type: ignore[attr-defined]
+        preds = self.model["model_task"](batch)
+        preds = preds.reshape((-1,)).data.cpu() / HAR2EV  # type: ignore[attr-defined]
         preds[preds.isnan()] = 1
         preds = self.flat_reward_transform(preds).clip(1e-4, 2)
         

@@ -99,7 +99,6 @@ def train_gflownet(
     )
 
     task = _task(
-        model,
         dataset,
         configuration["temperature_sample_dist"],
         ast.literal_eval(configuration["temperature_dist_params"]),
@@ -147,6 +146,7 @@ def train_gflownet(
         flush_logs_every_n_steps=getattr(
             arguments, "trainer_flush_logs_every_n_steps", 100
         ),
+        fast_dev_run=getattr(arguments, "dev", False),
     )
     trainer.fit(module, dm)
 
@@ -164,7 +164,7 @@ def train_gflownet_main(
         return {
             "bootstrap_own_reward": False,
             "learning_rate": 1e-4,
-            "global_batch_size": 64,
+            "global_batch_size": 8,
             "num_emb": 128,
             "num_layers": 4,
             "tb_epsilon": None,
@@ -186,6 +186,7 @@ def train_gflownet_main(
             "num_offline": 10,
             "sampling_iterator": True,
             "ratio": 0.9,
+            "dev": False,
         }
 
     # add default configuration

@@ -124,8 +124,8 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     # adding basename as the name of the run
     parser.add_argument("--epoch", type=int)
     parser.add_argument("--basename", type=str)
-    parser.add_argument("--batch_size", type=int, default=64)
-    parser.add_argument("--num_workers", type=int, default=8)
+    parser.add_argument("--batch_size", type=int, default=16)
+    parser.add_argument("--num_workers", type=int, default=0)
     parser.add_argument("--lr", type=float, default=0.0001)
 
     parser.add_argument("--validation_split", type=float)

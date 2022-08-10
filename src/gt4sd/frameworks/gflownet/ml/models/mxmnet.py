@@ -28,6 +28,7 @@ from math import pi as PI
 from operator import itemgetter
 
 import numpy as np
+import sympy as sym
 import torch
 import torch.nn as nn
 from rdkit.Chem import AllChem
@@ -39,11 +40,6 @@ from torch_geometric.nn import global_add_pool, radius
 from torch_geometric.utils import add_self_loops, remove_self_loops
 from torch_scatter import scatter
 from torch_sparse import SparseTensor
-
-try:
-    import sympy as sym
-except ImportError:
-    sym = None
 
 # type: ignore
 # flake8: noqa
@@ -60,7 +56,7 @@ HAR2EV = 27.2113825435
 KCALMOL2EV = 0.04336414
 
 
-class Config(object):
+class MXMNetConfig(object):
     def __init__(self, dim, n_layer, cutoff):
         self.dim = dim
         self.n_layer = n_layer
@@ -68,8 +64,10 @@ class Config(object):
 
 
 class MXMNet(nn.Module):
-    def __init__(self, config: Config, num_spherical=7, num_radial=6, envelope_exponent=5):
+    def __init__(self, config: MXMNetConfig, num_spherical=7, num_radial=6, envelope_exponent=5):
         super(MXMNet, self).__init__()
+
+        self.name = "mxmnet"
 
         self.dim = config.dim
         self.n_layer = config.n_layer
@@ -295,7 +293,6 @@ def Jn_zeros(n, k):
 
 def spherical_bessel_formulas(n):
     x = sym.symbols('x')
-
     f = [sym.sin(x) / x]
     a = sym.sin(x) / x
     for i in range(1, n):

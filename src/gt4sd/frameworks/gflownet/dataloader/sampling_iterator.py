@@ -244,7 +244,7 @@ class SamplingIterator(IterableDataset):
         """Build batch using online and offline data."""
         worker_info = torch.utils.data.get_worker_info()
         wid = worker_info.id if worker_info is not None else 0
-        # set seed for each worker
+        # set seed for each worker # TODO: fix this
         seed = np.random.default_rng(142857 + wid)
         self.rng = seed
         self.algo.rng = seed
@@ -252,6 +252,8 @@ class SamplingIterator(IterableDataset):
 
         self.ctx.device = self.device
 
+        # import ipdb
+        # ipdb.sset_trace()
         # iterate over the indices in the batch
         for idcs in self._idx_iterator():
 
@@ -269,7 +271,7 @@ class SamplingIterator(IterableDataset):
             if self.online_batch_size > 0:
                 # update trajectories and rewards with on-policy data
                 trajs, flat_rewards = self.sample_online(
-                    idcs, trajs, flat_rewards, cond_info, num_offline
+                    trajs, flat_rewards, cond_info, num_offline
                 )
 
             # compute scalar rewards from conditional information & flat rewards

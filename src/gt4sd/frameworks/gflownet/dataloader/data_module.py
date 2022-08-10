@@ -136,7 +136,11 @@ class GFlowNetDataModule(pl.LightningDataModule):
         self.hps = configuration
 
         self.model = model
-        self.sampling_model = MODEL_FACTORY[sampling_model]
+        self.sampling_model = MODEL_FACTORY[sampling_model](
+            context,
+            num_emb=self.hps["num_emb"],
+            num_layers=self.hps["num_layers"],
+        )
         self.algo = algorithm
         self.env = environment
         self.ctx = context
@@ -239,7 +243,8 @@ class GFlowNetDataModule(pl.LightningDataModule):
             iterator,
             batch_size=None,
             num_workers=self.num_workers,
-            persistent_workers=self.num_workers > 0,
+            persistent_workers=self.num_workers
+            > 0,  # TODO: fix issue with num_workers > 0 and SamplingIterator
         )
 
     def val_dataloader(self) -> DataLoader:
@@ -251,7 +256,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         if self.sampling_iterator:
             # model, dev = self._wrap_model_mp(self.model)
             iterator = SamplingIterator(
-                self.test_dataset,
+                self.test_dataset,  # TODO: add validation set
                 self.model,
                 self.mb_size,
                 self.ctx,

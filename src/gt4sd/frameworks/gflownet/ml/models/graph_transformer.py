@@ -41,6 +41,7 @@ class GraphTransformer(nn.Module):
     def __init__(self, x_dim, e_dim, g_dim, num_emb=64, num_layers=3, num_heads=2):
         super().__init__()
         self.num_layers = num_layers
+        self.name = "graph_transformer"
 
         self.x2h = mlp(x_dim, num_emb, num_emb, 2)
         self.e2h = mlp(e_dim, num_emb, num_emb, 2)
@@ -106,6 +107,7 @@ class GraphTransformer(nn.Module):
 class GraphTransformerGFN(nn.Module):
     def __init__(self, env_ctx, num_emb=64, num_layers=3, num_heads=2):
         super().__init__()
+        self.name = "graph_transformer_gfn"
         self.transf = GraphTransformer(
             x_dim=env_ctx.num_node_dim,
             e_dim=env_ctx.num_edge_dim,
