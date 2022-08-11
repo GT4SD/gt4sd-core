@@ -49,8 +49,8 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
     ):
         """
         Args:
-            atoms: _description_. Defaults to ["H", "C", "N", "O", "F"].
-            num_cond_dim: _description_. Defaults to 0.
+            atoms: Basic building blocks. Defaults to ["H", "C", "N", "O", "F"].
+            num_cond_dim: Number of conditional dimensions. Defaults to 32.
         """
         # idx 0 has to coincide with the default value
         self.atom_attr_values = {
