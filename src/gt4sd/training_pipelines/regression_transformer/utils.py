@@ -256,6 +256,81 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
             )
         },
     )
+    evaluation_strategy: Optional[str] = field(  # type: ignore
+        default="no",
+        metadata={
+            "help": (
+                "The evaluation strategy to adopt during training. Possible values are:"
+                " - 'no': No evaluation is done during training."
+                " - 'steps'`: Evaluation is done (and logged) every `eval_steps`."
+                " - 'epoch': Evaluation is done at the end of each epoch."
+            )
+        },
+    )
+    lr_scheduler_type: Optional[str] = field(  # type: ignore
+        default="linear",
+        metadata={
+            "help": (
+                "The scheduler type to use. See the documentation of "
+                "`transformers.SchedulerType` for all possible values."
+            )
+        },
+    )
+    logging_strategy: Optional[str] = field(  # type: ignore
+        default="steps",
+        metadata={
+            "help": (
+                "The logging strategy to adopt during training. Possible values are:"
+                " - 'no': No logging is done during training."
+                " - 'steps'`: Logging is done every `logging_steps`."
+                " - 'epoch': Logging is done at the end of each epoch."
+            )
+        },
+    )
+    save_strategy: Optional[str] = field(  # type: ignore
+        default="steps",
+        metadata={
+            "help": (
+                "The saving strategy to adopt during training. Possible values are:"
+                " - 'no': No saving is done during training."
+                " - 'steps'`: Saving is done every `saving_steps`."
+                " - 'epoch': Saving is done at the end of each epoch."
+            )
+        },
+    )
+    hub_strategy: Optional[str] = field(  # type: ignore
+        default="every_save",
+        metadata={
+            "help": (
+                "Optional, defaults to `every_save`. Defines the scope of what is pushed "
+                "to the Hub and when. Possible values are:"
+                " - `end`: push the model, its configuration, the tokenizer (if passed "
+                "       along to the Trainer and a draft of a model card when the "
+                "       Trainer.save_model method is called."
+                " - `every_save`: push the model, its configuration, the tokenizer (if "
+                "       passed along to the Trainer and a draft of a model card each time "
+                "       there is a model save. The pushes are asynchronous to not block "
+                "       training, and in case the save are very frequent, a new push is "
+                "       only attempted if the previous one is finished. A last push is made "
+                "       with the final model at the end of training."
+                " - `checkpoint`: like `every_save` but the latest checkpoint is also "
+                "       pushed in a subfolder named last-checkpoint, allowing you to resume "
+                "       training easily with `trainer.train(resume_from_checkpoint)`."
+                " - `all_checkpoints`: like `checkpoint` but all checkpoints are pushed "
+                "       like they appear in the output folder (so you will get one "
+                "       checkpoint folder per folder in your final repository)."
+            )
+        },
+    )
+    optim: Optional[str] = field(  # type: ignore
+        default="adamw_hf",
+        metadata={
+            "help": (
+                "The optimizer to use. One of  `adamw_hf`, `adamw_torch`, `adafactor` "
+                "or `adamw_apex_fused`."
+            )
+        },
+    )
 
     def __post_init__(self):
         """
