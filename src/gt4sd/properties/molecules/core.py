@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+from enum import Enum
 from typing import List
 
 from paccmann_generator.drug_evaluators import SIDER as _SIDER
@@ -38,6 +39,7 @@ from ...algorithms.core import (
 from ...domains.materials import SmallMolecule
 from ..core import (
     CallablePropertyPredictor,
+    DomainSubmodule,
     PropertyPredictorParameters,
     PropertyValue,
     S3Parameters,
@@ -83,7 +85,7 @@ class ActivityAgainstTargetParameters(PropertyPredictorParameters):
 
 
 class S3ParametersMolecules(S3Parameters):
-    domain: str = "molecules"
+    domain: DomainSubmodule = DomainSubmodule("molecules")
 
 
 class MCAParameters(S3ParametersMolecules):
@@ -103,35 +105,41 @@ class SiderParameters(MCAParameters):
 
 
 class OrganToxParameters(MCAParameters):
+    class Organs(str, Enum):
+        adrenal_gland: str = "Adrenal Gland"
+        bone_marrow: str = "Bone Marrow"
+        brain: str = "Brain"
+        eye: str = "Eye"
+        heart: str = "Heart"
+        kidney: str = "Kidney"
+        liver: str = "Liver"
+        lung: str = "Lung"
+        lymph_node: str = "Lymph Node"
+        mammary_gland: str = "Mammary Gland"
+        ovary: str = "Ovary"
+        pancreas: str = "Pancreas"
+        pituitary_gland: str = "Pituitary Gland"
+        spleen: str = "Spleen"
+        stomach: str = "Stomach"
+        testes: str = "Testes"
+        thymus: str = "Thymus"
+        thyroid_gland: str = "Thyroid Gland"
+        urinary_bladder: str = "Urinary Bladder"
+        uterus: str = "Uterus"
+
+    class ToxType(str, Enum):
+        chronic: str = "chronic"
+        subchronic: str = "subchronic"
+        multigenerational: str = "multigenerational"
+        all: str = "all"
+
     algorithm_application: str = "OrganTox"
-    site: str = Field(
+    site: Organs = Field(
         ...,
         example="breast",
         description="name of the target site of interest.",
-        options=[
-            "Adrenal Gland",
-            "Bone Marrow",
-            "Brain",
-            "Eye",
-            "Heart",
-            "Kidney",
-            "Liver",
-            "Lung",
-            "Lymph Node",
-            "Mammary Gland",
-            "Pancreas",
-            "Pituitary Gland",
-            "Spleen",
-            "Stomach",
-            "Testes",
-            "Thymus",
-            "Thyroid Gland",
-            "Urinary Bladder",
-            "Uterus",
-            "Ovary",
-        ],
     )
-    toxicity_type: str = Field(
+    toxicity_type: ToxType = Field(
         default="all",
         example="chronic",
         description="type of toxicity for which predictions are made.",

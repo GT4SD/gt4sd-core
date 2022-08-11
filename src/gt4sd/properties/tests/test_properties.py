@@ -74,21 +74,32 @@ molecule_further_ground_truths = {
 }
 protein_further_ground_truths = {"charge": 1.123}
 
-artifact_model_ground_truths = {
-    "tox21": [
-        6.422001024475321e-05,
-        0.00028556393226608634,
-        0.0027144483756273985,
-        0.03775344416499138,
-        0.000604992441367358,
-        0.00027705798856914043,
-        0.10752066224813461,
-        0.5733309388160706,
-        0.001268531079404056,
-        0.10181115567684174,
-        0.8995946049690247,
-        0.1677667647600174,
-    ],
+artifact_model_data = {
+    "tox21": {
+        "parameters": {"algorithm_version": "v0"},
+        "ground_truth": [
+            6.422001024475321e-05,
+            0.00028556393226608634,
+            0.0027144483756273985,
+            0.03775344416499138,
+            0.000604992441367358,
+            0.00027705798856914043,
+            0.10752066224813461,
+            0.5733309388160706,
+            0.001268531079404056,
+            0.10181115567684174,
+            0.8995946049690247,
+            0.1677667647600174,
+        ],
+    },
+    "organtox": {
+        "parameters": {
+            "algorithm_version": "v0",
+            "site": "Heart",
+            "toxicity_type": "all",
+        },
+        "ground_truth": [0.06142323836684227, 0.07934761792421341],
+    },
 }
 
 
@@ -130,15 +141,19 @@ def test_charge_with_arguments():
 
 @pytest.mark.parametrize(
     "property_key",
-    [(property_key) for property_key in artifact_model_ground_truths.keys()],
+    [(property_key) for property_key in artifact_model_data.keys()],
 )
 def test_artifact_models(property_key):
     property_class, parameters_class = PROPERTY_PREDICTOR_FACTORY[property_key]
-    function = property_class(parameters_class(algorithm_version="v0"))
+    function = property_class(
+        parameters_class(**artifact_model_data[property_key]["parameters"])
+    )
     sample = protein if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY else molecule
     assert all(
         np.isclose(
-            function(sample), artifact_model_ground_truths[property_key], atol=1e-2
+            function(sample),
+            artifact_model_data[property_key]["ground_truth"],
+            atol=1e-2,
         )
     )  # type: ignore
 

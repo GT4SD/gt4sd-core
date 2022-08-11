@@ -747,7 +747,7 @@ class AlgorithmConfiguration(Generic[S, T]):
             )
 
     @classmethod
-    def ensure_artifacts_for_version(cls, algorithm_version: str) -> str:  # type: ignore
+    def ensure_artifacts_for_version(cls, algorithm_version: str) -> str:
         """The artifacts matching the path defined by class attributes and the given version are downloaded.
 
         That is all objects under ``algorithm_type/algorithm_name/algorithm_application/algorithm_version``
@@ -921,6 +921,7 @@ class PropertyPredictor(ABC, Generic[S, U]):
             context: the context in which a property of an item can be
                 computed or checked is very application specific.
         """
+        logger.warning("This class will be deprecated in a future release.")
         self.context = context
         # or pass these with methods?
 

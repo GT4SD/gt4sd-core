@@ -21,11 +21,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+from enum import Enum
 from typing import Any, Callable, Dict, Union
 
 from pydantic import BaseModel, Field
 
 PropertyValue = Union[float, int, Dict[str, Any]]
+
+
+class DomainSubmodule(str, Enum):
+    molecules: str = "molecules"
+    properties: str = "properties"
 
 
 class PropertyPredictorParameters(BaseModel):
@@ -39,7 +45,7 @@ class S3Parameters(PropertyPredictorParameters):
 
     algorithm_type: str = "prediction"
 
-    domain: str = Field(
+    domain: DomainSubmodule = Field(
         ..., example="molecules", description="Submodule of gt4sd.properties"
     )
     algorithm_name: str = Field(..., example="MCA", description="Name of the algorithm")
