@@ -32,7 +32,6 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 import torch_geometric.data as gd
-from rdkit.Chem.rdchem import Mol as RDMol
 from torch.utils.data import DataLoader  # , Subset, random_split
 
 from ..envs.graph_building_env import (

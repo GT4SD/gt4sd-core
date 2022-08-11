@@ -36,7 +36,6 @@ import torch
 import torch.nn as nn
 import torch_geometric.data as gd
 from torch import Tensor
-from torch.utils.tensorboard import SummaryWriter
 
 from ..dataloader.data_module import GFlowNetTask
 from ..dataloader.dataset import GFlowNetDataset

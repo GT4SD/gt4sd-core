@@ -9,10 +9,12 @@ def main():
     """Run basic GFN training on QM9."""
 
     hps = {"dataset": "qm9", "dataset_path": "/Users/ggi/GFN/qm9.h5"}
-
+    # data
     dataset = QM9Dataset(hps["dataset_path"], train=True, target="gap")
+    # graph
     environment = GraphBuildingEnv()
-    context = MolBuildingEnvContext(["H", "C", "N", "F", "O"], num_cond_dim=32)
+    # specify how to build the graph
+    context = MolBuildingEnvContext(atoms=["H", "C", "N", "F", "O"], num_cond_dim=32)
 
     train_gflownet_main(
         configuration=hps,

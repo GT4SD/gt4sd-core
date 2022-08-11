@@ -23,7 +23,6 @@
 #
 import argparse
 import configparser
-from email.policy import default
 from typing import Any, Dict, Optional
 
 import sentencepiece as _sentencepiece

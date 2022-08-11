@@ -23,14 +23,12 @@
 #
 import copy
 import enum
-from collections import defaultdict
 from typing import Any, Dict, List, Tuple, Union
 
 import networkx as nx
 import numpy as np
 import torch
 import torch_geometric.data as gd
-from networkx.algorithms.isomorphism import is_isomorphic
 from rdkit.Chem import Mol
 from torch_scatter import scatter, scatter_max
 

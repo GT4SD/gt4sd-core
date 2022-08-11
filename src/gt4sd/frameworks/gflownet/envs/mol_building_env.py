@@ -45,8 +45,13 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
     """
 
     def __init__(
-        self, atoms: List[str] = ["H", "C", "N", "O", "F"], num_cond_dim: int = 0
+        self, atoms: List[str] = ["H", "C", "N", "O", "F"], num_cond_dim: int = 32
     ):
+        """
+        Args:
+            atoms: _description_. Defaults to ["H", "C", "N", "O", "F"].
+            num_cond_dim: _description_. Defaults to 0.
+        """
         # idx 0 has to coincide with the default value
         self.atom_attr_values = {
             "v": atoms,
