@@ -88,9 +88,6 @@ class S3ParametersMolecules(S3Parameters):
 
 class MCAParameters(S3ParametersMolecules):
     algorithm_name: str = "MCA"
-    # algorithm_application: str = Field(
-    #     ..., example='Tox21', description='Name of the application', options=['Tox21']
-    # )
 
 
 class Tox21Parameters(MCAParameters):
@@ -371,10 +368,6 @@ class _MCA(PredictorAlgorithm):
 class Tox21(_MCA):
     """Model to predict environmental toxicity for the 12 endpoints in Tox21."""
 
-    def __init__(self, parameters: Tox21Parameters) -> None:
-
-        super().__init__(parameters=parameters)
-
     def get_model(self, resources_path: str) -> Predictor:
         """Instantiate the actual model.
 
@@ -408,10 +401,6 @@ class Tox21(_MCA):
 class ClinTox(_MCA):
     """Model to predict environmental toxicity for the 12 endpoints in Tox21."""
 
-    def __init__(self, parameters: ClinToxParameters) -> None:
-
-        super().__init__(parameters=parameters)
-
     def get_model(self, resources_path: str) -> Predictor:
         """Instantiate the actual model.
 
@@ -444,10 +433,6 @@ class ClinTox(_MCA):
 
 
 class SIDER(_MCA):
-    def __init__(self, parameters: SiderParameters) -> None:
-
-        super().__init__(parameters=parameters)
-
     def get_model(self, resources_path: str) -> Predictor:
         """Instantiate the actual model.
 
@@ -507,7 +492,7 @@ class OrganTox(_MCA):
         def informative_model(x: SmallMolecule) -> List[PropertyValue]:
             x = to_smiles(x)
             _ = model(x)
-            all_preds = model.predictions.detach()[model.class_indices]
+            all_preds = model.predictions.detach()
 
             return all_preds[model.class_indices].tolist()
 
