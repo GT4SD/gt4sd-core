@@ -152,7 +152,7 @@ def test_artifact_models(property_key):
     assert all(
         np.isclose(
             function(sample),
-            artifact_model_data[property_key]["ground_truth"],
+            artifact_model_data[property_key]["ground_truth"],  # type: ignore
             atol=1e-2,
         )
     )  # type: ignore
