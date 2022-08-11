@@ -73,6 +73,8 @@ U = TypeVar("U")  # used for additional context (e.g. part of target definition)
 Targeted = Callable[[T], Iterable[Any]]
 # callable not taking any target
 Untargeted = Callable[[], Iterable[Any]]
+# predictive model
+Predictor = Callable[[Any], Any]
 
 
 class GeneratorAlgorithm(ABC, Generic[S, T]):
@@ -277,6 +279,94 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
         """
         logger.info("no parameters validation")
         return configuration
+
+
+class PredictorAlgorithm(ABC, Generic[S, T]):
+    """Interface for automated prediction via an :class:`AlgorithmConfiguration`."""
+
+    #: The maximum amount of time we should let the algorithm run
+    max_runtime: int = gt4sd_configuration_instance.gt4sd_max_runtime
+
+    def __init__(self, configuration: AlgorithmConfiguration[S, T]):
+        """Targeted or untargeted generation.
+
+        Args:
+            configuration: application specific helper that allows to setup the
+                generator.
+        """
+        logger.info(
+            f"runnning {self.__class__.__name__} with configuration={configuration}"
+        )
+        self.configuration = configuration
+        self.predictor = self.get_predictor(configuration)
+
+    def get_predictor(
+        self,
+        configuration: AlgorithmConfiguration[S, T],
+    ) -> Predictor:
+        """Set up the predictive model from the configuration. This is called at
+            instantiation of the PredictorAlgorithm and must return a callable.
+
+        Returns:
+            predictor, a callable that takes an item and returns a prediction.
+        """
+        logger.info("ensure artifacts for the application are present.")
+        self.local_artifacts = configuration.ensure_artifacts()
+        model: Predictor = self.get_model(self.local_artifacts)
+        return model
+
+    @abstractmethod
+    def get_model(self, resources_path: str) -> Predictor:
+        """
+        Restore the model from a local path.
+
+        Note:
+            This is the major method to implement in child classes, it is called
+            at instantiation of the PredictorAlgorithm and must return a callable:
+
+        Args:
+            resources_path: local path to the downloaded artifacts.
+
+        Returns:
+            Predictor (callable)
+        """
+        raise NotImplementedError("Not implemented in baseclass.")
+
+    def timeout(self, signum, frame):
+        raise TimeoutError(
+            "Alarm signal received, probably because a signal.alarm timed out.",
+        )
+
+    def predict(self, input: Any) -> Any:
+        """Perform a prediction for an input.
+        Args:
+            input: the input for the predictive model
+
+        Raises:
+            TimeoutError: when the walltime limit is hit.
+
+        Returns:
+            the prediction.
+        """
+
+        signal.signal(signal.SIGALRM, self.timeout)
+        signal.alarm(self.max_runtime)
+
+        try:
+            predicted = self.predictor(input)
+        except TimeoutError:
+            detail = (
+                f"Predicting took longer than maximum ({self.max_runtime} seconds)."
+            )
+            logger.warning(detail + " Exiting now!")
+        except Exception:
+            raise Exception(f"{self.__class__.__name__} failed with {input}")
+        signal.alarm(0)
+        return predicted
+
+    def __call__(self, input: Any) -> Any:
+        """Alias for `self.predict`."""
+        return self.predict(input)
 
 
 @dataclass
@@ -657,7 +747,7 @@ class AlgorithmConfiguration(Generic[S, T]):
             )
 
     @classmethod
-    def ensure_artifacts_for_version(cls, algorithm_version: str) -> str:
+    def ensure_artifacts_for_version(cls, algorithm_version: str) -> str:  # type: ignore
         """The artifacts matching the path defined by class attributes and the given version are downloaded.
 
         That is all objects under ``algorithm_type/algorithm_name/algorithm_application/algorithm_version``
@@ -700,6 +790,108 @@ class AlgorithmConfiguration(Generic[S, T]):
         return self.ensure_artifacts_for_version(self.algorithm_version)
 
 
+class ConfigurablePropertyAlgorithmConfiguration(AlgorithmConfiguration):
+    """A configurable AlgorithmConfiguration to be used by the properties submodule."""
+
+    module: str = "properties"
+
+    def __init__(
+        self,
+        domain: str,
+        algorithm_name: str,
+        algorithm_application: str,
+        algorithm_version: str = "v0",
+        algorithm_type: str = "prediction",
+    ):
+        """
+        Args:
+            domain: submodule of properties where the model resides.
+            algorithm_version: name of the predictive model, e.g., `MCA`.
+            algorithm_application: application of the algorithm, e.g., dataset it was
+                trained on, like `Tox21`.
+            algorithm_version: version of the algorithm, defaults to `v0`.
+            algorithm_type: type of the algorithm. This should be `prediction`.
+        """
+        self.algorithm_type = algorithm_type  # type: ignore
+        self.domain = domain  # type: ignore
+        self.algorithm_name = algorithm_name  # type: ignore
+        self.algorithm_application = algorithm_application  # type: ignore
+        self.algorithm_version = algorithm_version
+
+    def get_application_prefix(self) -> str:  # type: ignore
+        """Get prefix up to the specific application.
+
+        NOTE: Unlike the parent method this uses the assgined attributes since it's
+        configurable.
+
+        Returns:
+            the application prefix.
+        """
+        return os.path.join(
+            self.domain, self.algorithm_name, self.algorithm_application
+        )
+
+    def ensure_artifacts_for_version(self, algorithm_version: str) -> str:  # type: ignore
+        """The artifacts matching the path defined by class attributes and the given version are downloaded.
+
+        NOTE: Unlike the parent method this uses the assigned attributes since it's
+        configurable.
+
+        That is all objects under ``algorithm_type/algorithm_name/algorithm_application/algorithm_version``
+        in the bucket are downloaded.
+
+        Args:
+            algorithm_version: version of the algorithm to ensure artifacts for.
+
+        Returns:
+            the common local path of the matching artifacts.
+        """
+        prefix = os.path.join(
+            self.get_application_prefix(),
+            algorithm_version,
+        )
+        try:
+            local_path = sync_algorithm_with_s3(prefix, module=self.module)
+        except (KeyError, S3SyncError) as error:
+            logger.info(
+                f"searching S3 raised {error.__class__.__name__}, using local cache only."
+            )
+            logger.debug(error)
+            local_path = get_cached_algorithm_path(prefix, module=self.module)
+            if not os.path.isdir(local_path):
+                raise OSError(
+                    f"artifacts directory {local_path} does not exist locally, and syncing with s3 failed: {error}"
+                )
+
+        return local_path
+
+    def list_versions(self) -> Set[str]:  # type: ignore
+        """Get possible algorithm versions.
+
+        NOTE: Unlike the parent method this uses the assigned attributes since it's
+        configurable.
+
+        S3 is searched as well as the local cache is searched for matching versions.
+
+        Returns:
+            viable values as :attr:`algorithm_version` for the environment.
+        """
+
+        prefix = self.get_application_prefix()
+        try:
+            versions = get_algorithm_subdirectories_with_s3(prefix, module=self.module)
+        except (KeyError, S3SyncError) as error:
+            logger.info(
+                f"searching S3 raised {error.__class__.__name__}, using local cache only."
+            )
+            logger.debug(error)
+            versions = set()
+        versions = versions.union(
+            get_algorithm_subdirectories_in_cache(prefix, module=self.module)
+        )
+        return versions
+
+
 def get_configuration_class_with_attributes(
     klass: Type[AlgorithmConfiguration],
 ) -> Type[AlgorithmConfiguration]:
@@ -720,7 +912,7 @@ def get_configuration_class_with_attributes(
 
 
 class PropertyPredictor(ABC, Generic[S, U]):
-    """WIP"""
+    """TODO: Might be deprecated in future release."""
 
     def __init__(self, context: U) -> None:
         """Property predictor to investigate items.
