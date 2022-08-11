@@ -176,7 +176,7 @@ def get_cached_algorithm_path(
 ) -> str:
 
     if module not in gt4sd_configuration_instance.gt4sd_s3_modules:
-        raise KeyError(f"Unknown submodule {module}")
+        raise ValueError(f"Unknown cache module: {module}. Supported module: {','.join(gt4sd_configuration_instance.gt4sd_s3_modules)}")
 
     return (
         os.path.join(
