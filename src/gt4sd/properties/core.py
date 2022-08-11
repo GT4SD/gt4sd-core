@@ -23,7 +23,7 @@
 #
 from typing import Any, Callable, Dict, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 PropertyValue = Union[float, int, Dict[str, Any]]
 
@@ -32,6 +32,21 @@ class PropertyPredictorParameters(BaseModel):
     """Abstract class for property computation."""
 
     pass
+
+
+# Base class for property predictors that use S3 artifacts
+class S3Parameters(PropertyPredictorParameters):
+
+    algorithm_type: str = "prediction"
+
+    domain: str = Field(
+        ..., example="molecules", description="Submodule of gt4sd.properties"
+    )
+    algorithm_name: str = Field(..., example="MCA", description="Name of the algorithm")
+    algorithm_version: str = Field(
+        ..., example="v0", description="Version of the algorithm"
+    )
+    algorithm_application: str = Field(..., example="Tox21")
 
 
 class PropertyPredictor:

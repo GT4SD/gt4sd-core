@@ -21,13 +21,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Dict, Tuple, Type
+from typing import Dict, Tuple, Type, Union
 
+from ...algorithms.core import PredictorAlgorithm
 from ..core import PropertyPredictor, PropertyPredictorParameters
 from .core import (
+    SIDER,
     ActivityAgainstTarget,
     ActivityAgainstTargetParameters,
     Bertz,
+    ClinTox,
+    ClinToxParameters,
     Esol,
     IsScaffold,
     Lipinski,
@@ -42,19 +46,28 @@ from .core import (
     NumberRings,
     NumberRotatableBonds,
     NumberStereocenters,
+    OrganTox,
+    OrganToxParameters,
     Plogp,
     Qed,
     Sas,
     Scscore,
     ScscoreConfiguration,
+    SiderParameters,
     SimilaritySeed,
     SimilaritySeedParameters,
+    Tox21,
+    Tox21Parameters,
     Tpsa,
 )
 
 # NOTE: all functions can be called with either a SMILES or a rdkit.Chem.Mol object.
 MOLECULE_PROPERTY_PREDICTOR_FACTORY: Dict[
-    str, Tuple[Type[PropertyPredictor], Type[PropertyPredictorParameters]]
+    str,
+    Tuple[
+        Union[Type[PropertyPredictor], Type[PredictorAlgorithm]],
+        Type[PropertyPredictorParameters],
+    ],
 ] = {
     # inherent properties
     "molecular_weight": (MolecularWeight, PropertyPredictorParameters),
@@ -82,4 +95,8 @@ MOLECULE_PROPERTY_PREDICTOR_FACTORY: Dict[
     # properties predicted by models
     "scscore": (Scscore, ScscoreConfiguration),
     "activity_against_target": (ActivityAgainstTarget, ActivityAgainstTargetParameters),
+    "tox21": (Tox21, Tox21Parameters),
+    "sider": (SIDER, SiderParameters),
+    "organtox": (OrganTox, OrganToxParameters),
+    "clintox": (ClinTox, ClinToxParameters),
 }

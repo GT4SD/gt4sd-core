@@ -21,11 +21,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+from typing import List
+
+from paccmann_generator.drug_evaluators import SIDER as _SIDER
+from paccmann_generator.drug_evaluators import ClinTox as _ClinTox
+from paccmann_generator.drug_evaluators import OrganDB as _OrganTox
 from paccmann_generator.drug_evaluators import SCScore
+from paccmann_generator.drug_evaluators import Tox21 as _Tox21
 from pydantic import Field
 
-from ..core import CallablePropertyPredictor, PropertyPredictorParameters
-from ..utils import get_activity_fn, get_similarity_fn
+from ...algorithms.core import (
+    ConfigurablePropertyAlgorithmConfiguration,
+    Predictor,
+    PredictorAlgorithm,
+)
+from ...domains.materials import SmallMolecule
+from ..core import (
+    CallablePropertyPredictor,
+    PropertyPredictorParameters,
+    PropertyValue,
+    S3Parameters,
+)
+from ..utils import get_activity_fn, get_similarity_fn, to_smiles
 from .functions import (
     bertz,
     esol,
@@ -63,6 +80,66 @@ class SimilaritySeedParameters(PropertyPredictorParameters):
 
 class ActivityAgainstTargetParameters(PropertyPredictorParameters):
     target: str = Field(..., example="drd2", description="name of the target.")
+
+
+class S3ParametersMolecules(S3Parameters):
+    domain: str = "molecules"
+
+
+class MCAParameters(S3ParametersMolecules):
+    algorithm_name: str = "MCA"
+    # algorithm_application: str = Field(
+    #     ..., example='Tox21', description='Name of the application', options=['Tox21']
+    # )
+
+
+class Tox21Parameters(MCAParameters):
+    algorithm_application: str = "Tox21"
+
+
+class ClinToxParameters(MCAParameters):
+    algorithm_application: str = "ClinTox"
+
+
+class SiderParameters(MCAParameters):
+    algorithm_application: str = "SIDER"
+
+
+class OrganToxParameters(MCAParameters):
+    algorithm_application: str = "OrganTox"
+    site: str = Field(
+        ...,
+        example="breast",
+        description="name of the target site of interest.",
+        options=[
+            "Adrenal Gland",
+            "Bone Marrow",
+            "Brain",
+            "Eye",
+            "Heart",
+            "Kidney",
+            "Liver",
+            "Lung",
+            "Lymph Node",
+            "Mammary Gland",
+            "Pancreas",
+            "Pituitary Gland",
+            "Spleen",
+            "Stomach",
+            "Testes",
+            "Thymus",
+            "Thyroid Gland",
+            "Urinary Bladder",
+            "Uterus",
+            "Ovary",
+        ],
+    )
+    toxicity_type: str = Field(
+        default="all",
+        example="chronic",
+        description="type of toxicity for which predictions are made.",
+        options=["chronic", "subchronic", "multigenerational", "all"],
+    )
 
 
 # NOTE: property prediction classes
@@ -271,3 +348,181 @@ class ActivityAgainstTarget(CallablePropertyPredictor):
         super().__init__(
             callable_fn=get_activity_fn(target=parameters.target), parameters=parameters
         )
+
+
+class _MCA(PredictorAlgorithm):
+    """Base class for all MCA-based predictive algorithms."""
+
+    def __init__(self, parameters: MCAParameters):
+
+        # Set up the configuration from the parameters
+        configuration = ConfigurablePropertyAlgorithmConfiguration(
+            algorithm_type=parameters.algorithm_type,
+            domain=parameters.domain,
+            algorithm_name=parameters.algorithm_name,
+            algorithm_application=parameters.algorithm_application,
+            algorithm_version=parameters.algorithm_version,
+        )
+
+        # The parent constructor calls `self.get_model`.
+        super().__init__(configuration=configuration)
+
+
+class Tox21(_MCA):
+    """Model to predict environmental toxicity for the 12 endpoints in Tox21."""
+
+    def __init__(self, parameters: Tox21Parameters) -> None:
+
+        super().__init__(parameters=parameters)
+
+    def get_model(self, resources_path: str) -> Predictor:
+        """Instantiate the actual model.
+
+        Args:
+            resources_path: local path to model files.
+
+        Returns:
+            Predictor: the model.
+        """
+        # This model returns a singular reward and not a prediction for all 12 classes.
+        model = _Tox21(model_path=resources_path)
+
+        # Wrapper to get toxicity-endpoint-level predictions
+        def informative_model(x: SmallMolecule) -> List[PropertyValue]:
+            x = to_smiles(x)
+            _ = model(x)
+            return model.predictions.detach().tolist()
+
+        return informative_model
+
+    @classmethod
+    def get_description(cls) -> str:
+        text = """
+        This model predicts the 12 endpoints from the Tox21 challenge.
+        The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53
+        For details on the data see: https://tripod.nih.gov/tox21/challenge/.
+        """
+        return text
+
+
+class ClinTox(_MCA):
+    """Model to predict environmental toxicity for the 12 endpoints in Tox21."""
+
+    def __init__(self, parameters: ClinToxParameters) -> None:
+
+        super().__init__(parameters=parameters)
+
+    def get_model(self, resources_path: str) -> Predictor:
+        """Instantiate the actual model.
+
+        Args:
+            resources_path: local path to model files.
+
+        Returns:
+            Predictor: the model.
+        """
+        # This model returns a singular reward and not a prediction for both classes.
+        model = _ClinTox(model_path=resources_path)
+
+        # Wrapper to get toxicity-endpoint-level predictions
+        def informative_model(x: SmallMolecule) -> List[PropertyValue]:
+            x = to_smiles(x)
+            _ = model(x)
+            return model.predictions.detach().tolist()
+
+        return informative_model
+
+    @classmethod
+    def get_description(cls) -> str:
+        text = """
+        This model is a multitask classifier for two classes:
+            1. Predicted probability to receive FDA approval.
+            2. Predicted probability of failure in clinical trials.
+        For details on the data see: https://pubs.rsc.org/en/content/articlehtml/2018/sc/c7sc02664a.
+        """
+        return text
+
+
+class SIDER(_MCA):
+    def __init__(self, parameters: SiderParameters) -> None:
+
+        super().__init__(parameters=parameters)
+
+    def get_model(self, resources_path: str) -> Predictor:
+        """Instantiate the actual model.
+
+        Args:
+            resources_path: local path to model files.
+
+        Returns:
+            Predictor: the model.
+        """
+        # This model returns a singular reward and not a prediction for both classes.
+        model = _SIDER(model_path=resources_path)
+
+        # Wrapper to get toxicity-endpoint-level predictions
+        def informative_model(x: SmallMolecule) -> List[PropertyValue]:
+            x = to_smiles(x)
+            _ = model(x)
+            return model.predictions.detach().tolist()
+
+        return informative_model
+
+    @classmethod
+    def get_description(cls) -> str:
+        text = """
+        This model is a multitask classifier to predict side effects of drugs across
+        27 classes. For details on the data see:
+        https://pubs.rsc.org/en/content/articlehtml/2018/sc/c7sc02664a.
+        """
+        return text
+
+
+class OrganTox(_MCA):
+    """Model to predict toxicity for different organs."""
+
+    def __init__(self, parameters: OrganToxParameters) -> None:
+
+        # Extract model-specific parameters
+        self.site = parameters.site
+        self.toxicity_type = parameters.toxicity_type
+
+        super().__init__(parameters=parameters)
+
+    def get_model(self, resources_path: str) -> Predictor:
+        """Instantiate the actual model.
+
+        Args:
+            resources_path: local path to model files.
+
+        Returns:
+            Predictor: the model.
+        """
+        # This model returns a singular reward and not a prediction for both classes.
+        model = _OrganTox(
+            model_path=resources_path, site=self.site, toxicity_type=self.toxicity_type
+        )
+
+        # Wrapper to get toxicity-endpoint-level predictions
+        def informative_model(x: SmallMolecule) -> List[PropertyValue]:
+            x = to_smiles(x)
+            _ = model(x)
+            all_preds = model.predictions.detach()[model.class_indices]
+
+            return all_preds[model.class_indices].tolist()
+
+        return informative_model
+
+    @classmethod
+    def get_description(cls) -> str:
+        text = """
+        This model is a multitask classifier to toxicity across different organs and
+        toxicity types (`chronic`, `subchronic`, `multigenerational` or `all`).
+        The organ has to specified in the constructor. The toxicity type defaults to
+        `all` in which case three values are returned in the order `chronic`,
+        `multigenerational` and `subchronic`.
+
+        For details on the data see:
+        https://pubs.rsc.org/en/content/articlehtml/2018/sc/c7sc02664a.
+        """
+        return text
