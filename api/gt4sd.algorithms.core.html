@@ -210,11 +210,17 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.core.AlgorithmConfiguration" title="gt4sd.algorithms.core.AlgorithmConfiguration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AlgorithmConfiguration</span></code></a></p></td>
 <td><p>Algorithm parameter definitions and implementation setup.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.algorithms.core.GeneratorAlgorithm" title="gt4sd.algorithms.core.GeneratorAlgorithm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneratorAlgorithm</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration" title="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConfigurablePropertyAlgorithmConfiguration</span></code></a></p></td>
+<td><p>A configurable AlgorithmConfiguration to be used by the properties submodule.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.core.GeneratorAlgorithm" title="gt4sd.algorithms.core.GeneratorAlgorithm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneratorAlgorithm</span></code></a></p></td>
 <td><p>Interface for automated generation via an <a class="reference internal" href="#gt4sd.algorithms.core.AlgorithmConfiguration" title="gt4sd.algorithms.core.AlgorithmConfiguration"><code class="xref py py-class docutils literal notranslate"><span class="pre">AlgorithmConfiguration</span></code></a>.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.algorithms.core.PredictorAlgorithm" title="gt4sd.algorithms.core.PredictorAlgorithm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PredictorAlgorithm</span></code></a></p></td>
+<td><p>Interface for automated prediction via an <a class="reference internal" href="#gt4sd.algorithms.core.AlgorithmConfiguration" title="gt4sd.algorithms.core.AlgorithmConfiguration"><code class="xref py py-class docutils literal notranslate"><span class="pre">AlgorithmConfiguration</span></code></a>.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.core.PropertyPredictor" title="gt4sd.algorithms.core.PropertyPredictor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PropertyPredictor</span></code></a></p></td>
-<td><p>WIP</p></td>
+<td><p>TODO: Might be deprecated in future release.</p></td>
 </tr>
 </tbody>
 </table>
@@ -430,6 +436,151 @@ Defaults to 100.</p>
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.core.GeneratorAlgorithm._abc_impl">
 <code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="headerlink" href="#gt4sd.algorithms.core.GeneratorAlgorithm._abc_impl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm">
+<em class="property">class </em><code class="sig-name descname">PredictorAlgorithm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configuration</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PredictorAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">gt4sd.algorithms.core.S</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">gt4sd.algorithms.core.T</span></code>]</p>
+<p>Interface for automated prediction via an <a class="reference internal" href="#gt4sd.algorithms.core.AlgorithmConfiguration" title="gt4sd.algorithms.core.AlgorithmConfiguration"><code class="xref py py-class docutils literal notranslate"><span class="pre">AlgorithmConfiguration</span></code></a>.</p>
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.max_runtime">
+<code class="sig-name descname">max_runtime</code><em class="property">: int</em><em class="property"> = 86400</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.max_runtime" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum amount of time we should let the algorithm run</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configuration</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PredictorAlgorithm.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Targeted or untargeted generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>configuration</strong> (<a class="reference internal" href="#gt4sd.algorithms.core.AlgorithmConfiguration" title="gt4sd.algorithms.core.AlgorithmConfiguration"><code class="xref py py-class docutils literal notranslate"><span class="pre">AlgorithmConfiguration</span></code></a>[~S, ~T]) – application specific helper that allows to setup the
+generator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.get_predictor">
+<code class="sig-name descname">get_predictor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configuration</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PredictorAlgorithm.get_predictor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.get_predictor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Set up the predictive model from the configuration. This is called at</dt><dd><p>instantiation of the PredictorAlgorithm and must return a callable.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>predictor, a callable that takes an item and returns a prediction.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.get_model">
+<em class="property">abstract </em><code class="sig-name descname">get_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PredictorAlgorithm.get_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.get_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restore the model from a local path.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is the major method to implement in child classes, it is called
+at instantiation of the PredictorAlgorithm and must return a callable:</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>resources_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – local path to the downloaded artifacts.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Predictor (callable)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.timeout">
+<code class="sig-name descname">timeout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">signum</span></em>, <em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PredictorAlgorithm.timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PredictorAlgorithm.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a prediction for an input.
+:type input: <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>
+:param input: the input for the predictive model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>TimeoutError</strong> – when the walltime limit is hit.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the prediction.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PredictorAlgorithm.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for <cite>self.predict</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.__abstractmethods__">
+<code class="sig-name descname">__abstractmethods__</code><em class="property"> = frozenset({'get_model'})</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'max_runtime': 'int'}</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.core', '__annotations__': {'max_runtime': 'int'}, '__doc__': 'Interface for automated prediction via an :class:`AlgorithmConfiguration`.', 'max_runtime': 86400, '__init__': &lt;function PredictorAlgorithm.__init__&gt;, 'get_predictor': &lt;function PredictorAlgorithm.get_predictor&gt;, 'get_model': &lt;function PredictorAlgorithm.get_model&gt;, 'timeout': &lt;function PredictorAlgorithm.timeout&gt;, 'predict': &lt;function PredictorAlgorithm.predict&gt;, '__call__': &lt;function PredictorAlgorithm.__call__&gt;, '__orig_bases__': (&lt;class 'abc.ABC'&gt;, typing.Generic[~S, ~T]), '__dict__': &lt;attribute '__dict__' of 'PredictorAlgorithm' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'PredictorAlgorithm' objects&gt;, '__parameters__': (~S, ~T), '__abstractmethods__': frozenset({'get_model'}), '_abc_impl': &lt;_abc_data object&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Interface for automated prediction via an :class:`AlgorithmConfiguration`.'</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.core'</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.__orig_bases__">
+<code class="sig-name descname">__orig_bases__</code><em class="property"> = (&lt;class 'abc.ABC'&gt;, typing.Generic[~S, ~T])</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__orig_bases__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.__parameters__">
+<code class="sig-name descname">__parameters__</code><em class="property"> = (~S, ~T)</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__parameters__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.PredictorAlgorithm._abc_impl">
+<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm._abc_impl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -810,6 +961,109 @@ in the bucket are downloaded.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt id="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration">
+<em class="property">class </em><code class="sig-name descname">ConfigurablePropertyAlgorithmConfiguration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">domain</span></em>, <em class="sig-param"><span class="n">algorithm_name</span></em>, <em class="sig-param"><span class="n">algorithm_application</span></em>, <em class="sig-param"><span class="n">algorithm_version</span><span class="o">=</span><span class="default_value">'v0'</span></em>, <em class="sig-param"><span class="n">algorithm_type</span><span class="o">=</span><span class="default_value">'prediction'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#ConfigurablePropertyAlgorithmConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">gt4sd.algorithms.core.S</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">gt4sd.algorithms.core.T</span></code>]</p>
+<p>A configurable AlgorithmConfiguration to be used by the properties submodule.</p>
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.module">
+<code class="sig-name descname">module</code><em class="property">: str</em><em class="property"> = 'properties'</em><a class="headerlink" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">domain</span></em>, <em class="sig-param"><span class="n">algorithm_name</span></em>, <em class="sig-param"><span class="n">algorithm_application</span></em>, <em class="sig-param"><span class="n">algorithm_version</span><span class="o">=</span><span class="default_value">'v0'</span></em>, <em class="sig-param"><span class="n">algorithm_type</span><span class="o">=</span><span class="default_value">'prediction'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#ConfigurablePropertyAlgorithmConfiguration.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – submodule of properties where the model resides.</p></li>
+<li><p><strong>algorithm_version</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the predictive model, e.g., <cite>MCA</cite>.</p></li>
+<li><p><strong>algorithm_application</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – application of the algorithm, e.g., dataset it was
+trained on, like <cite>Tox21</cite>.</p></li>
+<li><p><strong>algorithm_version</strong> – version of the algorithm, defaults to <cite>v0</cite>.</p></li>
+<li><p><strong>algorithm_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – type of the algorithm. This should be <cite>prediction</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.get_application_prefix">
+<code class="sig-name descname">get_application_prefix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#ConfigurablePropertyAlgorithmConfiguration.get_application_prefix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.get_application_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get prefix up to the specific application.</p>
+<p>NOTE: Unlike the parent method this uses the assgined attributes since it’s
+configurable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the application prefix.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.ensure_artifacts_for_version">
+<code class="sig-name descname">ensure_artifacts_for_version</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">algorithm_version</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#ConfigurablePropertyAlgorithmConfiguration.ensure_artifacts_for_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.ensure_artifacts_for_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The artifacts matching the path defined by class attributes and the given version are downloaded.</p>
+<p>NOTE: Unlike the parent method this uses the assigned attributes since it’s
+configurable.</p>
+<p>That is all objects under <code class="docutils literal notranslate"><span class="pre">algorithm_type/algorithm_name/algorithm_application/algorithm_version</span></code>
+in the bucket are downloaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>algorithm_version</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – version of the algorithm to ensure artifacts for.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the common local path of the matching artifacts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.list_versions">
+<code class="sig-name descname">list_versions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#ConfigurablePropertyAlgorithmConfiguration.list_versions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.list_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get possible algorithm versions.</p>
+<p>NOTE: Unlike the parent method this uses the assigned attributes since it’s
+configurable.</p>
+<p>S3 is searched as well as the local cache is searched for matching versions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>viable values as <code class="xref py py-attr docutils literal notranslate"><span class="pre">algorithm_version</span></code> for the environment.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.__annotations__">
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'algorithm_application': 'ClassVar[str]', 'algorithm_name': 'ClassVar[str]', 'algorithm_type': 'ClassVar[str]', 'algorithm_version': 'str', 'domain': 'ClassVar[str]', 'module': 'str'}</em><a class="headerlink" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.__annotations__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'A configurable AlgorithmConfiguration to be used by the properties submodule.'</em><a class="headerlink" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.algorithms.core'</em><a class="headerlink" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.__parameters__">
+<code class="sig-name descname">__parameters__</code><em class="property"> = ()</em><a class="headerlink" href="#gt4sd.algorithms.core.ConfigurablePropertyAlgorithmConfiguration.__parameters__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt id="gt4sd.algorithms.core.get_configuration_class_with_attributes">
 <code class="sig-name descname">get_configuration_class_with_attributes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">klass</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#get_configuration_class_with_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.get_configuration_class_with_attributes" title="Permalink to this definition">¶</a></dt>
@@ -831,7 +1085,7 @@ in the bucket are downloaded.</p>
 <dt id="gt4sd.algorithms.core.PropertyPredictor">
 <em class="property">class </em><code class="sig-name descname">PropertyPredictor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PropertyPredictor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PropertyPredictor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">gt4sd.algorithms.core.S</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">gt4sd.algorithms.core.U</span></code>]</p>
-<p>WIP</p>
+<p>TODO: Might be deprecated in future release.</p>
 <dl class="py method">
 <dt id="gt4sd.algorithms.core.PropertyPredictor.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PropertyPredictor.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PropertyPredictor.__init__" title="Permalink to this definition">¶</a></dt>
@@ -885,12 +1139,12 @@ computed or checked is very application specific.</p>
 
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.core.PropertyPredictor.__dict__">
-<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.core', '__doc__': 'WIP', '__init__': &lt;function PropertyPredictor.__init__&gt;, 'satisfies': &lt;function PropertyPredictor.satisfies&gt;, 'compute': &lt;function PropertyPredictor.compute&gt;, '__orig_bases__': (&lt;class 'abc.ABC'&gt;, typing.Generic[~S, ~U]), '__dict__': &lt;attribute '__dict__' of 'PropertyPredictor' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'PropertyPredictor' objects&gt;, '__parameters__': (~S, ~U), '__abstractmethods__': frozenset({'satisfies'}), '_abc_impl': &lt;_abc_data object&gt;, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.algorithms.core.PropertyPredictor.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.core', '__doc__': 'TODO: Might be deprecated in future release.', '__init__': &lt;function PropertyPredictor.__init__&gt;, 'satisfies': &lt;function PropertyPredictor.satisfies&gt;, 'compute': &lt;function PropertyPredictor.compute&gt;, '__orig_bases__': (&lt;class 'abc.ABC'&gt;, typing.Generic[~S, ~U]), '__dict__': &lt;attribute '__dict__' of 'PropertyPredictor' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'PropertyPredictor' objects&gt;, '__parameters__': (~S, ~U), '__abstractmethods__': frozenset({'satisfies'}), '_abc_impl': &lt;_abc_data object&gt;, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.algorithms.core.PropertyPredictor.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.core.PropertyPredictor.__doc__">
-<code class="sig-name descname">__doc__</code><em class="property"> = 'WIP'</em><a class="headerlink" href="#gt4sd.algorithms.core.PropertyPredictor.__doc__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__doc__</code><em class="property"> = 'TODO: Might be deprecated in future release.'</em><a class="headerlink" href="#gt4sd.algorithms.core.PropertyPredictor.__doc__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

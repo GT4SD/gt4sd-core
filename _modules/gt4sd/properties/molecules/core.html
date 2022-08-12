@@ -183,11 +183,30 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">SIDER</span> <span class="k">as</span> <span class="n">_SIDER</span>
+<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">ClinTox</span> <span class="k">as</span> <span class="n">_ClinTox</span>
+<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">OrganDB</span> <span class="k">as</span> <span class="n">_OrganTox</span>
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">SCScore</span>
+<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">Tox21</span> <span class="k">as</span> <span class="n">_Tox21</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">Field</span>
 
-<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">CallablePropertyPredictor</span><span class="p">,</span> <span class="n">PropertyPredictorParameters</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">get_activity_fn</span><span class="p">,</span> <span class="n">get_similarity_fn</span>
+<span class="kn">from</span> <span class="nn">...algorithms.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConfigurablePropertyAlgorithmConfiguration</span><span class="p">,</span>
+    <span class="n">Predictor</span><span class="p">,</span>
+    <span class="n">PredictorAlgorithm</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">...domains.materials</span> <span class="kn">import</span> <span class="n">SmallMolecule</span>
+<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CallablePropertyPredictor</span><span class="p">,</span>
+    <span class="n">DomainSubmodule</span><span class="p">,</span>
+    <span class="n">PropertyPredictorParameters</span><span class="p">,</span>
+    <span class="n">PropertyValue</span><span class="p">,</span>
+    <span class="n">S3Parameters</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">get_activity_fn</span><span class="p">,</span> <span class="n">get_similarity_fn</span><span class="p">,</span> <span class="n">to_smiles</span>
 <span class="kn">from</span> <span class="nn">.functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">bertz</span><span class="p">,</span>
     <span class="n">esol</span><span class="p">,</span>
@@ -225,6 +244,69 @@
 
 <div class="viewcode-block" id="ActivityAgainstTargetParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ActivityAgainstTargetParameters">[docs]</a><span class="k">class</span> <span class="nc">ActivityAgainstTargetParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
     <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">example</span><span class="o">=</span><span class="s2">&quot;drd2&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;name of the target.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="S3ParametersMolecules"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.S3ParametersMolecules">[docs]</a><span class="k">class</span> <span class="nc">S3ParametersMolecules</span><span class="p">(</span><span class="n">S3Parameters</span><span class="p">):</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">DomainSubmodule</span> <span class="o">=</span> <span class="n">DomainSubmodule</span><span class="p">(</span><span class="s2">&quot;molecules&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MCAParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MCAParameters">[docs]</a><span class="k">class</span> <span class="nc">MCAParameters</span><span class="p">(</span><span class="n">S3ParametersMolecules</span><span class="p">):</span>
+    <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MCA&quot;</span></div>
+
+
+<div class="viewcode-block" id="Tox21Parameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21Parameters">[docs]</a><span class="k">class</span> <span class="nc">Tox21Parameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Tox21&quot;</span></div>
+
+
+<div class="viewcode-block" id="ClinToxParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinToxParameters">[docs]</a><span class="k">class</span> <span class="nc">ClinToxParameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ClinTox&quot;</span></div>
+
+
+<div class="viewcode-block" id="SiderParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SiderParameters">[docs]</a><span class="k">class</span> <span class="nc">SiderParameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;SIDER&quot;</span></div>
+
+
+<div class="viewcode-block" id="OrganToxParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganToxParameters">[docs]</a><span class="k">class</span> <span class="nc">OrganToxParameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="OrganToxParameters.Organs"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganToxParameters.Organs">[docs]</a>    <span class="k">class</span> <span class="nc">Organs</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+        <span class="n">adrenal_gland</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Adrenal Gland&quot;</span>
+        <span class="n">bone_marrow</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Bone Marrow&quot;</span>
+        <span class="n">brain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Brain&quot;</span>
+        <span class="n">eye</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Eye&quot;</span>
+        <span class="n">heart</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Heart&quot;</span>
+        <span class="n">kidney</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Kidney&quot;</span>
+        <span class="n">liver</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Liver&quot;</span>
+        <span class="n">lung</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Lung&quot;</span>
+        <span class="n">lymph_node</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Lymph Node&quot;</span>
+        <span class="n">mammary_gland</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Mammary Gland&quot;</span>
+        <span class="n">ovary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Ovary&quot;</span>
+        <span class="n">pancreas</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Pancreas&quot;</span>
+        <span class="n">pituitary_gland</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Pituitary Gland&quot;</span>
+        <span class="n">spleen</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Spleen&quot;</span>
+        <span class="n">stomach</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Stomach&quot;</span>
+        <span class="n">testes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Testes&quot;</span>
+        <span class="n">thymus</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Thymus&quot;</span>
+        <span class="n">thyroid_gland</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Thyroid Gland&quot;</span>
+        <span class="n">urinary_bladder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Urinary Bladder&quot;</span>
+        <span class="n">uterus</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Uterus&quot;</span></div>
+
+<div class="viewcode-block" id="OrganToxParameters.ToxType"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganToxParameters.ToxType">[docs]</a>    <span class="k">class</span> <span class="nc">ToxType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+        <span class="n">chronic</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;chronic&quot;</span>
+        <span class="n">subchronic</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;subchronic&quot;</span>
+        <span class="n">multigenerational</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;multigenerational&quot;</span>
+        <span class="nb">all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span></div>
+
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;OrganTox&quot;</span>
+    <span class="n">site</span><span class="p">:</span> <span class="n">Organs</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span>
+        <span class="n">example</span><span class="o">=</span><span class="s2">&quot;breast&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;name of the target site of interest.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">toxicity_type</span><span class="p">:</span> <span class="n">ToxType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="n">example</span><span class="o">=</span><span class="s2">&quot;chronic&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;type of toxicity for which predictions are made.&quot;</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chronic&quot;</span><span class="p">,</span> <span class="s2">&quot;subchronic&quot;</span><span class="p">,</span> <span class="s2">&quot;multigenerational&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">],</span>
+    <span class="p">)</span></div>
 
 
 <span class="c1"># NOTE: property prediction classes</span>
@@ -433,6 +515,172 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">callable_fn</span><span class="o">=</span><span class="n">get_activity_fn</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">target</span><span class="p">),</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span>
         <span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">_MCA</span><span class="p">(</span><span class="n">PredictorAlgorithm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for all MCA-based predictive algorithms.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">MCAParameters</span><span class="p">):</span>
+
+        <span class="c1"># Set up the configuration from the parameters</span>
+        <span class="n">configuration</span> <span class="o">=</span> <span class="n">ConfigurablePropertyAlgorithmConfiguration</span><span class="p">(</span>
+            <span class="n">algorithm_type</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_type</span><span class="p">,</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">algorithm_name</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_name</span><span class="p">,</span>
+            <span class="n">algorithm_application</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_application</span><span class="p">,</span>
+            <span class="n">algorithm_version</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># The parent constructor calls `self.get_model`.</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Tox21"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21">[docs]</a><span class="k">class</span> <span class="nc">Tox21</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Model to predict environmental toxicity for the 12 endpoints in Tox21.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Tox21.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Predictor: the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This model returns a singular reward and not a prediction for all 12 classes.</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">_Tox21</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
+
+        <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
+        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">to_smiles</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">informative_model</span></div>
+
+<div class="viewcode-block" id="Tox21.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        This model predicts the 12 endpoints from the Tox21 challenge.</span>
+<span class="s2">        The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53</span>
+<span class="s2">        For details on the data see: https://tripod.nih.gov/tox21/challenge/.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="ClinTox"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinTox">[docs]</a><span class="k">class</span> <span class="nc">ClinTox</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Model to predict environmental toxicity for the 12 endpoints in Tox21.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ClinTox.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinTox.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Predictor: the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This model returns a singular reward and not a prediction for both classes.</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">_ClinTox</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
+
+        <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
+        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">to_smiles</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">informative_model</span></div>
+
+<div class="viewcode-block" id="ClinTox.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinTox.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        This model is a multitask classifier for two classes:</span>
+<span class="s2">            1. Predicted probability to receive FDA approval.</span>
+<span class="s2">            2. Predicted probability of failure in clinical trials.</span>
+<span class="s2">        For details on the data see: https://pubs.rsc.org/en/content/articlehtml/2018/sc/c7sc02664a.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="SIDER"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SIDER">[docs]</a><span class="k">class</span> <span class="nc">SIDER</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
+<div class="viewcode-block" id="SIDER.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SIDER.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Predictor: the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This model returns a singular reward and not a prediction for both classes.</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">_SIDER</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
+
+        <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
+        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">to_smiles</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">informative_model</span></div>
+
+<div class="viewcode-block" id="SIDER.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SIDER.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        This model is a multitask classifier to predict side effects of drugs across</span>
+<span class="s2">        27 classes. For details on the data see:</span>
+<span class="s2">        https://pubs.rsc.org/en/content/articlehtml/2018/sc/c7sc02664a.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="OrganTox"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox">[docs]</a><span class="k">class</span> <span class="nc">OrganTox</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Model to predict toxicity for different organs.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="OrganTox.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">OrganToxParameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="c1"># Extract model-specific parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">site</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toxicity_type</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">toxicity_type</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OrganTox.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Predictor: the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This model returns a singular reward and not a prediction for both classes.</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">_OrganTox</span><span class="p">(</span>
+            <span class="n">model_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span> <span class="n">site</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">site</span><span class="p">,</span> <span class="n">toxicity_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">toxicity_type</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
+        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">to_smiles</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">all_preds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">all_preds</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">class_indices</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">informative_model</span></div>
+
+<div class="viewcode-block" id="OrganTox.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        This model is a multitask classifier to toxicity across different organs and</span>
+<span class="s2">        toxicity types (`chronic`, `subchronic`, `multigenerational` or `all`).</span>
+<span class="s2">        The organ has to specified in the constructor. The toxicity type defaults to</span>
+<span class="s2">        `all` in which case three values are returned in the order `chronic`,</span>
+<span class="s2">        `multigenerational` and `subchronic`.</span>
+
+<span class="s2">        For details on the data see:</span>
+<span class="s2">        https://pubs.rsc.org/en/content/articlehtml/2018/sc/c7sc02664a.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
 </pre></div>
 
            </div>
