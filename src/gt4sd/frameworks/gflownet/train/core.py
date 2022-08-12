@@ -146,7 +146,8 @@ def train_gflownet(
         flush_logs_every_n_steps=getattr(
             arguments, "trainer_flush_logs_every_n_steps", 100
         ),
-        fast_dev_run=getattr(arguments, "dev", False),
+        fast_dev_run=getattr(arguments, "development", False),
+        accelerator=getattr(arguments, "distributed_training_strategy", "ddp"),
     )
     trainer.fit(module, dm)
 
@@ -186,7 +187,8 @@ def train_gflownet_main(
             "num_offline": 10,
             "sampling_iterator": True,
             "ratio": 0.9,
-            "dev": False,
+            "distributed_training_strategy": "ddp",
+            "development": False,
         }
 
     # add default configuration

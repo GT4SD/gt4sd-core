@@ -23,20 +23,27 @@
 #
 """GFlowNet training utilities."""
 
+import ast
 import json
 import logging
-from argparse import Namespace
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Tuple
 
 import sentencepiece as _sentencepiece
 from pytorch_lightning import LightningDataModule, LightningModule
 
-from ....frameworks.gflownet.dataloader import build_dataset
-from ....frameworks.gflownet.dataloader.data_module import GFlowNetDataModule
-from ....frameworks.gflownet.envs import build_env_context
+from ....frameworks.gflownet.dataloader.data_module import (
+    GFlowNetDataModule,
+    GFlowNetTask,
+)
+from ....frameworks.gflownet.dataloader.dataset import GFlowNetDataset
+from ....frameworks.gflownet.envs.graph_building_env import (
+    GraphBuildingEnv,
+    GraphBuildingEnvContext,
+)
+from ....frameworks.gflownet.loss import ALGORITHM_FACTORY
+from ....frameworks.gflownet.ml.models import MODEL_FACTORY
 from ....frameworks.gflownet.ml.module import GFlowNetModule
-from ....frameworks.gflownet.train import build_task
 from ...core import TrainingPipelineArguments
 from ..core import PytorchLightningTrainingArguments, PyTorchLightningTrainingPipeline
 
@@ -54,7 +61,11 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
         self,
         model_args: Dict[str, Any],
         dataset_args: Dict[str, Any],
-        **kwargs,
+        configuration: Dict[str, Any],
+        dataset: Optional[GFlowNetDataset] = None,
+        environment: Optional[GraphBuildingEnv] = None,
+        context: Optional[GraphBuildingEnvContext] = None,
+        _task: Optional[GFlowNetTask] = None,
     ) -> Tuple[LightningDataModule, LightningModule]:
         """Get data and model modules for training.
 
@@ -78,32 +89,45 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
                 "Models configuration is not given in the specified config file."
             )
 
-        arguments = Namespace(**configuration)
-
-        dataset = build_dataset(
-            arguments.name,
-            arguments.data_path,
-            arguments.data_file,
-            arguments.dataset_type,
-            arguments.type,
-            arguments,
+        algorithm = ALGORITHM_FACTORY[configuration["algorithm"]](
+            environment,
+            context,
+            configuration,
+        )
+        model = MODEL_FACTORY[configuration["model"]](
+            context,
+            num_emb=configuration["num_emb"],
+            num_layers=configuration["num_layers"],
         )
 
-        env, ctx = build_env_context(arguments.env, arguments.context)
-        task = build_task(arguments.task)
+        task = _task(
+            dataset,
+            configuration["temperature_sample_dist"],
+            ast.literal_eval(configuration["temperature_dist_params"]),
+            device=configuration["device"],
+        )
 
         dm = GFlowNetDataModule(
-            dataset,
-            env,
-            ctx,
-            task,
+            configuration=configuration,
+            dataset=dataset,
+            environment=environment,
+            context=context,
+            task=task,
+            algorithm=algorithm,
+            model=model,
+            sampling_model=configuration["sampling_model"],
+            sampling_iterator=configuration["sampling_iterator"],
         )
         dm.prepare_data()
 
         module = GFlowNetModule(
-            architecture=arguments.model_type,
-            lr=arguments.lr,
-            test_output_path=arguments.test_output_path,
+            configuration=configuration,
+            dataset=dataset,
+            environment=environment,
+            context=context,
+            task=task,
+            algorithm=algorithm,
+            model=model,
         )
 
         return dm, module

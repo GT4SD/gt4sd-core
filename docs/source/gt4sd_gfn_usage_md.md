@@ -26,7 +26,8 @@ We recommend training GFN on GPU and checking the pytorch_geomtric requirements 
 
 ## Debugging
 
-Training GFN can be a long process. To debug your training pipeline set `configuration["dev"] = True`. This will activate `fast_dev_run` functionality in the pytorch_lightning trainer.
+Training GFN can be a long process. To debug your training pipeline, set `development = True`. This will activate `fast_dev_run` functionality in the pytorch_lightning trainer.
+If training gets stuck and the dataloader does not yield data, set `num_workers=0`.
 
 ## Minimal training example
 

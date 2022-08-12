@@ -97,7 +97,7 @@ class GFlowNetModule(pl.LightningModule):
 
         super().__init__()
         self.hps = configuration
-        self.save_hyperparameters()
+        # self.save_hyperparameters()
 
         self.env = environment
         self.ctx = context

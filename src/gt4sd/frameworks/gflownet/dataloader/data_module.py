@@ -240,8 +240,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
             iterator,
             batch_size=None,
             num_workers=self.num_workers,
-            persistent_workers=self.num_workers
-            > 0,  # TODO: fix issue with num_workers > 0 and SamplingIterator
+            persistent_workers=self.num_workers > 0,
         )
 
     def val_dataloader(self) -> DataLoader:

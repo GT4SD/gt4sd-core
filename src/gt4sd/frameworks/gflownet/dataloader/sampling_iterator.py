@@ -65,7 +65,7 @@ class SamplingIterator(IterableDataset):
                 _not_ the batch size in terms of the number of graphs (that will depend on the task).
             ctx: the graph environment.
             algo: the training algorithm, e.g. a TrajectoryBalance instance.
-            task: ConditionalTask
+            task: ConditionalTask that specifies the reward structure.
             ratio: the ratio of offline trajectories in the batch.
             stream: if true, data is sampled iid for every batch. Otherwise, this is a normal in-order
                 dataset iterator.
@@ -100,6 +100,7 @@ class SamplingIterator(IterableDataset):
             worker_info = torch.utils.data.get_worker_info()
             n = len(self.data)
 
+            # refactor this
             if worker_info is None:
                 start = 0
                 end = n
@@ -160,7 +161,6 @@ class SamplingIterator(IterableDataset):
         # i.e. predict the output of cond_info_to_reward
         pred_reward = [i["reward_pred"].cpu().item() for i in trajs[num_offline:]]
         flat_rewards += list(pred_reward)
-        raise ValueError("make this flat rewards")  # TODO
         return flat_rewards
 
     def predict_reward_task(self, trajs, flat_rewards, num_offline, is_valid):
@@ -229,7 +229,6 @@ class SamplingIterator(IterableDataset):
 
         # predict reward with model
         if self.algo.bootstrap_own_reward:
-            # TODO: fix this
             flat_rewards = self.predict_reward_model(trajs, flat_rewards, num_offline)
 
         # predict reward with task
@@ -240,23 +239,27 @@ class SamplingIterator(IterableDataset):
 
         return trajs, flat_rewards
 
-    def __iter__(self) -> Iterator[Tuple[torch.Tensor, torch.Tensor]]:
-        """Build batch using online and offline data."""
+    def set_seed(self):
+        """Set the seed for the worker."""
         worker_info = torch.utils.data.get_worker_info()
         wid = worker_info.id if worker_info is not None else 0
-        # set seed for each worker # TODO: fix this
+        # set seed for each worker
         seed = np.random.default_rng(142857 + wid)
         self.rng = seed
         self.algo.rng = seed
         self.task.rng = seed
-
         self.ctx.device = self.device
+
+    def __iter__(self) -> Iterator[Tuple[torch.Tensor, torch.Tensor]]:
+        """Build batch using online and offline data and multiple workers."""
+        # we need to set a different seed for each worker to sample different batches.
+        # If we start with the same seed, each worker has the exact same copy of the data and will yield the same batch.
+        self.set_seed()
 
         # import ipdb
         # ipdb.sset_trace()
-        # iterate over the indices in the batch
+        # iterate over the indices in the batch and yield a bunch of indexes
         for idcs in self._idx_iterator():
-
             num_offline = idcs.shape[0]  # This is in [1, self.offline_batch_size]
             # Sample conditional info such as temperature, trade-off weights, etc.
             cond_info = self.task.sample_conditional_information(

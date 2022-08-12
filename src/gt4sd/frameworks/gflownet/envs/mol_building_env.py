@@ -162,10 +162,9 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
         elif t is GraphActionType.AddEdge:
             a, b = g.non_edge_index[:, act_row]
             return GraphAction(t, source=a.item(), target=b.item())
+        # Edges are duplicated to get undirected GNN, deduplicated for logits
         elif t is GraphActionType.SetEdgeAttr:
-            a, b = g.edge_index[
-                :, act_row * 2
-            ]  # Edges are duplicated to get undirected GNN, deduplicated for logits
+            a, b = g.edge_index[:, act_row * 2]
             attr, val = self.bond_attr_logit_map[act_col]
             return GraphAction(
                 t, source=a.item(), target=b.item(), attr=attr, value=val
@@ -222,34 +221,34 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
         return (type_idx, int(row), int(col))
 
     def graph_to_Data(self, g: Graph) -> gd.Data:
-        """Convert a networkx Graph to a torch geometric Data instance"""
+        """Convert a networkx Graph to a torch geometric Data instance."""
         x = torch.zeros((max(1, len(g.nodes)), self.num_node_dim))
         x[0, -1] = len(g.nodes) == 0
+
         for i, n in enumerate(g.nodes):
             ad = g.nodes[n]
             for k, sl in zip(self.atom_attrs, self.atom_attr_slice):
                 idx = self.atom_attr_values[k].index(ad[k]) if k in ad else 0
                 x[i, sl + idx] = 1
         edge_attr = torch.zeros((len(g.edges) * 2, self.num_edge_dim))
+
         for i, e in enumerate(g.edges):
             ad = g.edges[e]
             for k, sl in zip(self.bond_attrs, self.bond_attr_slice):
                 idx = self.bond_attr_values[k].index(ad[k]) if k in ad else 0
                 edge_attr[i * 2, sl + idx] = 1
                 edge_attr[i * 2 + 1, sl + idx] = 1
-        edge_index = (
-            torch.tensor(
-                [e for i, j in g.edges for e in [(i, j), (j, i)]], dtype=torch.long
-            )
-            .reshape((-1, 2))
-            .T
+
+        edge_index = torch.tensor(
+            [e for i, j in g.edges for e in [(i, j), (j, i)]], dtype=torch.long
         )
+        edge_index = edge_index.reshape((-1, 2)).T
         gc = nx.complement(g)
-        # non_edge_index = torch.tensor([i for i in gc.edges], dtype=torch.long)
-        non_edge_index = torch.tensor(
-            [i for i in gc.edges], dtype=torch.long
-        ).T.reshape((2, -1))
-        # non_edge_index = torch.tensor([i for i in gc.edges], dtype=torch.long).permute(0, 2, 1).reshape((2, -1))
+
+        non_edge_index = torch.tensor([i for i in gc.edges], dtype=torch.long)
+        if len(non_edge_index.shape) == 2:
+            non_edge_index = non_edge_index.T
+        non_edge_index = non_edge_index.reshape((2, -1))
         return gd.Data(x, edge_index, edge_attr, non_edge_index=non_edge_index)
 
     def collate(self, graphs: List[gd.Data]):
