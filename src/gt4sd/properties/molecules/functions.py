@@ -37,7 +37,7 @@ from guacamol.utils.descriptors import (
 )
 from guacamol.utils.descriptors import qed as _qed
 from guacamol.utils.descriptors import tpsa as _tpsa
-from paccmann_generator.drug_evaluators import (  # SIDER,; ClinTox,; OrganDB,; Tox21,
+from paccmann_generator.drug_evaluators import (
     ESOL,
     SAS,
     Lipinski,
