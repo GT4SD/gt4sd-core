@@ -51,6 +51,7 @@ from guacamol.utils.descriptors import (
     qed,
     tpsa,
 )
+from properties import PROPERTY_PREDICTOR_FACTORY
 
 MODIFIERS: Dict[str, Callable[..., Any]] = {
     "gaussian_modifier": GaussianModifier,
@@ -390,3 +391,30 @@ SCORING_FUNCTIONS = {
     "smarts_scorer": SMARTSScorer,
     "qed_scorer": QEDScorer,
 }
+
+
+class PropertyPredictionScorer(TargetValueScorer):
+    def __init__(
+        self, name: str, target: Union[float, int], parameters: Dict[str, Any] = {}
+    ) -> None:
+        """Scoring function that calculates a generic score for a property
+
+        Args:
+            name: name of the property to score.
+            target: target score that will be used to get the distance to the score of the SMILES
+        """
+        property_class, parameters_class = PROPERTY_PREDICTOR_FACTORY[name]
+        self.predictor = property_class(parameters_class(**parameters))
+        self.target = target
+        super().__init__(target=target, scoring_function=self.score)
+
+    def score(self, smiles: str) -> Union[float, int, bool]:
+        """Generates a score for a given SMILES.
+
+        Args:
+            smiles: SMILES.
+
+        Returns:
+            A score for the given SMILES
+        """
+        return self.predictor(smiles)
