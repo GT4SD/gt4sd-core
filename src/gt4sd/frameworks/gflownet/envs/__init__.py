@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-from typing import Tuple
+from typing import Optional, Tuple
 
 from .graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
 from .mol_building_env import MolBuildingEnvContext
@@ -32,7 +32,8 @@ from .mol_building_env import MolBuildingEnvContext
 def build_env_context(
     environment_name: str = "graph_building_env",
     context_name="graph_building_env_context",
-) -> Tuple[GraphBuildingEnv, GraphBuildingEnvContext]:
+):
+
     env, context = None, None
     if environment_name == "graph_building_env":
         env = GraphBuildingEnv

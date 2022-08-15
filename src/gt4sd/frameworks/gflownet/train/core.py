@@ -23,12 +23,12 @@
 #
 """Train module implementation."""
 
-import ast
 import logging
 from argparse import Namespace
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict
 
 import sentencepiece as _sentencepiece
+import numpy as np
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -36,8 +36,8 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from ..arg_parser.parser import parse_arguments_from_config
 
 # from ..dataloader import build_dataset
-from ..dataloader.data_module import GFlowNetDataModule, GFlowNetTask
-from ..dataloader.dataset import GFlowNetDataset
+from ..dataloader.data_module import GFlowNetDataModule
+from ..dataloader.dataset import GFlowNetDataset, GFlowNetTask
 
 # from ..envs import build_env_context
 from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
@@ -56,10 +56,10 @@ logger.addHandler(logging.NullHandler())
 
 def train_gflownet(
     configuration: Dict[str, Any],
-    dataset: Optional[GFlowNetDataset] = None,
-    environment: Optional[GraphBuildingEnv] = None,
-    context: Optional[GraphBuildingEnvContext] = None,
-    _task: Optional[GFlowNetTask] = None,
+    dataset: GFlowNetDataset,
+    environment: GraphBuildingEnv,
+    context: GraphBuildingEnvContext,
+    _task: Callable,
 ) -> None:
     """Train a gflownet given a configuration and lightning modules.
     dataset, enviroment, context and task are optional. The defaults are small molecules compatible.
@@ -88,21 +88,18 @@ def train_gflownet(
     #     task = build_task(task=getattr(arguments, "task"))
 
     algorithm = ALGORITHM_FACTORY[getattr(arguments, "algorithm")](
+        configuration,
         environment,
         context,
-        configuration,
     )
     model = MODEL_FACTORY[getattr(arguments, "model")](
+        configuration,
         context,
-        num_emb=getattr(arguments, "num_emb"),
-        num_layers=getattr(arguments, "num_layers"),
     )
 
     task = _task(
-        dataset,
-        configuration["temperature_sample_dist"],
-        ast.literal_eval(configuration["temperature_dist_params"]),
-        device=configuration["device"],
+        configuration=configuration,
+        dataset=dataset,
     )
 
     dm = GFlowNetDataModule(
@@ -113,8 +110,6 @@ def train_gflownet(
         task=task,
         algorithm=algorithm,
         model=model,
-        sampling_model=getattr(arguments, "sampling_model"),
-        sampling_iterator=getattr(arguments, "sampling_iterator", True),
     )
     dm.prepare_data()
 
@@ -154,10 +149,10 @@ def train_gflownet(
 
 def train_gflownet_main(
     configuration: Dict[str, Any],
-    dataset: Optional[GFlowNetDataset] = None,
-    environment: Optional[GraphBuildingEnv] = None,
-    context: Optional[GraphBuildingEnvContext] = None,
-    _task: Optional[GFlowNetTask] = None,
+    dataset: GFlowNetDataset,
+    environment: GraphBuildingEnv,
+    context: GraphBuildingEnvContext,
+    _task: Callable[[], GFlowNetTask],
 ) -> None:
     """Train a gflownet module parsing arguments from config and standard input."""
 
@@ -190,6 +185,8 @@ def train_gflownet_main(
             "distributed_training_strategy": "ddp",
             "development": False,
         }
+
+    configuration["rng"] = np.random.default_rng(142857)
 
     # add default configuration
     configuration.update(default_hps())

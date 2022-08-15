@@ -26,6 +26,7 @@ import math
 from collections import OrderedDict
 from math import pi as PI
 from operator import itemgetter
+from typing import Set
 
 import numpy as np
 import sympy as sym
@@ -305,11 +306,13 @@ def spherical_bessel_formulas(n):
 def bessel_basis(n, k):
     zeros = Jn_zeros(n, k)
     normalizer = []
+
     for order in range(n):
-        normalizer_tmp = []
+        _normalizer_tmp = []
         for i in range(k):
-            normalizer_tmp += [0.5 * Jn(zeros[order, i], order + 1)**2]
-        normalizer_tmp = 1 / np.array(normalizer_tmp)**0.5
+            _normalizer_tmp += [0.5 * Jn(zeros[order, i], order + 1)**2]
+
+        normalizer_tmp = 1 / np.array(_normalizer_tmp)**0.5
         normalizer += [normalizer_tmp]
 
     f = spherical_bessel_formulas(n)
@@ -324,7 +327,7 @@ def bessel_basis(n, k):
 
 
 def sph_harm_prefactor(k, m):
-    return ((2 * k + 1) * np.math.factorial(k - abs(m)) / (4 * np.pi * np.math.factorial(k + abs(m))))**0.5
+    return ((2 * k + 1) * math.factorial(k - abs(m)) / (4 * np.pi * math.factorial(k + abs(m))))**0.5
 
 
 def associated_legendre_polynomials(k, zero_m_only=True):
@@ -368,11 +371,12 @@ def real_sph_harm(k, zero_m_only=True, spherical_coordinates=True):
                     P_l_m[i][j] = P_l_m[i][j].subs(z, sym.cos(theta))
         if not zero_m_only:
             phi = sym.symbols('phi')
+
             for i in range(len(S_m)):
-                S_m[i] = S_m[i].subs(x,
+                S_m[i] = S_m[i].subs(x,  # type: ignore
                                      sym.sin(theta) * sym.cos(phi)).subs(y, sym.sin(theta) * sym.sin(phi))
             for i in range(len(C_m)):
-                C_m[i] = C_m[i].subs(x,
+                C_m[i] = C_m[i].subs(x,  # type: ignore
                                      sym.sin(theta) * sym.cos(phi)).subs(y, sym.sin(theta) * sym.sin(phi))
 
     Y_func_l_m = [['0'] * (2 * j + 1) for j in range(k)]
@@ -491,7 +495,7 @@ aggr_special_args = set([
     'index',
     'dim_size'])
 
-update_special_args = set([])
+update_special_args: Set = set([])
 
 
 class MessagePassing(torch.nn.Module):
@@ -531,15 +535,15 @@ class MessagePassing(torch.nn.Module):
         self.node_dim = node_dim
         assert self.node_dim >= 0
 
-        self.__msg_params__ = inspect.signature(self.message).parameters
-        self.__msg_params__ = OrderedDict(self.__msg_params__)
+        self.__msg_params__tmp = inspect.signature(self.message).parameters
+        self.__msg_params__ = OrderedDict(self.__msg_params__tmp)
 
-        self.__aggr_params__ = inspect.signature(self.aggregate).parameters
-        self.__aggr_params__ = OrderedDict(self.__aggr_params__)
+        self.__aggr_params__tmp = inspect.signature(self.aggregate).parameters
+        self.__aggr_params__ = OrderedDict(self.__aggr_params__tmp)
         self.__aggr_params__.popitem(last=False)
 
-        self.__update_params__ = inspect.signature(self.update).parameters
-        self.__update_params__ = OrderedDict(self.__update_params__)
+        self.__update_params__tmp = inspect.signature(self.update).parameters
+        self.__update_params__ = OrderedDict(self.__update_params__tmp)
         self.__update_params__.popitem(last=False)
 
         msg_args = set(self.__msg_params__.keys()) - msg_special_args

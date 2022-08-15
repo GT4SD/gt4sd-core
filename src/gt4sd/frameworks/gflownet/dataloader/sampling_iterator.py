@@ -22,13 +22,14 @@
 # SOFTWARE.
 #
 import logging
-from typing import Iterator, Tuple
+from typing import Generator
 
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, IterableDataset
+from torch.utils.data import IterableDataset
 
+from ..dataloader.dataset import GFlowNetDataset, GFlowNetTask
 from ..envs.graph_building_env import GraphBuildingEnvContext
 from ..loss.trajectory_balance import TrajectoryBalance
 
@@ -46,12 +47,12 @@ class SamplingIterator(IterableDataset):
 
     def __init__(
         self,
-        dataset: Dataset,
+        dataset: GFlowNetDataset,
         model: nn.Module,
         batch_size: int,
         ctx: GraphBuildingEnvContext,
         algo: TrajectoryBalance,
-        task: nn.Module,
+        task: GFlowNetTask,
         device: str = "cuda",
         ratio: float = 0.5,
         stream: bool = True,
@@ -82,7 +83,7 @@ class SamplingIterator(IterableDataset):
         self.device = device
         self.stream = stream
 
-    def _idx_iterator(self) -> torch.Tensor:
+    def _idx_iterator(self) -> Generator:
         """Returns an iterator over the indices of the dataset. The batch can be offline or online.
 
         Yields:
@@ -90,15 +91,16 @@ class SamplingIterator(IterableDataset):
         """
         bs = self.offline_batch_size
 
+        n = len(self.data)
+
         if self.stream:
             # If we're streaming data, just sample `offline_batch_size` indices
             # CHECK: shouldn't this be online_batch_size?
             while True:
-                yield self.rng.integers(0, len(self.data), bs)
+                yield self.rng.integers(0, n, bs)  # type: ignore
         else:
             # Otherwise, figure out which indices correspond to this worker
             worker_info = torch.utils.data.get_worker_info()
-            n = len(self.data)
 
             # refactor this
             if worker_info is None:
@@ -124,7 +126,7 @@ class SamplingIterator(IterableDataset):
         if self.stream:
             return int(1e6)
         # if offline
-        return len(self.data)
+        return len(self.data)  # type: ignore
 
     def sample_offline(self, idcs):
         """Samples offline data.
@@ -137,9 +139,9 @@ class SamplingIterator(IterableDataset):
             rewards: the rewards.
         """
         # Sample offline batch (mols, rewards)
-        mols, flat_rewards = map(list, zip(*[self.data[i] for i in idcs]))
+        mols, _flat_rewards = map(list, zip(*[self.data[i] for i in idcs]))
         # rewards
-        flat_rewards = list(self.task.flat_reward_transform(flat_rewards))
+        flat_rewards = list(self.task.flat_reward_transform(_flat_rewards))  # type: ignore
         # build graphs
         graphs = [self.ctx.mol_to_graph(m) for m in mols]
         # use trajectory balance to sample trajectories
@@ -222,7 +224,7 @@ class SamplingIterator(IterableDataset):
 
         with torch.no_grad():
             trajs += self.algo.create_training_data_from_own_samples(
-                self.model,
+                self.model,  # TODO: double-check the model here
                 self.online_batch_size,
                 cond_info["encoding"][num_offline:],
             )
@@ -250,7 +252,7 @@ class SamplingIterator(IterableDataset):
         self.task.rng = seed
         self.ctx.device = self.device
 
-    def __iter__(self) -> Iterator[Tuple[torch.Tensor, torch.Tensor]]:
+    def __iter__(self):
         """Build batch using online and offline data and multiple workers."""
         # we need to set a different seed for each worker to sample different batches.
         # If we start with the same seed, each worker has the exact same copy of the data and will yield the same batch.

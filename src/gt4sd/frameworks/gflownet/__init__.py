@@ -22,4 +22,4 @@
 # SOFTWARE.
 #
 
-"""Generative Flow Networks."""
+"""Training for Generative Flow Networks."""

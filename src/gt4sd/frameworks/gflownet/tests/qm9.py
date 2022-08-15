@@ -21,8 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-
-from typing import Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple, Union
 
 import numpy as np
 import torch
@@ -32,12 +31,53 @@ from rdkit.Chem.rdchem import Mol as RDMol
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from gt4sd.frameworks.gflownet.ml.models.mxmnet import MXMNet, MXMNetConfig, mol2graph, HAR2EV
-from gt4sd.frameworks.gflownet.dataloader.data_module import (
+from gt4sd.frameworks.gflownet.dataloader.dataset import (
     FlatRewards,
+    GFlowNetDataset,
     GFlowNetTask,
     RewardScalar,
 )
+from gt4sd.frameworks.gflownet.ml.models.mxmnet import (
+    HAR2EV,
+    MXMNet,
+    MXMNetConfig,
+    mol2graph,
+)
+
+PROPERTIES: List[str] = [
+    "rA",
+    "rB",
+    "rC",
+    "mu",
+    "alpha",
+    "homo",
+    "lumo",
+    "gap",
+    "r2",
+    "zpve",
+    "U0",
+    "U",
+    "H",
+    "G",
+    "Cv",
+]
+
+
+class QM9Dataset(GFlowNetDataset):
+    def __init__(
+        self,
+        h5_file: str = None,
+        xyz_file: str = None,
+        target: str = "gap",
+        properties: List[str] = PROPERTIES,
+    ) -> None:
+        """QM9 dataset."""
+        super().__init__(
+            h5_file=h5_file,
+            xyz_file=xyz_file,
+            target=target,
+            properties=properties,
+        )
 
 
 def thermometer(v: Tensor, n_bins=50, vmin=0, vmax=1) -> Tensor:
@@ -54,42 +94,21 @@ class QM9GapTask(GFlowNetTask):
 
     def __init__(
         self,  # this is set to self.model
+        configuration: Dict[str, Any],
         dataset: Dataset,
-        temperature_distribution: str,
-        temperature_parameters: Tuple[float],
         reward_model: nn.Module = None,
         wrap_model: Callable[[nn.Module], nn.Module] = None,
-        device: str = "cuda",
     ):
-        """This class captures conditional information generation and reward transforms.
+        super().__init__(
+            configuration=configuration,
+            dataset=dataset,
+            reward_model=reward_model,
+            wrap_model=wrap_model,
+        )
 
-        Args:
-            reward_model: The model that is used to generate the conditional reward.
-            dataset:
-            temperature_distribution:
-            temperature_parameters:
-            wrap_model: a wrapper function that is applied to the model. #TODO: do we need it with lightning?
-            device: cpu or cuda
-        """
-        
-        self._wrap_model = wrap_model
-        self.device = device
-        # fix this
-        if reward_model:
-            self.model = {"model_task": reward_model}
-        else:
-            self.model = self.load_task_models()
-        self.dataset = dataset
-        self.temperature_sample_dist = temperature_distribution
-        self.temperature_dist_params = temperature_parameters
-
-        self._min, self._max, self._percentile_95 = self.dataset.get_stats(percentile=0.05)  # type: ignore
-        self._width = self._max - self._min
-        self._rtrans = "unit+95p"
-
-    def flat_reward_transform(self, y: Union[float, Tensor]) -> FlatRewards:
+    def flat_reward_transform(self, _y: Union[float, Tensor]) -> FlatRewards:
         """Transforms a target quantity y (e.g. the LUMO energy in QM9) to a positive reward scalar."""
-        y = np.array(y)
+        y = np.array(_y)
         y = y.astype("float")
         if self._rtrans == "exp":
             flat_r = np.exp(-(y - self._min) / self._width)
@@ -119,7 +138,7 @@ class QM9GapTask(GFlowNetTask):
         except FileNotFoundError:
             pass
         gap_model.to(self.device)
-        #gap_model = self._wrap_model(gap_model)
+        # gap_model = self._wrap_model(gap_model)
         return {"model_task": gap_model}
 
     def sample_conditional_information(self, n):
@@ -134,10 +153,10 @@ class QM9GapTask(GFlowNetTask):
         return {"beta": torch.tensor(beta), "encoding": beta_enc}
 
     def cond_info_to_reward(
-        self, cond_info: Dict[str, Tensor], flat_reward: FlatRewards
+        self, cond_info: Dict[str, Tensor], _flat_reward: FlatRewards
     ) -> RewardScalar:
-        if isinstance(flat_reward, list):
-            flat_reward = torch.tensor(flat_reward)
+        if isinstance(_flat_reward, list):
+            flat_reward = torch.tensor(_flat_reward)
         return RewardScalar(flat_reward ** cond_info["beta"])
 
     def compute_flat_rewards(self, mols: List[RDMol]) -> Tuple[RewardScalar, Tensor]:
@@ -155,5 +174,5 @@ class QM9GapTask(GFlowNetTask):
         preds = preds.reshape((-1,)).data.cpu() / HAR2EV  # type: ignore[attr-defined]
         preds[preds.isnan()] = 1
         preds = self.flat_reward_transform(preds).clip(1e-4, 2)
-        
+
         return RewardScalar(preds), is_valid

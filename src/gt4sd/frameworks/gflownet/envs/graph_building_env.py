@@ -164,12 +164,16 @@ class GraphBuildingEnv:
         gp = g.copy()
         if action.action is GraphActionType.AddEdge:
             a, b = action.source, action.target
+
             assert self.allow_add_edge
             assert a in g and b in g
-            if a > b:
+
+            if a > b:  # type: ignore
                 a, b = b, a
+
             assert a != b
             assert not g.has_edge(a, b)
+
             # Ideally the FA underlying this must only be able to send
             # create_edge actions which respect this a<b property (or
             # its inverse!) , otherwise symmetry will be broken
@@ -476,7 +480,7 @@ class GraphActionCategorical:
             else torch.arange(graphs.num_graphs, device=dev)
             for k in keys
         ]
-        self.logprobs = None
+        self.logprobs: Union[List[Any], None] = None
 
         if deduplicate_edge_index and "edge_index" in keys:
             idx = keys.index("edge_index")
@@ -516,18 +520,21 @@ class GraphActionCategorical:
             .max(1)
             .values.detach()
         )
+
         # substract by max then take exp
         # x[b, None] indexes by the batch to map back to each node/edge and adds a broadcast dim
         exp_logits = [
             (i - maxl[b, None]).exp() + 1e-40 for i, b in zip(self.logits, self.batch)
         ]
+
         # sum corrected exponentiated logits, to get log(Z - max) = log(sum(exp(logits)) - max)
-        logZ = sum(
+        logZ = sum(  # type: ignore
             [
                 scatter(i, b, dim=0, dim_size=self.num_graphs, reduce="sum").sum(1)
                 for i, b in zip(exp_logits, self.batch)
             ]
         ).log()
+
         # log probabilities is log(exp(logit) / Z)
         self.logprobs = [
             i.log() - logZ[b, None] for i, b in zip(exp_logits, self.batch)
@@ -608,7 +615,7 @@ class GraphActionCategorical:
 class GraphBuildingEnvContext:
     """A context class defines what the graphs are, how they map to and from data."""
 
-    device: torch.device
+    device: str
 
     def aidx_to_GraphAction(
         self, g: gd.Data, action_idx: Tuple[int, int, int]
@@ -637,6 +644,12 @@ class GraphBuildingEnvContext:
             action_idx: the tensor indices for the corresponding action.
         """
         raise NotImplementedError()
+
+    def graph_to_mol(self, g: Graph) -> Mol:
+        pass
+
+    def sample_conditional_information(self):
+        pass
 
     def graph_to_Data(self, g: Graph) -> gd.Data:
         """Convert a networkx Graph to a torch geometric Data instance.

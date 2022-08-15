@@ -21,15 +21,116 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import ast
 import os
-import tarfile
-import zipfile
-from typing import List, Tuple
+
+# import tarfile
+# import zipfile
+from typing import Any, Callable, Dict, List, NewType, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import rdkit.Chem as Chem
+import torch
+import torch.nn as nn
+import torch_geometric.data as gd
+from torch import Tensor
 from torch.utils.data import Dataset
+
+from ..envs.graph_building_env import GraphActionCategorical
+from ..util import wrap_model_mp
+
+# This type represents an unprocessed list of reward signals/conditioning information
+FlatRewards = NewType("FlatRewards", torch.tensor)  # type: ignore
+
+# This type represents the outcome for a multi-objective task of
+# converting FlatRewards to a scalar, e.g. (sum R_i omega_i) ** beta
+RewardScalar = NewType("RewardScalar", torch.tensor)  # type: ignore
+
+
+class GFlowNetTask:
+    def __init__(
+        self,
+        configuration: Dict[str, Any],
+        dataset: Dataset,
+        reward_model: nn.Module = None,
+        wrap_model: Callable[[nn.Module], nn.Module] = None,
+    ) -> None:
+
+        """Class for a generic task.
+        We consider the task as part of the dataset (environment).
+
+        Args:
+            reward_model: The model that is used to generate the conditional reward.
+            dataset:
+            temperature_distribution:
+            temperature_parameters:
+            wrap_model: a wrapper function that is applied to the model. # TODO: do we need it with lightning?
+            device: cpu or cuda
+        """
+        hps = configuration
+
+        self._wrap_model = wrap_model
+        self.num_workers = hps["num_workers"]
+        self.device = hps["device"]
+        self.rng = hps["rng"]
+
+        # fix this
+        if reward_model:
+            self.model = {"model_task": reward_model}
+        else:
+            self.model = self.load_task_models()
+
+        self.dataset = dataset
+        self.temperature_sample_dist = hps["temperature_sample_dist"]
+        self.temperature_dist_params = ast.literal_eval(hps["temperature_dist_params"])
+
+        self._min, self._max, self._percentile_95 = self.dataset.get_stats(percentile=0.05)  # type: ignore
+        self._width = self._max - self._min
+        self._rtrans = "unit+95p"
+
+    def load_task_models(self) -> Dict[str, nn.Module]:
+        pass
+
+    def sample_conditional_information(self, n) -> Dict[str, Any]:
+        pass
+
+    def cond_info_to_reward(
+        self, cond_info: Dict[str, Any], flat_reward: FlatRewards
+    ) -> RewardScalar:
+        """Combines a minibatch of reward signal vectors and conditional information into a scalar reward.
+
+        Args:
+            cond_info: a dictionary with various conditional informations (e.g. temperature).
+            flat_reward: a 2d tensor where each row represents a series of flat rewards.
+
+        Returns:
+            reward: a 1d tensor, a scalar reward for each minibatch entry.
+        """
+        raise NotImplementedError()
+
+    def compute_flat_rewards(self, x: List[Any]) -> Tuple[RewardScalar, Any]:
+        """Compute the flat rewards of mols according the the tasks' proxies.
+
+        Args:
+            mols: a list of RDKit molecules.
+        Returns:
+            reward: a 1d tensor, a scalar reward for each molecule.
+            is_valid: a 1d tensor, a boolean indicating whether the molecule is valid.
+        """
+        raise NotImplementedError()
+
+    def flat_reward_transform(self, y: Union[float, Tensor]) -> FlatRewards:
+        raise NotImplementedError()
+
+    def _wrap_model_mp(self, model):
+        """Wraps a nn.Module instance so that it can be shared to `DataLoader` workers."""
+        if self.num_workers > 0:
+            placeholder = wrap_model_mp(
+                model, self.num_workers, cast_types=(gd.Batch, GraphActionCategorical)
+            )
+            return placeholder
+        return model
 
 
 class GFlowNetDataset(Dataset):
@@ -61,7 +162,8 @@ class GFlowNetDataset(Dataset):
                 "r",
             )["df"]
         elif xyz_file is not None:
-            self.load_tar(xyz_file)
+            pass
+            # self.load_tar(xyz_file)
 
         self.target = target
         self.properties = properties
@@ -73,7 +175,7 @@ class GFlowNetDataset(Dataset):
     def get_len(self):
         return self.len
 
-    def get_stats(self, percentile: float = 0.95) -> Tuple[float, float, np.array]:
+    def get_stats(self, percentile: float = 0.95) -> Tuple[float, float, Any]:
         """Get the stats of the dataset.
 
         Args:
@@ -85,39 +187,36 @@ class GFlowNetDataset(Dataset):
         y = self.df[self.target].astype(float)
         return y.min(), y.max(), np.sort(y)[int(y.shape[0] * percentile)]
 
-    def load_tar(self, xyz_file: str) -> None:
-        """Load the data from a tar file.
+    # def load_tar(self, xyz_file: str) -> None:
+    #     """Load the data from a tar file.
 
-        Args:
-            xyz_file: name of the tar file.
-        """
-        f = tarfile.TarFile(xyz_file, "r")
-        labels = self.properties
-        all_mols = []
-        for pt in f:
-            pt = f.extractfile(pt)
-            data = pt.read().decode().splitlines()
-            all_mols.append(
-                data[-2].split()[:1] + list(map(float, data[1].split()[2:]))
-            )
-        self.df = pd.DataFrame(all_mols, columns=["SMILES"] + labels)
+    #     Args:
+    #         xyz_file: name of the tar file.
+    #     """
+    #     f = tarfile.TarFile(xyz_file, "r")
+    #     labels = self.properties
+    #     all_mols = []
+    #     for _pt in f:
+    #         data = f.extractfile(_pt).read().decode().splitlines()
+    #         all_mols.append(
+    #             data[-2].split()[:1] + list(map(float, data[1].split()[2:]))  # type: ignore
+    #         )
+    #     self.df = pd.DataFrame(all_mols, columns=["SMILES"] + labels)
 
-    def load_zip(self, xyz_file) -> None:
-        """Load the data from a zip file.
+    # def load_zip(self, xyz_file) -> None:
+    #     """Load the data from a zip file.
 
-        Args:
-            xyz_file: name of the zip file.
-        """
-        f = zipfile.ZipFile(xyz_file, "r")
-        labels = self.properties
-        all_mols = []
-        for pt in f:
-            pt = f.extractall(pt)
-            data = pt.read().decode().splitlines()
-            all_mols.append(
-                data[-2].split()[:1] + list(map(float, data[1].split()[2:]))
-            )
-        self.df = pd.DataFrame(all_mols, columns=["SMILES"] + labels)
+    #     Args:
+    #         xyz_file: name of the zip file.
+    #     """
+    #     f = zipfile.ZipFile(xyz_file, "r")
+    #     labels = self.properties
+    #     all_mols = []
+    #     data = f.extractall().read().decode().splitlines()
+    #     all_mols.append(
+    #         data[-2].split()[:1] + list(map(float, data[1].split()[2:]))  # type: ignore
+    #     )
+    #     self.df = pd.DataFrame(all_mols, columns=["SMILES"] + labels)
 
     def convert2h5(
         self,

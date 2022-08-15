@@ -26,7 +26,6 @@ import configparser
 from typing import Any, Dict, Optional
 
 import sentencepiece as _sentencepiece
-import numpy as np
 from pytorch_lightning import Trainer
 
 from ..ml.models import MODEL_FACTORY
@@ -140,7 +139,6 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     parser.add_argument("--num_training_steps", type=int, default=1000)
     parser.add_argument("--validate_every", type=int, default=1000)
 
-    parser.add_argument("--rng", type=int, default=np.random.default_rng(142857))
     parser.add_argument("--device", type=str, default="cpu")
 
     args_dictionary = vars(parser.parse_args(remaining_argv))

@@ -21,19 +21,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-import ast
 from argparse import Namespace
 from typing import Any, Dict
 
 import pytorch_lightning as pl
-
-from examples.gflownet.dateset_qm9 import QM9Dataset
-from examples.gflownet.task_qm9 import QM9GapTask
-from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
-from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
+from qm9 import QM9Dataset, QM9GapTask  # type: ignore
 
 from ..arg_parser.parser import parse_arguments_from_config
 from ..dataloader.data_module import GFlowNetDataModule
+from ..envs.graph_building_env import GraphBuildingEnv
+from ..envs.mol_building_env import MolBuildingEnvContext
 from ..loss import ALGORITHM_FACTORY
 from ..ml.models import MODEL_FACTORY
 from ..ml.module import GFlowNetModule
@@ -46,22 +43,19 @@ def test_gfn(configuration):
     environment = GraphBuildingEnv()
     context = MolBuildingEnvContext(["H", "C", "N", "F", "O"], num_cond_dim=32)
 
-    algorithm = ALGORITHM_FACTORY[configuration["algorithm"]](
+    algorithm = ALGORITHM_FACTORY[getattr(configuration, "algorithm")](
+        configuration,
         environment,
         context,
-        configuration,
     )
-    model = MODEL_FACTORY[configuration["model"]](
+    model = MODEL_FACTORY[getattr(configuration, "model")](
+        configuration,
         context,
-        num_emb=configuration["num_emb"],
-        num_layers=configuration["num_layers"],
     )
 
     task = QM9GapTask(
-        dataset,
-        configuration["temperature_sample_dist"],
-        ast.literal_eval(configuration["temperature_dist_params"]),
-        device=configuration["device"],
+        configuration=configuration,
+        dataset=dataset,
     )
 
     dm = GFlowNetDataModule(
@@ -72,8 +66,6 @@ def test_gfn(configuration):
         task=task,
         algorithm=algorithm,
         model=model,
-        sampling_model=configuration["sampling_model"],
-        sampling_iterator=configuration["sampling_iterator"],
     )
     dm.prepare_data()
 

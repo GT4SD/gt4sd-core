@@ -45,7 +45,10 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
     """
 
     def __init__(
-        self, atoms: List[str] = ["H", "C", "N", "O", "F"], num_cond_dim: int = 32
+        self,
+        atoms: List[str] = ["H", "C", "N", "O", "F"],
+        num_cond_dim: int = 32,
+        device="cpu",
     ):
         """
         Args:
@@ -144,7 +147,7 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
             GraphActionType.AddEdge,
             GraphActionType.SetEdgeAttr,
         ]
-        self.device = torch.device("cpu")
+        self.device = device
 
     def aidx_to_GraphAction(self, g: gd.Data, action_idx: Tuple[int, int, int]):
         """Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction."""
@@ -174,18 +177,20 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
         self, g: gd.Data, action: GraphAction
     ) -> Tuple[int, int, int]:
         """Translate a GraphAction to an index tuple."""
+
         if action.action is GraphActionType.Stop:
-            row = col = 0
+            row = 0
+            col = 0
         elif action.action is GraphActionType.AddNode:
-            row = action.source
+            row = action.source  # type: ignore
             col = self.atom_attr_values["v"].index(action.value)
         elif action.action is GraphActionType.SetNodeAttr:
-            row = action.source
+            row = action.source  # type: ignore
             # - 1 because the default is index 0
             col = (
-                self.atom_attr_values[action.attr].index(action.value)
+                self.atom_attr_values[action.attr].index(action.value)  # type: ignore
                 - 1
-                + self.atom_attr_logit_slice[action.attr]
+                + self.atom_attr_logit_slice[action.attr]  # type: ignore
             )
         elif action.action is GraphActionType.AddEdge:
             # Here we have to retrieve the index in non_edge_index of an edge (s,t)
@@ -213,12 +218,14 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
             # Because edges are duplicated but logits aren't, divide by two
             row = row.div(2, rounding_mode="floor")  # type: ignore
             col = (
-                self.bond_attr_values[action.attr].index(action.value)
+                self.bond_attr_values[action.attr].index(action.value)  # type: ignore
                 - 1
-                + self.bond_attr_logit_slice[action.attr]
+                + self.bond_attr_logit_slice[action.attr]  # type: ignore
             )
         type_idx = self.action_type_order.index(action.action)
-        return (type_idx, int(row), int(col))
+        row = int(row)
+        col = int(col)
+        return (type_idx, row, col)
 
     def graph_to_Data(self, g: Graph) -> gd.Data:
         """Convert a networkx Graph to a torch geometric Data instance."""

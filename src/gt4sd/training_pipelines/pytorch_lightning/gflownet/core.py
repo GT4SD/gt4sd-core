@@ -23,7 +23,6 @@
 #
 """GFlowNet training utilities."""
 
-import ast
 import json
 import logging
 from dataclasses import dataclass, field
@@ -62,10 +61,10 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
         model_args: Dict[str, Any],
         dataset_args: Dict[str, Any],
         configuration: Dict[str, Any],
-        dataset: Optional[GFlowNetDataset] = None,
-        environment: Optional[GraphBuildingEnv] = None,
-        context: Optional[GraphBuildingEnvContext] = None,
-        _task: Optional[GFlowNetTask] = None,
+        dataset: GFlowNetDataset,
+        environment: GraphBuildingEnv,
+        context: GraphBuildingEnvContext,
+        _task: GFlowNetTask,
     ) -> Tuple[LightningDataModule, LightningModule]:
         """Get data and model modules for training.
 
@@ -89,22 +88,19 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
                 "Models configuration is not given in the specified config file."
             )
 
-        algorithm = ALGORITHM_FACTORY[configuration["algorithm"]](
+        algorithm = ALGORITHM_FACTORY[getattr(configuration, "algorithm")](
+            configuration,
             environment,
             context,
-            configuration,
         )
-        model = MODEL_FACTORY[configuration["model"]](
+        model = MODEL_FACTORY[getattr(configuration, "model")](
+            configuration,
             context,
-            num_emb=configuration["num_emb"],
-            num_layers=configuration["num_layers"],
         )
 
         task = _task(
-            dataset,
-            configuration["temperature_sample_dist"],
-            ast.literal_eval(configuration["temperature_dist_params"]),
-            device=configuration["device"],
+            configuration=configuration,
+            dataset=dataset,
         )
 
         dm = GFlowNetDataModule(
@@ -115,8 +111,6 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
             task=task,
             algorithm=algorithm,
             model=model,
-            sampling_model=configuration["sampling_model"],
-            sampling_iterator=configuration["sampling_iterator"],
         )
         dm.prepare_data()
 

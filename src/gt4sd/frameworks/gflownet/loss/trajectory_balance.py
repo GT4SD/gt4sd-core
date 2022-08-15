@@ -60,9 +60,9 @@ class TrajectoryBalance:
 
     def __init__(
         self,
+        hps: Dict[str, Any],
         env: GraphBuildingEnv,
         ctx: GraphBuildingEnvContext,
-        hps: Dict[str, Any],
         max_len: int = None,
     ):
         """
@@ -128,7 +128,7 @@ class TrajectoryBalance:
         """Generate trajectories by sampling a model.
 
         Args:
-            model: TrajectoryBalanceModel
+            model: model used with a certain algorithm (i.e. trajectory balance).
             The model being sampled
             graphs: List[Graph]
                 List of N Graph endpoints
@@ -150,8 +150,12 @@ class TrajectoryBalance:
         dev = self.ctx.device
         cond_info = cond_info.to(dev)
         logZ_pred = model.logZ(cond_info)
+
         # This will be returned as training data
-        data = [{"traj": [], "reward_pred": None, "is_valid": True} for i in range(n)]
+        data: List[Dict] = []
+        for i in range(n):
+            data.append({"traj": [], "reward_pred": None, "is_valid": True})
+
         # Let's also keep track of trajectory statistics according to the model
         zero = torch.tensor([0], device=dev).float()
         fwd_logprob: List[List[Tensor]] = [[] for i in range(n)]
@@ -176,6 +180,7 @@ class TrajectoryBalance:
         )
         if self.epsilon is not None:
             epsilon = torch.tensor([self.epsilon], device=dev).float()
+
         for t in range(self.max_len) if self.max_len is not None else count(0):
             # Construct graphs for the trajectories that aren't yet done
             torch_graphs = [ctx.graph_to_Data(i) for i in not_done(graphs)]
@@ -270,10 +275,10 @@ class TrajectoryBalance:
 
     def construct_batch(
         self,
-        trajs: List[List[Tuple[Graph, GraphAction]]],
-        cond_info: torch.Tensor,
-        rewards: torch.Tensor,
-    ):
+        trajs: List[Dict[str, List[Tuple[Graph, GraphAction]]]],
+        cond_info: float,
+        rewards: float,
+    ) -> gd.Batch:
         """Construct a batch from a list of trajectories and their information.
 
         Args:
@@ -303,6 +308,7 @@ class TrajectoryBalance:
                 for i in range(len(tj["traj"]))
             ]
         )
+
         batch = self.ctx.collate(torch_graphs)
         batch.traj_lens = torch.tensor([len(i["traj"]) for i in trajs])
         batch.num_backward = num_backward

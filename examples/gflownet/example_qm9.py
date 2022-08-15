@@ -1,10 +1,7 @@
-from examples.gflownet.dateset_qm9 import QM9Dataset
-from examples.gflownet.task_qm9 import QM9GapTask
-from gt4sd.frameworks.gflownet.train.core import train_gflownet_main
 from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
 from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
-
-import os
+from gt4sd.frameworks.gflownet.tests.qm9 import QM9Dataset, QM9GapTask
+from gt4sd.frameworks.gflownet.train.core import train_gflownet_main
 
 
 def main():

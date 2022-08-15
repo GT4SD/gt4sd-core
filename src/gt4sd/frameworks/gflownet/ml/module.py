@@ -35,10 +35,8 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 import torch_geometric.data as gd
-from torch import Tensor
 
-from ..dataloader.data_module import GFlowNetTask
-from ..dataloader.dataset import GFlowNetDataset
+from ..dataloader.dataset import GFlowNetDataset, GFlowNetTask
 from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
@@ -53,7 +51,7 @@ class GFlowNetAlgorithm:
 
     def compute_batch_losses(
         self, model: nn.Module, batch: gd.Batch, num_bootstrap: Optional[int] = 0
-    ) -> Tuple[Tensor, Dict[str, Tensor]]:
+    ) -> Tuple[float, Dict[str, float]]:
         """Computes the loss for a batch of data, and proves logging informations.
 
         Args:
@@ -129,18 +127,17 @@ class GFlowNetModule(pl.LightningModule):
         Returns:
             loss and logs.
         """
-        loss = 0.0
         logs = dict()
         loss, info = self.algo.compute_batch_losses(
             self.model, batch, num_bootstrap=self.mb_size
         )
         logs.update(
             {
-                self.model.name + f"/{k}": v.item() if hasattr(v, "item") else v
+                self.model.name + f"/{k}": v if hasattr(v, "item") else v  # type: ignore
                 for k, v in info.items()
             }
         )
-        logs.update({"total_loss": loss.item()})
+        logs.update({"total_loss": loss.item()})  # type: ignore
 
         # logs for step
         _logs = {f"train/{k}": v for k, v in logs.items()}
@@ -175,7 +172,7 @@ class GFlowNetModule(pl.LightningModule):
         loss, info = self.algo.compute_batch_losses(
             self.model, batch, num_bootstrap=batch.num_offline
         )
-        logs.update({k: v.item() if hasattr(v, "item") else v for k, v in info.items()})
+        logs.update({k: v if hasattr(v, "item") else v for k, v in info.items()})
         logs.update({"total_loss": loss})
 
         self.log_dict(
@@ -203,7 +200,7 @@ class GFlowNetModule(pl.LightningModule):
         loss, info = self.algo.compute_batch_losses(
             self.model, batch, num_bootstrap=batch.num_offline
         )
-        logs.update({k: v.item() if hasattr(v, "item") else v for k, v in info.items()})
+        logs.update({k: v if hasattr(v, "item") else v for k, v in info.items()})
         logs.update({"total_loss": loss})
 
         self.log_dict(
@@ -266,7 +263,7 @@ class GFlowNetModule(pl.LightningModule):
             an optimizer, currently only Adam is supported.
         """
         # Separate Z parameters from non-Z to allow for LR decay on the former
-        Z_params = list(self.model.logZ.parameters())
+        Z_params = list(self.model.logZ.parameters())  # type: ignore
         non_Z_params = [
             i for i in self.model.parameters() if all(id(i) != id(j) for j in Z_params)
         ]

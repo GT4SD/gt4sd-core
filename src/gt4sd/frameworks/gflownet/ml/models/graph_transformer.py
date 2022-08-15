@@ -105,7 +105,7 @@ class GraphTransformer(nn.Module):
 
 
 class GraphTransformerGFN(nn.Module):
-    def __init__(self, env_ctx, num_emb=64, num_layers=3, num_heads=2):
+    def __init__(self, configuration, env_ctx, num_emb=64, num_layers=3, num_heads=2):
         super().__init__()
         self.name = "graph_transformer_gfn"
         self.transf = GraphTransformer(
