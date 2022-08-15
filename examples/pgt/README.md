@@ -1,4 +1,4 @@
-# PGT: 
+# PGT
 
 A simple example to train the PGT model
 
@@ -8,7 +8,7 @@ Make sure to activate the conda environment:
 conda activate gt4sd
 ```
 
-To launch a training with the same parameters as the PGT paper execute the following command from the GT4SD root. A dummy `patent_dataset.jsonl` is provided to check the needed input format. Replace it with an actual dataset for a valid training.
+To launch a training execute the following command from the GT4SD root. A dummy `patent_dataset.jsonl` is provided to check the needed input format. Replace it with an actual dataset for a valid training.
 
 ```console
 
