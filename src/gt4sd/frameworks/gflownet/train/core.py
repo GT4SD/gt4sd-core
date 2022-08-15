@@ -127,7 +127,6 @@ def train_gflownet(
         "logs", name=getattr(arguments, "basename", "default")
     )
     checkpoint_callback = ModelCheckpoint(
-        every_n_val_epochs=getattr(arguments, "checkpoint_every_n_val_epochs", 5),
         save_top_k=-1,
     )
     trainer = pl.Trainer.from_argparse_args(
@@ -138,11 +137,10 @@ def train_gflownet(
         log_every_n_steps=getattr(arguments, "trainer_log_every_n_steps", 50),
         callbacks=[checkpoint_callback],
         max_epochs=getattr(arguments, "epoch", 10),
-        flush_logs_every_n_steps=getattr(
-            arguments, "trainer_flush_logs_every_n_steps", 100
-        ),
+        check_val_every_n_epoch=getattr(arguments, "checkpoint_every_n_val_epochs", 5),
         fast_dev_run=getattr(arguments, "development", False),
-        accelerator=getattr(arguments, "distributed_training_strategy", "ddp"),
+        accelerator=getattr(arguments, "device", "auto"),
+        strategy=getattr(arguments, "distributed_training_strategy", "ddp"),
     )
     trainer.fit(module, dm)
 
