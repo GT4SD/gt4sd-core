@@ -25,7 +25,6 @@ from argparse import Namespace
 from typing import Any, Dict
 
 import pytorch_lightning as pl
-from gt4sd.frameworks.gflownet.tests.qm9 import QM9Dataset, QM9GapTask  # type: ignore
 
 from gt4sd.frameworks.gflownet.arg_parser.parser import parse_arguments_from_config
 from gt4sd.frameworks.gflownet.dataloader.data_module import GFlowNetDataModule
@@ -34,12 +33,13 @@ from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContex
 from gt4sd.frameworks.gflownet.loss import ALGORITHM_FACTORY
 from gt4sd.frameworks.gflownet.ml.models import MODEL_FACTORY
 from gt4sd.frameworks.gflownet.ml.module import GFlowNetModule
+from gt4sd.frameworks.gflownet.tests.qm9 import QM9Dataset, QM9GapTask
 
 
 def test_gfn(configuration):
     """test basic GFN training on QM9."""
 
-    dataset = QM9Dataset(configuration["dataset_path"], train=True, target="gap")
+    dataset = QM9Dataset(configuration["dataset_path"], target="gap")
     environment = GraphBuildingEnv()
     context = MolBuildingEnvContext(["H", "C", "N", "F", "O"], num_cond_dim=32)
 
