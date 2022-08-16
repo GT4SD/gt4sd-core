@@ -25,15 +25,15 @@ from argparse import Namespace
 from typing import Any, Dict
 
 import pytorch_lightning as pl
-from qm9 import QM9Dataset, QM9GapTask  # type: ignore
+from gt4sd.frameworks.gflownet.tests.qm9 import QM9Dataset, QM9GapTask  # type: ignore
 
-from ..arg_parser.parser import parse_arguments_from_config
-from ..dataloader.data_module import GFlowNetDataModule
-from ..envs.graph_building_env import GraphBuildingEnv
-from ..envs.mol_building_env import MolBuildingEnvContext
-from ..loss import ALGORITHM_FACTORY
-from ..ml.models import MODEL_FACTORY
-from ..ml.module import GFlowNetModule
+from gt4sd.frameworks.gflownet.arg_parser.parser import parse_arguments_from_config
+from gt4sd.frameworks.gflownet.dataloader.data_module import GFlowNetDataModule
+from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
+from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
+from gt4sd.frameworks.gflownet.loss import ALGORITHM_FACTORY
+from gt4sd.frameworks.gflownet.ml.models import MODEL_FACTORY
+from gt4sd.frameworks.gflownet.ml.module import GFlowNetModule
 
 
 def test_gfn(configuration):
