@@ -114,8 +114,13 @@ class GFlowNetModule(pl.LightningModule):
         self.clip_grad_param = self.hps["clip_grad_param"]
         self.sampling_tau = self.hps["sampling_tau"]
 
-    def training_step(
-        self, batch: gd.Batch, optimizer_idx: int, batch_idx: int
+    def training_step(  # type:ignore
+        self,
+        batch: gd.Batch,
+        batch_idx: int,
+        optimizer_idx: int,
+        *args: Any,
+        **kwargs: Any,
     ) -> Dict[str, Any]:
         """Training step implementation.
 
@@ -158,7 +163,9 @@ class GFlowNetModule(pl.LightningModule):
             for a, b in zip(self.model.parameters(), self.sampling_model.parameters()):
                 b.data.mul_(self.sampling_tau).add_(a.data * (1 - self.sampling_tau))
 
-    def validation_step(self, batch: gd.Batch, batch_idx: int) -> Dict[str, Any]:
+    def validation_step(  # type:ignore
+        self, batch: gd.Batch, batch_idx: int, *args: Any, **kwargs: Any
+    ) -> Dict[str, Any]:
         """Validation step implementation.
 
         Args:
@@ -184,7 +191,7 @@ class GFlowNetModule(pl.LightningModule):
         return {"loss": loss, "logs": logs}
 
     def test_step(  # type:ignore
-        self, batch: Any, batch_idx: int, *args, **kwargs
+        self, batch: Any, batch_idx: int
     ) -> Dict[str, Any]:
         """Testing step implementation.
 
@@ -211,7 +218,7 @@ class GFlowNetModule(pl.LightningModule):
         )
         return {"loss": loss, "logs": logs}
 
-    def prediction_step(self, batch):
+    def prediction_step(self, batch) -> Dict[str, Any]:
         """Inference step implementation."""
         pass
 

@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 import logging
-from typing import Generator
+from typing import Generator, Union
 
 import numpy as np
 import torch
@@ -31,7 +31,7 @@ from torch.utils.data import IterableDataset
 
 from ..dataloader.dataset import GFlowNetDataset, GFlowNetTask
 from ..envs.graph_building_env import GraphBuildingEnvContext
-from ..loss.trajectory_balance import TrajectoryBalance
+from ..loss.trajectory_balance import TrajectoryBalance, TrajectoryBalanceModel
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -48,7 +48,7 @@ class SamplingIterator(IterableDataset):
     def __init__(
         self,
         dataset: GFlowNetDataset,
-        model: nn.Module,
+        model: Union[nn.Module, TrajectoryBalanceModel],
         batch_size: int,
         ctx: GraphBuildingEnvContext,
         algo: TrajectoryBalance,

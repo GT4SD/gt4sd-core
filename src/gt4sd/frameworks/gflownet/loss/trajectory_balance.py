@@ -23,7 +23,7 @@
 #
 import copy
 from itertools import count
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 import torch
@@ -123,7 +123,7 @@ class TrajectoryBalance:
             actions[i] = (which, row, col)
 
     def create_training_data_from_own_samples(
-        self, model: TrajectoryBalanceModel, n: int, cond_info: Tensor
+        self, model: Union[nn.Module, TrajectoryBalanceModel], n: int, cond_info: Tensor
     ) -> List[Dict]:
         """Generate trajectories by sampling a model.
 
@@ -149,7 +149,8 @@ class TrajectoryBalance:
         env = self.env
         dev = self.ctx.device
         cond_info = cond_info.to(dev)
-        logZ_pred = model.logZ(cond_info)
+        # TODO: how do we compute logZ?
+        logZ_pred = model.logZ(cond_info)  # type: ignore
 
         # This will be returned as training data
         data: List[Dict] = []

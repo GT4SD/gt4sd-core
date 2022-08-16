@@ -104,9 +104,10 @@ class GFlowNetDataModule(pl.LightningDataModule):
     def prepare_data(self) -> None:
         """Prepare training and test dataset."""
         self.train_dataset = self.dataset
+        self.val_dataset = self.dataset
         self.test_dataset = self.dataset
 
-    def setup(self, stage: Optional[str]) -> None:
+    def setup(self, stage: Optional[str]) -> None:  # type:ignore
         """Setup the data module.
         Args:
             stage: stage considered, unused. Defaults to None.
@@ -117,12 +118,18 @@ class GFlowNetDataModule(pl.LightningDataModule):
         self.rng.shuffle(ixs)
 
         # TODO: use Subset?
-        self.ix_train = ixs[: int(np.floor(self.ratio * ll))]
-        self.ix_test = ixs[int(np.floor(self.ratio * ll)) :]
+        thresh = int(np.floor(self.ratio * ll))
+
+        self.ix_train = ixs[: int(0.9 * thresh)]
+        self.ix_val = ixs[int(0.9 * thresh) : thresh]
+        self.ix_test = ixs[thresh:]
 
         if stage == "fit" or stage is None:
             self.train_dataset.set_indexes(self.ix_train)
+            self.val_dataset.set_indexes(self.ix_val)
         if stage == "test" or stage is None:
+            self.test_dataset.set_indexes(self.ix_test)
+        if stage == "predict" or stage is None:
             self.test_dataset.set_indexes(self.ix_test)
 
         logger.info(
@@ -133,30 +140,6 @@ class GFlowNetDataModule(pl.LightningDataModule):
             f"testing proportion: {len(self.test_dataset) / (len(self.test_dataset) + len(self.train_dataset))}"
         )
 
-    # @staticmethod
-    # def get_stratified_batch_sampler(
-    #     stratified_batch_file: str,
-    #     stratified_value_name: str,
-    #     batch_size: int,
-    #     selector_fn: Callable[[pd.DataFrame], pd.DataFrame],
-    # ) -> StratifiedSampler:
-    #     """Get stratified batch sampler.
-
-    #     Args:
-    #         stratified_batch_file: stratified batch file for sampling.
-    #         stratified_value_name: stratified value name.
-    #         batch_size: batch size.
-    #         selector_fn: selector function for stratified sampling.
-    #     Returns:
-    #         a stratified batch sampler.
-    #     """
-    #     stratified_batch_dataframe = pd.read_csv(stratified_batch_file)
-    #     stratified_data = stratified_batch_dataframe[
-    #         selector_fn(stratified_batch_dataframe)
-    #     ][stratified_value_name].values
-    #     stratified_data_tensor = torch.from_numpy(stratified_data)
-    #     return StratifiedSampler(targets=stratified_data_tensor, batch_size=batch_size)
-
     def train_dataloader(self) -> DataLoader:
         """Get a training data loader.
 
@@ -164,7 +147,6 @@ class GFlowNetDataModule(pl.LightningDataModule):
             a training data loader.
         """
         if self.sampling_iterator:
-            # model, dev = self._wrap_model_mp(self.model)
             iterator = SamplingIterator(
                 self.train_dataset,
                 self.model,
@@ -190,9 +172,8 @@ class GFlowNetDataModule(pl.LightningDataModule):
             a validation data loader.
         """
         if self.sampling_iterator:
-            # model, dev = self._wrap_model_mp(self.model)
             iterator = SamplingIterator(
-                self.test_dataset,  # TODO: add validation set
+                self.val_dataset,
                 self.model,
                 self.mb_size,
                 self.ctx,
@@ -203,7 +184,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
                 stream=False,
             )
         else:
-            iterator = self.test_dataset  # type: ignore
+            iterator = self.val_dataset  # type: ignore
         return DataLoader(
             iterator,
             batch_size=None,
@@ -212,6 +193,19 @@ class GFlowNetDataModule(pl.LightningDataModule):
         )
 
     def test_dataloader(self) -> DataLoader:
+        """Get a testing data loader.
+
+        Returns:
+            a testing data loader.
+        """
+        return DataLoader(
+            self.test_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            pin_memory=False,
+        )
+
+    def predict_dataloader(self) -> DataLoader:
         """Get a testing data loader.
 
         Returns:

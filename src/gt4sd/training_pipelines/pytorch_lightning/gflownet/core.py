@@ -26,7 +26,7 @@
 import json
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Type
 
 import sentencepiece as _sentencepiece
 from pytorch_lightning import LightningDataModule, LightningModule
@@ -56,15 +56,15 @@ logger.addHandler(logging.NullHandler())
 class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
     """gflownet training pipelines."""
 
-    def get_data_and_model_modules(
+    # TODO: compatible signature with Pytorch Lightning training pipelines
+    def get_data_and_model_modules(  # type: ignore
         self,
         model_args: Dict[str, Any],
         dataset_args: Dict[str, Any],
-        configuration: Dict[str, Any],
         dataset: GFlowNetDataset,
         environment: GraphBuildingEnv,
         context: GraphBuildingEnvContext,
-        _task: GFlowNetTask,
+        _task: Type[GFlowNetTask],
     ) -> Tuple[LightningDataModule, LightningModule]:
         """Get data and model modules for training.
 

@@ -25,7 +25,7 @@
 
 import logging
 from argparse import Namespace
-from typing import Any, Callable, Dict
+from typing import Any, Dict, Type
 
 import sentencepiece as _sentencepiece
 import numpy as np
@@ -59,7 +59,7 @@ def train_gflownet(
     dataset: GFlowNetDataset,
     environment: GraphBuildingEnv,
     context: GraphBuildingEnvContext,
-    _task: Callable,
+    _task: Type[GFlowNetTask],
 ) -> None:
     """Train a gflownet given a configuration and lightning modules.
     dataset, enviroment, context and task are optional. The defaults are small molecules compatible.
@@ -150,7 +150,7 @@ def train_gflownet_main(
     dataset: GFlowNetDataset,
     environment: GraphBuildingEnv,
     context: GraphBuildingEnvContext,
-    _task: Callable[[], GFlowNetTask],
+    _task: Type[GFlowNetTask],
 ) -> None:
     """Train a gflownet module parsing arguments from config and standard input."""
 
