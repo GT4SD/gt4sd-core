@@ -90,7 +90,10 @@ def thermometer(v: Tensor, n_bins=50, vmin=0, vmax=1) -> Tensor:
 
 # define task
 class QM9GapTask(GFlowNetTask):
-    """Define task for QM9 dataset."""
+    """Define task for QM9 dataset.
+    
+    Code adapted from: https://github.com/recursionpharma/gflownet/blob/trunk/src/gflownet/tasks/qm9/qm9.py.
+    """
 
     def __init__(
         self,  # this is set to self.model

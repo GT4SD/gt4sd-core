@@ -42,6 +42,8 @@ from ..envs.graph_building_env import (
 class MolBuildingEnvContext(GraphBuildingEnvContext):
     """A specification of what is being generated for a GraphBuildingEnv.
     This context specifies how to create molecules atom-by-atom (and attribute-by-attribute).
+
+    Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/envs
     """
 
     def __init__(

@@ -128,6 +128,8 @@ class GraphBuildingEnv:
         - an agent gets to do an extra action to set that attribute, but only
         if it is still default-valued (DAG property preserved)
         - we can generate a legal action for any attribute that isn't a default one.
+
+    Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/envs
     """
 
     def __init__(

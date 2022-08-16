@@ -38,6 +38,8 @@ def mlp(n_in, n_hid, n_out, n_layer, act=nn.LeakyReLU):
 
 
 class GraphTransformer(nn.Module):
+    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/models.
+    """
     def __init__(self, x_dim, e_dim, g_dim, num_emb=64, num_layers=3, num_heads=2):
         super().__init__()
         self.num_layers = num_layers

@@ -56,6 +56,8 @@ class TrajectoryBalance:
     "Trajectory Balance: Improved Credit Assignment in GFlowNets Nikolay Malkin, Moksh Jain,
     Emmanuel Bengio, Chen Sun, Yoshua Bengio"
     https://arxiv.org/abs/2201.13259.
+
+    Code adapted from: https://github.com/recursionpharma/gflownet/blob/trunk/src/gflownet/algo/trajectory_balance.py.
     """
 
     def __init__(

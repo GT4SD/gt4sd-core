@@ -43,6 +43,8 @@ class SamplingIterator(IterableDataset):
     graphs from training the model, we can do the former in different
     processes, which is much faster since much of graph construction
     is CPU-bound. This sampler can handle offline and online data.
+
+    Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data.
     """
 
     def __init__(

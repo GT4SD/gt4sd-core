@@ -1,8 +1,8 @@
 ## Training GFlowNets on QM9
 
-Here we adapt one of the experiments proposed in [`Trajectory Balance: Improved Credit Assignment in GFlowNets`](https://arxiv.org/abs/2201.13259) - Nikolay Malkin, Moksh Jain, Emmanuel Bengio, Chen Sun, Yoshua Bengio.  
+In this example we show how to use the GT4SD library to perform the molecular genration experiment proposed in [`Trajectory Balance: Improved Credit Assignment in GFlowNets`](https://arxiv.org/abs/2201.13259).
 
-The code is based on https://github.com/recursionpharma/gflownet.  
+The code is adapted from: https://github.com/recursionpharma/gflownet.  
 
 
 ```bibtex

@@ -65,6 +65,8 @@ class MXMNetConfig(object):
 
 
 class MXMNet(nn.Module):
+    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/models.
+    """
     def __init__(self, config: MXMNetConfig, num_spherical=7, num_radial=6, envelope_exponent=5):
         super(MXMNet, self).__init__()
 

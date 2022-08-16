@@ -7,7 +7,10 @@
 
 ## Overview
 
-This notebook shows the basic usage of the GFN framework in GT4SD on a generic task. We provide an example of how to setup GFN to train on QM9 in `examples/gflownet/main_qm9.py`
+This notebook shows the basic usage of the GFlowNetwork (GFN) framework on a generic task. 
+We provide an example of how to setup GFN to train on QM9 in `examples/gflownet/main_qm9.py`.
+The implementation is adapted from: https://github.com/recursionpharma/gflownet.
+
 The user has to define (at least) 2 main components:
 
 * a *dataset* compatible with `GFlowNetDataset` (see `gt4sd/frameworks/gflownet/tests/qm9.py`)

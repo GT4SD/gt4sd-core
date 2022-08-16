@@ -49,6 +49,8 @@ RewardScalar = NewType("RewardScalar", torch.tensor)  # type: ignore
 
 
 class GFlowNetTask:
+    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/tasks.
+    """
     def __init__(
         self,
         configuration: Dict[str, Any],
@@ -134,6 +136,8 @@ class GFlowNetTask:
 
 
 class GFlowNetDataset(Dataset):
+    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data.
+    """
     def __init__(
         self,
         h5_file: str = None,
@@ -269,7 +273,7 @@ class GFlowNetDataset(Dataset):
 
     def _read_xyz(self, path: str):
         """Reads the xyz files in the directory on 'path'.
-        Code adapted from # https://www.kaggle.com/code/rmonge/predicting-molecule-properties-based-on-its-smiles/notebook
+        Code adapted from: https://www.kaggle.com/code/rmonge/predicting-molecule-properties-based-on-its-smiles/notebook
 
             Args:
                 path: the path to the folder to be read.
