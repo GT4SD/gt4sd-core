@@ -49,8 +49,8 @@ RewardScalar = NewType("RewardScalar", torch.tensor)  # type: ignore
 
 
 class GFlowNetTask:
-    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/tasks.
-    """
+    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/tasks."""
+
     def __init__(
         self,
         configuration: Dict[str, Any],
@@ -136,8 +136,8 @@ class GFlowNetTask:
 
 
 class GFlowNetDataset(Dataset):
-    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data.
-    """
+    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data."""
+
     def __init__(
         self,
         h5_file: str = None,

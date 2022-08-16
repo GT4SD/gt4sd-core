@@ -22,6 +22,7 @@
 # SOFTWARE.
 #
 
+
 class TDLoss:
     """Temporal Difference implementation, see
     "Flow Network based Generative Models for Non-Iterative Diverse Candidate Generation
@@ -31,7 +32,9 @@ class TDLoss:
     Code adapted from: https://github.com/GFNOrg/gflownet
     """
 
-    def __init__(self,):
+    def __init__(
+        self,
+    ):
         """
         Args:
         """
