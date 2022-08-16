@@ -51,7 +51,8 @@ from guacamol.utils.descriptors import (
     qed,
     tpsa,
 )
-from properties import PROPERTY_PREDICTOR_FACTORY
+
+from ...properties import PROPERTY_PREDICTOR_FACTORY
 
 MODIFIERS: Dict[str, Callable[..., Any]] = {
     "gaussian_modifier": GaussianModifier,
@@ -112,7 +113,7 @@ class DistanceScorer(ScoringFunction):
 
 class TargetValueScorer(DistanceScorer):
     def __init__(self, target: float, scoring_function: Callable[[str], float]) -> None:
-        """Scoring function which is used to generate a socre based on a taget and a scroing function.
+        """Scoring function which is used to generate a score based on a taget and a scoring function.
 
         Args:
             target: target score that will be used to get the distance to the score of the SMILES
@@ -353,6 +354,44 @@ class QEDScorer(TargetValueScorer):
         return Chem.QED.qed(Chem.MolFromSmiles(smiles))
 
 
+class PropertyPredictorScorer(TargetValueScorer):
+    def __init__(
+        self, name: str, target: Union[float, int], parameters: Dict[str, Any] = {}
+    ) -> None:
+        """Scoring function that calculates a generic score for a property
+
+        Args:
+            name: name of the property to score.
+            target: target score that will be used to get the distance to the score of the SMILES
+        """
+        property_class, parameters_class = PROPERTY_PREDICTOR_FACTORY[name]
+        
+        self.scoring_function = property_class(parameters_class(**parameters))
+        self.target = target
+        super().__init__(target=target, scoring_function=self.score)
+
+    def score(self, smiles: str) -> Union[float, int, bool]:
+        """Generates a score for a given SMILES.
+
+        Args:
+            smiles: SMILES.
+
+        Returns:
+            A score for the given SMILES
+        """
+        return self.scoring_function(smiles)
+
+
+SCORING_FUNCTIONS = {
+    "rdkit_scorer": RDKitDescriptorScorer,
+    "tanimoto_scorer": TanimotoScorer,
+    "isomer_scorer": IsomerScorer,
+    "smarts_scorer": SMARTSScorer,
+    "qed_scorer": QEDScorer,
+    "property_scorer": PropertyPredictorScorer,
+}
+
+
 def get_target_parameters(
     target: Union[str, Dict[str, Any]]
 ) -> Tuple[List[Type[Any]], List[float]]:
@@ -382,39 +421,3 @@ def get_target_parameters(
         score_list.append(SCORING_FUNCTIONS[scoring_function_name](**parameters))
         weights.append(weight)
     return (score_list, weights)
-
-
-SCORING_FUNCTIONS = {
-    "rdkit_scorer": RDKitDescriptorScorer,
-    "tanimoto_scorer": TanimotoScorer,
-    "isomer_scorer": IsomerScorer,
-    "smarts_scorer": SMARTSScorer,
-    "qed_scorer": QEDScorer,
-}
-
-
-class PropertyPredictionScorer(TargetValueScorer):
-    def __init__(
-        self, name: str, target: Union[float, int], parameters: Dict[str, Any] = {}
-    ) -> None:
-        """Scoring function that calculates a generic score for a property
-
-        Args:
-            name: name of the property to score.
-            target: target score that will be used to get the distance to the score of the SMILES
-        """
-        property_class, parameters_class = PROPERTY_PREDICTOR_FACTORY[name]
-        self.predictor = property_class(parameters_class(**parameters))
-        self.target = target
-        super().__init__(target=target, scoring_function=self.score)
-
-    def score(self, smiles: str) -> Union[float, int, bool]:
-        """Generates a score for a given SMILES.
-
-        Args:
-            smiles: SMILES.
-
-        Returns:
-            A score for the given SMILES
-        """
-        return self.predictor(smiles)
