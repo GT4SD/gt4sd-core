@@ -40,7 +40,9 @@ def mlp(n_in, n_hid, n_out, n_layer, act=nn.LeakyReLU):
 class GraphTransformer(nn.Module):
     """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/models."""
 
-    def __init__(self, x_dim, e_dim, g_dim, num_emb=64, num_layers=3, num_heads=2):
+    def __init__(
+        self, configuration, x_dim, e_dim, g_dim, num_emb=64, num_layers=3, num_heads=2
+    ):
         super().__init__()
         self.num_layers = num_layers
         self.name = "graph_transformer"
@@ -111,6 +113,7 @@ class GraphTransformerGFN(nn.Module):
         super().__init__()
         self.name = "graph_transformer_gfn"
         self.transf = GraphTransformer(
+            configuration=configuration,
             x_dim=env_ctx.num_node_dim,
             e_dim=env_ctx.num_edge_dim,
             g_dim=env_ctx.num_cond_dim,

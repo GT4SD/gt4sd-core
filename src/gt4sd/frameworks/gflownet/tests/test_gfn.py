@@ -24,6 +24,7 @@
 from argparse import Namespace
 from typing import Any, Dict
 
+import pytest
 import pytorch_lightning as pl
 
 from gt4sd.frameworks.gflownet.arg_parser.parser import parse_arguments_from_config
@@ -35,13 +36,69 @@ from gt4sd.frameworks.gflownet.ml.models import MODEL_FACTORY
 from gt4sd.frameworks.gflownet.ml.module import GFlowNetModule
 from gt4sd.frameworks.gflownet.tests.qm9 import QM9Dataset, QM9GapTask
 
+configuration: Dict[str, Any] = {
+    "dataset": "qm9",
+    "dataset_path": "/GFN/qm9.h5",
+    "device": "cpu",
+}
 
+configuration.update(
+    {
+        "bootstrap_own_reward": False,
+        "learning_rate": 1e-4,
+        "global_batch_size": 16,
+        "num_emb": 128,
+        "num_layers": 4,
+        "tb_epsilon": None,
+        "illegal_action_logreward": -50,
+        "reward_loss_multiplier": 1,
+        "temperature_sample_dist": "uniform",
+        "temperature_dist_params": "(.5, 32)",
+        "weight_decay": 1e-8,
+        "num_data_loader_workers": 8,
+        "momentum": 0.9,
+        "adam_eps": 1e-8,
+        "lr_decay": 20000,
+        "Z_lr_decay": 20000,
+        "clip_grad_type": "norm",
+        "clip_grad_param": 10,
+        "random_action_prob": 0.001,
+        "sampling_tau": 0.0,
+        "max_nodes": 9,
+        "num_offline": 10,
+        "sampling_iterator": True,
+        "ratio": 0.9,
+        "development": True,
+    }
+)
+configuration.update(vars(parse_arguments_from_config()))
+
+
+@pytest.mark.parametrize("model_name", ["graph_transformer", "graph_transformer_gfn"])
+def test_gfn_model(model_name):
+    context = MolBuildingEnvContext()
+    model = MODEL_FACTORY[model_name](
+        configuration,
+        context,
+    )
+    assert isinstance(model, MODEL_FACTORY[model_name])
+
+
+def test_gfn_env():
+    environment = GraphBuildingEnv()
+    context = MolBuildingEnvContext()
+
+    assert isinstance(environment, GraphBuildingEnv)
+    assert isinstance(context, MolBuildingEnvContext)
+
+
+@pytest.mark.skip(reason="we need to add support for dataset buckets")
 def test_gfn(configuration):
     """test basic GFN training on QM9."""
 
     dataset = QM9Dataset(configuration["dataset_path"], target="gap")
     environment = GraphBuildingEnv()
-    context = MolBuildingEnvContext(["H", "C", "N", "F", "O"], num_cond_dim=32)
+    context = MolBuildingEnvContext()
 
     algorithm = ALGORITHM_FACTORY[getattr(configuration, "algorithm")](
         configuration,
@@ -90,43 +147,3 @@ def test_gfn(configuration):
         accelerator="cpu",
     )
     trainer.fit(module, dm)
-
-
-if __name__ == "__main__":
-
-    def default_hps() -> Dict[str, Any]:
-        return {
-            "bootstrap_own_reward": False,
-            "learning_rate": 1e-4,
-            "global_batch_size": 16,
-            "num_emb": 128,
-            "num_layers": 4,
-            "tb_epsilon": None,
-            "illegal_action_logreward": -50,
-            "reward_loss_multiplier": 1,
-            "temperature_sample_dist": "uniform",
-            "temperature_dist_params": "(.5, 32)",
-            "weight_decay": 1e-8,
-            "num_data_loader_workers": 8,
-            "momentum": 0.9,
-            "adam_eps": 1e-8,
-            "lr_decay": 20000,
-            "Z_lr_decay": 20000,
-            "clip_grad_type": "norm",
-            "clip_grad_param": 10,
-            "random_action_prob": 0.001,
-            "sampling_tau": 0.0,
-            "max_nodes": 9,
-            "num_offline": 10,
-            "sampling_iterator": True,
-            "ratio": 0.9,
-            "development": True,
-        }
-
-    hps = {"dataset": "qm9", "dataset_path": "/GFN/qm9.h5", "device": "cpu"}
-    # add default configuration
-    hps.update(default_hps())
-    # add user configuration
-    hps.update(vars(parse_arguments_from_config()))
-
-    test_gfn(hps)
