@@ -99,7 +99,7 @@ artifact_model_data = {
     },
 }
 
-distance = 0.0
+_score = 1.0
 
 
 def select_sample(property_key):
@@ -107,27 +107,23 @@ def select_sample(property_key):
     return protein if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY else molecule
 
 
-@pytest.mark.parametrize(
-    "property_key", [(property_key) for property_key in ground_truths.keys()]
-)
 def test_property_scorer(property_key):
-    property_predictor_scorer = SCORING_FUNCTIONS["property_predictor_scorer"] 
+    property_predictor_scorer = SCORING_FUNCTIONS["property_predictor_scorer"]
     scorer = property_predictor_scorer(
         name=property_key, target=ground_truths[property_key]
     )
     sample = select_sample(property_key)
-    print(scorer(sample), distance, np.isclose(scorer(sample), distance, atol=1e-2) )
-    assert np.isclose(scorer.score(sample), distance, atol=1e-2)  # type: ignore
+    assert np.isclose(scorer.score(sample), _score, atol=1e-2)  # type: ignore
 
 
 def test_similarity_seed_scorer():
-    property_predictor_scorer = SCORING_FUNCTIONS["property_predictor_scorer"] 
+    property_predictor_scorer = SCORING_FUNCTIONS["property_predictor_scorer"]
     scorer = property_predictor_scorer(
         name="similarity_seed",
         target=molecule_further_ground_truths["similarity_seed"],
         parameters={"smiles": seed},
     )
-    assert np.isclose(scorer.score(molecule), distance, atol=1e-2)  # type: ignore
+    assert np.isclose(scorer.score(molecule), _score, atol=1e-2)  # type: ignore
 
 
 def test_activity_against_target_scorer():
@@ -138,7 +134,7 @@ def test_activity_against_target_scorer():
         target=molecule_further_ground_truths["activity_against_target"],
         parameters={"target": _target},
     )
-    assert np.isclose(scorer.score(molecule), distance, atol=1e-2)  # type: ignore
+    assert np.isclose(scorer.score(molecule), _score, atol=1e-2)  # type: ignore
 
 
 def test_charge_with_arguments_scorer():
@@ -148,7 +144,7 @@ def test_charge_with_arguments_scorer():
         target=protein_further_ground_truths["charge"],
         parameters={"amide": True, "ph": 5.0},
     )
-    assert np.isclose(scorer.score(protein), distance, atol=1e-2)  # type: ignore
+    assert np.isclose(scorer.score(protein), _score, atol=1e-2)  # type: ignore
 
 
 @pytest.mark.parametrize(
@@ -166,7 +162,7 @@ def test_artifact_models_scorer(property_key):
     assert all(
         np.isclose(
             scorer.score(sample),
-            distance,  # type: ignore
+            _score,  # type: ignore
             atol=1e-2,
         )
     )  # type: ignore

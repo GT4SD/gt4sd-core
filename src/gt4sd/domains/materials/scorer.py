@@ -366,10 +366,13 @@ class PropertyPredictorScorer(TargetValueScorer):
         """
         self.target = target
         self.name = name
-        self.parameters=parameters
-        super().__init__(target=target, scoring_function=self.score)
+        self.parameters = parameters
+        self.scoring_function = PropertyPredictorRegistry.get_property_predictor(  # type: ignore
+            name=self.name, parameters=self.parameters
+        )
+        super().__init__(target=target, scoring_function=self.scoring_function)
 
-    def score(self, smiles: str) -> Union[float, int, bool]:
+    def predictor(self, smiles: str) -> Union[float, int, bool]:
         """Generates a prediction for a given SMILES.
 
         Args:
@@ -378,9 +381,7 @@ class PropertyPredictorScorer(TargetValueScorer):
         Returns:
             A score for the given SMILES
         """
-        self.scoring_function = PropertyPredictorRegistry.get_property_predictor(  # type: ignore
-            name=self.name, parameters=self.parameters
-        )
+
         return self.scoring_function(smiles)
 
 
