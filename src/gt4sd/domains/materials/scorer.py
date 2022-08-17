@@ -364,13 +364,12 @@ class PropertyPredictorScorer(TargetValueScorer):
             name: name of the property to score.
             target: target score that will be used to get the distance to the score of the SMILES (not be confused with parameters["target"])
         """
-        self.scoring_function = PropertyPredictorRegistry.get_property_predictor(  # type: ignore
-            name=name, parameters=parameters
-        )
         self.target = target
+        self.name = name
+        self.parameters=parameters
         super().__init__(target=target, scoring_function=self.score)
 
-    def predictor(self, smiles: str) -> Union[float, int, bool]:
+    def score(self, smiles: str) -> Union[float, int, bool]:
         """Generates a prediction for a given SMILES.
 
         Args:
@@ -379,6 +378,9 @@ class PropertyPredictorScorer(TargetValueScorer):
         Returns:
             A score for the given SMILES
         """
+        self.scoring_function = PropertyPredictorRegistry.get_property_predictor(  # type: ignore
+            name=self.name, parameters=self.parameters
+        )
         return self.scoring_function(smiles)
 
 
@@ -388,7 +390,7 @@ SCORING_FUNCTIONS = {
     "isomer_scorer": IsomerScorer,
     "smarts_scorer": SMARTSScorer,
     "qed_scorer": QEDScorer,
-    "property_scorer": PropertyPredictorScorer,
+    "property_predictor_scorer": PropertyPredictorScorer,
 }
 
 
