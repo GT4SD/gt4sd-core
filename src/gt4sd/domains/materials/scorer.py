@@ -51,6 +51,7 @@ from guacamol.utils.descriptors import (
     qed,
     tpsa,
 )
+from properties import PROPERTY_PREDICTOR_FACTORY
 
 from ...properties import PropertyPredictorRegistry
 
