@@ -52,7 +52,7 @@ from guacamol.utils.descriptors import (
     tpsa,
 )
 
-from ...properties import PROPERTY_PREDICTOR_FACTORY
+from ...properties import PropertyPredictorRegistry
 
 MODIFIERS: Dict[str, Callable[..., Any]] = {
     "gaussian_modifier": GaussianModifier,
@@ -364,14 +364,12 @@ class PropertyPredictorScorer(TargetValueScorer):
             name: name of the property to score.
             target: target score that will be used to get the distance to the score of the SMILES
         """
-        property_class, parameters_class = PROPERTY_PREDICTOR_FACTORY[name]
-        
-        self.scoring_function = property_class(parameters_class(**parameters))
+        self.scoring_function = PropertyPredictorRegistry.get_property_predictor(name=name, parameters=parameters)
         self.target = target
         super().__init__(target=target, scoring_function=self.score)
 
-    def score(self, smiles: str) -> Union[float, int, bool]:
-        """Generates a score for a given SMILES.
+    def predictor(self, smiles: str) -> Union[float, int, bool]:
+        """Generates a prediction for a given SMILES.
 
         Args:
             smiles: SMILES.

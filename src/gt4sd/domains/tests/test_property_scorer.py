@@ -26,7 +26,7 @@ import numpy as np
 import pytest
 
 from gt4sd.domains.materials.scorer import SCORING_FUNCTIONS
-from gt4sd.properties import MOLECULE_PROPERTY_PREDICTOR_FACTORY, PROTEIN_PROPERTY_PREDICTOR_FACTORY
+from gt4sd.properties import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 
 protein = "KFLIYQMECSTMIFGL"
 molecule = "C1=CC(=CC(=C1)Br)CN"
@@ -100,37 +100,39 @@ artifact_model_data = {
 }
 
 
+def select_sample(property_key):
+    """select a sample from the protein or molecule factory."""
+    return protein if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY else molecule
+
+
 @pytest.mark.parametrize(
     "property_key", [(property_key) for property_key in ground_truths.keys()]
 )
 def test_property(property_key):
     scorer = SCORING_FUNCTIONS["property_scorer"](name=property_key)
-    sample = protein if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY else molecule
-    assert np.isclose(function(sample), ground_truths[property_key], atol=1e-2)  # type: ignore
+    sample = select_sample(property_key)
+    assert np.isclose(scorer(sample), ground_truths[property_key], atol=1e-2)  # type: ignore
 
 
 def test_similarity_seed():
-    scorer = SCORING_FUNCTIONS["property_scorer"](name="similarity_seed")
-    scorer.score(smiles=seed))  # type: ignore
+    scorer = SCORING_FUNCTIONS["property_scorer"](name="similarity_seed", parameters={"smiles":seed})
     assert np.isclose(
-        function(molecule), molecule_further_ground_truths["similarity_seed"], atol=1e-2  # type: ignore
+        scorer(molecule), molecule_further_ground_truths["similarity_seed"], atol=1e-2  # type: ignore
     )
 
 
 def test_activity_against_target():
-    property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY[
-        "activity_against_target"
-    ]
-    function = property_class(parameters_class(target=target))  # type: ignore
+    scorer = SCORING_FUNCTIONS["property_scorer"](
+        name="activity_against_target", parameters={"target": target}
+    )
     assert np.isclose(
-        function(molecule), molecule_further_ground_truths["activity_against_target"], atol=1e-2  # type: ignore
+        scorer(molecule), molecule_further_ground_truths["activity_against_target"], atol=1e-2  # type: ignore
     )
 
 
 def test_charge_with_arguments():
-    property_class, parameters_class = PROTEIN_PROPERTY_PREDICTOR_FACTORY["charge"]
-    function = property_class(parameters_class(amide=True, ph=5.0))
-    assert np.isclose(function(protein), protein_further_ground_truths["charge"], atol=1e-2)  # type: ignore
+    scorer = SCORING_FUNCTIONS["property_scorer"](name="charge", parameters={"amide": True, "ph": 5.0})
+    assert np.isclose(scorer(protein), protein_further_ground_truths["charge"], atol=1e-2)  # type: ignore
 
 
 @pytest.mark.parametrize(
@@ -138,33 +140,14 @@ def test_charge_with_arguments():
     [(property_key) for property_key in artifact_model_data.keys()],
 )
 def test_artifact_models(property_key):
-    property_class, parameters_class = PROPERTY_PREDICTOR_FACTORY[property_key]
-    function = property_class(
-        parameters_class(**artifact_model_data[property_key]["parameters"])
+    scorer = SCORING_FUNCTIONS["property_scorer"](
+        name=property_key, parameters=artifact_model_data[property_key]["parameters"]
     )
-    sample = protein if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY else molecule
+    sample = select_sample(property_key)
     assert all(
         np.isclose(
-            function(sample),
+            scorer(sample),
             artifact_model_data[property_key]["ground_truth"],  # type: ignore
             atol=1e-2,
         )
     )  # type: ignore
-
-
-def test_property_predictor_registry():
-    predictor = PropertyPredictorRegistry.get_property_predictor(
-        "similarity_seed", {"smiles": seed}
-    )
-    assert isinstance(predictor, SimilaritySeed)
-    assert np.isclose(
-        predictor(molecule), molecule_further_ground_truths["similarity_seed"]  # type: ignore
-    )
-    predictor = PropertyPredictorRegistry.get_property_predictor(
-        "charge", {"amide": "True", "ph": 5.0}
-    )
-    assert isinstance(predictor, Charge)
-    assert np.isclose(predictor(protein), protein_further_ground_truths["charge"])  # type: ignore
-    assert len(PropertyPredictorRegistry.list_available()) == len(
-        PROTEIN_PROPERTY_PREDICTOR_FACTORY
-    ) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY)
