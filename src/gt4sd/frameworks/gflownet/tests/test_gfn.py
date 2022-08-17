@@ -84,9 +84,10 @@ def test_gfn(configuration):
         profiler="simple",
         auto_lr_find=True,
         log_every_n_steps=50,
-        max_epochs=10,
+        max_epochs=1,
         flush_logs_every_n_steps=100,
         fast_dev_run=True,
+        accelerator="cpu",
     )
     trainer.fit(module, dm)
 
@@ -119,7 +120,7 @@ if __name__ == "__main__":
             "num_offline": 10,
             "sampling_iterator": True,
             "ratio": 0.9,
-            "dev": False,
+            "development": True,
         }
 
     hps = {"dataset": "qm9", "dataset_path": "/GFN/qm9.h5", "device": "cpu"}
