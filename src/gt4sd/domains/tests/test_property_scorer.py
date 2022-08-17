@@ -115,7 +115,9 @@ def test_property(property_key):
 
 
 def test_similarity_seed():
-    scorer = SCORING_FUNCTIONS["property_scorer"](name="similarity_seed", parameters={"smiles":seed})
+    scorer = SCORING_FUNCTIONS["property_scorer"](
+        name="similarity_seed", parameters={"smiles": seed}
+    )
     assert np.isclose(
         scorer(molecule), molecule_further_ground_truths["similarity_seed"], atol=1e-2  # type: ignore
     )
@@ -131,7 +133,9 @@ def test_activity_against_target():
 
 
 def test_charge_with_arguments():
-    scorer = SCORING_FUNCTIONS["property_scorer"](name="charge", parameters={"amide": True, "ph": 5.0})
+    scorer = SCORING_FUNCTIONS["property_scorer"](
+        name="charge", parameters={"amide": True, "ph": 5.0}
+    )
     assert np.isclose(scorer(protein), protein_further_ground_truths["charge"], atol=1e-2)  # type: ignore
 
 
