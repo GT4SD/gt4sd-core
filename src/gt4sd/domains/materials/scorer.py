@@ -364,7 +364,7 @@ class PropertyPredictorScorer(TargetValueScorer):
             name: name of the property to score.
             target: target score that will be used to get the distance to the score of the SMILES (not be confused with parameters["target"])
         """
-        self.scoring_function = PropertyPredictorRegistry.get_property_predictor( # type: ignore
+        self.scoring_function = PropertyPredictorRegistry.get_property_predictor(  # type: ignore
             name=name, parameters=parameters
         )
         self.target = target
