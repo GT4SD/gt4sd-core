@@ -40,7 +40,7 @@ configuration = {
     "global_batch_size": 16,
     "num_emb": 128,
     "num_layers": 4,
-    "tb_epsilon": None,
+    "tb_epsilon": 1e-10,
     "illegal_action_logreward": -50,
     "reward_loss_multiplier": 1,
     "temperature_sample_dist": "uniform",
@@ -74,6 +74,14 @@ configuration = {
 }
 
 
+def test_gfn_env():
+    environment = GraphBuildingEnv()
+    context = MolBuildingEnvContext()
+
+    assert isinstance(environment, GraphBuildingEnv)
+    assert isinstance(context, MolBuildingEnvContext)
+
+
 @pytest.mark.parametrize("model_name", ["graph_transformer_gfn"])
 def test_gfn_model(model_name):
     context = MolBuildingEnvContext()
@@ -82,14 +90,6 @@ def test_gfn_model(model_name):
         context,
     )
     assert isinstance(model, MODEL_FACTORY[model_name])
-
-
-def test_gfn_env():
-    environment = GraphBuildingEnv()
-    context = MolBuildingEnvContext()
-
-    assert isinstance(environment, GraphBuildingEnv)
-    assert isinstance(context, MolBuildingEnvContext)
 
 
 @pytest.mark.skip(reason="we need to add support for dataset buckets")
@@ -101,13 +101,13 @@ def test_gfn(configuration):
     context = MolBuildingEnvContext()
 
     algorithm = ALGORITHM_FACTORY[getattr(configuration, "algorithm")](
-        configuration,
-        environment,
-        context,
+        configuration=configuration,
+        environment=environment,
+        context=context,
     )
     model = MODEL_FACTORY[getattr(configuration, "model")](
-        configuration,
-        context,
+        configuration=configuration,
+        context=context,
     )
 
     task = QM9GapTask(

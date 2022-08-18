@@ -26,6 +26,7 @@ import configparser
 from typing import Any, Dict, Optional
 
 import sentencepiece as _sentencepiece
+import numpy as np
 from pytorch_lightning import Trainer
 
 from ..ml.models import MODEL_FACTORY
@@ -139,10 +140,41 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     parser.add_argument("--num_training_steps", type=int, default=1000)
     parser.add_argument("--validate_every", type=int, default=1000)
 
+    parser.add_argument("--seed", type=int, default=142857)
     parser.add_argument("--device", type=str, default="cpu")
+
+    # arguments specific for gflownet
+    parser.add_argument("--bootstrap_own_reward", type=bool, default=False)
+    parser.add_argument("--learning_rate", type=float, default=1e-4)
+    parser.add_argument("--global_batch_size", type=int, default=16)
+    parser.add_argument("--num_emb", type=int, default=128)
+    parser.add_argument("--num_layers", type=int, default=4)
+    parser.add_argument("--tb_epsilon", type=float, default=1e-10)
+    parser.add_argument("--illegal_action_logreward", type=float, default=-50)
+    parser.add_argument("--reward_loss_multiplier", type=float, default=1)
+    parser.add_argument("--temperature_sample_dist", type=str, default="uniform")
+    parser.add_argument("--temperature_dist_params", type=str, default="(.5, 32)")
+    parser.add_argument("--weight_decay", type=float, default=1e-8)
+    parser.add_argument("--num_data_loader_workers", type=float, default=8)
+    parser.add_argument("--momentum", type=float, default=0.9)
+    parser.add_argument("--adam_eps", type=float, default=1e-8)
+    parser.add_argument("--lr_decay", type=int, default=20000)
+    parser.add_argument("--Z_lr_decay", type=int, default=20000)
+    parser.add_argument("--clip_grad_type", type=str, default="norm")
+    parser.add_argument("--clip_grad_param", type=int, default=10)
+    parser.add_argument("--random_action_prob", type=float, default=0.001)
+    parser.add_argument("--sampling_tau", type=float, default=0.0)
+    parser.add_argument("--max_nodes", type=int, default=9)
+    parser.add_argument("--num_offline", type=int, default=10)
+    parser.add_argument("--sampling_iterator", type=bool, default=True)
+    parser.add_argument("--ratio", type=float, default=0.9)
+    parser.add_argument("--distributed_training_strategy", type=str, default="ddp")
+    parser.add_argument("--development", type=bool, default=False)
 
     args_dictionary = vars(parser.parse_args(remaining_argv))
     result.update({k: v for k, v in args_dictionary.items() if v is not None})
+    # add random number generator from seed
+    result["rng"] = np.random.default_rng(result["seed"])
     result_namespace = argparse.Namespace(**result)
 
     return result_namespace

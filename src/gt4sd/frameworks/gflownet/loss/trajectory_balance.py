@@ -52,7 +52,7 @@ class TrajectoryBalanceModel(nn.Module):
 
 
 class TrajectoryBalance:
-    """TB implementation, see
+    """Trajectory Balance implementation, see
     "Trajectory Balance: Improved Credit Assignment in GFlowNets Nikolay Malkin, Moksh Jain,
     Emmanuel Bengio, Chen Sun, Yoshua Bengio"
     https://arxiv.org/abs/2201.13259.
@@ -62,16 +62,16 @@ class TrajectoryBalance:
 
     def __init__(
         self,
-        hps: Dict[str, Any],
-        env: GraphBuildingEnv,
-        ctx: GraphBuildingEnvContext,
+        configuration: Dict[str, Any],
+        environment: GraphBuildingEnv,
+        context: GraphBuildingEnvContext,
         max_len: int = None,
     ):
         """
         Args
-            hps: hyperparameters.
-            env: a graph environment.
-            ctx: a context.
+            configuration: hyperparameters.
+            environment: a graph environment.
+            context: a context.
             rng: rng used to take random actions.
             hps: hyperparameter dictionary, see above for used keys.
                 - random_action_prob: float, probability of taking a uniform random action when sampling.
@@ -82,17 +82,18 @@ class TrajectoryBalance:
             max_len: if not None, ends trajectories of more than max_len steps.
             max_nodes: if not None, ends trajectories of graphs with more than max_nodes steps (illegal action).
         """
-        self.ctx = ctx
-        self.env = env
-        self.rng = hps["rng"]
+        self.ctx = context
+        self.env = environment
+        self.hps = configuration
+        self.rng = self.hps["rng"]
         self.max_len = max_len
-        self.max_nodes = hps["max_nodes"]
-        self.random_action_prob = hps["random_action_prob"]
-        self.illegal_action_logreward = hps["illegal_action_logreward"]
-        self.bootstrap_own_reward = hps["bootstrap_own_reward"]
+        self.max_nodes = self.hps["max_nodes"]
+        self.random_action_prob = self.hps["random_action_prob"]
+        self.illegal_action_logreward = self.hps["illegal_action_logreward"]
+        self.bootstrap_own_reward = self.hps["bootstrap_own_reward"]
         self.sanitize_samples = True
-        self.epsilon = hps["tb_epsilon"]
-        self.reward_loss_multiplier = hps["reward_loss_multiplier"]
+        self.epsilon = self.hps["tb_epsilon"]
+        self.reward_loss_multiplier = self.hps["reward_loss_multiplier"]
         # Experimental flags
         self.reward_loss_is_mae = True
         self.tb_loss_is_mae = False

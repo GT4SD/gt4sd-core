@@ -41,7 +41,15 @@ class GraphTransformer(nn.Module):
     """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/models."""
 
     def __init__(
-        self, configuration, x_dim, e_dim, g_dim, num_emb=64, num_layers=3, num_heads=2
+        self,
+        configuration,
+        context,
+        x_dim=64,
+        e_dim=64,
+        g_dim=64,
+        num_emb=64,
+        num_layers=3,
+        num_heads=2,
     ):
         super().__init__()
         self.num_layers = num_layers
@@ -109,14 +117,15 @@ class GraphTransformer(nn.Module):
 
 
 class GraphTransformerGFN(nn.Module):
-    def __init__(self, configuration, env_ctx, num_emb=64, num_layers=3, num_heads=2):
+    def __init__(self, configuration, context, num_emb=64, num_layers=3, num_heads=2):
         super().__init__()
         self.name = "graph_transformer_gfn"
         self.transf = GraphTransformer(
             configuration=configuration,
-            x_dim=env_ctx.num_node_dim,
-            e_dim=env_ctx.num_edge_dim,
-            g_dim=env_ctx.num_cond_dim,
+            context=context,
+            x_dim=context.num_node_dim,
+            e_dim=context.num_edge_dim,
+            g_dim=context.num_cond_dim,
             num_emb=num_emb,
             num_layers=num_layers,
             num_heads=num_heads,
@@ -125,18 +134,18 @@ class GraphTransformerGFN(nn.Module):
         num_mlp_layers = 0
         self.emb2add_edge = mlp(num_final, num_emb, 1, num_mlp_layers)
         self.emb2add_node = mlp(
-            num_final, num_emb, env_ctx.num_new_node_values, num_mlp_layers
+            num_final, num_emb, context.num_new_node_values, num_mlp_layers
         )
         self.emb2set_node_attr = mlp(
-            num_final, num_emb, env_ctx.num_node_attr_logits, num_mlp_layers
+            num_final, num_emb, context.num_node_attr_logits, num_mlp_layers
         )
         self.emb2set_edge_attr = mlp(
-            num_final, num_emb, env_ctx.num_edge_attr_logits, num_mlp_layers
+            num_final, num_emb, context.num_edge_attr_logits, num_mlp_layers
         )
         self.emb2stop = mlp(num_emb * 3, num_emb, 1, num_mlp_layers)
         self.emb2reward = mlp(num_emb * 3, num_emb, 1, num_mlp_layers)
-        self.logZ = mlp(env_ctx.num_cond_dim, num_emb * 2, 1, 2)
-        self.action_type_order = env_ctx.action_type_order
+        self.logZ = mlp(context.num_cond_dim, num_emb * 2, 1, 2)
+        self.action_type_order = context.action_type_order
 
     def forward(self, g: gd.Batch, cond: torch.Tensor):
         node_embeddings, graph_embeddings = self.transf(g, cond)

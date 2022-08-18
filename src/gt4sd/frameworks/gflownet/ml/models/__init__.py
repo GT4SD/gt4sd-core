@@ -24,10 +24,8 @@
 from typing import Any, Dict
 
 from ..models.graph_transformer import GraphTransformer, GraphTransformerGFN
-from ..models.mxmnet import MXMNet
 
 MODEL_FACTORY: Dict[str, Any] = {
     "graph_transformer": GraphTransformer,
     "graph_transformer_gfn": GraphTransformerGFN,
-    "mxmnet": MXMNet,
 }

@@ -25,10 +25,9 @@
 
 import logging
 from argparse import Namespace
-from typing import Any, Dict, Type
+from typing import Any, Dict
 
 import sentencepiece as _sentencepiece
-import numpy as np
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -59,47 +58,29 @@ def train_gflownet(
     dataset: GFlowNetDataset,
     environment: GraphBuildingEnv,
     context: GraphBuildingEnvContext,
-    _task: Type[GFlowNetTask],
+    task: GFlowNetTask,
 ) -> None:
-    """Train a gflownet given a configuration and lightning modules.
-    dataset, enviroment, context and task are optional. The defaults are small molecules compatible.
+    """Train a gflownet given a configuration, a dataset and a task.
+    The default enviroment and context are compatible with small molecules.
 
     Args:
         configuration: a configuration dictionary.
         dataset: a dataset compatible with lightning.
-        environment: an environment compatible with lightning.
-        context: an environment context compatible with lightning.
-        task: a task compatible with lightning.
+        environment: an environment specifying the state space.
+        context: an environment context specifying how to combine states.
+        task: a task specifying the reward structure.
     """
 
     arguments = Namespace(**configuration)
 
-    # if not dataset:
-    #     dataset = build_dataset(
-    #         dataset=getattr(arguments, "dataset"),
-    #         configuration=configuration,
-    #     )
-    # if not (environment or context):
-    #     environment, context = build_env_context(
-    #         environment_name=getattr(arguments, "environment"),
-    #         context_name=getattr(arguments, "context"),
-    #     )
-    # if not task:
-    #     task = build_task(task=getattr(arguments, "task"))
-
     algorithm = ALGORITHM_FACTORY[getattr(arguments, "algorithm")](
-        configuration,
-        environment,
-        context,
+        configuration=configuration,
+        environment=environment,
+        context=context,
     )
     model = MODEL_FACTORY[getattr(arguments, "model")](
-        configuration,
-        context,
-    )
-
-    task = _task(
         configuration=configuration,
-        dataset=dataset,
+        context=context,
     )
 
     dm = GFlowNetDataModule(
@@ -150,44 +131,10 @@ def train_gflownet_main(
     dataset: GFlowNetDataset,
     environment: GraphBuildingEnv,
     context: GraphBuildingEnvContext,
-    _task: Type[GFlowNetTask],
+    task: GFlowNetTask,
 ) -> None:
     """Train a gflownet module parsing arguments from config and standard input."""
 
-    def default_hps() -> Dict[str, Any]:
-        return {
-            "bootstrap_own_reward": False,
-            "learning_rate": 1e-4,
-            "global_batch_size": 16,
-            "num_emb": 128,
-            "num_layers": 4,
-            "tb_epsilon": None,
-            "illegal_action_logreward": -50,
-            "reward_loss_multiplier": 1,
-            "temperature_sample_dist": "uniform",
-            "temperature_dist_params": "(.5, 32)",
-            "weight_decay": 1e-8,
-            "num_data_loader_workers": 8,
-            "momentum": 0.9,
-            "adam_eps": 1e-8,
-            "lr_decay": 20000,
-            "Z_lr_decay": 20000,
-            "clip_grad_type": "norm",
-            "clip_grad_param": 10,
-            "random_action_prob": 0.001,
-            "sampling_tau": 0.0,
-            "max_nodes": 9,
-            "num_offline": 10,
-            "sampling_iterator": True,
-            "ratio": 0.9,
-            "distributed_training_strategy": "ddp",
-            "development": False,
-        }
-
-    configuration["rng"] = np.random.default_rng(142857)
-
-    # add default configuration
-    configuration.update(default_hps())
     # add user configuration
     configuration.update(vars(parse_arguments_from_config()))
     # train gflownet
@@ -196,5 +143,5 @@ def train_gflownet_main(
         dataset=dataset,
         environment=environment,
         context=context,
-        _task=_task,
+        task=task,
     )
