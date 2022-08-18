@@ -153,16 +153,17 @@ def test_charge_with_arguments_scorer():
 )
 def test_artifact_models_scorer(property_key):
     property_predictor_scorer = SCORING_FUNCTIONS["property_predictor_scorer"]
-    scorer = property_predictor_scorer(
-        name=property_key,
-        target=artifact_model_data[property_key]["ground_truth"],
-        parameters=artifact_model_data[property_key]["parameters"],
-    )
-    sample = select_sample(property_key)
-    assert all(
-        np.isclose(
-            scorer.score(sample),
-            _score,  # type: ignore
-            atol=1e-2,
+    for s in range(len(artifact_model_data[property_key]["ground_truth"])):
+        scorer = property_predictor_scorer(
+            name=property_key,
+            target=artifact_model_data[property_key]["ground_truth"][s],
+            parameters=artifact_model_data[property_key]["parameters"],
         )
-    )  # type: ignore
+        sample = select_sample(property_key)
+        assert all(
+            np.isclose(
+                scorer.score(sample),
+                _score,  # type: ignore
+                atol=1e-2,
+            )
+        )  # type: ignore
