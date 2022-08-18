@@ -52,8 +52,6 @@ from guacamol.utils.descriptors import (
     tpsa,
 )
 
-from ...properties import PropertyPredictorRegistry
-
 MODIFIERS: Dict[str, Callable[..., Any]] = {
     "gaussian_modifier": GaussianModifier,
     "min_gaussian_modifier": MinGaussianModifier,
@@ -354,44 +352,12 @@ class QEDScorer(TargetValueScorer):
         return Chem.QED.qed(Chem.MolFromSmiles(smiles))
 
 
-class PropertyPredictorScorer(TargetValueScorer):
-    def __init__(
-        self, name: str, target: Union[float, int], parameters: Dict[str, Any] = {}
-    ) -> None:
-        """Scoring function that calculates a generic score for a property
-
-        Args:
-            name: name of the property to score.
-            target: target score that will be used to get the distance to the score of the SMILES (not be confused with parameters["target"])
-        """
-        self.target = target
-        self.name = name
-        self.parameters = parameters
-        self.scoring_function = PropertyPredictorRegistry.get_property_predictor(  # type: ignore
-            name=self.name, parameters=self.parameters
-        )
-        super().__init__(target=target, scoring_function=self.scoring_function)
-
-    def predictor(self, smiles: str) -> Union[float, int, bool]:
-        """Generates a prediction for a given SMILES.
-
-        Args:
-            smiles: SMILES.
-
-        Returns:
-            A score for the given SMILES
-        """
-
-        return self.scoring_function(smiles)
-
-
 SCORING_FUNCTIONS = {
     "rdkit_scorer": RDKitDescriptorScorer,
     "tanimoto_scorer": TanimotoScorer,
     "isomer_scorer": IsomerScorer,
     "smarts_scorer": SMARTSScorer,
     "qed_scorer": QEDScorer,
-    "property_predictor_scorer": PropertyPredictorScorer,
 }
 
 

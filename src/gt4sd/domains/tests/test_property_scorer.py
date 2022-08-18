@@ -25,7 +25,7 @@
 import numpy as np
 import pytest
 
-from gt4sd.domains.materials.scorer import SCORING_FUNCTIONS
+from gt4sd.domains.materials.property_scorer import PropertyPredictorScorer
 from gt4sd.properties import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 
 protein = "KFLIYQMECSTMIFGL"
@@ -71,35 +71,8 @@ molecule_further_ground_truths = {
 }
 protein_further_ground_truths = {"charge": 1.123}
 
-artifact_model_data = {
-    "tox21": {
-        "parameters": {"algorithm_version": "v0"},
-        "ground_truth": [
-            6.422001024475321e-05,
-            0.00028556393226608634,
-            0.0027144483756273985,
-            0.03775344416499138,
-            0.000604992441367358,
-            0.00027705798856914043,
-            0.10752066224813461,
-            0.5733309388160706,
-            0.001268531079404056,
-            0.10181115567684174,
-            0.8995946049690247,
-            0.1677667647600174,
-        ],
-    },
-    "organtox": {
-        "parameters": {
-            "algorithm_version": "v0",
-            "site": "Heart",
-            "toxicity_type": "all",
-        },
-        "ground_truth": [0.06142323836684227, 0.07934761792421341],
-    },
-}
 
-_score = 1.0
+OPTIMAL_SCORE = 1.0
 
 
 def select_sample(property_key):
@@ -107,63 +80,40 @@ def select_sample(property_key):
     return protein if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY else molecule
 
 
+@pytest.mark.parametrize(
+    "property_key", [(property_key) for property_key in ground_truths.keys()]
+)
 def test_property_scorer(property_key):
-    property_predictor_scorer = SCORING_FUNCTIONS["property_predictor_scorer"]
-    scorer = property_predictor_scorer(
+    scorer = PropertyPredictorScorer(
         name=property_key, target=ground_truths[property_key]
     )
     sample = select_sample(property_key)
-    assert np.isclose(scorer.score(sample), _score, atol=1e-2)  # type: ignore
+    assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
 
 
 def test_similarity_seed_scorer():
-    property_predictor_scorer = SCORING_FUNCTIONS["property_predictor_scorer"]
-    scorer = property_predictor_scorer(
+    scorer = PropertyPredictorScorer(
         name="similarity_seed",
         target=molecule_further_ground_truths["similarity_seed"],
         parameters={"smiles": seed},
     )
-    assert np.isclose(scorer.score(molecule), _score, atol=1e-2)  # type: ignore
+    assert np.isclose(scorer.score(molecule), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
 
 
 def test_activity_against_target_scorer():
     """target for the scorer is a number (for example the predicted property value). Target for the property is a string (molecule)."""
-    property_predictor_scorer = SCORING_FUNCTIONS["property_predictor_scorer"]
-    scorer = property_predictor_scorer(
+    scorer = PropertyPredictorScorer(
         name="activity_against_target",
         target=molecule_further_ground_truths["activity_against_target"],
         parameters={"target": _target},
     )
-    assert np.isclose(scorer.score(molecule), _score, atol=1e-2)  # type: ignore
+    assert np.isclose(scorer.score(molecule), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
 
 
 def test_charge_with_arguments_scorer():
-    property_predictor_scorer = SCORING_FUNCTIONS["property_predictor_scorer"]
-    scorer = property_predictor_scorer(
+    scorer = PropertyPredictorScorer(
         name="charge",
         target=protein_further_ground_truths["charge"],
         parameters={"amide": True, "ph": 5.0},
     )
-    assert np.isclose(scorer.score(protein), _score, atol=1e-2)  # type: ignore
-
-
-@pytest.mark.parametrize(
-    "property_key",
-    [(property_key) for property_key in artifact_model_data.keys()],
-)
-def test_artifact_models_scorer(property_key):
-    property_predictor_scorer = SCORING_FUNCTIONS["property_predictor_scorer"]
-    for s in range(len(artifact_model_data[property_key]["ground_truth"])):
-        scorer = property_predictor_scorer(
-            name=property_key,
-            target=artifact_model_data[property_key]["ground_truth"][s],
-            parameters=artifact_model_data[property_key]["parameters"],
-        )
-        sample = select_sample(property_key)
-        assert all(
-            np.isclose(
-                scorer.score(sample),
-                _score,  # type: ignore
-                atol=1e-2,
-            )
-        )  # type: ignore
+    assert np.isclose(scorer.score(protein), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
