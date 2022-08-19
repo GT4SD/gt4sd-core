@@ -46,7 +46,7 @@ logger.addHandler(logging.NullHandler())
 
 
 class GFlowNetDataModule(pl.LightningDataModule):
-    """Data module from gflownet."""
+    """Data module for gflownet."""
 
     def __init__(
         self,
@@ -59,6 +59,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         model: nn.Module,
     ) -> None:
         """Construct GFlowNetDataModule.
+        
         The module assumes a model and algorithm factory/registry.
         The user should provide a dataset, environment, context for the environment, and task.
 

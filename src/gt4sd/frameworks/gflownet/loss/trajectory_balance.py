@@ -44,30 +44,49 @@ from ..envs.graph_building_env import (
 
 
 class TrajectoryBalanceModel(nn.Module):
+    """Generic model compatible with trajectory balance."""
+
     def forward(self, batch: gd.Batch) -> Tuple[GraphActionCategorical, Tensor]:
+        """Run forward pass.
+
+        Args:
+            batch: batch of data
+
+        Returns:
+            action: action to take
+        """
         raise NotImplementedError()
 
     def logZ(self, cond_info: Tensor) -> Tensor:
+        """Compute logZ.
+        
+        Args:
+            cond_info: conditional information
+
+        Returns:
+            log partition function.
+        """
         raise NotImplementedError()
 
 
 class TrajectoryBalance:
-    """Trajectory Balance implementation, see
-    "Trajectory Balance: Improved Credit Assignment in GFlowNets Nikolay Malkin, Moksh Jain,
-    Emmanuel Bengio, Chen Sun, Yoshua Bengio"
-    https://arxiv.org/abs/2201.13259.
-
-    Code adapted from: https://github.com/recursionpharma/gflownet/blob/trunk/src/gflownet/algo/trajectory_balance.py.
-    """
+    """A trajectory balance algorithm for gflownet."""
 
     def __init__(
         self,
         configuration: Dict[str, Any],
         environment: GraphBuildingEnv,
         context: GraphBuildingEnvContext,
-        max_len: int = None,
-    ):
-        """
+        max_len: int = None):
+        """Initialize trajectory balance algorithm.
+
+        Trajectory balance implementation, see
+        "Trajectory Balance: Improved Credit Assignment in GFlowNets 
+            Nikolay Malkin, Moksh Jain, Emmanuel Bengio, Chen Sun, Yoshua Bengio"
+            https://arxiv.org/abs/2201.13259.
+
+        Code adapted from: https://github.com/recursionpharma/gflownet/blob/trunk/src/gflownet/algo/trajectory_balance.py.
+
         Args
             configuration: hyperparameters.
             environment: a graph environment.
@@ -82,6 +101,7 @@ class TrajectoryBalance:
             max_len: if not None, ends trajectories of more than max_len steps.
             max_nodes: if not None, ends trajectories of graphs with more than max_nodes steps (illegal action).
         """
+
         self.ctx = context
         self.env = environment
         self.hps = configuration
@@ -103,10 +123,14 @@ class TrajectoryBalance:
         self.sample_temp = 1
 
     def _corrupt_actions(
-        self, actions: List[Tuple[int, int, int]], cat: GraphActionCategorical
-    ):
-        """Sample from the uniform policy with probability `self.random_action_prob`"""
-        # Should this be a method of GraphActionCategorical?
+        self, actions: List[Tuple[int, int, int]], cat: GraphActionCategorical):
+        """Sample from the uniform policy with probability random_action_prob.
+        
+        Args:
+            actions: list of actions.
+            cat: action categorical.
+        """
+        
         if self.random_action_prob <= 0:
             return
         (corrupted,) = (
@@ -126,17 +150,13 @@ class TrajectoryBalance:
             actions[i] = (which, row, col)
 
     def create_training_data_from_own_samples(
-        self, model: Union[nn.Module, TrajectoryBalanceModel], n: int, cond_info: Tensor
-    ) -> List[Dict]:
+        self, model: Union[nn.Module, TrajectoryBalanceModel], n: int, cond_info: Tensor) -> List[Dict]:
         """Generate trajectories by sampling a model.
 
         Args:
-            model: model used with a certain algorithm (i.e. trajectory balance).
-            The model being sampled
-            graphs: List[Graph]
-                List of N Graph endpoints
-            cond_info: torch.tensor
-                Conditional information, shape (N, n_info)
+            model: model used with a certain algorithm (i.e. trajectory balance). The model being sampled.
+            graphs: list of N Graph endpoints.
+            cond_info: conditional information, shape (N, n_info).
 
         Returns:
             data: a list of trajectories. Each trajectory is a dict with keys.
@@ -146,8 +166,9 @@ class TrajectoryBalance:
                 - bck_logprob: sum logprobs P_B.
                 - logZ: predicted log Z.
                 - loss: predicted loss (if bootstrapping).
-                - is_valid: is the generated graph valid according to the env & ctx.
+                - is_valid: is the generated graph valid according to the environment and context.
         """
+
         ctx = self.ctx
         env = self.env
         dev = self.ctx.device
@@ -186,6 +207,7 @@ class TrajectoryBalance:
             epsilon = torch.tensor([self.epsilon], device=dev).float()
 
         for t in range(self.max_len) if self.max_len is not None else count(0):
+
             # Construct graphs for the trajectories that aren't yet done
             torch_graphs = [ctx.graph_to_Data(i) for i in not_done(graphs)]
             not_done_mask = torch.tensor(done, device=dev).logical_not()
@@ -204,6 +226,7 @@ class TrajectoryBalance:
                 ctx.aidx_to_GraphAction(g, a) for g, a in zip(torch_graphs, actions)
             ]
             log_probs = fwd_cat.log_prob(actions)
+
             for i, j in zip(not_done(range(n)), range(n)):
                 # Step each trajectory, and accumulate statistics
                 fwd_logprob[i].append(log_probs[j].unsqueeze(0))
@@ -270,10 +293,10 @@ class TrajectoryBalance:
         """Generate trajectories from known endpoints.
 
         Args:
-        graphs: list of Graph endpoints.
+            graphs: list of Graph endpoints.
 
         Returns:
-        trajs: a list of trajectories.
+            a list of trajectories.
         """
         return [{"traj": generate_forward_trajectory(i)} for i in graphs]
 
@@ -291,7 +314,7 @@ class TrajectoryBalance:
             rewards: the transformed reward (e.g. R(x) ** beta) for each trajectory. Shape (N,).
 
         Returns:
-            batch: a (CPU) Batch object with relevant attributes added.
+            a (CPU) Batch object with relevant attributes added.
         """
 
         torch_graphs = [
@@ -329,9 +352,12 @@ class TrajectoryBalance:
 
         Args:
             model: a GNN taking in a batch of graphs as input as per constructed by self.construct_batch.
-            Must have a `logZ` attribute, itself a model, which predicts log of Z(cond_info)
+                    Must have a `logZ` attribute, itself a model, which predicts log of Z(cond_info)
             batch: batch of graphs inputs as per constructed by self.construct_batch.
             num_bootstrap: the number of trajectories for which the reward loss is computed. Ignored if 0.
+
+        Returns:
+            a tuple containing the loss for each trajectory and relevant info.
         """
 
         dev = batch.x.device
