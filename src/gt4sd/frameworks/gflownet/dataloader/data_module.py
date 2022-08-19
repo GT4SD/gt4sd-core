@@ -46,7 +46,7 @@ logger.addHandler(logging.NullHandler())
 
 
 class GFlowNetDataModule(pl.LightningDataModule):
-    """Data module for gflownet."""
+    """Data module from gflownet."""
 
     def __init__(
         self,

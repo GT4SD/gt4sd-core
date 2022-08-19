@@ -64,17 +64,16 @@ PROPERTIES: List[str] = [
 
 
 class QM9Dataset(GFlowNetDataset):
+    """QM9 dataset compatible with gflownet."""
     def __init__(
         self,
         h5_file: str = None,
-        xyz_file: str = None,
         target: str = "gap",
         properties: List[str] = PROPERTIES,
     ) -> None:
-        """QM9 dataset."""
+        
         super().__init__(
             h5_file=h5_file,
-            xyz_file=xyz_file,
             target=target,
             properties=properties,
         )
@@ -90,7 +89,7 @@ def thermometer(v: Tensor, n_bins=50, vmin=0, vmax=1) -> Tensor:
 
 # define task
 class QM9GapTask(GFlowNetTask):
-    """Define task for QM9 dataset.
+    """QM9 task compatible with gflownet
 
     Code adapted from: https://github.com/recursionpharma/gflownet/blob/trunk/src/gflownet/tasks/qm9/qm9.py.
     """

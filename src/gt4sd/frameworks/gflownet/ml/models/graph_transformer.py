@@ -26,8 +26,8 @@ import torch.nn as nn
 import torch_geometric.data as gd
 import torch_geometric.nn as gnn
 from torch_geometric.utils import add_self_loops
-
-from ...envs.graph_building_env import GraphActionCategorical
+from typing import Any, Dict, Tuple
+from ...envs.graph_building_env import GraphActionCategorical, GraphBuildingEnvContext
 
 
 def mlp(n_in, n_hid, n_out, n_layer, act=nn.LeakyReLU):
@@ -38,19 +38,34 @@ def mlp(n_in, n_hid, n_out, n_layer, act=nn.LeakyReLU):
 
 
 class GraphTransformer(nn.Module):
-    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/models."""
+    """GraphTransformer."""
 
     def __init__(
         self,
-        configuration,
-        context,
+        configuration: Dict[str, Any],
+        context: GraphBuildingEnvContext,
         x_dim=64,
         e_dim=64,
         g_dim=64,
         num_emb=64,
         num_layers=3,
         num_heads=2,
-    ):
+    ) -> None:
+        """Construct GraphTransformer.
+
+        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/models.
+
+        Args:
+            configuration: model configuration.
+            context: context environment.
+            x_dim: dimension of input node features.
+            e_dim: dimension of input edge features.
+            g_dim: dimension of input graph features.
+            num_emb: dimension of embedding layer.
+            num_layers: number of layers in the graph transformer.
+            num_heads: number of heads in the graph transformer.
+        """
+
         super().__init__()
         self.num_layers = num_layers
         self.name = "graph_transformer"
@@ -79,7 +94,18 @@ class GraphTransformer(nn.Module):
             )
         )
 
-    def forward(self, g: gd.Batch, cond: torch.Tensor):
+    def forward(
+        self, g: gd.Batch, cond: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Forward pass.
+
+        Args:
+            g: graph data.
+            cond: conditioning.
+
+        Returns:
+            embeddings and pooled features.
+        """
         o = self.x2h(g.x)
         e = self.e2h(g.edge_attr)
         c = self.c2h(cond)
@@ -117,7 +143,26 @@ class GraphTransformer(nn.Module):
 
 
 class GraphTransformerGFN(nn.Module):
-    def __init__(self, configuration, context, num_emb=64, num_layers=3, num_heads=2):
+    """GraphTransformerGFN."""
+
+    def __init__(
+        self,
+        configuration: Dict[str, Any],
+        context: GraphBuildingEnvContext,
+        num_emb=64,
+        num_layers=3,
+        num_heads=2,
+    ) -> None:
+        """Construct GraphTransformerGFN.
+
+        Args:
+            configuration: model configuration.
+            context: context environment.
+            num_emb: dimension of embedding layer.
+            num_layers: number of layers in the graph transformer.
+            num_heads: number of heads in the graph transformer.
+        """
+
         super().__init__()
         self.name = "graph_transformer_gfn"
         self.transf = GraphTransformer(
@@ -148,6 +193,15 @@ class GraphTransformerGFN(nn.Module):
         self.action_type_order = context.action_type_order
 
     def forward(self, g: gd.Batch, cond: torch.Tensor):
+        """Forward pass. Given a graph and a conditioning, return the action logits and rewards.
+        
+        Args:
+            g: graph data.
+            cond: conditioning.
+
+        Returns:
+            categorical action and rewards.
+        """
         node_embeddings, graph_embeddings = self.transf(g, cond)
         ne_row, ne_col = g.non_edge_index
         # On `::2`, edges are duplicated to make graphs undirected, only take the even ones

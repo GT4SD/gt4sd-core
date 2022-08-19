@@ -47,7 +47,7 @@ logger.addHandler(logging.NullHandler())
 
 
 class GFlowNetAlgorithm:
-    """We consider the algorithm (objective structure) as part of the model."""
+    """A generic algorithm for gflownet."""
 
     def compute_batch_losses(
         self, model: nn.Module, batch: gd.Batch, num_bootstrap: Optional[int] = 0
@@ -67,7 +67,7 @@ class GFlowNetAlgorithm:
 
 
 class GFlowNetModule(pl.LightningModule):
-    """Module from generative flow networks."""
+    """Module from gflownet."""
 
     def __init__(
         self,
@@ -82,15 +82,13 @@ class GFlowNetModule(pl.LightningModule):
         """Construct GFNModule.
 
         Args:
+            configuration: the configuration of the module.
             dataset: the dataset to use.
             environment: the environment to use.
             context: the context to use.
             task: the task to solve.
-            model: architecture (graph_transformer or mxmnet).
             algorithm: algorithm (trajectory_balance or td_loss).
-            lr: learning rate for Adam optimizer. Defaults to 1e-4.
-            test_output_path: path where to save latent encodings and predictions for the test set
-                when an epoch ends. Defaults to a a folder called "test" in the current working directory.
+            model: architecture (graph_transformer_gfn or graph_transformer).
         """
 
         super().__init__()
