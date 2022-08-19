@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Data module."""
+"""Data module for gflownet."""
 
 import logging
 from typing import Any, Dict, Optional
@@ -33,7 +33,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader  # , Subset, random_split
 
 from ..dataloader.dataset import GFlowNetDataset, GFlowNetTask
-from ..dataloader.sampling_iterator import SamplingIterator
+from .sampler import SamplingIterator
 from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
 from ..loss.trajectory_balance import TrajectoryBalance
 from ..ml.models import MODEL_FACTORY
@@ -46,10 +46,7 @@ logger.addHandler(logging.NullHandler())
 
 
 class GFlowNetDataModule(pl.LightningDataModule):
-    """Data module from gflownet.
-    We assume to have a model and algorithm factory/registry. The user should provide
-    a dataset, environment, context for the environment, and task.
-    """
+    """Data module from gflownet."""
 
     def __init__(
         self,
@@ -62,16 +59,17 @@ class GFlowNetDataModule(pl.LightningDataModule):
         model: nn.Module,
     ) -> None:
         """Construct GFlowNetDataModule.
+        The module assumes a model and algorithm factory/registry.
+        The user should provide a dataset, environment, context for the environment, and task.
 
         Args:
+            configuration: configuration dictionary.
             dataset: dataset.
             environment: environment for graph building.
-            context: context env.
+            context: context environment.
             task: generic task.
             algorithm: loss function.
             model: model type.
-            sampling_model:
-            sampling_iterator: sampling iterator to use.
         """
         super().__init__()
         self.hps = configuration
@@ -87,15 +85,8 @@ class GFlowNetDataModule(pl.LightningDataModule):
         self.task = task
 
         self.sampling_iterator = self.hps["sampling_iterator"]
-
         self.batch_size = self.hps["batch_size"]
         self.num_workers = self.hps["num_workers"]
-
-        # self.validation_split = self.hps["validation_split"]
-        # self.validation_indices_file = self.hps["validation_indices_file"]
-        # self.stratified_batch_file = self.hps["stratified_batch_file"]
-        # self.stratified_value_name = self.hps["stratified_value_name"]
-
         self.device = self.hps["device"]
         self.rng = self.hps["rng"]
         self.ratio = self.hps["ratio"]
@@ -109,6 +100,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
 
     def setup(self, stage: Optional[str]) -> None:  # type:ignore
         """Setup the data module.
+
         Args:
             stage: stage considered, unused. Defaults to None.
         """
@@ -116,8 +108,6 @@ class GFlowNetDataModule(pl.LightningDataModule):
         ll = self.dataset.get_len()
         ixs = np.arange(ll)
         self.rng.shuffle(ixs)
-
-        # TODO: use Subset?
         thresh = int(np.floor(self.ratio * ll))
 
         self.ix_train = ixs[: int(0.9 * thresh)]
@@ -141,7 +131,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         )
 
     def train_dataloader(self) -> DataLoader:
-        """Get a training data loader.
+        """Get a data loader for training.
 
         Returns:
             a training data loader.
@@ -154,7 +144,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
                 self.ctx,
                 self.algo,
                 self.task,
-                self.device,
+                device=self.device,
             )
         else:
             iterator = self.train_dataset  # type: ignore
@@ -166,7 +156,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         )
 
     def val_dataloader(self) -> DataLoader:
-        """Get a validation data loader.
+        """Get a data loader for validation.
 
         Returns:
             a validation data loader.
@@ -179,9 +169,9 @@ class GFlowNetDataModule(pl.LightningDataModule):
                 self.ctx,
                 self.algo,
                 self.task,
-                self.device,
                 ratio=1,
                 stream=False,
+                device=self.device,
             )
         else:
             iterator = self.val_dataset  # type: ignore
@@ -193,7 +183,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         )
 
     def test_dataloader(self) -> DataLoader:
-        """Get a testing data loader.
+        """Get a data loader for testing.
 
         Returns:
             a testing data loader.
@@ -206,10 +196,10 @@ class GFlowNetDataModule(pl.LightningDataModule):
         )
 
     def predict_dataloader(self) -> DataLoader:
-        """Get a testing data loader.
+        """Get a data loader for prediction.
 
         Returns:
-            a testing data loader.
+            a prediction data loader.
         """
         return DataLoader(
             self.test_dataset,

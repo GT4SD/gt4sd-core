@@ -23,9 +23,7 @@
 #
 import ast
 import os
-
-# import tarfile
-# import zipfile
+import pickle
 from typing import Any, Callable, Dict, List, NewType, Tuple, Union
 
 import numpy as np
@@ -49,7 +47,7 @@ RewardScalar = NewType("RewardScalar", torch.tensor)  # type: ignore
 
 
 class GFlowNetTask:
-    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/tasks."""
+    """A task for gflownet."""
 
     def __init__(
         self,
@@ -59,16 +57,17 @@ class GFlowNetTask:
         wrap_model: Callable[[nn.Module], nn.Module] = None,
     ) -> None:
 
-        """Class for a generic task.
-        We consider the task as part of the dataset (environment).
+        """Initialize a generic gflownet task. 
+        The task specifies the reward model for the trajectory.
+        We consider the task as part of the dataset.
+
+        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/tasks.
 
         Args:
+            configuration: a dictionary with the task configuration.
+            dataset: a dataset instance.
             reward_model: The model that is used to generate the conditional reward.
-            dataset:
-            temperature_distribution:
-            temperature_parameters:
-            wrap_model: a wrapper function that is applied to the model. # TODO: do we need it with lightning?
-            device: cpu or cuda
+            wrap_model: a wrapper function that is applied to the model.
         """
         hps = configuration
 
@@ -92,9 +91,22 @@ class GFlowNetTask:
         self._rtrans = "unit+95p"
 
     def load_task_models(self) -> Dict[str, nn.Module]:
+        """Loads the task models.
+
+        Returns:
+            model: a dictionary with the task models.
+        """
         pass
 
-    def sample_conditional_information(self, n) -> Dict[str, Any]:
+    def sample_conditional_information(self, n: int) -> Dict[str, Any]:
+        """Samples conditional information for a minibatch.
+
+        Args:
+            n: number of samples.
+
+        Returns:
+            cond_info: a dictionary with the sampled conditional information.
+        """
         pass
 
     def cond_info_to_reward(
@@ -123,10 +135,19 @@ class GFlowNetTask:
         raise NotImplementedError()
 
     def flat_reward_transform(self, y: Union[float, Tensor]) -> FlatRewards:
+        """Transforms a reward with a generic structure to a flat vector.
+
+        Args:
+            y: scalar reward for a trajectory.
+        """
         raise NotImplementedError()
 
-    def _wrap_model_mp(self, model):
-        """Wraps a nn.Module instance so that it can be shared to `DataLoader` workers."""
+    def _wrap_model_mp(self, model: nn.Module) -> nn.Module:
+        """Wraps a nn.Module instance so that it can be shared to `DataLoader` workers.
+
+        Args:
+            model: a nn.Module instance.
+        """
         if self.num_workers > 0:
             placeholder = wrap_model_mp(
                 model, self.num_workers, cast_types=(gd.Batch, GraphActionCategorical)
@@ -136,48 +157,58 @@ class GFlowNetTask:
 
 
 class GFlowNetDataset(Dataset):
-    """Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data."""
+    """A dataset for gflownet."""
 
     def __init__(
         self,
         h5_file: str = None,
-        xyz_file: str = None,
         target: str = "gap",
-        properties: List[str] = [],
-    ) -> None:
-        """Dataloader for generic dataset. Assuming the dataset is in a format compatible with h5 file.
-        Describe dataset structure in the h5 file.
+        properties: List[str] = []) -> None:
+
+        """Initialize a gflownet dataset.
+        If the dataset is in a format compatible with h5 file, we can directly load it.
+        If the dataset is in a format compatible with xyz file, we have to convert it to h5 file.
+
+        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data.
 
         Args:
             h5_file: data file in h5 format.
-            xyz_file: data file in xyz format.
-            train: split.
-            target: target.
-            properties: properties.
-        """
-        if h5_file is not None:
-            import pickle
+            target: reward target.
+            properties: relevant properties for the task.
 
-            # problem with python 3.8 and 3.7
-            # pickle on 3.8 uses prot 5
-            pickle.HIGHEST_PROTOCOL = 5
-            self.df = pd.HDFStore(
-                h5_file,
-                "r",
-            )["df"]
-        elif xyz_file is not None:
-            pass
-            # self.load_tar(xyz_file)
+        Raises:
+            ValueError: if the dataset is not in a format compatible with h5 file or not present.
+        """
+        if h5_file:
+            try:
+                # pickle on py3.8 uses prot 5
+                pickle.HIGHEST_PROTOCOL = 5
+                self.df = pd.HDFStore(h5_file, "r")["df"]
+            except:
+                ValueError(f"No h5 compatible database found in the path.")
+        else:
+            raise ValueError(
+                f"The h5_file path is None. Please specify a h5 file path."
+            )
 
         self.target = target
         self.properties = properties
-        self.len = len(self.df)
 
-    def set_indexes(self, ixs):
+    def set_indexes(self, ixs: int):
+        """Set the indexes of the dataset split (train/val/test).
+
+        Args:
+            ixs: indexes of the dataset split.
+        """
         self.idcs = ixs
 
     def get_len(self):
-        return self.len
+        """Get the length of the full dataset (before splitting).
+        
+        Returns:
+            len: the length of the full dataset.
+        """
+        return len(self.df)
 
     def get_stats(self, percentile: float = 0.95) -> Tuple[float, float, Any]:
         """Get the stats of the dataset.
@@ -191,41 +222,10 @@ class GFlowNetDataset(Dataset):
         y = self.df[self.target].astype(float)
         return y.min(), y.max(), np.sort(y)[int(y.shape[0] * percentile)]
 
-    # def load_tar(self, xyz_file: str) -> None:
-    #     """Load the data from a tar file.
-
-    #     Args:
-    #         xyz_file: name of the tar file.
-    #     """
-    #     f = tarfile.TarFile(xyz_file, "r")
-    #     labels = self.properties
-    #     all_mols = []
-    #     for _pt in f:
-    #         data = f.extractfile(_pt).read().decode().splitlines()
-    #         all_mols.append(
-    #             data[-2].split()[:1] + list(map(float, data[1].split()[2:]))  # type: ignore
-    #         )
-    #     self.df = pd.DataFrame(all_mols, columns=["SMILES"] + labels)
-
-    # def load_zip(self, xyz_file) -> None:
-    #     """Load the data from a zip file.
-
-    #     Args:
-    #         xyz_file: name of the zip file.
-    #     """
-    #     f = zipfile.ZipFile(xyz_file, "r")
-    #     labels = self.properties
-    #     all_mols = []
-    #     data = f.extractall().read().decode().splitlines()
-    #     all_mols.append(
-    #         data[-2].split()[:1] + list(map(float, data[1].split()[2:]))  # type: ignore
-    #     )
-    #     self.df = pd.DataFrame(all_mols, columns=["SMILES"] + labels)
-
-    def convert2h5(
+    def convert_xyz_to_h5(
         self,
-        xyz_path: str,
-        h5_path: str = "qm9.h5",
+        xyz_path: str = "data/xyz",
+        h5_path: str = "data/qm9.h5",
         property_names: List[str] = [
             "rA",
             "rB",
@@ -244,6 +244,13 @@ class GFlowNetDataset(Dataset):
             "Cv",
         ],
     ) -> None:
+        """Convert the data from xyz to h5. Assumes that the xyz files are extracted in the xyz_path folder.
+
+        Args:
+            xyz_path: path to the xyz file in input.
+            h5_path: path to the h5 file in output.
+            property_names: names of the properties we want to use/overwrite.
+        """
 
         # Reads the xyz files and return the properties, smiles and coordinates
         data = []
@@ -273,16 +280,17 @@ class GFlowNetDataset(Dataset):
 
     def _read_xyz(self, path: str):
         """Reads the xyz files in the directory on 'path'.
+        
         Code adapted from: https://www.kaggle.com/code/rmonge/predicting-molecule-properties-based-on-its-smiles/notebook
 
-            Args:
-                path: the path to the folder to be read.
+        Args:
+            path: the path to the folder.
 
-            Returns:
-                atoms: list with the characters representing the atoms of a molecule.
-                coordinates: list with the cartesian coordinates of each atom.
-                smile: list with the SMILE representation of a molecule.
-                prop: list with the scalar properties.
+        Returns:
+            atoms: list with the characters representing the atoms of a molecule.
+            coordinates: list with the cartesian coordinates of each atom.
+            smile: list with the SMILE representation of a molecule.
+            prop: list with the scalar properties.
         """
         atoms = []
         coordinates = []
@@ -315,9 +323,22 @@ class GFlowNetDataset(Dataset):
         return atoms, coordinates, smile, prop
 
     def __len__(self):
+        """Dataset split (train/val/test) length.
+
+        Returns:
+            length of the dataset.
+        """
         return len(self.idcs)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx:  int) -> Tuple[Any, float]:
+        """Retrieve an item from the dataset by index.
+
+        Args:
+            index: index for the item.
+
+        Returns:
+            an tuple (item, reward).
+        """
         return (
             Chem.MolFromSmiles(self.df["SMILES"][self.idcs[idx]]),
             self.df[self.target][self.idcs[idx]],
