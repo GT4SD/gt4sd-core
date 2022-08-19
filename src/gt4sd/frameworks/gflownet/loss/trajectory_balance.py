@@ -59,7 +59,7 @@ class TrajectoryBalanceModel(nn.Module):
 
     def logZ(self, cond_info: Tensor) -> Tensor:
         """Compute logZ.
-        
+
         Args:
             cond_info: conditional information
 
@@ -77,11 +77,12 @@ class TrajectoryBalance:
         configuration: Dict[str, Any],
         environment: GraphBuildingEnv,
         context: GraphBuildingEnvContext,
-        max_len: int = None):
+        max_len: int = None,
+    ):
         """Initialize trajectory balance algorithm.
 
         Trajectory balance implementation, see
-        "Trajectory Balance: Improved Credit Assignment in GFlowNets 
+        "Trajectory Balance: Improved Credit Assignment in GFlowNets
             Nikolay Malkin, Moksh Jain, Emmanuel Bengio, Chen Sun, Yoshua Bengio"
             https://arxiv.org/abs/2201.13259.
 
@@ -123,14 +124,15 @@ class TrajectoryBalance:
         self.sample_temp = 1
 
     def _corrupt_actions(
-        self, actions: List[Tuple[int, int, int]], cat: GraphActionCategorical):
+        self, actions: List[Tuple[int, int, int]], cat: GraphActionCategorical
+    ):
         """Sample from the uniform policy with probability random_action_prob.
-        
+
         Args:
             actions: list of actions.
             cat: action categorical.
         """
-        
+
         if self.random_action_prob <= 0:
             return
         (corrupted,) = (
@@ -150,7 +152,8 @@ class TrajectoryBalance:
             actions[i] = (which, row, col)
 
     def create_training_data_from_own_samples(
-        self, model: Union[nn.Module, TrajectoryBalanceModel], n: int, cond_info: Tensor) -> List[Dict]:
+        self, model: Union[nn.Module, TrajectoryBalanceModel], n: int, cond_info: Tensor
+    ) -> List[Dict]:
         """Generate trajectories by sampling a model.
 
         Args:
@@ -209,7 +212,7 @@ class TrajectoryBalance:
         for t in range(self.max_len) if self.max_len is not None else count(0):
 
             # Construct graphs for the trajectories that aren't yet done
-            torch_graphs = [ctx.graph_to_Data(i) for i in not_done(graphs)]
+            torch_graphs = [ctx.graph_to_data(i) for i in not_done(graphs)]
             not_done_mask = torch.tensor(done, device=dev).logical_not()
             # Forward pass to get GraphActionCategorical
             fwd_cat, log_reward_preds = model(
@@ -223,7 +226,7 @@ class TrajectoryBalance:
                 actions = fwd_cat.sample()
             self._corrupt_actions(actions, fwd_cat)
             graph_actions = [
-                ctx.aidx_to_GraphAction(g, a) for g, a in zip(torch_graphs, actions)
+                ctx.aidx_to_graph_action(g, a) for g, a in zip(torch_graphs, actions)
             ]
             log_probs = fwd_cat.log_prob(actions)
 
@@ -318,10 +321,10 @@ class TrajectoryBalance:
         """
 
         torch_graphs = [
-            self.ctx.graph_to_Data(i[0]) for tj in trajs for i in tj["traj"]
+            self.ctx.graph_to_data(i[0]) for tj in trajs for i in tj["traj"]
         ]
         actions = [
-            self.ctx.GraphAction_to_aidx(g, a)
+            self.ctx.graph_action_to_aidx(g, a)
             for g, a in zip(torch_graphs, [i[1] for tj in trajs for i in tj["traj"]])
         ]
         num_backward = torch.tensor(

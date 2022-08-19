@@ -43,7 +43,7 @@ class Graph(nx.Graph):
         return f'<{list(self.nodes)}, {list(self.edges)}, {list(self.nodes[i]["v"] for i in self.nodes)}>'
 
 
-def graph_without_edge(g: nx.Graph, e: nx.EdgeView) -> nx.Graph:
+def graph_without_edge(g: nx.Graph, e: nx.Graph) -> nx.Graph:
     """Build a new graph without an edge.
 
     Args:
@@ -59,7 +59,7 @@ def graph_without_edge(g: nx.Graph, e: nx.EdgeView) -> nx.Graph:
     return gp
 
 
-def graph_without_node(g: nx.Graph, n: nx.NodeView) -> nx.Graph:
+def graph_without_node(g: nx.Graph, n: nx.Graph) -> nx.Graph:
     """Build a new graph without a node.
 
     Args:
@@ -75,7 +75,7 @@ def graph_without_node(g: nx.Graph, n: nx.NodeView) -> nx.Graph:
     return gp
 
 
-def graph_without_node_attr(g: nx.Graph, n: nx.NodeView, a: Any) -> nx.Graph:
+def graph_without_node_attr(g: nx.Graph, n: nx.Graph, a: Any) -> nx.Graph:
     """Build a new graph without a node attribute.
 
     Args:
@@ -92,7 +92,7 @@ def graph_without_node_attr(g: nx.Graph, n: nx.NodeView, a: Any) -> nx.Graph:
     return gp
 
 
-def graph_without_edge_attr(g: nx.Graph, e: nx.EdgeView, a: Any) -> nx.Graph:
+def graph_without_edge_attr(g: nx.Graph, e: nx.Graph, a: Any) -> nx.Graph:
     """Build a new graph without an edge attribute.
 
     Args:
@@ -135,7 +135,8 @@ class GraphAction:
         target: int = None,
         value: Any = None,
         attr: str = None,
-        relabel: int = None):
+        relabel: int = None,
+    ):
         """Initialize a single graph-building action.
 
         Args:
@@ -169,7 +170,8 @@ class GraphBuildingEnv:
         self,
         allow_add_edge: bool = True,
         allow_node_attr: bool = True,
-        allow_edge_attr: bool = True):
+        allow_edge_attr: bool = True,
+    ):
         """Initialize a GraphBuildingEnv.
 
         Supports forward and backward actions, with a `parents` function that list parents of
@@ -285,7 +287,8 @@ class GraphBuildingEnv:
 
 
 def generate_forward_trajectory(
-    g: Graph, max_nodes: int = None) -> List[Tuple[Graph, GraphAction]]:
+    g: Graph, max_nodes: int = None
+) -> List[Tuple[Graph, GraphAction]]:
     """Sample (uniformly) a trajectory that generates g.
 
     Args:
@@ -478,7 +481,7 @@ class GraphActionCategorical:
 
     def to(self, device):
         """Move everything to the specified device.
-        
+
         Args:
             device: the device to move to.
         """
@@ -492,7 +495,7 @@ class GraphActionCategorical:
 
     def logsoftmax(self) -> List[torch.Tensor]:
         """Compute log-probabilities given logits.
-        
+
         Returns:
             a list of log-probabilities.
         """
@@ -600,7 +603,7 @@ class GraphActionCategorical:
 
     def log_prob(self, actions: List[Tuple[int, int, int]]) -> torch.Tensor:
         """The log-probability of a list of action tuples.
-        
+
         Args:
             actions: A list of action tuples (type, row, column).
 
@@ -620,6 +623,13 @@ class GraphBuildingEnvContext:
     """A context environment that defines what the graphs are, how they map to and from data."""
 
     device: str
+    num_node_dim: int
+    num_edge_dim: int
+    num_cond_dim: int
+    num_new_node_values: int
+    num_node_attr_logits: int
+    num_edge_attr_logits: int
+    action_type_order: List[GraphActionType]
 
     def aidx_to_graph_action(
         self, g: gd.Data, action_idx: Tuple[int, int, int]

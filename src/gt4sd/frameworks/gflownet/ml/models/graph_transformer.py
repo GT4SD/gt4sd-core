@@ -21,12 +21,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+from typing import Any, Dict, Tuple
+
 import torch
 import torch.nn as nn
 import torch_geometric.data as gd
 import torch_geometric.nn as gnn
 from torch_geometric.utils import add_self_loops
-from typing import Any, Dict, Tuple
+
 from ...envs.graph_building_env import GraphActionCategorical, GraphBuildingEnvContext
 
 
@@ -194,7 +196,7 @@ class GraphTransformerGFN(nn.Module):
 
     def forward(self, g: gd.Batch, cond: torch.Tensor):
         """Forward pass. Given a graph and a conditioning, return the action logits and rewards.
-        
+
         Args:
             g: graph data.
             cond: conditioning.

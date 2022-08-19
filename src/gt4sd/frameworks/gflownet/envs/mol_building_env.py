@@ -155,12 +155,17 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
         ]
         self.device = device
 
-    def aidx_to_graph_action(self, g: gd.Data, action_idx: Tuple[int, int, int]) -> GraphAction:
+    def aidx_to_graph_action(
+        self, g: gd.Data, action_idx: Tuple[int, int, int]
+    ) -> GraphAction:
         """Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction.
-        
+
         Args:
             g: The graph to act on.
             action_idx: The action index.
+
+        Raises:
+            ValueError: If the action index is invalid.
 
         Returns:
             The action corresponding to the action index.
@@ -188,12 +193,14 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
             return GraphAction(
                 t, source=a.item(), target=b.item(), attr=attr, value=val
             )
+        else:
+            raise ValueError(f"Unknown action type: {t}")
 
     def graph_action_to_aidx(
         self, g: gd.Data, action: GraphAction
     ) -> Tuple[int, int, int]:
         """Translate a GraphAction to an index tuple.
-        
+
         Args:
             g: The graph to act on.
             action: The action to translate.
@@ -253,7 +260,7 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
 
     def graph_to_data(self, g: Graph) -> gd.Data:
         """Convert a networkx Graph to a torch geometric Data instance.
-        
+
         Args:
             g: Networkx Graph to convert.
 
@@ -292,7 +299,7 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
 
     def collate(self, graphs: List[gd.Data]):
         """Batch Data instances.
-        
+
         Args:
             graphs: List of Data instances.
 
@@ -306,7 +313,7 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
 
     def mol_to_graph(self, mol: Mol) -> Graph:
         """Convert an RDMol to a Graph.
-        
+
         Args:
             mol: RDKit molecule format.
 
@@ -347,7 +354,7 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
 
     def graph_to_mol(self, g: Graph) -> Mol:
         """Convert a Graph to an RDKit molecule.
-        
+
         Args:
             g: Graph format.
 
@@ -378,7 +385,7 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
 
     def is_sane(self, g: Graph) -> bool:
         """Check if a graph is sane.
-        
+
         Args:
             g: Graph format.
 

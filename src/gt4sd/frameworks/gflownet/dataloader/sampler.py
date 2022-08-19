@@ -29,9 +29,9 @@ import torch
 import torch.nn as nn
 from torch.utils.data import IterableDataset
 
-from .dataset import GFlowNetDataset, GFlowNetTask
 from ..envs.graph_building_env import GraphBuildingEnvContext
 from ..loss.trajectory_balance import TrajectoryBalance, TrajectoryBalanceModel
+from .dataset import GFlowNetDataset, GFlowNetTask
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -262,7 +262,7 @@ class SamplingIterator(IterableDataset):
 
     def __iter__(self):
         """Build batch using online and offline data and multiple workers.
-        
+
         Yields:
             batch of data using trajectories and rewards.
         """

@@ -36,7 +36,7 @@ from torch import Tensor
 from torch.utils.data import Dataset
 
 from ..envs.graph_building_env import GraphActionCategorical
-from ..util import wrap_model_mp
+from ..util import MPModelPlaceholder, wrap_model_mp
 
 # This type represents an unprocessed list of reward signals/conditioning information
 FlatRewards = NewType("FlatRewards", torch.tensor)  # type: ignore
@@ -57,7 +57,7 @@ class GFlowNetTask:
         wrap_model: Callable[[nn.Module], nn.Module] = None,
     ) -> None:
 
-        """Initialize a generic gflownet task. 
+        """Initialize a generic gflownet task.
         The task specifies the reward model for the trajectory.
         We consider the task as part of the dataset.
 
@@ -142,7 +142,7 @@ class GFlowNetTask:
         """
         raise NotImplementedError()
 
-    def _wrap_model_mp(self, model: nn.Module) -> nn.Module:
+    def _wrap_model_mp(self, model: nn.Module) -> Union[nn.Module, MPModelPlaceholder]:
         """Wraps a nn.Module instance so that it can be shared to `DataLoader` workers.
 
         Args:
@@ -160,10 +160,8 @@ class GFlowNetDataset(Dataset):
     """A dataset for gflownet."""
 
     def __init__(
-        self,
-        h5_file: str = None,
-        target: str = "gap",
-        properties: List[str] = []) -> None:
+        self, h5_file: str = None, target: str = "gap", properties: List[str] = []
+    ) -> None:
 
         """Initialize a gflownet dataset.
         If the dataset is in a format compatible with h5 file, we can directly load it.
@@ -184,17 +182,15 @@ class GFlowNetDataset(Dataset):
                 # pickle on py3.8 uses prot 5
                 pickle.HIGHEST_PROTOCOL = 5
                 self.df = pd.HDFStore(h5_file, "r")["df"]
-            except:
-                ValueError(f"No h5 compatible database found in the path.")
+            except FileNotFoundError:
+                ValueError("No h5 compatible database found in the path.")
         else:
-            raise ValueError(
-                f"The h5_file path is None. Please specify a h5 file path."
-            )
+            raise ValueError("The h5_file path is None. Please specify a h5 file path.")
 
         self.target = target
         self.properties = properties
 
-    def set_indexes(self, ixs: int):
+    def set_indexes(self, ixs: torch.Tensor):
         """Set the indexes of the dataset split (train/val/test).
 
         Args:
@@ -204,7 +200,7 @@ class GFlowNetDataset(Dataset):
 
     def get_len(self):
         """Get the length of the full dataset (before splitting).
-        
+
         Returns:
             len: the length of the full dataset.
         """
@@ -280,7 +276,7 @@ class GFlowNetDataset(Dataset):
 
     def _read_xyz(self, path: str):
         """Reads the xyz files in the directory on 'path'.
-        
+
         Code adapted from: https://www.kaggle.com/code/rmonge/predicting-molecule-properties-based-on-its-smiles/notebook
 
         Args:
@@ -330,7 +326,7 @@ class GFlowNetDataset(Dataset):
         """
         return len(self.idcs)
 
-    def __getitem__(self, idx:  int) -> Tuple[Any, float]:
+    def __getitem__(self, idx: torch.Tensor) -> Tuple[Any, float]:
         """Retrieve an item from the dataset by index.
 
         Args:

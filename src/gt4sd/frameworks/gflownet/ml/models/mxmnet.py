@@ -480,14 +480,14 @@ def real_sph_harm(k, zero_m_only=True, spherical_coordinates=True):
 
             for i in range(len(S_m)):
                 S_m[i] = (
-                    S_m[i]
-                    .subs(x, sym.sin(theta) * sym.cos(phi))  # type: ignore
+                    S_m[i]  # type: ignore
+                    .subs(x, sym.sin(theta) * sym.cos(phi))
                     .subs(y, sym.sin(theta) * sym.sin(phi))
                 )
             for i in range(len(C_m)):
                 C_m[i] = (
-                    C_m[i]
-                    .subs(x, sym.sin(theta) * sym.cos(phi))  # type: ignore
+                    C_m[i]  # type: ignore
+                    .subs(x, sym.sin(theta) * sym.cos(phi))
                     .subs(y, sym.sin(theta) * sym.sin(phi))
                 )
 
@@ -666,12 +666,12 @@ update_special_args: Set = set([])
 
 
 class MessagePassing(torch.nn.Module):
-    """Message Passing layer for mxmnet.
+    r"""Message Passing Layer.
 
-    \mathbf{x}_i^{\prime} = \gamma_{\mathbf{\Theta}} \left( \mathbf{x}_i,
-    \square_{j \in \mathcal{N}(i)} \, \phi_{\mathbf{\Theta}}
-    \left(\mathbf{x}_i, \mathbf{x}_j,\mathbf{e}_{i,j}\right) \right),
-
+    .. math::
+        \mathbf{x}_i^{\prime} = \gamma_{\mathbf{\Theta}} \left( \mathbf{x}_i,
+        \square_{j \in \mathcal{N}(i)} \, \phi_{\mathbf{\Theta}}
+        \left(\mathbf{x}_i, \mathbf{x}_j,\mathbf{e}_{i,j}\right) \right),
     where :math:`\square` denotes a differentiable, permutation invariant
     function, *e.g.*, sum, mean or max, and :math:`\gamma_{\mathbf{\Theta}}`
     and :math:`\phi_{\mathbf{\Theta}}` denote differentiable functions such as
@@ -798,9 +798,9 @@ class MessagePassing(torch.nn.Module):
                 aggregate messages, and to update node embeddings.
         """
 
-        size = [None, None] if size is None else size
-        size = [size, size] if isinstance(size, int) else size
-        size = size.tolist() if torch.is_tensor(size) else size
+        size = [None, None] if size is None else size  # type: ignore
+        size = [size, size] if isinstance(size, int) else size  # type: ignore
+        size = size.tolist() if torch.is_tensor(size) else size  # type: ignore
         size = list(size) if isinstance(size, tuple) else size
         assert isinstance(size, list)
         assert len(size) == 2
@@ -819,7 +819,7 @@ class MessagePassing(torch.nn.Module):
         return m
 
     def message(self, x_j):  # pragma: no cover
-        """Constructs messages to node :math:`i` in analogy to
+        r"""Constructs messages to node :math:`i` in analogy to
         :math:`\phi_{\mathbf{\Theta}}` for each edge in
         :math:`(j,i) \in \mathcal{E}` if :obj:`flow="source_to_target"` and
         :math:`(i,j) \in \mathcal{E}` if :obj:`flow="target_to_source"`.
@@ -832,9 +832,8 @@ class MessagePassing(torch.nn.Module):
         return x_j
 
     def aggregate(self, inputs, index, dim_size):  # pragma: no cover
-        """Aggregates messages from neighbors as
+        r"""Aggregates messages from neighbors as
         :math:`\square_{j \in \mathcal{N}(i)}`.
-
         By default, delegates call to scatter functions that support
         "add", "mean" and "max" operations specified in :meth:`__init__` by
         the :obj:`aggr` argument.
@@ -845,13 +844,12 @@ class MessagePassing(torch.nn.Module):
         )
 
     def update(self, inputs):  # pragma: no cover
-        """Updates node embeddings in analogy to
+        r"""Updates node embeddings in analogy to
         :math:`\gamma_{\mathbf{\Theta}}` for each node
         :math:`i \in \mathcal{V}`.
         Takes in the output of aggregation as first argument and any argument
         which was initially passed to :meth:`propagate`.
         """
-
         return inputs
 
 

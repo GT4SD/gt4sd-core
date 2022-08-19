@@ -28,7 +28,6 @@ import torch
 import torch.nn as nn
 import torch_geometric.data as gd
 from rdkit.Chem.rdchem import Mol as RDMol
-import torch
 from torch.utils.data import Dataset
 
 from gt4sd.frameworks.gflownet.dataloader.dataset import (
@@ -65,6 +64,7 @@ PROPERTIES: List[str] = [
 
 class QM9Dataset(GFlowNetDataset):
     """QM9 dataset compatible with gflownet."""
+
     def __init__(
         self,
         h5_file: str = None,
@@ -72,7 +72,7 @@ class QM9Dataset(GFlowNetDataset):
         properties: List[str] = PROPERTIES,
     ) -> None:
         """Initialize QM9 dataset.
-        
+
         Args:
             h5_file: path to the h5 file containing the dataset.
             target: target property to optimize and build the reward.
@@ -85,9 +85,11 @@ class QM9Dataset(GFlowNetDataset):
         )
 
 
-def thermometer(v: torch.Tensor, n_bins: int = 50, vmin: int = 0, vmax: int = 1) -> torch.Tensor:
+def thermometer(
+    v: torch.Tensor, n_bins: int = 50, vmin: int = 0, vmax: int = 1
+) -> torch.Tensor:
     """Compute a thermometer reward using gap.
-    
+
     Args:
         v: tensor of values to compute the reward.
         n_bins: number of bins to use.
@@ -118,7 +120,7 @@ class QM9GapTask(GFlowNetTask):
         """Initialize QM9 task.
 
         Code adapted from: https://github.com/recursionpharma/gflownet/blob/trunk/src/gflownet/tasks/qm9/qm9.py.
-        
+
         Args:
             configuration: configuration of the task.
             dataset: dataset to use for the task.
@@ -134,10 +136,10 @@ class QM9GapTask(GFlowNetTask):
 
     def flat_reward_transform(self, _y: Union[float, torch.Tensor]) -> FlatRewards:
         """Transforms a target quantity y (e.g. the LUMO energy in QM9) to a positive reward scalar.
-        
+
         Args:
             _y: target quantity to transform.
-        
+
         Returns:
             reward scalar.
         """
@@ -156,10 +158,10 @@ class QM9GapTask(GFlowNetTask):
 
     def inverse_flat_reward_transform(self, rp):
         """Inverse transform a reward scalar to a target quantity y (e.g. the LUMO energy in QM9).
-        
+
         Args:
             rp: reward scalar to transform.
-        
+
         Returns:
             target quantity.
         """
@@ -172,7 +174,7 @@ class QM9GapTask(GFlowNetTask):
 
     def load_task_models(self) -> Dict[str, nn.Module]:
         """Loads the models for the task.
-        
+
         Returns:
             dictionary of models.
         """
@@ -188,7 +190,7 @@ class QM9GapTask(GFlowNetTask):
 
     def sample_conditional_information(self, n):
         """Sample conditional information for the task.
-        
+
         Args:
             n: number of samples to sample.
 
@@ -210,7 +212,7 @@ class QM9GapTask(GFlowNetTask):
     ) -> RewardScalar:
 
         """Compute the reward for a given conditional information.
-        
+
         Args:
             cond_info: dictionary of conditional information.
             _flat_reward: flat reward.
@@ -221,9 +223,11 @@ class QM9GapTask(GFlowNetTask):
             flat_reward = torch.tensor(_flat_reward)
         return RewardScalar(flat_reward ** cond_info["beta"])
 
-    def compute_flat_rewards(self, mols: List[RDMol]) -> Tuple[RewardScalar, torch.Tensor]:
+    def compute_flat_rewards(
+        self, mols: List[RDMol]
+    ) -> Tuple[RewardScalar, torch.Tensor]:
         """Computes the flat rewards for a list of molecules.
-        
+
         Args:
             mols: list of molecules.
 

@@ -136,7 +136,7 @@ class GFlowNetModule(pl.LightningModule):
         )
         logs.update(
             {
-                self.model.name + f"/{k}": v if hasattr(v, "item") else v  # type: ignore
+                self.model.name + f"/{k}": v.detach() if hasattr(v, "item") else v  # type: ignore
                 for k, v in info.items()
             }
         )
@@ -144,12 +144,21 @@ class GFlowNetModule(pl.LightningModule):
 
         # logs for step
         _logs = {f"train/{k}": v for k, v in logs.items()}
-        self.log_dict(_logs, on_step=True, on_epoch=True, prog_bar=True)
+        self.log_dict(
+            _logs, on_step=True, on_epoch=True, prog_bar=True, batch_size=batch.size(0)
+        )
+        self.log("train_loss", loss, batch_size=batch.size(0))
 
         # logs per epoch
         logs_epoch = {f"train_epoch/{k}": v for k, v in logs.items()}
         logs_epoch["step"] = self.current_epoch
-        self.log_dict(logs_epoch, on_step=False, on_epoch=True, prog_bar=False)
+        self.log_dict(
+            logs_epoch,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            batch_size=batch.size(0),
+        )
 
         return {"loss": loss, "logs": logs}
 
@@ -185,7 +194,9 @@ class GFlowNetModule(pl.LightningModule):
             on_step=True,
             on_epoch=True,
             prog_bar=False,
+            batch_size=batch.size(0),
         )
+        self.log("val_loss", loss, batch_size=batch.size(0))
         return {"loss": loss, "logs": logs}
 
     def test_step(  # type:ignore
@@ -213,14 +224,30 @@ class GFlowNetModule(pl.LightningModule):
             on_step=True,
             on_epoch=True,
             prog_bar=True,
+            batch_size=batch.size(0),
         )
+        self.log("test_loss", loss, batch_size=batch.size(0))
         return {"loss": loss, "logs": logs}
 
-    def prediction_step(self, batch) -> Dict[str, Any]:
-        """Inference step implementation."""
-        pass
+    def prediction_step(self, batch) -> torch.Tensor:
+        """Inference step.
+
+        Args:
+            batch: batch data.
+
+        Returns:
+            output forward.
+        """
+        return self(batch)
 
     def train_epoch_end(self, outputs: List[Dict[str, Any]]):
+        """Train epoch end.
+
+        Args:
+            outputs: list of outputs epoch.
+
+        Returns:
+        """
         pass
 
     # change the following to new implementation

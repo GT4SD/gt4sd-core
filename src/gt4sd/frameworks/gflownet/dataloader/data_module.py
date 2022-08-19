@@ -33,10 +33,10 @@ import torch.nn as nn
 from torch.utils.data import DataLoader  # , Subset, random_split
 
 from ..dataloader.dataset import GFlowNetDataset, GFlowNetTask
-from .sampler import SamplingIterator
 from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
 from ..loss.trajectory_balance import TrajectoryBalance
 from ..ml.models import MODEL_FACTORY
+from .sampler import SamplingIterator
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
@@ -59,7 +59,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         model: nn.Module,
     ) -> None:
         """Construct GFlowNetDataModule.
-        
+
         The module assumes a model and algorithm factory/registry.
         The user should provide a dataset, environment, context for the environment, and task.
 
