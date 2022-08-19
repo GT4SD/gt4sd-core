@@ -40,23 +40,27 @@ from ..envs.graph_building_env import (
 
 
 class MolBuildingEnvContext(GraphBuildingEnvContext):
-    """A specification of what is being generated for a GraphBuildingEnv.
-    This context specifies how to create molecules atom-by-atom (and attribute-by-attribute).
-
-    Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/envs
-    """
+    """A context environment for building molecular graphs."""
 
     def __init__(
         self,
         atoms: List[str] = ["H", "C", "N", "O", "F"],
         num_cond_dim: int = 32,
         device="cpu",
-    ):
-        """
+    ) -> None:
+        """Initialize a generic context environment for molecules.
+
+        A specification of what is being generated for a GraphBuildingEnv.
+        This context specifies how to create molecules atom-by-atom (and attribute-by-attribute).
+
+        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/envs
+
         Args:
-            atoms: Basic building blocks. Defaults to ["H", "C", "N", "O", "F"].
-            num_cond_dim: Number of conditional dimensions. Defaults to 32.
+            atoms: basic building blocks. In principle we can infer this information from the dataset.
+            num_cond_dim: number of conditional dimensions.s
+            device: device to use (cpu, cuda).
         """
+
         # idx 0 has to coincide with the default value
         self.atom_attr_values = {
             "v": atoms,
@@ -151,10 +155,20 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
         ]
         self.device = device
 
-    def aidx_to_GraphAction(self, g: gd.Data, action_idx: Tuple[int, int, int]):
-        """Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction."""
+    def aidx_to_graph_action(self, g: gd.Data, action_idx: Tuple[int, int, int]) -> GraphAction:
+        """Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction.
+        
+        Args:
+            g: The graph to act on.
+            action_idx: The action index.
+
+        Returns:
+            The action corresponding to the action index.
+        """
+
         act_type, act_row, act_col = [int(i) for i in action_idx]
         t = self.action_type_order[act_type]
+
         if t is GraphActionType.Stop:
             return GraphAction(t)
         elif t is GraphActionType.AddNode:
@@ -175,10 +189,18 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
                 t, source=a.item(), target=b.item(), attr=attr, value=val
             )
 
-    def GraphAction_to_aidx(
+    def graph_action_to_aidx(
         self, g: gd.Data, action: GraphAction
     ) -> Tuple[int, int, int]:
-        """Translate a GraphAction to an index tuple."""
+        """Translate a GraphAction to an index tuple.
+        
+        Args:
+            g: The graph to act on.
+            action: The action to translate.
+
+        Returns:
+            The index corresponding to the action.
+        """
 
         if action.action is GraphActionType.Stop:
             row = 0
@@ -229,8 +251,16 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
         col = int(col)
         return (type_idx, row, col)
 
-    def graph_to_Data(self, g: Graph) -> gd.Data:
-        """Convert a networkx Graph to a torch geometric Data instance."""
+    def graph_to_data(self, g: Graph) -> gd.Data:
+        """Convert a networkx Graph to a torch geometric Data instance.
+        
+        Args:
+            g: Networkx Graph to convert.
+
+        Returns:
+            torch geometric Data instance.
+        """
+
         x = torch.zeros((max(1, len(g.nodes)), self.num_node_dim))
         x[0, -1] = len(g.nodes) == 0
 
@@ -261,13 +291,29 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
         return gd.Data(x, edge_index, edge_attr, non_edge_index=non_edge_index)
 
     def collate(self, graphs: List[gd.Data]):
-        """Batch Data instances"""
+        """Batch Data instances.
+        
+        Args:
+            graphs: List of Data instances.
+
+        Returns:
+            Batch of Data instances.
+        """
+
         return gd.Batch.from_data_list(
             graphs, follow_batch=["edge_index", "non_edge_index"]
         )
 
     def mol_to_graph(self, mol: Mol) -> Graph:
-        """Convert an RDMol to a Graph"""
+        """Convert an RDMol to a Graph.
+        
+        Args:
+            mol: RDKit molecule format.
+
+        Returns:
+            Graph format.
+        """
+
         g = Graph()
         # Only set an attribute tag if it is not the default attribute
         for a in mol.GetAtoms():
@@ -300,6 +346,15 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
         return g
 
     def graph_to_mol(self, g: Graph) -> Mol:
+        """Convert a Graph to an RDKit molecule.
+        
+        Args:
+            g: Graph format.
+
+        Returns:
+            RDKit molecule format.
+        """
+
         mp = Chem.RWMol()
         mp.BeginBatchEdit()
         for i in range(len(g.nodes)):
@@ -322,6 +377,14 @@ class MolBuildingEnvContext(GraphBuildingEnvContext):
         return mp
 
     def is_sane(self, g: Graph) -> bool:
+        """Check if a graph is sane.
+        
+        Args:
+            g: Graph format.
+
+        Returns:
+            True if sane, False otherwise.
+        """
         try:
             mol = self.graph_to_mol(g)
             assert Chem.MolFromSmiles(Chem.MolToSmiles(mol)) is not None

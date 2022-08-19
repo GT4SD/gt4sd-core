@@ -22,8 +22,6 @@
 # SOFTWARE.
 #
 
-from typing import Optional, Tuple
-
 from .graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
 from .mol_building_env import MolBuildingEnvContext
 
@@ -31,8 +29,18 @@ from .mol_building_env import MolBuildingEnvContext
 # convert to a factory/registry
 def build_env_context(
     environment_name: str = "graph_building_env",
-    context_name="graph_building_env_context",
+    context_name: str = "graph_building_env_context",
 ):
+
+    """Builds an environment and context environment.
+
+    Args:
+        environment_name: The name of the environment to build.
+        context_name: The name of the context environment to build.
+
+    Returns:
+        tuple with selected environment and context environment.
+    """
 
     env, context = None, None
     if environment_name == "graph_building_env":
