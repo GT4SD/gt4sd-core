@@ -25,7 +25,11 @@
 import numpy as np
 import pytest
 
-from gt4sd.domains.materials.property_scorer import PropertyPredictorScorer
+from gt4sd.domains.materials.property_scorer import (
+    MoleculePropertyPredictorScorer,
+    PropertyPredictorScorer,
+    ProteinPropertyPredictorScorer,
+)
 from gt4sd.properties import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 
 protein = "KFLIYQMECSTMIFGL"
@@ -76,8 +80,15 @@ OPTIMAL_SCORE = 1.0
 
 
 def select_sample(property_key):
-    """select a sample from the protein or molecule factory."""
+    """select a molecule or protein accordingly to the property."""
     return protein if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY else molecule
+
+
+def select_opposite_sample(property_key):
+    """select a molecule or protein not accordingly to the property."""
+    return (
+        protein if property_key not in PROTEIN_PROPERTY_PREDICTOR_FACTORY else molecule
+    )
 
 
 @pytest.mark.parametrize(
@@ -117,3 +128,60 @@ def test_charge_with_arguments_scorer():
         parameters={"amide": True, "ph": 5.0},
     )
     assert np.isclose(scorer.score(protein), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
+
+
+@pytest.mark.parametrize(
+    "property_key", [(property_key) for property_key in ground_truths.keys()]
+)
+def test_validation_property_scorer(property_key):
+    scorer = PropertyPredictorScorer(
+        name=property_key, target=ground_truths[property_key]
+    )
+    sample = select_opposite_sample(property_key)
+    try:
+        scorer.score(sample)
+        assert False
+    except ValueError:
+        assert True
+
+
+@pytest.mark.parametrize(
+    "property_key", [(property_key) for property_key in ground_truths.keys()]
+)
+def test_molecule_property_scorer(property_key):
+    if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
+        try:
+            scorer = MoleculePropertyPredictorScorer(
+                name=property_key, target=ground_truths[property_key]
+            )
+            assert False
+        except ValueError:
+            assert True
+
+    if property_key not in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
+        scorer = MoleculePropertyPredictorScorer(
+            name=property_key, target=ground_truths[property_key]
+        )
+        sample = select_sample(property_key)
+        assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
+
+
+@pytest.mark.parametrize(
+    "property_key", [(property_key) for property_key in ground_truths.keys()]
+)
+def test_protein_property_scorer(property_key):
+    if property_key not in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
+        try:
+            scorer = ProteinPropertyPredictorScorer(
+                name=property_key, target=ground_truths[property_key]
+            )
+            assert False
+        except ValueError:
+            assert True
+
+    if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
+        scorer = ProteinPropertyPredictorScorer(
+            name=property_key, target=ground_truths[property_key]
+        )
+        sample = select_sample(property_key)
+        assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
