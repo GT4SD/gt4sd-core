@@ -23,5 +23,15 @@
 #
 """Module initialization."""
 
-__version__ = "0.47.0"
+__version__ = "0.48.0"
 __name__ = "gt4sd"
+
+# NOTE: configure SSL to allow unverified contexts by default
+from .configuration import GT4SDConfiguration
+
+gt4sd_configuration_instance = GT4SDConfiguration.get_instance()
+
+if gt4sd_configuration_instance.gt4sd_create_unverified_ssl_context:
+    import ssl
+
+    ssl._create_default_https_context = ssl._create_unverified_context
