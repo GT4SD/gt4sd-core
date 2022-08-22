@@ -142,10 +142,6 @@ class MoleculePropertyPredictorScorer(PropertyPredictorScorer):
             target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters["target"]).
             parameters: parameters for the scoring function.
         """
-        self.name = name
-        self.target = target
-        self.parameters = parameters
-
         if name not in MOLECULE_PROPERTY_PREDICTOR_FACTORY:
             raise ValueError(f"property {name} not available for molecules.")
 
@@ -168,10 +164,6 @@ class ProteinPropertyPredictorScorer(PropertyPredictorScorer):
             target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters["target"]).
             parameters: parameters for the scoring function.
         """
-        self.name = name
-        self.target = target
-        self.parameters = parameters
-
         if name not in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
             raise ValueError(f"property {name} not available for proteins.")
 
