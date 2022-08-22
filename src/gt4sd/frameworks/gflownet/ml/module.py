@@ -294,26 +294,26 @@ class GFlowNetModule(pl.LightningModule):
         Returns:
             an optimizer, currently only Adam is supported.
         """
-        # Separate Z parameters from non-Z to allow for LR decay on the former
-        Z_params = list(self.model.logZ.parameters())  # type: ignore
-        non_Z_params = [
-            i for i in self.model.parameters() if all(id(i) != id(j) for j in Z_params)
+        # Separate z parameters from non-z to allow for LR decay on the former
+        z_params = list(self.model.log_z.parameters())  # type: ignore
+        non_z_params = [
+            i for i in self.model.parameters() if all(id(i) != id(j) for j in z_params)
         ]
 
         self.opt = torch.optim.Adam(
-            non_Z_params,
+            non_z_params,
             self.hps["learning_rate"],
             (self.hps["momentum"], 0.999),
             weight_decay=self.hps["weight_decay"],
             eps=self.hps["adam_eps"],
         )
-        self.opt_Z = torch.optim.Adam(Z_params, self.hps["learning_rate"], (0.9, 0.999))
+        self.opt_z = torch.optim.Adam(z_params, self.hps["learning_rate"], (0.9, 0.999))
 
         self.lr_sched = torch.optim.lr_scheduler.LambdaLR(
             self.opt, lambda steps: 2 ** (-steps / self.hps["lr_decay"])
         )
-        self.lr_sched_Z = torch.optim.lr_scheduler.LambdaLR(
-            self.opt_Z, lambda steps: 2 ** (-steps / self.hps["Z_lr_decay"])
+        self.lr_sched_z = torch.optim.lr_scheduler.LambdaLR(
+            self.opt_z, lambda steps: 2 ** (-steps / self.hps["z_lr_decay"])
         )
 
         if self.sampling_tau > 0:
@@ -338,4 +338,4 @@ class GFlowNetModule(pl.LightningModule):
             "none": (lambda x: None),
         }[self.hps["clip_grad_type"]]
 
-        return [self.opt, self.opt_Z], [self.lr_sched, self.lr_sched_Z]
+        return [self.opt, self.opt_z], [self.lr_sched, self.lr_sched_z]

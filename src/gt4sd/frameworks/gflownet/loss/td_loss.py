@@ -25,8 +25,8 @@
 
 class TDLoss:
     """Temporal Difference implementation, see
-    "Flow Network based Generative Models for Non-Iterative Diverse Candidate Generation
-    Emmanuel Bengio, Moksh Jain, Maksym Korablyov, Doina Precup, Yoshua Bengio"
+    `Flow Network based Generative Models for Non-Iterative Diverse Candidate Generation`
+    Emmanuel Bengio, Moksh Jain, Maksym Korablyov, Doina Precup, Yoshua Bengio
     https://arxiv.org/abs/2106.04399.
 
     Code adapted from: https://github.com/GFNOrg/gflownet

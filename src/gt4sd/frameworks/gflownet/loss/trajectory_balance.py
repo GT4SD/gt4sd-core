@@ -57,8 +57,8 @@ class TrajectoryBalanceModel(nn.Module):
         """
         raise NotImplementedError()
 
-    def logZ(self, cond_info: Tensor) -> Tensor:
-        """Compute logZ.
+    def log_z(self, cond_info: Tensor) -> Tensor:
+        """Compute log_z.
 
         Args:
             cond_info: conditional information
@@ -165,9 +165,9 @@ class TrajectoryBalance:
             data: a list of trajectories. Each trajectory is a dict with keys.
                 - trajs: List[Tuple[Graph, GraphAction]].
                 - reward_pred: float, -100 if an illegal action is taken, predicted R(x) if bootstrapping, None otherwise.
-                - fwd_logprob: log Z + sum logprobs P_F.
+                - fwd_logprob: log_z + sum logprobs P_F.
                 - bck_logprob: sum logprobs P_B.
-                - logZ: predicted log Z.
+                - log_z: predicted log_z.
                 - loss: predicted loss (if bootstrapping).
                 - is_valid: is the generated graph valid according to the environment and context.
         """
@@ -176,8 +176,8 @@ class TrajectoryBalance:
         env = self.env
         dev = self.ctx.device
         cond_info = cond_info.to(dev)
-        # TODO: how do we compute logZ?
-        logZ_pred = model.logZ(cond_info)  # type: ignore
+        # how do we compute log_z pred?
+        log_z_pred = model.log_z(cond_info)  # type: ignore
 
         # This will be returned as training data
         data: List[Dict] = []
@@ -275,14 +275,14 @@ class TrajectoryBalance:
             # If we're not bootstrapping, we could query the reward
             # model here, but this is expensive/impractical.  Instead
             # just report forward and backward flows
-            data[i]["logZ"] = logZ_pred[i].item()
+            data[i]["log_z"] = log_z_pred[i].item()
             data[i]["fwd_logprob"] = sum(fwd_logprob[i])
             data[i]["bck_logprob"] = sum(bck_logprob[i])
             if self.bootstrap_own_reward:
                 if not data[i]["is_valid"]:
                     logprob_of_illegal.append(data[i]["fwd_logprob"].item())
                 # If we are bootstrapping, we can report the theoretical loss as well
-                numerator = data[i]["fwd_logprob"] + logZ_pred[i]
+                numerator = data[i]["fwd_logprob"] + log_z_pred[i]
                 denominator = data[i]["bck_logprob"] + data[i]["reward_pred"].log()
                 if self.epsilon is not None:
                     numerator = torch.logaddexp(numerator, epsilon)
@@ -355,7 +355,7 @@ class TrajectoryBalance:
 
         Args:
             model: a GNN taking in a batch of graphs as input as per constructed by self.construct_batch.
-                    Must have a `logZ` attribute, itself a model, which predicts log of Z(cond_info)
+                    Must have a `log_z` attribute, itself a model, which predicts log of z(cond_info)
             batch: batch of graphs inputs as per constructed by self.construct_batch.
             num_bootstrap: the number of trajectories for which the reward loss is computed. Ignored if 0.
 
@@ -385,7 +385,7 @@ class TrajectoryBalance:
         # i.e. the final graph of each trajectory
         log_reward_preds = log_reward_preds[final_graph_idx, 0]
         # Compute trajectory balance objective
-        Z = model.logZ(cond_info)[:, 0]
+        logz = model.log_z(cond_info)[:, 0]
         # This is the log prob of each action in the trajectory
         log_prob = fwd_cat.log_prob(batch.actions)
         # The log prob of each backward action
@@ -397,7 +397,7 @@ class TrajectoryBalance:
             log_prob, batch_idx, dim=0, dim_size=num_trajs, reduce="sum"
         )
         # Compute log numerator and denominator of the TB objective
-        numerator = Z + traj_log_prob
+        numerator = logz + traj_log_prob
         denominator = Rp + scatter(
             log_p_B, batch_idx, dim=0, dim_size=num_trajs, reduce="sum"
         )
@@ -453,7 +453,7 @@ class TrajectoryBalance:
             / (invalid_mask.sum() + 1e-4),
             "invalid_losses": (invalid_mask * traj_losses).sum()
             / (invalid_mask.sum() + 1e-4),
-            "logZ": Z.mean(),
+            "log_z": logz.mean(),
         }
 
         if not torch.isfinite(traj_losses).all():

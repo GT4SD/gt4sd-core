@@ -159,7 +159,7 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     parser.add_argument("--momentum", type=float, default=0.9)
     parser.add_argument("--adam_eps", type=float, default=1e-8)
     parser.add_argument("--lr_decay", type=int, default=20000)
-    parser.add_argument("--Z_lr_decay", type=int, default=20000)
+    parser.add_argument("--z_lr_decay", type=int, default=20000)
     parser.add_argument("--clip_grad_type", type=str, default="norm")
     parser.add_argument("--clip_grad_param", type=int, default=10)
     parser.add_argument("--random_action_prob", type=float, default=0.001)

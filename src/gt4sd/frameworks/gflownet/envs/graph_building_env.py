@@ -522,8 +522,8 @@ class GraphActionCategorical:
             (i - maxl[b, None]).exp() + 1e-40 for i, b in zip(self.logits, self.batch)
         ]
 
-        # sum corrected exponentiated logits, to get log(Z - max) = log(sum(exp(logits)) - max)
-        logZ = sum(  # type: ignore
+        # sum corrected exponentiated logits, to get log(z - max) = log(sum(exp(logits)) - max)
+        log_z = sum(  # type: ignore
             [
                 scatter(i, b, dim=0, dim_size=self.num_graphs, reduce="sum").sum(1)
                 for i, b in zip(exp_logits, self.batch)
@@ -532,7 +532,7 @@ class GraphActionCategorical:
 
         # log probabilities is log(exp(logit) / Z)
         self.logprobs = [
-            i.log() - logZ[b, None] for i, b in zip(exp_logits, self.batch)
+            i.log() - log_z[b, None] for i, b in zip(exp_logits, self.batch)
         ]
         return self.logprobs
 

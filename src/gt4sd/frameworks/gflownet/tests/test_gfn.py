@@ -50,7 +50,7 @@ configuration = {
     "momentum": 0.9,
     "adam_eps": 1e-8,
     "lr_decay": 20000,
-    "Z_lr_decay": 20000,
+    "z_lr_decay": 20000,
     "clip_grad_type": "norm",
     "clip_grad_param": 10,
     "random_action_prob": 0.001,

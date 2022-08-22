@@ -47,10 +47,9 @@ class MPModelPlaceholder:
         self.out_queue = self.qs[1][info.id]
         self._is_init = True
 
-    # TODO: make a generic method for this based on __getattr__
-    def logZ(self, *a):
+    def log_z(self, *a):
         self._check_init()
-        self.in_queue.put(("logZ", *a))
+        self.in_queue.put(("log_z", *a))
         return self.out_queue.get()
 
     def __call__(self, *a):
@@ -77,9 +76,8 @@ class MPModelProxy:
 
         Args:
             model: a torch model which lives in the main process to which method calls are passed.
-            num_workers: number of DataLoader workers.
+            num_workers: number of workers.
             cast_types: types that will be cast to cuda when received as arguments of method calls.
-                torch.Tensor is cast by default.
         """
         self.in_queues = [mp.Queue() for i in range(num_workers)]  # type: ignore
         self.out_queues = [mp.Queue() for i in range(num_workers)]  # type: ignore

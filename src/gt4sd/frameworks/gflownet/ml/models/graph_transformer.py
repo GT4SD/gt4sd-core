@@ -191,7 +191,7 @@ class GraphTransformerGFN(nn.Module):
         )
         self.emb2stop = mlp(num_emb * 3, num_emb, 1, num_mlp_layers)
         self.emb2reward = mlp(num_emb * 3, num_emb, 1, num_mlp_layers)
-        self.logZ = mlp(context.num_cond_dim, num_emb * 2, 1, 2)
+        self.log_z = mlp(context.num_cond_dim, num_emb * 2, 1, 2)
         self.action_type_order = context.action_type_order
 
     def forward(self, g: gd.Batch, cond: torch.Tensor):
