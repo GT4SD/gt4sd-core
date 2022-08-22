@@ -42,8 +42,9 @@ from guacamol_baselines.smiles_lstm_ppo.goal_directed_generation import (
     PPODirectedGenerator,
 )
 
-from .....domains.materials.scorer import CombinedScorer, get_target_parameters
 from .....frameworks.torch import claim_device_name
+from .....properties.scores import get_target_parameters
+from .....properties.scores.core import CombinedScorer
 from .graph_ga import GraphGA
 from .graph_mcts import GraphMCTS
 from .moses_aae import AAE

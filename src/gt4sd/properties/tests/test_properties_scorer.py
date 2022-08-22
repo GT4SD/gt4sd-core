@@ -25,12 +25,8 @@
 import numpy as np
 import pytest
 
-from gt4sd.domains.materials.property_scorer import (
-    MoleculePropertyPredictorScorer,
-    PropertyPredictorScorer,
-    ProteinPropertyPredictorScorer,
-)
 from gt4sd.properties import PROTEIN_PROPERTY_PREDICTOR_FACTORY
+from gt4sd.properties.scores import SCORING_FUNCTIONS_FACTORY
 
 protein = "KFLIYQMECSTMIFGL"
 molecule = "C1=CC(=CC(=C1)Br)CN"
@@ -95,7 +91,7 @@ def select_opposite_sample(property_key):
     "property_key", [(property_key) for property_key in ground_truths.keys()]
 )
 def test_property_scorer(property_key):
-    scorer = PropertyPredictorScorer(
+    scorer = SCORING_FUNCTIONS_FACTORY["property_predictor_scorer"](
         name=property_key, target=ground_truths[property_key]
     )
     sample = select_sample(property_key)
@@ -103,7 +99,7 @@ def test_property_scorer(property_key):
 
 
 def test_similarity_seed_scorer():
-    scorer = PropertyPredictorScorer(
+    scorer = SCORING_FUNCTIONS_FACTORY["property_predictor_scorer"](
         name="similarity_seed",
         target=molecule_further_ground_truths["similarity_seed"],
         parameters={"smiles": seed},
@@ -113,7 +109,7 @@ def test_similarity_seed_scorer():
 
 def test_activity_against_target_scorer():
     """target for the scorer is a number (for example the predicted property value). Target for the property is a string (molecule)."""
-    scorer = PropertyPredictorScorer(
+    scorer = SCORING_FUNCTIONS_FACTORY["property_predictor_scorer"](
         name="activity_against_target",
         target=molecule_further_ground_truths["activity_against_target"],
         parameters={"target": _target},
@@ -122,7 +118,7 @@ def test_activity_against_target_scorer():
 
 
 def test_charge_with_arguments_scorer():
-    scorer = PropertyPredictorScorer(
+    scorer = SCORING_FUNCTIONS_FACTORY["property_predictor_scorer"](
         name="charge",
         target=protein_further_ground_truths["charge"],
         parameters={"amide": True, "ph": 5.0},
@@ -134,7 +130,7 @@ def test_charge_with_arguments_scorer():
     "property_key", [(property_key) for property_key in ground_truths.keys()]
 )
 def test_validation_property_scorer(property_key):
-    scorer = PropertyPredictorScorer(
+    scorer = SCORING_FUNCTIONS_FACTORY["property_predictor_scorer"](
         name=property_key, target=ground_truths[property_key]
     )
     sample = select_opposite_sample(property_key)
@@ -151,7 +147,7 @@ def test_validation_property_scorer(property_key):
 def test_molecule_property_scorer(property_key):
     if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
         try:
-            scorer = MoleculePropertyPredictorScorer(
+            scorer = SCORING_FUNCTIONS_FACTORY["molecule_property_predictor_scorer"](
                 name=property_key, target=ground_truths[property_key]
             )
             assert False
@@ -159,7 +155,7 @@ def test_molecule_property_scorer(property_key):
             assert True
 
     if property_key not in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
-        scorer = MoleculePropertyPredictorScorer(
+        scorer = SCORING_FUNCTIONS_FACTORY["molecule_property_predictor_scorer"](
             name=property_key, target=ground_truths[property_key]
         )
         sample = select_sample(property_key)
@@ -172,7 +168,7 @@ def test_molecule_property_scorer(property_key):
 def test_protein_property_scorer(property_key):
     if property_key not in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
         try:
-            scorer = ProteinPropertyPredictorScorer(
+            scorer = SCORING_FUNCTIONS_FACTORY["protein_property_predictor_scorer"](
                 name=property_key, target=ground_truths[property_key]
             )
             assert False
@@ -180,7 +176,7 @@ def test_protein_property_scorer(property_key):
             assert True
 
     if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
-        scorer = ProteinPropertyPredictorScorer(
+        scorer = SCORING_FUNCTIONS_FACTORY["protein_property_predictor_scorer"](
             name=property_key, target=ground_truths[property_key]
         )
         sample = select_sample(property_key)
