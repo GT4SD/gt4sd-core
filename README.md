@@ -348,6 +348,13 @@ url = {https://github.com/GT4SD/gt4sd-core},
 version = {main},
 year = {2022}
 }
+
+@article{manica2022gt4sd,
+  title={GT4SD: Generative Toolkit for Scientific Discovery},
+  author={Manica, Matteo and Cadow, Joris and Christofidellis, Dimitrios and Dave, Ashish and Born, Jannis and Clarke, Dean and Teukam, Yves Gaetan Nana and Hoffman, Samuel C and Buchan, Matthew and Chenthamarakshan, Vijil and others},
+  journal={arXiv preprint arXiv:2207.03928},
+  year={2022}
+}
 ```
 
 ## License
