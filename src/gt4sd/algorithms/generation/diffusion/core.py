@@ -34,7 +34,7 @@ from ...core import (
     get_configuration_class_with_attributes,
 )
 from ...registry import ApplicationsRegistry
-from .implementation import MODEL_TYPES, Generator
+from .implementation import MODEL_TYPES, SCHEDULER_TYPES, Generator
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -43,11 +43,11 @@ T = type(None)
 S = TypeVar("S", bound=str)
 
 
-class HuggingFaceGenerationAlgorithm(GeneratorAlgorithm[S, T]):
+class DiffusersGenerationAlgorithm(GeneratorAlgorithm[S, T]):
     def __init__(
         self, configuration: AlgorithmConfiguration, target: Optional[T] = None
     ):
-        """HuggingFace generation algorithm.
+        """Diffusers generation algorithm.
 
         Args:
             configuration: domain and application
@@ -55,10 +55,10 @@ class HuggingFaceGenerationAlgorithm(GeneratorAlgorithm[S, T]):
             target: unused since it is not a conditional generator.
 
         Example:
-            An example for using a generative algorithm from HuggingFace::
+            An example for using a generative algorithm from Diffusers::
 
-                configuration = HuggingFaceXLMGenerator()
-                algorithm = HuggingFaceGenerationAlgorithm(configuration=configuration)
+                configuration = GeneratorConfiguration()
+                algorithm = DiffusersGenerationAlgorithm(configuration=configuration)
                 items = list(algorithm.sample(1))
                 print(items)
         """
@@ -100,8 +100,8 @@ class HuggingFaceGenerationAlgorithm(GeneratorAlgorithm[S, T]):
         return configuration
 
 
-@ApplicationsRegistry.register_algorithm_application(HuggingFaceGenerationAlgorithm)
-class HuggingFaceConfiguration(AlgorithmConfiguration[str, None]):
+@ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
+class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
     """Basic configuration for an hugging face algorithm."""
 
     algorithm_type: ClassVar[str] = "generation"
@@ -113,16 +113,14 @@ class HuggingFaceConfiguration(AlgorithmConfiguration[str, None]):
             description=f"Type of the model. Supported: {', '.join(MODEL_TYPES.keys())}"
         ),
     )
-    prompt: str = field(
-        default="I'm a stochastic parrot.",
-        metadata=dict(description="Prompt for text generation."),
+
+    scheduler_type: str = field(
+        default="",
+        metadata=dict(
+            description=f"Type of the noise scheduler. Supported: {', '.join(SCHEDULER_TYPES.keys())}"
+        ),
     )
-    length: int = field(
-        default=20, metadata=dict(description="Length of the generated text.")
-    )
-    stop_token: str = field(
-        default="", metadata=dict(description="Stop token for text generation.")
-    )
+
     temperature: float = field(
         default=1.0,
         metadata=dict(
@@ -169,9 +167,7 @@ class HuggingFaceConfiguration(AlgorithmConfiguration[str, None]):
             resources_path=resources_path,
             model_type=self.model_type,
             model_name=self.algorithm_version,
-            prompt=self.prompt,
-            length=self.length,
-            stop_token=self.stop_token,
+            scheduler_type=self.scheduler_type,
             temperature=self.temperature,
             repetition_penalty=self.repetition_penalty,
             k=self.k,
@@ -181,12 +177,12 @@ class HuggingFaceConfiguration(AlgorithmConfiguration[str, None]):
         )
 
 
-@ApplicationsRegistry.register_algorithm_application(HuggingFaceGenerationAlgorithm)
-class HuggingFaceXLMGenerator(HuggingFaceConfiguration):
-    """Configuration to generate text using XLM."""
+@ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
+class DDPMGenerator(DiffusersConfiguration):
+    """DDPM - Configuration to generate using unconditional denoising diffusion models."""
 
-    algorithm_version: str = "xlm-mlm-en-2048"
-    model_type: str = "xlm"
+    algorithm_version: str = "google/ddpm-celebahq-256"
+    model_type: str = "ddpm"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -198,7 +194,7 @@ class HuggingFaceXLMGenerator(HuggingFaceConfiguration):
             viable values as :attr:`algorithm_version` for the environment.
         """
         logger.warning(
-            "more algorithm versions can be found on https://huggingface.co/models"
+            "more algorithm versions can be found on https://github.com/huggingface/diffusers"
         )
         return (
             get_configuration_class_with_attributes(cls)
@@ -207,12 +203,12 @@ class HuggingFaceXLMGenerator(HuggingFaceConfiguration):
         )
 
 
-@ApplicationsRegistry.register_algorithm_application(HuggingFaceGenerationAlgorithm)
-class HuggingFaceCTRLGenerator(HuggingFaceConfiguration):
-    """Configuration to generate text using CTRL."""
+@ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
+class DDIMGenerator(DiffusersConfiguration):
+    """DDIM - Configuration to generate using a denoising diffusion implicit model."""
 
-    algorithm_version: str = "ctrl"
-    model_type: str = "ctrl"
+    algorithm_version: str = "ddim"
+    model_type: str = "ddim"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -224,7 +220,7 @@ class HuggingFaceCTRLGenerator(HuggingFaceConfiguration):
             viable values as :attr:`algorithm_version` for the environment.
         """
         logger.warning(
-            "more algorithm versions can be found on https://huggingface.co/models"
+            "more algorithm versions can be found on https://github.com/huggingface/diffusers"
         )
         return (
             get_configuration_class_with_attributes(cls)
@@ -233,12 +229,12 @@ class HuggingFaceCTRLGenerator(HuggingFaceConfiguration):
         )
 
 
-@ApplicationsRegistry.register_algorithm_application(HuggingFaceGenerationAlgorithm)
-class HuggingFaceGPT2Generator(HuggingFaceConfiguration):
-    """Configuration to generate text using GPT2."""
+@ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
+class PNDMPGenerator(DiffusersConfiguration):
+    """PNDMP - Configuration to generate using a ."""
 
-    algorithm_version: str = "gpt2"
-    model_type: str = "gpt2"
+    algorithm_version: str = "pndmp"
+    model_type: str = "pndmp"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -250,7 +246,7 @@ class HuggingFaceGPT2Generator(HuggingFaceConfiguration):
             viable values as :attr:`algorithm_version` for the environment.
         """
         logger.warning(
-            "more algorithm versions can be found on https://huggingface.co/models"
+            "more algorithm versions can be found on https://github.com/huggingface/diffusers"
         )
         return (
             get_configuration_class_with_attributes(cls)
@@ -259,12 +255,12 @@ class HuggingFaceGPT2Generator(HuggingFaceConfiguration):
         )
 
 
-@ApplicationsRegistry.register_algorithm_application(HuggingFaceGenerationAlgorithm)
-class HuggingFaceOpenAIGPTGenerator(HuggingFaceConfiguration):
-    """Configuration to generate text using OpenAIGPT."""
+@ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
+class DiffusionGenerator(DiffusersConfiguration):
+    """LDM - Configuration to generate text2img using a latent diffusion model."""
 
-    algorithm_version: str = "openai-gpt"
-    model_type: str = "openai-gpt"
+    algorithm_version: str = "CompVis/ldm-text2im-large-256"
+    model_type: str = "latent_diffusion"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -276,7 +272,7 @@ class HuggingFaceOpenAIGPTGenerator(HuggingFaceConfiguration):
             viable values as :attr:`algorithm_version` for the environment.
         """
         logger.warning(
-            "more algorithm versions can be found on https://huggingface.co/models"
+            "more algorithm versions can be found on https://github.com/huggingface/diffusers"
         )
         return (
             get_configuration_class_with_attributes(cls)
@@ -285,38 +281,12 @@ class HuggingFaceOpenAIGPTGenerator(HuggingFaceConfiguration):
         )
 
 
-@ApplicationsRegistry.register_algorithm_application(HuggingFaceGenerationAlgorithm)
-class HuggingFaceXLNetGenerator(HuggingFaceConfiguration):
-    """Configuration to generate text using XLNet."""
+@ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
+class StableDiffusionGenerator(DiffusersConfiguration):
+    """Stable LDM - Configuration to generate text2img using a latent diffusion model."""
 
-    algorithm_version: str = "xlnet-large-cased"
-    model_type: str = "xlnet"
-
-    @classmethod
-    def list_versions(cls) -> Set[str]:
-        """Get possible algorithm versions.
-
-        Standard S3 and cache search adding the version used in the configuration.
-
-        Returns:
-            viable values as :attr:`algorithm_version` for the environment.
-        """
-        logger.warning(
-            "more algorithm versions can be found on https://huggingface.co/models"
-        )
-        return (
-            get_configuration_class_with_attributes(cls)
-            .list_versions()
-            .union({cls.algorithm_version})
-        )
-
-
-@ApplicationsRegistry.register_algorithm_application(HuggingFaceGenerationAlgorithm)
-class HuggingFaceTransfoXLGenerator(HuggingFaceConfiguration):
-    """Configuration to generate text using TransfoXL."""
-
-    algorithm_version: str = "transfo-xl-wt103"
-    model_type: str = "transfo-xl"
+    algorithm_version: str = "CompVis/stable-diffusion-v1-3"
+    model_type: str = "stable_diffusion"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -328,7 +298,7 @@ class HuggingFaceTransfoXLGenerator(HuggingFaceConfiguration):
             viable values as :attr:`algorithm_version` for the environment.
         """
         logger.warning(
-            "more algorithm versions can be found on https://huggingface.co/models"
+            "more algorithm versions can be found on https://github.com/huggingface/diffusers"
         )
         return (
             get_configuration_class_with_attributes(cls)

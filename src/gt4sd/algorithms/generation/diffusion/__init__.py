@@ -21,24 +21,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""HuggingFaceGenerationAlgorithm initialization."""
+"""DiffusersGenerationAlgorithm initialization."""
 
 from .core import (
-    HuggingFaceCTRLGenerator,
-    HuggingFaceGenerationAlgorithm,
-    HuggingFaceGPT2Generator,
-    HuggingFaceOpenAIGPTGenerator,
-    HuggingFaceTransfoXLGenerator,
-    HuggingFaceXLMGenerator,
-    HuggingFaceXLNetGenerator,
+    DDIMGenerator,
+    DDPMGenerator,
+    DiffusersGenerationAlgorithm,
+    DiffusionGenerator,
+    PNDMPGenerator,
+    StableDiffusionGenerator,
 )
 
 __all__ = [
-    "HuggingFaceGenerationAlgorithm",
-    "HuggingFaceXLMGenerator",
-    "HuggingFaceCTRLGenerator",
-    "HuggingFaceGPT2Generator",
-    "HuggingFaceOpenAIGPTGenerator",
-    "HuggingFaceXLNetGenerator",
-    "HuggingFaceTransfoXLGenerator",
+    "DiffusersGenerationAlgorithm",
+    "DDPMGenerator",
+    "DDIMGenerator",
+    "PNDMPGenerator",
+    "DiffusionGenerator",
+    "StableDiffusionGenerator",
 ]
