@@ -65,20 +65,6 @@ class GT4SDConfiguration(BaseSettings):
     gt4sd_s3_bucket_hub_algorithms: str = "gt4sd-cos-hub-algorithms-artifacts"
     gt4sd_s3_bucket_hub_properties: str = "gt4sd-cos-hub-properties-artifacts"
 
-    gt4sd_s3_modules: Set[str] = {"algorithms", "properties"}
-    local_cache_path: Dict[str, str] = {
-        "algorithms": gt4sd_local_cache_path_algorithms,
-        "properties": gt4sd_local_cache_path_properties,
-    }
-    s3_bucket: Dict[str, str] = {
-        "algorithms": gt4sd_s3_bucket_algorithms,
-        "properties": gt4sd_s3_bucket_properties,
-    }
-    s3_bucket_hub: Dict[str, str] = {
-        "algorithms": gt4sd_s3_bucket_hub_algorithms,
-        "properties": gt4sd_s3_bucket_hub_properties,
-    }
-
     class Config:
         # immutable and in turn hashable, that is required for lru_cache
         frozen = True
@@ -89,9 +75,37 @@ class GT4SDConfiguration(BaseSettings):
         return GT4SDConfiguration()
 
 
-gt4sd_configuration_instance = GT4SDConfiguration.get_instance()
+class GT4SDArtifactManagementConfiguration:
+    """Artifact management configuration."""
 
-for key, val in gt4sd_configuration_instance.local_cache_path.items():
+    gt4sd_s3_modules: Set[str] = {"algorithms", "properties"}
+
+    def __init__(self, gt4sd_configuration: GT4SDConfiguration) -> None:
+        """Initialize the artifact management configuration from the base one.
+
+        Args:
+            gt4sd_configuration: GT4SD base configuration.
+        """
+        self.local_cache_path: Dict[str, str] = {
+            "algorithms": gt4sd_configuration.gt4sd_local_cache_path_algorithms,
+            "properties": gt4sd_configuration.gt4sd_local_cache_path_properties,
+        }
+        self.s3_bucket: Dict[str, str] = {
+            "algorithms": gt4sd_configuration.gt4sd_s3_bucket_algorithms,
+            "properties": gt4sd_configuration.gt4sd_s3_bucket_properties,
+        }
+        self.s3_bucket_hub: Dict[str, str] = {
+            "algorithms": gt4sd_configuration.gt4sd_s3_bucket_hub_algorithms,
+            "properties": gt4sd_configuration.gt4sd_s3_bucket_hub_properties,
+        }
+
+
+gt4sd_configuration_instance = GT4SDConfiguration.get_instance()
+gt4sd_artifact_management_configuration = GT4SDArtifactManagementConfiguration(
+    gt4sd_configuration=gt4sd_configuration_instance
+)
+
+for key, val in gt4sd_artifact_management_configuration.local_cache_path.items():
     logger.info(f"using as local cache path for {key}: {val}")
     try:
         os.makedirs(val)
@@ -110,10 +124,10 @@ def upload_to_s3(
             to `algorithms`.
     """
 
-    if module not in gt4sd_configuration_instance.gt4sd_s3_modules:
+    if module not in gt4sd_artifact_management_configuration.gt4sd_s3_modules:
         raise ValueError(
             f"Unknown cache module: {module}. Supported modules: "
-            f"{','.join(gt4sd_configuration_instance.gt4sd_s3_modules)}"
+            f"{','.join(gt4sd_artifact_management_configuration.gt4sd_s3_modules)}"
         )
 
     try:
@@ -121,7 +135,7 @@ def upload_to_s3(
             host=gt4sd_configuration_instance.gt4sd_s3_host_hub,
             access_key=gt4sd_configuration_instance.gt4sd_s3_access_key_hub,
             secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key_hub,
-            bucket=gt4sd_configuration_instance.s3_bucket_hub[module],
+            bucket=gt4sd_artifact_management_configuration.s3_bucket_hub[module],
             target_filepath=target_filepath,
             source_filepath=source_filepath,
             secure=gt4sd_configuration_instance.gt4sd_s3_secure_hub,
@@ -144,15 +158,15 @@ def sync_algorithm_with_s3(
     Returns:
         str: local path using the prefix.
     """
-    if module not in gt4sd_configuration_instance.gt4sd_s3_modules:
+    if module not in gt4sd_artifact_management_configuration.gt4sd_s3_modules:
         raise ValueError(
             f"Unknown cache module: {module}. Supported modules: "
-            f"{','.join(gt4sd_configuration_instance.gt4sd_s3_modules)}"
+            f"{','.join(gt4sd_artifact_management_configuration.gt4sd_s3_modules)}"
         )
 
     folder_path = os.path.join(
         gt4sd_configuration_instance.gt4sd_local_cache_path,
-        gt4sd_configuration_instance.local_cache_path[module],
+        gt4sd_artifact_management_configuration.local_cache_path[module],
     )
 
     try:
@@ -161,7 +175,7 @@ def sync_algorithm_with_s3(
             host=gt4sd_configuration_instance.gt4sd_s3_host,
             access_key=gt4sd_configuration_instance.gt4sd_s3_access_key,
             secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key,
-            bucket=gt4sd_configuration_instance.s3_bucket[module],
+            bucket=gt4sd_artifact_management_configuration.s3_bucket[module],
             folder_path=folder_path,
             prefix=prefix,
             secure=gt4sd_configuration_instance.gt4sd_s3_secure,
@@ -171,7 +185,7 @@ def sync_algorithm_with_s3(
             host=gt4sd_configuration_instance.gt4sd_s3_host_hub,
             access_key=gt4sd_configuration_instance.gt4sd_s3_access_key_hub,
             secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key_hub,
-            bucket=gt4sd_configuration_instance.s3_bucket_hub[module],
+            bucket=gt4sd_artifact_management_configuration.s3_bucket_hub[module],
             folder_path=folder_path,
             prefix=prefix,
             secure=gt4sd_configuration_instance.gt4sd_s3_secure_hub,
@@ -185,22 +199,22 @@ def get_cached_algorithm_path(
     prefix: Optional[str] = None, module: str = "algorithms"
 ) -> str:
 
-    if module not in gt4sd_configuration_instance.gt4sd_s3_modules:
+    if module not in gt4sd_artifact_management_configuration.gt4sd_s3_modules:
         raise ValueError(
             f"Unknown cache module: {module}. Supported modules: "
-            f"{','.join(gt4sd_configuration_instance.gt4sd_s3_modules)}."
+            f"{','.join(gt4sd_artifact_management_configuration.gt4sd_s3_modules)}."
         )
 
     return (
         os.path.join(
             gt4sd_configuration_instance.gt4sd_local_cache_path,
-            gt4sd_configuration_instance.local_cache_path[module],
+            gt4sd_artifact_management_configuration.local_cache_path[module],
             prefix,
         )
         if prefix is not None
         else os.path.join(
             gt4sd_configuration_instance.gt4sd_local_cache_path,
-            gt4sd_configuration_instance.local_cache_path[module],
+            gt4sd_artifact_management_configuration.local_cache_path[module],
         )
     )
 
@@ -234,10 +248,10 @@ def get_algorithm_subdirectories_with_s3(
     Returns:
         Set: set of available algorithms on s3 with that prefix.
     """
-    if module not in gt4sd_configuration_instance.gt4sd_s3_modules:
+    if module not in gt4sd_artifact_management_configuration.gt4sd_s3_modules:
         raise ValueError(
             f"Unknown cache module: {module}. Supported modules: "
-            f"{','.join(gt4sd_configuration_instance.gt4sd_s3_modules)}"
+            f"{','.join(gt4sd_artifact_management_configuration.gt4sd_s3_modules)}"
         )
 
     try:
@@ -246,7 +260,7 @@ def get_algorithm_subdirectories_with_s3(
             host=gt4sd_configuration_instance.gt4sd_s3_host,
             access_key=gt4sd_configuration_instance.gt4sd_s3_access_key,
             secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key,
-            bucket=gt4sd_configuration_instance.s3_bucket[module],
+            bucket=gt4sd_artifact_management_configuration.s3_bucket[module],
             secure=gt4sd_configuration_instance.gt4sd_s3_secure,
             prefix=prefix,
         )
@@ -256,7 +270,7 @@ def get_algorithm_subdirectories_with_s3(
             host=gt4sd_configuration_instance.gt4sd_s3_host_hub,
             access_key=gt4sd_configuration_instance.gt4sd_s3_access_key_hub,
             secret_key=gt4sd_configuration_instance.gt4sd_s3_secret_key_hub,
-            bucket=gt4sd_configuration_instance.s3_bucket_hub[module],
+            bucket=gt4sd_artifact_management_configuration.s3_bucket_hub[module],
             secure=gt4sd_configuration_instance.gt4sd_s3_secure_hub,
             prefix=prefix,
         )
