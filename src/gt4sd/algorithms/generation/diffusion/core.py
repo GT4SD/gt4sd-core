@@ -95,27 +95,26 @@ class DiffusersGenerationAlgorithm(GeneratorAlgorithm[S, T]):
     def validate_configuration(
         self, configuration: AlgorithmConfiguration
     ) -> AlgorithmConfiguration:
-        # TODO raise InvalidAlgorithmConfiguration
         assert isinstance(configuration, AlgorithmConfiguration)
         return configuration
 
 
 @ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
 class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
-    """Basic configuration for an hugging face algorithm."""
+    """Basic configuration for a diffusion algorithm."""
 
     algorithm_type: ClassVar[str] = "generation"
-    domain: ClassVar[str] = "nlp"
+    domain: ClassVar[str] = "image"
 
     model_type: str = field(
-        default="",
+        default="diffusion",
         metadata=dict(
             description=f"Type of the model. Supported: {', '.join(MODEL_TYPES.keys())}"
         ),
     )
 
     scheduler_type: str = field(
-        default="",
+        default="discrete",
         metadata=dict(
             description=f"Type of the noise scheduler. Supported: {', '.join(SCHEDULER_TYPES.keys())}"
         ),
@@ -183,6 +182,7 @@ class DDPMGenerator(DiffusersConfiguration):
 
     algorithm_version: str = "google/ddpm-celebahq-256"
     model_type: str = "ddpm"
+    scheduler_type: str = "ddpm"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -207,8 +207,9 @@ class DDPMGenerator(DiffusersConfiguration):
 class DDIMGenerator(DiffusersConfiguration):
     """DDIM - Configuration to generate using a denoising diffusion implicit model."""
 
-    algorithm_version: str = "ddim"
+    algorithm_version: str = "google/ddim-celebahq-256"
     model_type: str = "ddim"
+    scheduler_type: str = "ddim"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -230,11 +231,12 @@ class DDIMGenerator(DiffusersConfiguration):
 
 
 @ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
-class PNDMPGenerator(DiffusersConfiguration):
-    """PNDMP - Configuration to generate using a ."""
+class LDMGenerator(DiffusersConfiguration):
+    """Unconditional Latent Diffusion Model - Configuration to generate using a latent diffusion model."""
 
-    algorithm_version: str = "pndmp"
-    model_type: str = "pndmp"
+    algorithm_version: str = ""
+    model_type: str = "latent_diffusion"
+    scheduler_type: str = "discrete"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -256,11 +258,39 @@ class PNDMPGenerator(DiffusersConfiguration):
 
 
 @ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
-class DiffusionGenerator(DiffusersConfiguration):
-    """LDM - Configuration to generate text2img using a latent diffusion model."""
+class ScoreSdeGenerator(DiffusersConfiguration):
+    """Score SDE Generative Model - Configuration to generate using a score-based diffusion generative model."""
+
+    algorithm_version: str = ""
+    model_type: str = "score_sde"
+    scheduler_type: str = "continuous"
+
+    @classmethod
+    def list_versions(cls) -> Set[str]:
+        """Get possible algorithm versions.
+
+        Standard S3 and cache search adding the version used in the configuration.
+
+        Returns:
+            viable values as :attr:`algorithm_version` for the environment.
+        """
+        logger.warning(
+            "more algorithm versions can be found on https://github.com/huggingface/diffusers"
+        )
+        return (
+            get_configuration_class_with_attributes(cls)
+            .list_versions()
+            .union({cls.algorithm_version})
+        )
+
+
+@ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
+class LDMTextToImageGenerator(DiffusersConfiguration):
+    """Conditional Latent Diffusion Model - Configuration for conditional text2image generation using a latent diffusion model."""
 
     algorithm_version: str = "CompVis/ldm-text2im-large-256"
-    model_type: str = "latent_diffusion"
+    model_type: str = "latent_diffusion_conditional"
+    scheduler_type: str = "discrete"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -283,10 +313,11 @@ class DiffusionGenerator(DiffusersConfiguration):
 
 @ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
 class StableDiffusionGenerator(DiffusersConfiguration):
-    """Stable LDM - Configuration to generate text2img using a latent diffusion model."""
+    """Stable Diffusion Model - Configuration for conditional text2image generation using a stable diffusion model."""
 
     algorithm_version: str = "CompVis/stable-diffusion-v1-3"
     model_type: str = "stable_diffusion"
+    scheduler_type: str = "discrete"
 
     @classmethod
     def list_versions(cls) -> Set[str]:

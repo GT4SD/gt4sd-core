@@ -27,8 +27,9 @@ from .core import (
     DDIMGenerator,
     DDPMGenerator,
     DiffusersGenerationAlgorithm,
-    DiffusionGenerator,
-    PNDMPGenerator,
+    LDMGenerator,
+    LDMTextToImageGenerator,
+    ScoreSdeGenerator,
     StableDiffusionGenerator,
 )
 
@@ -36,7 +37,9 @@ __all__ = [
     "DiffusersGenerationAlgorithm",
     "DDPMGenerator",
     "DDIMGenerator",
-    "PNDMPGenerator",
     "DiffusionGenerator",
     "StableDiffusionGenerator",
+    "ScoreSdeGenerator",
+    "LDMGenerator",
+    "LDMTextToImageGenerator",
 ]

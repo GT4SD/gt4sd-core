@@ -35,12 +35,15 @@ import numpy as np
 import torch
 from diffusers import (
     DDIMPipeline,
+    DDIMScheduler,
     DDPMPipeline,
-    DiffusionPipeline,
+    DDPMScheduler,
+    LDMPipeline,
+    LDMTextToImagePipeline,
     LMSContinuousScheduler,
     LMSContinuousSchedulerWithDiscrete,
     LMSDiscreteScheduler,
-    PNDMPipeline,
+    ScoreSdeVePipeline,
     StableDiffusionPipeline,
 )
 
@@ -65,12 +68,15 @@ def set_seed(seed: int = 42) -> None:
 MODEL_TYPES = {
     "diffusion": DDPMPipeline,
     "diffusion_implicit": DDIMPipeline,
-    "pndmp": PNDMPipeline,
-    "latent_diffusion": DiffusionPipeline,
+    "latent_diffusion": LDMPipeline,
+    "latent_diffusion_conditional": LDMTextToImagePipeline,
     "stable_diffusion": StableDiffusionPipeline,
+    "score_sde": ScoreSdeVePipeline,
 }
 
 SCHEDULER_TYPES = {
+    "ddpm": DDPMScheduler,
+    "ddim": DDIMScheduler,
     "discrete": LMSDiscreteScheduler,
     "continuous": LMSContinuousScheduler,
     "continuous_with_discrete": LMSContinuousSchedulerWithDiscrete,
@@ -94,7 +100,7 @@ class Generator:
         number_of_sequences: int,
         device: Optional[Union[torch.device, str]] = None,
     ):
-        """An HuggingFace Difffuser generation algorithm.
+        """A Difffusers generation algorithm.
 
         Args:
             resources_path: path to the cache.
@@ -156,30 +162,15 @@ class Generator:
             generated text snippets.
         """
 
-        output = self.model()["sample"]
-        return output
+        return self.model()["sample"]
 
-    def conditional_sample(self, cond) -> List[str]:
+    def conditional_sample(self, prompt: Union[str, List[str]]) -> List[str]:
         """Sample text snippets.
 
         Args:
-            cond: text to condition the model on.
-        Returns:
-            generated text snippets.
-        """
-
-        output = self.model(cond)["sample"]
-        return output
-
-    def conditional_text_sample(self, cond, prompt) -> List[str]:
-        """Sample text snippets.
-
-        Args:
-            cond: text to condition the model on.
             prompt: text to condition the model on.
         Returns:
             generated text snippets.
         """
 
-        output = self.model(cond, prompt)["sample"]
-        return output
+        return self.model(prompt)["sample"]
