@@ -40,10 +40,10 @@ from diffusers import (
     DDPMScheduler,
     LDMPipeline,
     LDMTextToImagePipeline,
+    LMSDiscreteScheduler,
     ScoreSdeVePipeline,
     ScoreSdeVeScheduler,
     StableDiffusionPipeline,
-    LMSDiscreteScheduler
 )
 
 from ....frameworks.torch import device_claim
