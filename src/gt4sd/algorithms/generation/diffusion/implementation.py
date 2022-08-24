@@ -40,11 +40,10 @@ from diffusers import (
     DDPMScheduler,
     LDMPipeline,
     LDMTextToImagePipeline,
-    LMSContinuousScheduler,
-    LMSContinuousSchedulerWithDiscrete,
-    LMSDiscreteScheduler,
     ScoreSdeVePipeline,
+    ScoreSdeVeScheduler,
     StableDiffusionPipeline,
+    LMSDiscreteScheduler
 )
 
 from ....frameworks.torch import device_claim
@@ -78,8 +77,7 @@ SCHEDULER_TYPES = {
     "ddpm": DDPMScheduler,
     "ddim": DDIMScheduler,
     "discrete": LMSDiscreteScheduler,
-    "continuous": LMSContinuousScheduler,
-    "continuous_with_discrete": LMSContinuousSchedulerWithDiscrete,
+    "continuous": ScoreSdeVeScheduler,
 }
 
 
