@@ -24,6 +24,7 @@
 """Enzyme optimization."""
 
 import json
+import logging
 import random
 import time
 from collections import OrderedDict
@@ -31,7 +32,6 @@ from typing import Any, Dict, List, MutableMapping, Optional, Sequence, Tuple, U
 
 import numpy as np
 from joblib import load
-from loguru import logger
 
 from .processing import (
     HuggingFaceTransformerEmbedding,
@@ -40,6 +40,9 @@ from .processing import (
     reconstruct_sequence_with_mutation_range,
     sanitize_intervals,
 )
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 #: transition matrix representation
 TransitionMatrix = MutableMapping[str, MutableMapping[str, float]]
