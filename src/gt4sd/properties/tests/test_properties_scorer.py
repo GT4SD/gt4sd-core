@@ -26,7 +26,7 @@ import numpy as np
 import pytest
 
 from gt4sd.properties import PROTEIN_PROPERTY_PREDICTOR_FACTORY
-from gt4sd.properties.scores import SCORING_FUNCTIONS_FACTORY
+from gt4sd.properties.scorer import SCORING_FUNCTIONS_FACTORY
 
 protein = "KFLIYQMECSTMIFGL"
 molecule = "C1=CC(=CC(=C1)Br)CN"
