@@ -100,7 +100,7 @@ def test_config_class(
     assert config_class.algorithm_name == algorithm_name
 
     for keyword, type_annotation in config_class.__annotations__.items():
-        if keyword in ("algorithm_type", "domain", "modality", "algorithm_name"):
+        if keyword in ("algorithm_type", "domain", "algorithm_name"):
             assert type_annotation.__origin__ is ClassVar  # type: ignore
             assert str == get_classvar_type(type_annotation)
 
