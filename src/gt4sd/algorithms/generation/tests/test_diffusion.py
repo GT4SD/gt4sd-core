@@ -179,7 +179,7 @@ def test_generation_via_import(config, algorithm):
 
 
 @pytest.mark.parametrize(
-    "algorithm_application, algorithm_type, domain, modality, algorithm_name",
+    "algorithm_application, algorithm_type, domain, algorithm_name",
     [
         pytest.param(
             DDPMGenerator.__name__,
