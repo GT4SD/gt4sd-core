@@ -54,37 +54,37 @@ def get_classvar_type(class_var):
         (
             DDPMGenerator,
             "generation",
-            "image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
             DDIMGenerator,
             "generation",
-            "image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
             ScoreSdeGenerator,
             "generation",
-            "image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
             LDMGenerator,
             "generation",
-            "image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
             LDMTextToImageGenerator,
             "generation",
-            "token2image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
             StableDiffusionGenerator,
             "generation",
-            "token2image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
         ),
     ],
@@ -100,7 +100,7 @@ def test_config_class(
     assert config_class.algorithm_name == algorithm_name
 
     for keyword, type_annotation in config_class.__annotations__.items():
-        if keyword in ("algorithm_type", "domain", "algorithm_name"):
+        if keyword in ("algorithm_type", "domain", "modality", "algorithm_name"):
             assert type_annotation.__origin__ is ClassVar  # type: ignore
             assert str == get_classvar_type(type_annotation)
 
@@ -179,47 +179,47 @@ def test_generation_via_import(config, algorithm):
 
 
 @pytest.mark.parametrize(
-    "algorithm_application, algorithm_type, domain, algorithm_name",
+    "algorithm_application, algorithm_type, domain, modality, algorithm_name",
     [
         pytest.param(
             DDPMGenerator.__name__,
             "generation",
-            "image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             DDIMGenerator.__name__,
             "generation",
-            "image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             ScoreSdeGenerator.__name__,
             "generation",
-            "image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             LDMGenerator.__name__,
             "generation",
-            "image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             LDMTextToImageGenerator.__name__,
             "generation",
-            "token2image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             StableDiffusionGenerator.__name__,
             "generation",
-            "token2image",
+            "generic",
             DiffusersGenerationAlgorithm.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),

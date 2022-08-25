@@ -104,7 +104,14 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
     """Basic configuration for a diffusion algorithm."""
 
     algorithm_type: ClassVar[str] = "generation"
-    domain: ClassVar[str] = "image"
+    domain: ClassVar[str] = "generic"
+
+    modality: str = field(
+        default="image",
+        metadata=dict(
+            description="Model domain.  Supported: 'image', 'text', 'audio', 'token2image', 'token2sample', 'molecule'."
+        ),
+    )
 
     model_type: str = field(
         default="diffusion",
@@ -183,6 +190,7 @@ class DDPMGenerator(DiffusersConfiguration):
     algorithm_version: str = "google/ddpm-celebahq-256"
     model_type: str = "ddpm"
     scheduler_type: str = "ddpm"
+    modality: str = "image"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -210,6 +218,7 @@ class DDIMGenerator(DiffusersConfiguration):
     algorithm_version: str = "google/ddim-celebahq-256"
     model_type: str = "ddim"
     scheduler_type: str = "ddim"
+    modality: str = "image"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -237,6 +246,7 @@ class LDMGenerator(DiffusersConfiguration):
     algorithm_version: str = ""
     model_type: str = "latent_diffusion"
     scheduler_type: str = "discrete"
+    modality: str = "image"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -264,6 +274,7 @@ class ScoreSdeGenerator(DiffusersConfiguration):
     algorithm_version: str = ""
     model_type: str = "score_sde"
     scheduler_type: str = "continuous"
+    modality: str = "image"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -291,6 +302,7 @@ class LDMTextToImageGenerator(DiffusersConfiguration):
     algorithm_version: str = "CompVis/ldm-text2im-large-256"
     model_type: str = "latent_diffusion_conditional"
     scheduler_type: str = "discrete"
+    modality: str = "token2image"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
@@ -318,6 +330,7 @@ class StableDiffusionGenerator(DiffusersConfiguration):
     algorithm_version: str = "CompVis/stable-diffusion-v1-3"
     model_type: str = "stable_diffusion"
     scheduler_type: str = "discrete"
+    modality: str = "token2image"
 
     @classmethod
     def list_versions(cls) -> Set[str]:
