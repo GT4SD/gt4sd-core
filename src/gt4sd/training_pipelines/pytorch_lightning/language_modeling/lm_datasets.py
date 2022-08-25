@@ -24,6 +24,7 @@
 """Dataset routines-filtering, dataset building."""
 
 import json
+import logging
 import os
 from functools import lru_cache
 from typing import Any, Callable, Dict, List, Union
@@ -31,7 +32,6 @@ from typing import Any, Callable, Dict, List, Union
 import sentencepiece as _sentencepiece
 import pytorch_lightning as pl
 from datasets import DatasetDict
-from loguru import logger
 from torch.utils.data import ConcatDataset, DataLoader, Dataset
 from transformers import (
     AutoTokenizer,
@@ -43,6 +43,9 @@ from transformers.tokenization_utils_base import BatchEncoding
 
 # Sentencepiece has to be loaded before lightning
 _sentencepiece
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 class LMDataset(Dataset):
