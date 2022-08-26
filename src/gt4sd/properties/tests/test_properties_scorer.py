@@ -25,8 +25,12 @@
 import numpy as np
 import pytest
 
-from gt4sd.properties import PROTEIN_PROPERTY_PREDICTOR_FACTORY
-from gt4sd.properties.scorer import SCORING_FUNCTIONS_FACTORY
+from gt4sd.properties import (
+    MOLECULE_PROPERTY_PREDICTOR_FACTORY,
+    PROTEIN_PROPERTY_PREDICTOR_FACTORY,
+    SCORING_FACTORY_WITH_PROPERTY_PREDICTORS,
+    PropertyPredictorRegistry,
+)
 
 protein = "KFLIYQMECSTMIFGL"
 molecule = "C1=CC(=CC(=C1)Br)CN"
@@ -91,37 +95,51 @@ def select_opposite_sample(property_key):
     "property_key", [(property_key) for property_key in ground_truths.keys()]
 )
 def test_property_scorer(property_key):
-    scorer = SCORING_FUNCTIONS_FACTORY["property_predictor_scorer"](
-        name=property_key, target=ground_truths[property_key]
+    scoring_function = PropertyPredictorRegistry.get_property_predictor(
+        name=property_key
+    )
+    scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS["property_predictor_scorer"](
+        name=property_key,
+        scoring_function=scoring_function,
+        target=ground_truths[property_key],
     )
     sample = select_sample(property_key)
     assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
 
 
 def test_similarity_seed_scorer():
-    scorer = SCORING_FUNCTIONS_FACTORY["property_predictor_scorer"](
+    scoring_function = PropertyPredictorRegistry.get_property_predictor(
+        name="similarity_seed", parameters={"smiles": seed}
+    )
+    scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS["property_predictor_scorer"](
         name="similarity_seed",
+        scoring_function=scoring_function,
         target=molecule_further_ground_truths["similarity_seed"],
-        parameters={"smiles": seed},
     )
     assert np.isclose(scorer.score(molecule), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
 
 
 def test_activity_against_target_scorer():
     """target for the scorer is a number (for example the predicted property value). Target for the property is a string (molecule)."""
-    scorer = SCORING_FUNCTIONS_FACTORY["property_predictor_scorer"](
+    scoring_function = PropertyPredictorRegistry.get_property_predictor(
+        name="activity_against_target", parameters={"target": _target}
+    )
+    scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS["property_predictor_scorer"](
         name="activity_against_target",
+        scoring_function=scoring_function,
         target=molecule_further_ground_truths["activity_against_target"],
-        parameters={"target": _target},
     )
     assert np.isclose(scorer.score(molecule), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
 
 
 def test_charge_with_arguments_scorer():
-    scorer = SCORING_FUNCTIONS_FACTORY["property_predictor_scorer"](
+    scoring_function = PropertyPredictorRegistry.get_property_predictor(
+        name="charge", parameters={"amide": True, "ph": 5.0}
+    )
+    scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS["property_predictor_scorer"](
         name="charge",
+        scoring_function=scoring_function,
         target=protein_further_ground_truths["charge"],
-        parameters={"amide": True, "ph": 5.0},
     )
     assert np.isclose(scorer.score(protein), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
 
@@ -130,8 +148,13 @@ def test_charge_with_arguments_scorer():
     "property_key", [(property_key) for property_key in ground_truths.keys()]
 )
 def test_validation_property_scorer(property_key):
-    scorer = SCORING_FUNCTIONS_FACTORY["property_predictor_scorer"](
-        name=property_key, target=ground_truths[property_key]
+    scoring_function = PropertyPredictorRegistry.get_property_predictor(
+        name=property_key
+    )
+    scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS["property_predictor_scorer"](
+        name=property_key,
+        scoring_function=scoring_function,
+        target=ground_truths[property_key],
     )
     sample = select_opposite_sample(property_key)
     try:
@@ -145,18 +168,29 @@ def test_validation_property_scorer(property_key):
     "property_key", [(property_key) for property_key in ground_truths.keys()]
 )
 def test_molecule_property_scorer(property_key):
+    scoring_function = PropertyPredictorRegistry.get_property_predictor(
+        name=property_key
+    )
     if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
         try:
-            scorer = SCORING_FUNCTIONS_FACTORY["molecule_property_predictor_scorer"](
-                name=property_key, target=ground_truths[property_key]
+            scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS[
+                "molecule_property_predictor_scorer"
+            ](
+                name=property_key,
+                scoring_function=scoring_function,
+                target=ground_truths[property_key],
             )
             assert False
         except ValueError:
             assert True
 
     if property_key not in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
-        scorer = SCORING_FUNCTIONS_FACTORY["molecule_property_predictor_scorer"](
-            name=property_key, target=ground_truths[property_key]
+        scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS[
+            "molecule_property_predictor_scorer"
+        ](
+            name=property_key,
+            scoring_function=scoring_function,
+            target=ground_truths[property_key],
         )
         sample = select_sample(property_key)
         assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
@@ -166,18 +200,52 @@ def test_molecule_property_scorer(property_key):
     "property_key", [(property_key) for property_key in ground_truths.keys()]
 )
 def test_protein_property_scorer(property_key):
+    scoring_function = PropertyPredictorRegistry.get_property_predictor(
+        name=property_key
+    )
     if property_key not in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
         try:
-            scorer = SCORING_FUNCTIONS_FACTORY["protein_property_predictor_scorer"](
-                name=property_key, target=ground_truths[property_key]
+            scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS[
+                "protein_property_predictor_scorer"
+            ](
+                name=property_key,
+                scoring_function=scoring_function,
+                target=ground_truths[property_key],
             )
             assert False
         except ValueError:
             assert True
 
     if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
-        scorer = SCORING_FUNCTIONS_FACTORY["protein_property_predictor_scorer"](
-            name=property_key, target=ground_truths[property_key]
+        scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS[
+            "protein_property_predictor_scorer"
+        ](
+            name=property_key,
+            scoring_function=scoring_function,
+            target=ground_truths[property_key],
         )
         sample = select_sample(property_key)
         assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
+
+
+def test_property_predictor_scorer_registry():
+    scorer = PropertyPredictorRegistry.get_property_predictor_scorer(
+        property_name="similarity_seed",
+        scorer_name="property_predictor_scorer",
+        target=molecule_further_ground_truths["similarity_seed"],
+        parameters={"smiles": seed},
+    )
+    sample = select_sample("similarity_seed")
+    assert isinstance(scorer, MOLECULE_PROPERTY_PREDICTOR_FACTORY["similarity_seed"][0])
+    assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
+
+    scorer = PropertyPredictorRegistry.get_property_predictor_scorer(
+        property_name="charge",
+        scorer_name="property_predictor_scorer",
+        target=protein_further_ground_truths["charge"],
+        parameters={"amide": "True", "ph": 5.0},
+    )
+    sample = select_sample("charge")
+    assert isinstance(scorer, PROTEIN_PROPERTY_PREDICTOR_FACTORY["charge"][0])
+    assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
+    assert len(PropertyPredictorRegistry.list_available_scorer()) == len(3)

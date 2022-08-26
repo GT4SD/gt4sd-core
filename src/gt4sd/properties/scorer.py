@@ -21,41 +21,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Any, Dict, List, Union
+from typing import List, Union
 
 from rdkit import Chem
 
-from . import PropertyPredictorRegistry
-from .molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
-from .proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
-from .scores import SCORING_FUNCTIONS_FACTORY
-from .scores.core import TargetValueScorer
+from .core import PropertyPredictor
+from .molecules import AVAILABLE_MOLECULES_PROPERTY_PREDICTOR
+from .proteins import AVAILABLE_PROTEINS_PROPERTY_PREDICTOR
+from .scores import DistanceScorer
 
 
-class PropertyPredictorScorer(TargetValueScorer):
+class PropertyPredictorScorer(DistanceScorer):
     """Property Predictor Scorer."""
 
     def __init__(
         self,
         name: str,
+        scoring_function: PropertyPredictor,
         target: Union[float, int],
-        parameters: Dict[str, Any] = {},
     ) -> None:
         """Scoring function that calculates a generic score for a property.
 
         Args:
-            name: name of the property to score.
+            name: name of the property to score. Needed for validation.
+            scoring_function: callable scoring function.
             target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters["target"]).
-            parameters: parameters for the scoring function.
         """
         self.name = name
         self.target = target
-        self.parameters = parameters
 
-        self.scoring_function = PropertyPredictorRegistry.get_property_predictor(  # type: ignore
-            name=self.name, parameters=self.parameters
-        )
-        super().__init__(target=target, scoring_function=self.scoring_function)
+        self.scoring_function = scoring_function
+        super().__init__()
 
     def score(self, sample: str) -> float:
         """Generates a score for a given molecule or protein.
@@ -112,7 +108,7 @@ class PropertyPredictorScorer(TargetValueScorer):
             True if the input is valid.
         """
         # if selected property is available for molecules, check that sample is a SMILES
-        if self.name in MOLECULE_PROPERTY_PREDICTOR_FACTORY:
+        if self.name in AVAILABLE_MOLECULES_PROPERTY_PREDICTOR:
             if Chem.MolFromSmiles(sample) is None:
                 raise ValueError(
                     f"{property_name} is a property available for molecules and {sample} is not a valid SMILES. Please input a molecule."
@@ -131,20 +127,20 @@ class MoleculePropertyPredictorScorer(PropertyPredictorScorer):
     def __init__(
         self,
         name: str,
+        scoring_function: PropertyPredictor,
         target: Union[float, int],
-        parameters: Dict[str, Any] = {},
     ) -> None:
         """Scoring function that calculates a generic score for a property in molecules.
 
         Args:
             name: name of the property to score.
+            scoring_function: callable scoring function.
             target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters["target"]).
-            parameters: parameters for the scoring function.
         """
-        if name not in MOLECULE_PROPERTY_PREDICTOR_FACTORY:
+        if name not in AVAILABLE_MOLECULES_PROPERTY_PREDICTOR:
             raise ValueError(f"property {name} not available for molecules.")
 
-        super().__init__(name=name, target=target, parameters=parameters)
+        super().__init__(name=name, scoring_function=scoring_function, target=target)
 
 
 class ProteinPropertyPredictorScorer(PropertyPredictorScorer):
@@ -153,27 +149,17 @@ class ProteinPropertyPredictorScorer(PropertyPredictorScorer):
     def __init__(
         self,
         name: str,
+        scoring_function: PropertyPredictor,
         target: Union[float, int],
-        parameters: Dict[str, Any] = {},
     ) -> None:
         """Scoring function that calculates a generic score for a property in proteins.
 
         Args:
             name: name of the property to score.
+            scoring_function: callable scoring function.
             target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters["target"]).
-            parameters: parameters for the scoring function.
         """
-        if name not in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
+        if name not in AVAILABLE_PROTEINS_PROPERTY_PREDICTOR:
             raise ValueError(f"property {name} not available for proteins.")
 
-        super().__init__(name=name, target=target, parameters=parameters)
-
-
-SCORING_FUNCTIONS_FACTORY.update(
-    {
-        "property_predictor_scorer": PropertyPredictorScorer,
-        "molecule_property_predictor_scorer": MoleculePropertyPredictorScorer,
-        "protein_property_predictor_scorer": ProteinPropertyPredictorScorer,
-    }
-)
-AVAILABLE_SCORING_FUNCTIONS = sorted(SCORING_FUNCTIONS_FACTORY.keys())
+        super().__init__(name=name, scoring_function=scoring_function, target=target)
