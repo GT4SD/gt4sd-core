@@ -171,7 +171,7 @@ def test_molecule_property_scorer(property_key):
     scoring_function = PropertyPredictorRegistry.get_property_predictor(
         name=property_key
     )
-    if property_key in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
+    if property_key not in MOLECULE_PROPERTY_PREDICTOR_FACTORY:
         try:
             scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS[
                 "molecule_property_predictor_scorer"
@@ -184,7 +184,7 @@ def test_molecule_property_scorer(property_key):
         except ValueError:
             assert True
 
-    if property_key not in PROTEIN_PROPERTY_PREDICTOR_FACTORY:
+    if property_key in MOLECULE_PROPERTY_PREDICTOR_FACTORY:
         scorer = SCORING_FACTORY_WITH_PROPERTY_PREDICTORS[
             "molecule_property_predictor_scorer"
         ](
@@ -236,7 +236,9 @@ def test_property_predictor_scorer_registry():
         parameters={"smiles": seed},
     )
     sample = select_sample("similarity_seed")
-    assert isinstance(scorer, MOLECULE_PROPERTY_PREDICTOR_FACTORY["similarity_seed"][0])
+    assert isinstance(
+        scorer, SCORING_FACTORY_WITH_PROPERTY_PREDICTORS["property_predictor_scorer"]
+    )
     assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
 
     scorer = PropertyPredictorRegistry.get_property_predictor_scorer(
@@ -246,6 +248,8 @@ def test_property_predictor_scorer_registry():
         parameters={"amide": "True", "ph": 5.0},
     )
     sample = select_sample("charge")
-    assert isinstance(scorer, PROTEIN_PROPERTY_PREDICTOR_FACTORY["charge"][0])
+    assert isinstance(
+        scorer, SCORING_FACTORY_WITH_PROPERTY_PREDICTORS["property_predictor_scorer"]
+    )
     assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
-    assert len(PropertyPredictorRegistry.list_available_scorer()) == len(3)
+    assert len(PropertyPredictorRegistry.list_available_scorer()) == 3
