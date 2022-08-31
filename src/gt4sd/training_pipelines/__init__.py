@@ -30,6 +30,13 @@ from typing import Any, Dict
 import pkg_resources
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
+from .diffusion.core import (
+    DiffusionDataArguments,
+    DiffusionModelArguments,
+    DiffusionSavingArguments,
+    DiffusionTrainingArguments,
+    DiffusionTrainingPipeline,
+)
 from .guacamol_baselines.core import GuacaMolDataArguments, GuacaMolSavingArguments
 from .guacamol_baselines.smiles_lstm.core import (
     GuacaMolLSTMModelArguments,
@@ -144,6 +151,11 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         RegressionTransformerDataArguments,
         RegressionTransformerModelArguments,
     ),
+    "diffusion-trainer": (
+        DiffusionTrainingArguments,
+        DiffusionDataArguments,
+        DiffusionModelArguments,
+    ),
 }
 
 TRAINING_PIPELINE_MAPPING = {
@@ -156,6 +168,7 @@ TRAINING_PIPELINE_MAPPING = {
     "moses-organ-trainer": MosesOrganTrainingPipeline,
     "moses-vae-trainer": MosesVAETrainingPipeline,
     "regression-transformer-trainer": RegressionTransformerTrainingPipeline,
+    "diffusion-trainer": DiffusionTrainingPipeline,
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
@@ -168,6 +181,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "moses-organ-trainer": MosesSavingArguments,
     "moses-vae-trainer": MosesSavingArguments,
     "regression-transformer-trainer": RegressionTransformerSavingArguments,
+    "diffusion-trainer": DiffusionSavingArguments,
 }
 
 

@@ -146,7 +146,7 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
         ),
         pytest.param(
             DDIMGenerator,
-            DiffusersGenerationAlgorithm,        
+            DiffusersGenerationAlgorithm,
         ),
         pytest.param(
             ScoreSdeGenerator,
