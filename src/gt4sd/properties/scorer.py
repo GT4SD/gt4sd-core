@@ -107,18 +107,25 @@ class PropertyPredictorScorer(DistanceScorer):
         Returns:
             True if the input is valid.
         """
-        # if selected property is available for molecules, check that sample is a SMILES
+        # if selected property is available for molecules
         if self.name in AVAILABLE_MOLECULES_PROPERTY_PREDICTOR:
+            # check that sample is a valid SMILES, if not raise error
             if Chem.MolFromSmiles(sample) is None:
                 raise ValueError(
                     f"{property_name} is a property available for molecules and {sample} is not a valid SMILES. Please input a molecule."
                 )
-        else:
-            # if property is available for proteins, check that sample is a FASTA
+        # if selected property is available for proteins
+        elif self.name in AVAILABLE_PROTEINS_PROPERTY_PREDICTOR:
+            # check that sample is a valid FASTA, if not raise error
             if Chem.MolFromFASTA(sample) is None:
                 raise ValueError(
                     f"{property_name} is a property available for proteins and {sample} is not a valid FASTA. Plese input a protein."
                 )
+        # if property is not available, raise error
+        else:
+            raise ValueError(
+                f"{property_name} is not available or not a valid property."
+            )
 
 
 class MoleculePropertyPredictorScorer(PropertyPredictorScorer):

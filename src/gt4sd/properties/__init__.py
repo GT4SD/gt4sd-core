@@ -112,5 +112,5 @@ class PropertyPredictorRegistry:
         return AVAILABLE_PROPERTY_PREDICTORS
 
     @staticmethod
-    def list_available_scorer() -> List[str]:
+    def list_available_scorers() -> List[str]:
         return AVAILABLE_SCORING_WITH_PROPERTY_PREDICTORS

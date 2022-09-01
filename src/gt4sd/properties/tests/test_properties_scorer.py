@@ -252,4 +252,4 @@ def test_property_predictor_scorer_registry():
         scorer, SCORING_FACTORY_WITH_PROPERTY_PREDICTORS["property_predictor_scorer"]
     )
     assert np.isclose(scorer.score(sample), OPTIMAL_SCORE, atol=1e-2)  # type: ignore
-    assert len(PropertyPredictorRegistry.list_available_scorer()) == 3
+    assert len(PropertyPredictorRegistry.list_available_scorers()) == 3
