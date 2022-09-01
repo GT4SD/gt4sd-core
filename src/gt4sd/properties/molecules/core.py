@@ -136,12 +136,12 @@ class OrganToxParameters(MCAParameters):
     algorithm_application: str = "OrganTox"
     site: Organs = Field(
         ...,
-        example="breast",
+        example=Organs.kidney,
         description="name of the target site of interest.",
     )
     toxicity_type: ToxType = Field(
-        default="all",
-        example="chronic",
+        default=ToxType.all,
+        example=ToxType.chronic,
         description="type of toxicity for which predictions are made.",
         options=["chronic", "subchronic", "multigenerational", "all"],
     )
