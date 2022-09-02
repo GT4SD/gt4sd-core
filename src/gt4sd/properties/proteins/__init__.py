@@ -57,3 +57,7 @@ PROTEIN_PROPERTY_PREDICTOR_FACTORY: Dict[
     "instability": (Instability, PropertyPredictorParameters),
     # properties predicted by ML models
 }
+
+AVAILABLE_PROTEINS_PROPERTY_PREDICTOR = sorted(
+    PROTEIN_PROPERTY_PREDICTOR_FACTORY.keys()
+)
