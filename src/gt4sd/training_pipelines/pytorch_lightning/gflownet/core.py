@@ -23,7 +23,6 @@
 #
 """GFlowNet training utilities."""
 
-import json
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Tuple
@@ -61,6 +60,7 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
         self,
         model_args: Dict[str, Any],
         dataset_args: Dict[str, Any],
+        pl_training_args: Dict[str, Any],
         dataset: GFlowNetDataset,
         environment: GraphBuildingEnv,
         context: GraphBuildingEnvContext,
@@ -76,27 +76,28 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
             the data and model modules.
         """
 
-        configuration = {**model_args, **dataset_args}
+        configuration = {**model_args, **dataset_args, **pl_training_args}
 
-        with open(model_args["model_list_path"], "r") as fp:  # type:ignore
-            model_config = json.load(fp)
+        if configuration["algorithm"] in ALGORITHM_FACTORY:
+            algorithm = ALGORITHM_FACTORY[getattr(configuration, "algorithm")](
+                configuration,
+                environment,
+                context,
+            )
+        else:
+            raise ValueError(
+                "Algorithm configuration is not given in the specified config file."
+            )
 
-        if "models" in model_config:
-            configuration["model_list"] = model_config["models"]
+        if configuration["model"] in MODEL_FACTORY:
+            model = MODEL_FACTORY[getattr(configuration, "model")](
+                configuration,
+                context,
+            )
         else:
             raise ValueError(
                 "Models configuration is not given in the specified config file."
             )
-
-        algorithm = ALGORITHM_FACTORY[getattr(configuration, "algorithm")](
-            configuration,
-            environment,
-            context,
-        )
-        model = MODEL_FACTORY[getattr(configuration, "model")](
-            configuration,
-            context,
-        )
 
         dm = GFlowNetDataModule(
             configuration=configuration,
@@ -130,6 +131,11 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
 
     __name__ = "pl_trainer_args"
 
+    basename: str = field(
+        default="gflownet",
+        metadata={"help": "The basename as the name for the run."},
+    )
+
     every_n_val_epochs: Optional[int] = field(
         default=5,
         metadata={"help": "Number of training epochs between checkpoints."},
@@ -146,6 +152,46 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
             "help": "To profile individual steps during training and assist in identifying bottlenecks."
         },
     )
+    learning_rate: float = field(
+        default=0.0001,
+        metadata={"help": "The learning rate."},
+    )
+
+    test_output_path: Optional[str] = field(
+        default="./test",
+        metadata={
+            "help": "Path where to save latent encodings and predictions for the test set when an epoch ends."
+        },
+    )
+    num_workers: int = field(
+        default=0,
+        metadata={"help": "number of workers. Defaults to 1."},
+    )
+
+    log_dir: str = field(
+        default="./log/",
+        metadata={"help": "The directory to save logs."},
+    )
+
+    num_training_steps: int = field(
+        default=1000,
+        metadata={"help": "The number of training steps."},
+    )
+
+    validate_every: int = field(
+        default=1000,
+        metadata={"help": "The number of training steps between validation."},
+    )
+
+    seed: int = field(
+        default=142857,
+        metadata={"help": "The random seed."},
+    )
+
+    device: str = field(
+        default="cpu",
+        metadata={"help": "The device to use."},
+    )
 
 
 @dataclass
@@ -156,23 +202,149 @@ class GFlowNetModelArguments(TrainingPipelineArguments):
 
     __name__ = "model_args"
 
-    model_list_path: Optional[str] = field(
-        default=None,
-        metadata={
-            "help": "Path to a json file that contains a dictionary with models and their parameters."
-            "If it is not provided, then the dictionary is searched in the given config file."
-        },
+    algorithm: str = field(
+        default="trajectory_balance",
+        metadata={"help": "The algorithm to use for training the model. "},
     )
-    lr: float = field(
-        default=0.0001,
-        metadata={"help": "The learning rate."},
+    context: str = field(  # type: ignore
+        default=None,
+        metadata={"help": "The environment context to use for training the model. "},
+    )
+    environment: str = field(  # type: ignore
+        default=None,
+        metadata={"help": "The environment to use for training the model. "},
+    )
+    model: str = field(
+        default="graph_transformer_gfn",
+        metadata={"help": "The model to use for training the model. "},
+    )
+    sampling_model: str = field(
+        default="graph_transformer_gfn",
+        metadata={"help": "The model used to generate samples. "},
+    )
+    task: str = field(
+        default="qm9",
+        metadata={"help": "The task to use for training the model. "},
     )
 
-    test_output_path: Optional[str] = field(
-        default="./test",
-        metadata={
-            "help": "Path where to save latent encodings and predictions for the test set when an epoch ends. Defaults to a a folder called 'test' in the current working directory."
-        },
+    bootstrap_own_reward: bool = field(
+        default=False,
+        metadata={"help": "Whether to bootstrap the own reward. "},
+    )
+
+    num_emb: int = field(
+        default=128,
+        metadata={"help": "The number of embeddings. "},
+    )
+
+    num_layers: int = field(
+        default=4,
+        metadata={"help": "The number of layers. "},
+    )
+
+    tb_epsilon: float = field(
+        default=1e-10,
+        metadata={"help": "The epsilon. "},
+    )
+
+    illegal_action_logreward: float = field(
+        default=-50.0,
+        metadata={"help": "The illegal action log reward. "},
+    )
+
+    reward_loss_multiplier: float = field(
+        default=1.0,
+        metadata={"help": "The reward loss multiplier. "},
+    )
+
+    temperature_sample_dist: str = field(
+        default="uniform",
+        metadata={"help": "The temperature sample distribution. "},
+    )
+
+    temperature_dist_params: str = field(
+        default="(.5, 32)",
+        metadata={"help": "The temperature distribution parameters. "},
+    )
+
+    weight_decay: float = field(
+        default=1e-8,
+        metadata={"help": "The weight decay. "},
+    )
+
+    num_data_loader_workers: int = field(
+        default=8,
+        metadata={"help": "The number of data loader workers. "},
+    )
+
+    momentum: float = field(
+        default=0.9,
+        metadata={"help": "The momentum. "},
+    )
+
+    adam_eps: float = field(
+        default=1e-8,
+        metadata={"help": "The adam epsilon. "},
+    )
+
+    lr_decay: float = field(
+        default=20000,
+        metadata={"help": "The learning rate decay steps. "},
+    )
+
+    z_lr_decay: float = field(
+        default=20000,
+        metadata={"help": "The learning rate decay steps for z."},
+    )
+
+    clip_grad_type: str = field(
+        default="norm",
+        metadata={"help": "The clip grad type. "},
+    )
+
+    clip_grad_param: float = field(
+        default=10.0,
+        metadata={"help": "The clip grad param. "},
+    )
+
+    random_action_prob: float = field(
+        default=0.001,
+        metadata={"help": "The random action probability. "},
+    )
+
+    sampling_tau: float = field(
+        default=0.0,
+        metadata={"help": "The sampling temperature. "},
+    )
+
+    max_nodes: int = field(
+        default=9,
+        metadata={"help": "The maximum number of nodes. "},
+    )
+
+    num_offline: int = field(
+        default=10,
+        metadata={"help": "The number of offline samples. "},
+    )
+
+    sampling_iterator: bool = field(
+        default=True,
+        metadata={"help": "Whether to use a sampling iterator. "},
+    )
+
+    ratio: float = field(
+        default=0.9,
+        metadata={"help": "The ratio. "},
+    )
+
+    distributed_training_strategy: str = field(
+        default="ddp",
+        metadata={"help": "The distributed training strategy. "},
+    )
+
+    development_mode: bool = field(
+        default=False,
+        metadata={"help": "Whether to run in development mode. "},
     )
 
 
@@ -184,23 +356,28 @@ class GFlowNetDataArguments(TrainingPipelineArguments):
 
     __name__ = "dataset_args"
 
-    env: str = field(
-        default="",
-        metadata={"help": ""},
+    dataset: str = field(
+        default="qm9",
+        metadata={"help": "The dataset to use for training the model. "},
     )
-    ctx: str = field(
-        default="",
-        metadata={"help": ""},
+    dataset_path: str = field(
+        default="./data/qm9",
+        metadata={"help": "The path to the dataset to use for training the model. "},
     )
-    task: str = field(
-        default="",
-        metadata={"help": ""},
+    epoch: int = field(
+        default=100,
+        metadata={"help": "The number of epochs. "},
     )
 
     batch_size: int = field(
         default=64,
         metadata={"help": "Batch size of the training. Defaults to 64."},
     )
+    global_batch_size: int = field(
+        default=16,
+        metadata={"help": "Global batch size of the training. Defaults to 16."},
+    )
+
     validation_split: Optional[float] = field(
         default=None,
         metadata={
@@ -224,19 +401,4 @@ class GFlowNetDataArguments(TrainingPipelineArguments):
         metadata={
             "help": "Stratified value name. Defaults to None, a.k.a., no stratified sampling. Needed in case a stratified batch file is provided."
         },
-    )
-    num_workers: int = field(
-        default=1,
-        metadata={"help": "number of workers. Defaults to 1."},
-    )
-
-
-@dataclass
-class GFlowNetSavingArguments(TrainingPipelineArguments):
-    """Saving arguments related to gflownet trainer."""
-
-    __name__ = "saving_args"
-
-    model_path: str = field(
-        metadata={"help": "Path to the checkpoint file to be used."}
     )

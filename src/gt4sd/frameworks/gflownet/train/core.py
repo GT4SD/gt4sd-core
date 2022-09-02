@@ -73,15 +73,22 @@ def train_gflownet(
 
     arguments = Namespace(**configuration)
 
-    algorithm = ALGORITHM_FACTORY[getattr(arguments, "algorithm")](
-        configuration=configuration,
-        environment=environment,
-        context=context,
-    )
-    model = MODEL_FACTORY[getattr(arguments, "model")](
-        configuration=configuration,
-        context=context,
-    )
+    if arguments.algorithm in ALGORITHM_FACTORY:
+        algorithm = ALGORITHM_FACTORY[getattr(arguments, "algorithm")](
+            configuration=configuration,
+            environment=environment,
+            context=context,
+        )
+    else:
+        raise ValueError(f"Algorithm {arguments.algorithm} not supported.")
+
+    if arguments.model in MODEL_FACTORY:
+        model = MODEL_FACTORY[getattr(arguments, "model")](
+            configuration=configuration,
+            context=context,
+        )
+    else:
+        raise ValueError(f"Model {arguments.model} not supported.")
 
     dm = GFlowNetDataModule(
         configuration=configuration,
@@ -119,7 +126,7 @@ def train_gflownet(
         callbacks=[checkpoint_callback],
         max_epochs=getattr(arguments, "epoch", 10),
         check_val_every_n_epoch=getattr(arguments, "checkpoint_every_n_val_epochs", 5),
-        fast_dev_run=getattr(arguments, "development", False),
+        fast_dev_run=getattr(arguments, "development_mode", False),
         accelerator=getattr(arguments, "device", "auto"),
         strategy=getattr(arguments, "distributed_training_strategy", "ddp"),
     )

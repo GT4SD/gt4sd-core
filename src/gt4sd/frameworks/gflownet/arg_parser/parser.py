@@ -125,7 +125,6 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     parser.add_argument("--basename", type=str)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--num_workers", type=int, default=0)
-    parser.add_argument("--lr", type=float, default=0.0001)
 
     parser.add_argument("--validation_split", type=float)
     parser.add_argument("--validation_indices_file", type=str)
@@ -169,7 +168,7 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     parser.add_argument("--sampling_iterator", type=bool, default=True)
     parser.add_argument("--ratio", type=float, default=0.9)
     parser.add_argument("--distributed_training_strategy", type=str, default="ddp")
-    parser.add_argument("--development", type=bool, default=False)
+    parser.add_argument("--development_mode", type=bool, default=False)
 
     args_dictionary = vars(parser.parse_args(remaining_argv))
     result.update({k: v for k, v in args_dictionary.items() if v is not None})

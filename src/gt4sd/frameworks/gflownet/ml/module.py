@@ -104,7 +104,6 @@ class GFlowNetModule(pl.LightningModule):
 
         self.task = task
 
-        self.lr = self.hps["lr"]
         self.test_output_path = self.hps["test_output_path"]
 
         self.rng = self.hps["rng"]
