@@ -36,6 +36,7 @@ from diffusers import DDPMPipeline, DDPMScheduler, UNet2DModel
 from diffusers.optimization import get_scheduler
 from diffusers.training_utils import EMAModel
 from paccmann_chemistry.utils import disable_rdkit_logging
+from rdkit.Chem import Descriptors
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.transforms import (
     CenterCrop,
@@ -52,6 +53,10 @@ from ..core import TrainingPipeline, TrainingPipelineArguments
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
+
+# NOTE: This import is needed because importing torchvision before rdkit Descriptors
+# can cause segmentation faults.
+Descriptors
 
 
 class DiffusionTrainingPipeline(TrainingPipeline):
