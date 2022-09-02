@@ -181,17 +181,34 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
+
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
 <span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">PropertyPredictor</span>
 <span class="kn">from</span> <span class="nn">.molecules</span> <span class="kn">import</span> <span class="n">MOLECULE_PROPERTY_PREDICTOR_FACTORY</span>
 <span class="kn">from</span> <span class="nn">.proteins</span> <span class="kn">import</span> <span class="n">PROTEIN_PROPERTY_PREDICTOR_FACTORY</span>
+<span class="kn">from</span> <span class="nn">.scorer</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MoleculePropertyPredictorScorer</span><span class="p">,</span>
+    <span class="n">PropertyPredictorScorer</span><span class="p">,</span>
+    <span class="n">ProteinPropertyPredictorScorer</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">PROPERTY_PREDICTOR_FACTORY</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="o">**</span><span class="n">MOLECULE_PROPERTY_PREDICTOR_FACTORY</span><span class="p">,</span>
     <span class="o">**</span><span class="n">PROTEIN_PROPERTY_PREDICTOR_FACTORY</span><span class="p">,</span>
 <span class="p">}</span>
+
 <span class="n">AVAILABLE_PROPERTY_PREDICTORS</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">PROPERTY_PREDICTOR_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<span class="n">SCORING_FACTORY_WITH_PROPERTY_PREDICTORS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;property_predictor_scorer&quot;</span><span class="p">:</span> <span class="n">PropertyPredictorScorer</span><span class="p">,</span>
+    <span class="s2">&quot;molecule_property_predictor_scorer&quot;</span><span class="p">:</span> <span class="n">MoleculePropertyPredictorScorer</span><span class="p">,</span>
+    <span class="s2">&quot;protein_property_predictor_scorer&quot;</span><span class="p">:</span> <span class="n">ProteinPropertyPredictorScorer</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">AVAILABLE_SCORING_WITH_PROPERTY_PREDICTORS</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+    <span class="n">SCORING_FACTORY_WITH_PROPERTY_PREDICTORS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="PropertyPredictorRegistry"><a class="viewcode-back" href="../../api/gt4sd.properties.html#gt4sd.properties.PropertyPredictorRegistry">[docs]</a><span class="k">class</span> <span class="nc">PropertyPredictorRegistry</span><span class="p">:</span>
@@ -219,9 +236,44 @@
                 <span class="sa">f</span><span class="s2">&quot;Property predictor name=</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not supported. Pick one from </span><span class="si">{</span><span class="n">AVAILABLE_PROPERTY_PREDICTORS</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span></div>
 
+<div class="viewcode-block" id="PropertyPredictorRegistry.get_property_predictor_scorer"><a class="viewcode-back" href="../../api/gt4sd.properties.html#gt4sd.properties.PropertyPredictorRegistry.get_property_predictor_scorer">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_property_predictor_scorer</span><span class="p">(</span>
+        <span class="n">property_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">scorer_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PropertyPredictorScorer</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get a property predictor scorer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            property_name: name of the property to score.</span>
+<span class="sd">            scorer_name: name of the scorer to use.</span>
+<span class="sd">            target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters[&quot;target&quot;]).</span>
+<span class="sd">            parameters: parameters for the scoring function.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A property predictor scorer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scoring_function</span> <span class="o">=</span> <span class="n">PropertyPredictorRegistry</span><span class="o">.</span><span class="n">get_property_predictor</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">property_name</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">scorer_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SCORING_FACTORY_WITH_PROPERTY_PREDICTORS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Scorer name=</span><span class="si">{</span><span class="n">scorer_name</span><span class="si">}</span><span class="s2"> not supported. Pick one from </span><span class="si">{</span><span class="n">AVAILABLE_SCORING_WITH_PROPERTY_PREDICTORS</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">property_predictor_scorer</span> <span class="o">=</span> <span class="n">SCORING_FACTORY_WITH_PROPERTY_PREDICTORS</span><span class="p">[</span>
+            <span class="n">scorer_name</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">property_predictor_scorer</span><span class="p">(</span><span class="n">property_name</span><span class="p">,</span> <span class="n">scoring_function</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="PropertyPredictorRegistry.list_available"><a class="viewcode-back" href="../../api/gt4sd.properties.html#gt4sd.properties.PropertyPredictorRegistry.list_available">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">list_available</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="n">AVAILABLE_PROPERTY_PREDICTORS</span></div></div>
+        <span class="k">return</span> <span class="n">AVAILABLE_PROPERTY_PREDICTORS</span></div>
+
+<div class="viewcode-block" id="PropertyPredictorRegistry.list_available_scorers"><a class="viewcode-back" href="../../api/gt4sd.properties.html#gt4sd.properties.PropertyPredictorRegistry.list_available_scorers">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">list_available_scorers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">AVAILABLE_SCORING_WITH_PROPERTY_PREDICTORS</span></div></div>
 </pre></div>
 
            </div>

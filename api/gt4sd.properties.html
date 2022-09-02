@@ -106,9 +106,11 @@
 <li class="toctree-l2"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">gt4sd.properties package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="gt4sd.properties.core.html">gt4sd.properties.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.properties.scorer.html">gt4sd.properties.scorer module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gt4sd.properties.utils.html">gt4sd.properties.utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gt4sd.properties.molecules.html">gt4sd.properties.molecules package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gt4sd.properties.proteins.html">gt4sd.properties.proteins package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.properties.scores.html">gt4sd.properties.scores package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gt4sd.properties.tests.html">gt4sd.properties.tests package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#summary">Summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#reference">Reference</a></li>
@@ -193,6 +195,7 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="gt4sd.properties.core.html">gt4sd.properties.core module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gt4sd.properties.scorer.html">gt4sd.properties.scorer module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gt4sd.properties.utils.html">gt4sd.properties.utils module</a></li>
 </ul>
 </div>
@@ -201,6 +204,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="gt4sd.properties.molecules.html">gt4sd.properties.molecules package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gt4sd.properties.proteins.html">gt4sd.properties.proteins package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gt4sd.properties.scores.html">gt4sd.properties.scores package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gt4sd.properties.tests.html">gt4sd.properties.tests package</a></li>
 </ul>
 </div>
@@ -216,7 +220,7 @@
 <p>A registry for property predictors.</p>
 <dl class="py attribute">
 <dt id="gt4sd.properties.PropertyPredictorRegistry.__dict__">
-<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.properties', '__doc__': 'A registry for property predictors.', 'get_property_predictor_parameters_schema': &lt;staticmethod object&gt;, 'get_property_predictor': &lt;staticmethod object&gt;, 'list_available': &lt;staticmethod object&gt;, '__dict__': &lt;attribute '__dict__' of 'PropertyPredictorRegistry' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'PropertyPredictorRegistry' objects&gt;, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.properties.PropertyPredictorRegistry.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.properties', '__doc__': 'A registry for property predictors.', 'get_property_predictor_parameters_schema': &lt;staticmethod object&gt;, 'get_property_predictor': &lt;staticmethod object&gt;, 'get_property_predictor_scorer': &lt;staticmethod object&gt;, 'list_available': &lt;staticmethod object&gt;, 'list_available_scorers': &lt;staticmethod object&gt;, '__dict__': &lt;attribute '__dict__' of 'PropertyPredictorRegistry' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'PropertyPredictorRegistry' objects&gt;, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.properties.PropertyPredictorRegistry.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -256,8 +260,40 @@
 </dd></dl>
 
 <dl class="py method">
+<dt id="gt4sd.properties.PropertyPredictorRegistry.get_property_predictor_scorer">
+<em class="property">static </em><code class="sig-name descname">get_property_predictor_scorer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">property_name</span></em>, <em class="sig-param"><span class="n">scorer_name</span></em>, <em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/properties.html#PropertyPredictorRegistry.get_property_predictor_scorer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.properties.PropertyPredictorRegistry.get_property_predictor_scorer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a property predictor scorer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>property_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the property to score.</p></li>
+<li><p><strong>scorer_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the scorer to use.</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters[“target”]).</p></li>
+<li><p><strong>parameters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – parameters for the scoring function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="gt4sd.properties.scorer.html#gt4sd.properties.scorer.PropertyPredictorScorer" title="gt4sd.properties.scorer.PropertyPredictorScorer"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyPredictorScorer</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A property predictor scorer.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="gt4sd.properties.PropertyPredictorRegistry.list_available">
 <em class="property">static </em><code class="sig-name descname">list_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/properties.html#PropertyPredictorRegistry.list_available"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.properties.PropertyPredictorRegistry.list_available" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.properties.PropertyPredictorRegistry.list_available_scorers">
+<em class="property">static </em><code class="sig-name descname">list_available_scorers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/properties.html#PropertyPredictorRegistry.list_available_scorers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.properties.PropertyPredictorRegistry.list_available_scorers" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
