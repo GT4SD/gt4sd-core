@@ -143,7 +143,6 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
         pytest.param(
             DDPMGenerator,
             DiffusersGenerationAlgorithm,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             DDIMGenerator,
@@ -186,7 +185,6 @@ def test_generation_via_import(config, algorithm):
             "generation",
             "generic",
             DiffusersGenerationAlgorithm.__name__,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
             DDIMGenerator.__name__,
@@ -234,8 +232,6 @@ def test_generation_via_registry(
         domain=domain,
         algorithm_name=algorithm_name,
         algorithm_application=algorithm_application,
-        length=10,
-        number_of_sequences=1,
     )
     items = list(algorithm.sample(1))
     assert len(items) == 1
