@@ -22,11 +22,11 @@
 # SOFTWARE.
 #
 from enum import Enum
-from typing import Any, Callable, Dict, Union
+from typing import Any, Callable, Union
 
 from pydantic import BaseModel, Field
 
-PropertyValue = Union[float, int, Dict[str, Any]]
+PropertyValue = Union[float, int]
 
 
 class DomainSubmodule(str, Enum):
@@ -103,7 +103,7 @@ class CallablePropertyPredictor(PropertyPredictor):
             sample: a sample to use for predicting the property of interest.
 
         Returns:
-            Property:
+            Property: Property predicted by the predictor.
 
         Example:
             An example for predicting properties::

@@ -100,3 +100,8 @@ MOLECULE_PROPERTY_PREDICTOR_FACTORY: Dict[
     "organtox": (OrganTox, OrganToxParameters),
     "clintox": (ClinTox, ClinToxParameters),
 }
+
+
+AVAILABLE_MOLECULES_PROPERTY_PREDICTOR = sorted(
+    MOLECULE_PROPERTY_PREDICTOR_FACTORY.keys()
+)

@@ -21,17 +21,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Module initialization."""
 
-__version__ = "0.48.3"
-__name__ = "gt4sd"
+from .core import (
+    CombinedScorer,
+    DistanceScorer,
+    IsomerScorer,
+    QEDScorer,
+    RDKitDescriptorScorer,
+    SMARTSScorer,
+    TanimotoScorer,
+    TargetValueScorer,
+)
 
-# NOTE: configure SSL to allow unverified contexts by default
-from .configuration import GT4SDConfiguration
+SCORING_FACTORY = {
+    "target_value_scorer": TargetValueScorer,
+    "combined_scorer": CombinedScorer,
+    "rdkit_scorer": RDKitDescriptorScorer,
+    "tanimoto_scorer": TanimotoScorer,
+    "isomer_scorer": IsomerScorer,
+    "smarts_scorer": SMARTSScorer,
+    "qed_scorer": QEDScorer,
+    "distance_scorer": DistanceScorer,
+}
 
-gt4sd_configuration_instance = GT4SDConfiguration.get_instance()
-
-if gt4sd_configuration_instance.gt4sd_create_unverified_ssl_context:
-    import ssl
-
-    ssl._create_default_https_context = ssl._create_unverified_context
+AVAILABLE_SCORING = sorted(SCORING_FACTORY.keys())
