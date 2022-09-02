@@ -208,6 +208,7 @@ The trainer currently supports the following training pipelines:
 - `moses-vae-trainer`: Moses VAE models.
 - `torchdrug-gcpn-trainer`: TorchDrug Graph Convolutional Policy Network model.
 - `torchdrug-graphaf-trainer`: TorchDrug autoregressive GraphAF model.
+- `diffusion-trainer`: Diffusers model.
 
 ```console
 $ gt4sd-trainer --help
