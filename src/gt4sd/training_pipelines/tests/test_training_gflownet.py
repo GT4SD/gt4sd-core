@@ -113,7 +113,7 @@ template_config = {
 
 def test_train():
 
-    pipeline = TRAINING_PIPELINE_MAPPING.get("moses-organ-trainer")
+    pipeline = TRAINING_PIPELINE_MAPPING.get("gflownet-trainer")
 
     assert pipeline is not None
 
