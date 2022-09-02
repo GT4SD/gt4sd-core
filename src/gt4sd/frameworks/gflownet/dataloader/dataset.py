@@ -46,13 +46,199 @@ FlatRewards = NewType("FlatRewards", torch.tensor)  # type: ignore
 RewardScalar = NewType("RewardScalar", torch.tensor)  # type: ignore
 
 
+class GFlowNetDataset(Dataset):
+    """A dataset for gflownet."""
+
+    def __init__(
+        self, h5_file: str = None, target: str = "gap", properties: List[str] = []
+    ) -> None:
+
+        """Initialize a gflownet dataset.
+        If the dataset is in a format compatible with h5 file, we can directly load it.
+        If the dataset is in a format compatible with xyz file, we have to convert it to h5 file.
+
+        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data.
+
+        Args:
+            h5_file: data file in h5 format.
+            target: reward target.
+            properties: relevant properties for the task.
+
+        Raises:
+            ValueError: if the dataset is not in a format compatible with h5 file or not present.
+        """
+        if h5_file:
+            try:
+                # pickle on py3.8 uses prot 5
+                pickle.HIGHEST_PROTOCOL = 5
+                self.df = pd.HDFStore(h5_file, "r")["df"]
+            except FileNotFoundError:
+                ValueError("No h5 compatible database found in the path.")
+        else:
+            raise ValueError("The h5_file path is None. Please specify a h5 file path.")
+
+        self.target = target
+        self.properties = properties
+
+    def set_indexes(self, ixs: torch.Tensor):
+        """Set the indexes of the dataset split (train/val/test).
+
+        Args:
+            ixs: indexes of the dataset split.
+        """
+        self.idcs = ixs
+
+    def get_len(self):
+        """Get the length of the full dataset (before splitting).
+
+        Returns:
+            len: the length of the full dataset.
+        """
+        return len(self.df)
+
+    def get_stats(self, percentile: float = 0.95) -> Tuple[float, float, Any]:
+        """Get the stats of the dataset.
+
+        Args:
+            percentile: percentile.
+
+        Returns:
+            min, max, percentile.
+        """
+        y = self.df[self.target].astype(float)
+        return y.min(), y.max(), np.sort(y)[int(y.shape[0] * percentile)]
+
+    @staticmethod
+    def convert_xyz_to_h5(
+        xyz_path: str = "data/xyz",
+        h5_path: str = "data/qm9.h5",
+        property_names: List[str] = [
+            "rA",
+            "rB",
+            "rC",
+            "mu",
+            "alpha",
+            "homo",
+            "lumo",
+            "gap",
+            "r2",
+            "zpve",
+            "U0",
+            "U",
+            "H",
+            "G",
+            "Cv",
+        ],
+    ) -> None:
+        """Convert the data from xyz to h5. Assumes that the xyz files are extracted in the xyz_path folder.
+
+        Args:
+            xyz_path: path to the xyz file in input.
+            h5_path: path to the h5 file in output.
+            property_names: names of the properties we want to use/overwrite.
+        """
+
+        # Reads the xyz files and return the properties, smiles and coordinates
+        data = []
+        smiles = []
+        properties = []
+        i = 0
+
+        for file in os.listdir(xyz_path):
+            try:
+                path = os.path.join(xyz_path, file)
+                atoms, coordinates, smile, prop = GFlowNetDataset._read_xyz(path)
+                data.append(
+                    (atoms, coordinates)
+                )  # A tuple with the atoms and its coordinates
+                smiles.append(smile)  # The SMILES representation
+                properties.append(prop)  # The molecules properties
+            except ValueError:
+                print(path)
+            i += 1
+
+        # rename relevant properties to match GFN schema
+        labels = property_names
+        df = pd.DataFrame(properties, columns=labels)
+        df["SMILES"] = smiles
+
+        df.to_hdf(h5_path, key="df", mode="w")
+
+    @staticmethod
+    def _read_xyz(path: str):
+        """Reads the xyz files in the directory on 'path'.
+
+        Code adapted from: https://www.kaggle.com/code/rmonge/predicting-molecule-properties-based-on-its-smiles/notebook
+
+        Args:
+            path: the path to the folder.
+
+        Returns:
+            atoms: list with the characters representing the atoms of a molecule.
+            coordinates: list with the cartesian coordinates of each atom.
+            smile: list with the SMILE representation of a molecule.
+            prop: list with the scalar properties.
+        """
+        atoms = []
+        coordinates = []
+
+        with open(path, "r") as file:
+            lines = file.readlines()
+            n_atoms = int(lines[0])  # the number of atoms
+            smile = lines[n_atoms + 3].split()[0]  # smiles string
+            prop = lines[1].split()[2:]  # scalar properties
+
+            # to retrieve each atmos and its cartesian coordenates
+            for atom in lines[2 : n_atoms + 2]:
+                line = atom.split()
+                # which atom
+                atoms.append(line[0])
+
+                # its coordinate
+                # Some properties have '*^' indicading exponentiation
+                try:
+                    coordinates.append((float(line[1]), float(line[2]), float(line[3])))
+                except ValueError:
+                    coordinates.append(
+                        (
+                            float(line[1].replace("*^", "e")),
+                            float(line[2].replace("*^", "e")),
+                            float(line[3].replace("*^", "e")),
+                        )
+                    )
+
+        return atoms, coordinates, smile, prop
+
+    def __len__(self):
+        """Dataset split (train/val/test) length.
+
+        Returns:
+            length of the dataset.
+        """
+        return len(self.idcs)
+
+    def __getitem__(self, idx: torch.Tensor) -> Tuple[Any, float]:
+        """Retrieve an item from the dataset by index.
+
+        Args:
+            index: index for the item.
+
+        Returns:
+            an tuple (item, reward).
+        """
+        return (
+            Chem.MolFromSmiles(self.df["SMILES"][self.idcs[idx]]),
+            self.df[self.target][self.idcs[idx]],
+        )
+
+
 class GFlowNetTask:
     """A task for gflownet."""
 
     def __init__(
         self,
         configuration: Dict[str, Any],
-        dataset: Dataset,
+        dataset: GFlowNetDataset,
         reward_model: nn.Module = None,
         wrap_model: Callable[[nn.Module], nn.Module] = None,
     ) -> None:
@@ -76,7 +262,7 @@ class GFlowNetTask:
         self.device = hps["device"]
         self.rng = hps["rng"]
 
-        # fix this
+        # if reward model provided, use it
         if reward_model:
             self.model = {"model_task": reward_model}
         else:
@@ -154,188 +340,3 @@ class GFlowNetTask:
             )
             return placeholder
         return model
-
-
-class GFlowNetDataset(Dataset):
-    """A dataset for gflownet."""
-
-    def __init__(
-        self, h5_file: str = None, target: str = "gap", properties: List[str] = []
-    ) -> None:
-
-        """Initialize a gflownet dataset.
-        If the dataset is in a format compatible with h5 file, we can directly load it.
-        If the dataset is in a format compatible with xyz file, we have to convert it to h5 file.
-
-        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data.
-
-        Args:
-            h5_file: data file in h5 format.
-            target: reward target.
-            properties: relevant properties for the task.
-
-        Raises:
-            ValueError: if the dataset is not in a format compatible with h5 file or not present.
-        """
-        if h5_file:
-            try:
-                # pickle on py3.8 uses prot 5
-                pickle.HIGHEST_PROTOCOL = 5
-                self.df = pd.HDFStore(h5_file, "r")["df"]
-            except FileNotFoundError:
-                ValueError("No h5 compatible database found in the path.")
-        else:
-            raise ValueError("The h5_file path is None. Please specify a h5 file path.")
-
-        self.target = target
-        self.properties = properties
-
-    def set_indexes(self, ixs: torch.Tensor):
-        """Set the indexes of the dataset split (train/val/test).
-
-        Args:
-            ixs: indexes of the dataset split.
-        """
-        self.idcs = ixs
-
-    def get_len(self):
-        """Get the length of the full dataset (before splitting).
-
-        Returns:
-            len: the length of the full dataset.
-        """
-        return len(self.df)
-
-    def get_stats(self, percentile: float = 0.95) -> Tuple[float, float, Any]:
-        """Get the stats of the dataset.
-
-        Args:
-            percentile: percentile.
-
-        Returns:
-            min, max, percentile.
-        """
-        y = self.df[self.target].astype(float)
-        return y.min(), y.max(), np.sort(y)[int(y.shape[0] * percentile)]
-
-    def convert_xyz_to_h5(
-        self,
-        xyz_path: str = "data/xyz",
-        h5_path: str = "data/qm9.h5",
-        property_names: List[str] = [
-            "rA",
-            "rB",
-            "rC",
-            "mu",
-            "alpha",
-            "homo",
-            "lumo",
-            "gap",
-            "r2",
-            "zpve",
-            "U0",
-            "U",
-            "H",
-            "G",
-            "Cv",
-        ],
-    ) -> None:
-        """Convert the data from xyz to h5. Assumes that the xyz files are extracted in the xyz_path folder.
-
-        Args:
-            xyz_path: path to the xyz file in input.
-            h5_path: path to the h5 file in output.
-            property_names: names of the properties we want to use/overwrite.
-        """
-
-        # Reads the xyz files and return the properties, smiles and coordinates
-        data = []
-        smiles = []
-        properties = []
-        i = 0
-
-        for file in os.listdir(xyz_path):
-            try:
-                path = os.path.join(xyz_path, file)
-                atoms, coordinates, smile, prop = self._read_xyz(path)
-                data.append(
-                    (atoms, coordinates)
-                )  # A tuple with the atoms and its coordinates
-                smiles.append(smile)  # The SMILES representation
-                properties.append(prop)  # The molecules properties
-            except ValueError:
-                print(path)
-            i += 1
-
-        # rename relevant properties to match GFN schema
-        labels = property_names
-        df = pd.DataFrame(properties, columns=labels)
-        df["SMILES"] = smiles
-
-        df.to_hdf(h5_path, key="df", mode="w")
-
-    def _read_xyz(self, path: str):
-        """Reads the xyz files in the directory on 'path'.
-
-        Code adapted from: https://www.kaggle.com/code/rmonge/predicting-molecule-properties-based-on-its-smiles/notebook
-
-        Args:
-            path: the path to the folder.
-
-        Returns:
-            atoms: list with the characters representing the atoms of a molecule.
-            coordinates: list with the cartesian coordinates of each atom.
-            smile: list with the SMILE representation of a molecule.
-            prop: list with the scalar properties.
-        """
-        atoms = []
-        coordinates = []
-
-        with open(path, "r") as file:
-            lines = file.readlines()
-            n_atoms = int(lines[0])  # the number of atoms
-            smile = lines[n_atoms + 3].split()[0]  # smiles string
-            prop = lines[1].split()[2:]  # scalar properties
-
-            # to retrieve each atmos and its cartesian coordenates
-            for atom in lines[2 : n_atoms + 2]:
-                line = atom.split()
-                # which atom
-                atoms.append(line[0])
-
-                # its coordinate
-                # Some properties have '*^' indicading exponentiation
-                try:
-                    coordinates.append((float(line[1]), float(line[2]), float(line[3])))
-                except ValueError:
-                    coordinates.append(
-                        (
-                            float(line[1].replace("*^", "e")),
-                            float(line[2].replace("*^", "e")),
-                            float(line[3].replace("*^", "e")),
-                        )
-                    )
-
-        return atoms, coordinates, smile, prop
-
-    def __len__(self):
-        """Dataset split (train/val/test) length.
-
-        Returns:
-            length of the dataset.
-        """
-        return len(self.idcs)
-
-    def __getitem__(self, idx: torch.Tensor) -> Tuple[Any, float]:
-        """Retrieve an item from the dataset by index.
-
-        Args:
-            index: index for the item.
-
-        Returns:
-            an tuple (item, reward).
-        """
-        return (
-            Chem.MolFromSmiles(self.df["SMILES"][self.idcs[idx]]),
-            self.df[self.target][self.idcs[idx]],
-        )

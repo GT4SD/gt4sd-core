@@ -114,7 +114,7 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     parser.add_argument("--algorithm", type=str, default="trajectory_balance")
     parser.add_argument("--context", type=str, default=None)
     parser.add_argument("--dataset", type=str, default="qm9")
-    parser.add_argument("--dataset_path", type=str, default="/Users/ggi/GFN/qm9.h5")
+    parser.add_argument("--dataset_path", type=str, default="./data/qm9.h5")
     parser.add_argument("--environment", type=str, default=None)
     parser.add_argument("--model", type=str, default="graph_transformer_gfn")
     parser.add_argument("--sampling_model", type=str, default="graph_transformer_gfn")

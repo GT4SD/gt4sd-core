@@ -28,7 +28,6 @@ import torch
 import torch.nn as nn
 import torch_geometric.data as gd
 from rdkit.Chem.rdchem import Mol as RDMol
-from torch.utils.data import Dataset
 
 from gt4sd.frameworks.gflownet.dataloader.dataset import (
     FlatRewards,
@@ -113,7 +112,7 @@ class QM9GapTask(GFlowNetTask):
     def __init__(
         self,
         configuration: Dict[str, Any],
-        dataset: Dataset,
+        dataset: GFlowNetDataset,
         reward_model: nn.Module = None,
         wrap_model: Callable[[nn.Module], nn.Module] = None,
     ):

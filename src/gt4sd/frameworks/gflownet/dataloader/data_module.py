@@ -56,7 +56,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         context: GraphBuildingEnvContext,
         task: GFlowNetTask,
         algorithm: TrajectoryBalance,
-        model: nn.Module,
+        model: Optional[nn.Module] = None,
     ) -> None:
         """Construct GFlowNetDataModule.
 
@@ -70,15 +70,19 @@ class GFlowNetDataModule(pl.LightningDataModule):
             context: context environment.
             task: generic task.
             algorithm: loss function.
-            model: model type.
+            model: model used to generate data with the sampling iterator.
+                It can be a custom model or the same as the one used in the algorithm.
         """
         super().__init__()
         self.hps = configuration
 
-        self.model = model
-        self.sampling_model = MODEL_FACTORY[self.hps["sampling_model"]](
-            self.hps, context
-        )
+        # if model is given
+        if model:
+            self.sampling_model = model
+        else:
+            self.sampling_model = MODEL_FACTORY[self.hps["sampling_model"]](
+                self.hps, context
+            )
         self.algo = algorithm
         self.env = environment
         self.ctx = context
@@ -103,7 +107,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         """Setup the data module.
 
         Args:
-            stage: stage considered, unused. Defaults to None.
+            stage: stage considered. Defaults to None.
         """
 
         ll = self.dataset.get_len()
@@ -140,18 +144,21 @@ class GFlowNetDataModule(pl.LightningDataModule):
         if self.sampling_iterator:
             iterator = SamplingIterator(
                 self.train_dataset,
-                self.model,
+                self.sampling_model,
                 self.mb_size * 2,
                 self.ctx,
                 self.algo,
                 self.task,
                 device=self.device,
             )
+            batch_size = None
         else:
             iterator = self.train_dataset  # type: ignore
+            batch_size = self.batch_size
+
         return DataLoader(
             iterator,
-            batch_size=None,
+            batch_size=batch_size,
             num_workers=self.num_workers,
             persistent_workers=self.num_workers > 0,
         )
@@ -165,7 +172,7 @@ class GFlowNetDataModule(pl.LightningDataModule):
         if self.sampling_iterator:
             iterator = SamplingIterator(
                 self.val_dataset,
-                self.model,
+                self.sampling_model,
                 self.mb_size,
                 self.ctx,
                 self.algo,
@@ -174,11 +181,14 @@ class GFlowNetDataModule(pl.LightningDataModule):
                 stream=False,
                 device=self.device,
             )
+            batch_size = None
         else:
             iterator = self.val_dataset  # type: ignore
+            batch_size = self.batch_size
+
         return DataLoader(
             iterator,
-            batch_size=None,
+            batch_size=batch_size,
             num_workers=self.num_workers,
             persistent_workers=self.num_workers > 0,
         )
