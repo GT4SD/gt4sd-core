@@ -192,6 +192,15 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
         default="cpu",
         metadata={"help": "The device to use."},
     )
+    distributed_training_strategy: str = field(
+        default="ddp",
+        metadata={"help": "The distributed training strategy. "},
+    )
+
+    development_mode: bool = field(
+        default=False,
+        metadata={"help": "Whether to run in development mode. "},
+    )
 
 
 @dataclass
@@ -271,12 +280,6 @@ class GFlowNetModelArguments(TrainingPipelineArguments):
         default=1e-8,
         metadata={"help": "The weight decay. "},
     )
-
-    num_data_loader_workers: int = field(
-        default=8,
-        metadata={"help": "The number of data loader workers. "},
-    )
-
     momentum: float = field(
         default=0.9,
         metadata={"help": "The momentum. "},
@@ -325,26 +328,6 @@ class GFlowNetModelArguments(TrainingPipelineArguments):
     num_offline: int = field(
         default=10,
         metadata={"help": "The number of offline samples. "},
-    )
-
-    sampling_iterator: bool = field(
-        default=True,
-        metadata={"help": "Whether to use a sampling iterator. "},
-    )
-
-    ratio: float = field(
-        default=0.9,
-        metadata={"help": "The ratio. "},
-    )
-
-    distributed_training_strategy: str = field(
-        default="ddp",
-        metadata={"help": "The distributed training strategy. "},
-    )
-
-    development_mode: bool = field(
-        default=False,
-        metadata={"help": "Whether to run in development mode. "},
     )
 
 
@@ -401,4 +384,28 @@ class GFlowNetDataArguments(TrainingPipelineArguments):
         metadata={
             "help": "Stratified value name. Defaults to None, a.k.a., no stratified sampling. Needed in case a stratified batch file is provided."
         },
+    )
+    num_data_loader_workers: int = field(
+        default=8,
+        metadata={"help": "The number of data loader workers. "},
+    )
+    sampling_iterator: bool = field(
+        default=True,
+        metadata={"help": "Whether to use a sampling iterator. "},
+    )
+
+    ratio: float = field(
+        default=0.9,
+        metadata={"help": "The ratio. "},
+    )
+
+
+@dataclass
+class GFlowNetSavingArguments(TrainingPipelineArguments):
+    """Saving arguments related to Granular trainer."""
+
+    __name__ = "saving_args"
+
+    model_path: str = field(
+        metadata={"help": "Path to the checkpoint file to be used."}
     )

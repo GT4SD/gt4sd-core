@@ -54,6 +54,13 @@ from .paccmann.core import (
 )
 from .paccmann.vae.core import PaccMannVAEModelArguments, PaccMannVAETrainingPipeline
 from .pytorch_lightning.core import PytorchLightningTrainingArguments
+from .pytorch_lightning.gflownet.core import (
+    GFlowNetDataArguments,
+    GFlowNetModelArguments,
+    GFlowNetPytorchLightningTrainingArguments,
+    GFlowNetSavingArguments,
+    GFlowNetTrainingPipeline,
+)
 from .pytorch_lightning.granular.core import (
     GranularDataArguments,
     GranularModelArguments,
@@ -144,6 +151,11 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         RegressionTransformerDataArguments,
         RegressionTransformerModelArguments,
     ),
+    "gflownet-trainer": (
+        GFlowNetPytorchLightningTrainingArguments,
+        GFlowNetDataArguments,
+        GFlowNetModelArguments,
+    ),
 }
 
 TRAINING_PIPELINE_MAPPING = {
@@ -156,6 +168,7 @@ TRAINING_PIPELINE_MAPPING = {
     "moses-organ-trainer": MosesOrganTrainingPipeline,
     "moses-vae-trainer": MosesVAETrainingPipeline,
     "regression-transformer-trainer": RegressionTransformerTrainingPipeline,
+    "gflownet-trainer": GFlowNetTrainingPipeline,
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
@@ -168,6 +181,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "moses-organ-trainer": MosesSavingArguments,
     "moses-vae-trainer": MosesSavingArguments,
     "regression-transformer-trainer": RegressionTransformerSavingArguments,
+    "gflownet-trainer": GFlowNetSavingArguments,
 }
 
 

@@ -1,0 +1,130 @@
+#
+# MIT License
+#
+# Copyright (c) 2022 GT4SD team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+"""gflownet trainer unit tests."""
+
+import os
+import shutil
+import tempfile
+from typing import Any, Dict, cast
+
+import pkg_resources
+
+from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, GFlowNetTrainingPipeline
+
+TEST_DATA_DIRECTORY = pkg_resources.resource_filename(
+    "gt4sd",
+    "training_pipelines/tests/",
+)
+
+
+def _create_training_output_filepaths(directory: str) -> Dict[str, str]:
+    """Create output filepath from directory.
+
+    Args:
+        directory: output directory.
+
+    Returns:
+        a dictionary containing the output files.
+    """
+    return {
+        "log_file": os.path.join(directory, "log.txt"),
+        "model_save": os.path.join(directory, "model.pt"),
+        "config_save": os.path.join(directory, "config.pt"),
+    }
+
+
+template_config = {
+    "model_args": {
+        "algorithm": "trajectory_balance",
+        "context": None,
+        "environment": None,
+        "model": "graph_transformer_gfn",
+        "sampling_model": "graph_transformer_gfn",
+        "task": "qm9",
+        "bootstrap_own_reward": False,
+        "num_emb": 128,
+        "num_layers": 4,
+        "tb_epsilon": 1e-10,
+        "illegal_action_logreward": -50,
+        "reward_loss_multiplier": 1.0,
+        "temperature_sample_dist": "uniform",
+        "temperature_dist_params": "(.5, 32)",
+        "weight_decay": 1e-8,
+        "momentum": 0.9,
+        "adam_eps": 1e-8,
+        "lr_decay": 20000,
+        "z_lr_decay": 20000,
+        "clip_grad_type": "norm",
+        "clip_grad_param": 10.0,
+        "random_action_prob": 0.001,
+        "sampling_tau": 0.0,
+        "max_nodes": 9,
+        "num_offline": 10,
+    },
+    "pl_training_args": {
+        "basename": "gflownet",
+        "every_n_val_epochs": 5,
+        "auto_lr_find": True,
+        "profiler": "simple",
+        "learning_rate": 0.0001,
+        "test_output_path": "./test",
+        "num_workers": 0,
+        "log_dir": "./log/",
+        "num_training_steps": 1000,
+        "validate_every": 1000,
+        "seed": 142857,
+        "device": "cpu",
+        "distributed_training_strategy": "ddp",
+        "development_mode": False,
+    },
+    "dataset_args": {
+        "dataset": "qm9",
+        "dataset_path": "./data/qm9",
+        "epoch": 100,
+        "batch_size": 64,
+        "global_batch_size": 16,
+        "validation_split": None,
+        "sampling_iterator": True,
+        "ratio": 0.9,
+    },
+}
+
+
+def test_train():
+
+    pipeline = TRAINING_PIPELINE_MAPPING.get("moses-organ-trainer")
+
+    assert pipeline is not None
+
+    TEMPORARY_DIRECTORY = tempfile.mkdtemp()
+
+    test_pipeline = cast(GFlowNetTrainingPipeline, pipeline())
+
+    config: Dict[str, Any] = template_config.copy()
+    for key, value in _create_training_output_filepaths(TEMPORARY_DIRECTORY).items():
+        config["training_args"][key] = value
+
+    test_pipeline.train(**config)
+
+    shutil.rmtree(TEMPORARY_DIRECTORY)
