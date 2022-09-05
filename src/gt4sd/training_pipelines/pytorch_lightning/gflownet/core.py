@@ -25,10 +25,11 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Union
 
 import sentencepiece as _sentencepiece
-from pytorch_lightning import LightningDataModule, LightningModule
+from pytorch_lightning import LightningDataModule, LightningModule, Trainer
+from pytorch_lightning.loggers import TensorBoardLogger
 
 from ....frameworks.gflownet.dataloader.data_module import (
     GFlowNetDataModule,
@@ -55,12 +56,82 @@ logger.addHandler(logging.NullHandler())
 class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
     """gflownet training pipelines."""
 
+    def train(  # type: ignore
+        self,
+        pl_trainer_args: Dict[str, Any],
+        model_args: Dict[str, Union[float, str, int]],
+        dataset_args: Dict[str, Union[float, str, int]],
+        dataset: GFlowNetDataset,
+        environment: GraphBuildingEnv,
+        context: GraphBuildingEnvContext,
+        task: GFlowNetTask,
+    ) -> None:
+        """Generic training function for PyTorch Lightning-based training.
+
+        Args:
+            pl_trainer_args: pytorch lightning trainer arguments passed to the configuration.
+            model_args: model arguments passed to the configuration.
+            dataset_args: dataset arguments passed to the configuration.
+            dataset: dataset to be used for training.
+            environment: environment to be used for training.
+            context: context to be used for training.
+            task: task to be used for training.
+        """
+
+        logger.info(f"Trainer arguments: {pl_trainer_args}")
+
+        if pl_trainer_args[
+            "resume_from_checkpoint"
+        ] is not None and not pl_trainer_args["resume_from_checkpoint"].endswith(
+            ".ckpt"
+        ):
+            pl_trainer_args["resume_from_checkpoint"] = None
+
+        pl_trainer_args["callbacks"] = {
+            "model_checkpoint_callback": {
+                "monitor": pl_trainer_args["monitor"],
+                "save_top_k": pl_trainer_args["save_top_k"],
+                "mode": pl_trainer_args["mode"],
+                "every_n_train_steps": pl_trainer_args["every_n_train_steps"],
+                "every_n_val_epochs": pl_trainer_args["every_n_val_epochs"],
+                "save_last": pl_trainer_args["save_last"],
+            }
+        }
+
+        del (
+            pl_trainer_args["monitor"],
+            pl_trainer_args["save_top_k"],
+            pl_trainer_args["mode"],
+            pl_trainer_args["every_n_train_steps"],
+            pl_trainer_args["save_last"],
+            pl_trainer_args["every_n_val_epochs"],
+        )
+
+        pl_trainer_args["callbacks"] = self.add_callbacks(pl_trainer_args["callbacks"])
+
+        pl_trainer_args["logger"] = TensorBoardLogger(
+            pl_trainer_args["save_dir"], name=pl_trainer_args["basename"]
+        )
+        del (pl_trainer_args["save_dir"], pl_trainer_args["basename"])
+
+        trainer = Trainer(**pl_trainer_args)
+        data_module, model_module = self.get_data_and_model_modules(
+            model_args,
+            dataset_args,
+            pl_trainer_args,
+            dataset,
+            environment,
+            context,
+            task,
+        )
+        trainer.fit(model_module, data_module)
+
     # TODO: compatible signature with Pytorch Lightning training pipelines
     def get_data_and_model_modules(  # type: ignore
         self,
         model_args: Dict[str, Any],
         dataset_args: Dict[str, Any],
-        pl_training_args: Dict[str, Any],
+        pl_trainer_args: Dict[str, Any],
         dataset: GFlowNetDataset,
         environment: GraphBuildingEnv,
         context: GraphBuildingEnvContext,
@@ -76,7 +147,7 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
             the data and model modules.
         """
 
-        configuration = {**model_args, **dataset_args, **pl_training_args}
+        configuration = {**model_args, **dataset_args, **pl_trainer_args}
 
         if configuration["algorithm"] in ALGORITHM_FACTORY:
             algorithm = ALGORITHM_FACTORY[getattr(configuration, "algorithm")](
@@ -130,6 +201,76 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
     """
 
     __name__ = "pl_trainer_args"
+
+    accelerator: Optional[str] = field(
+        default="ddp", metadata={"help": "Accelerator type."}
+    )
+    accumulate_grad_batches: int = field(
+        default=1,
+        metadata={
+            "help": "Accumulates grads every k batches or as set up in the dict."
+        },
+    )
+    val_check_interval: int = field(
+        default=5000, metadata={"help": " How often to check the validation set."}
+    )
+    save_dir: Optional[str] = field(
+        default="logs", metadata={"help": "Save directory for logs and output."}
+    )
+    basename: Optional[str] = field(
+        default="lightning_logs", metadata={"help": "Experiment name."}
+    )
+    gradient_clip_val: float = field(
+        default=0.0, metadata={"help": "Gradient clipping value."}
+    )
+    limit_val_batches: int = field(
+        default=500, metadata={"help": "How much of validation dataset to check."}
+    )
+    log_every_n_steps: int = field(
+        default=500, metadata={"help": "How often to log within steps."}
+    )
+    max_epochs: int = field(
+        default=3,
+        metadata={"help": "Stop training once this number of epochs is reached."},
+    )
+    resume_from_checkpoint: Optional[str] = field(
+        default=None,
+        metadata={"help": "Path/URL of the checkpoint from which training is resumed."},
+    )
+    gpus: Optional[int] = field(
+        default=-1,
+        metadata={"help": "Number of gpus to train on."},
+    )
+
+    monitor: Optional[str] = field(
+        default=None,
+        metadata={"help": "Quantity to monitor in order to store a checkpoint."},
+    )
+    save_last: Optional[bool] = field(
+        default=None,
+        metadata={
+            "help": "When True, always saves the model at the end of the epoch to a file last.ckpt"
+        },
+    )
+    save_top_k: Optional[int] = field(
+        default=None,
+        metadata={
+            "help": "The best k models according to the quantity monitored will be saved."
+        },
+    )
+    mode: str = field(
+        default="min",
+        metadata={"help": "Quantity to monitor in order to store a checkpoint."},
+    )
+    every_n_train_steps: Optional[int] = field(
+        default=None,
+        metadata={"help": "Number of training steps between checkpoints."},
+    )
+
+    resume_from_checkpoint: Optional[str] = field(
+        default=None,
+        metadata={"help": "Resume from checkpoint."},
+    )
 
     basename: str = field(
         default="gflownet",

@@ -28,8 +28,13 @@ import shutil
 import tempfile
 from typing import Any, Dict, cast
 
+import numpy as np
 import pkg_resources
+import pytest
 
+from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
+from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
+from gt4sd.frameworks.gflownet.tests.qm9 import QM9Dataset, QM9GapTask
 from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, GFlowNetTrainingPipeline
 
 TEST_DATA_DIRECTORY = pkg_resources.resource_filename(
@@ -82,7 +87,7 @@ template_config = {
         "max_nodes": 9,
         "num_offline": 10,
     },
-    "pl_training_args": {
+    "pl_trainer_args": {
         "basename": "gflownet",
         "every_n_val_epochs": 5,
         "auto_lr_find": True,
@@ -97,10 +102,11 @@ template_config = {
         "device": "cpu",
         "distributed_training_strategy": "ddp",
         "development_mode": False,
+        "resume_from_checkpoint": None,
     },
     "dataset_args": {
         "dataset": "qm9",
-        "dataset_path": "./data/qm9",
+        "dataset_path": "./data/qm9.h5",
         "epoch": 100,
         "batch_size": 64,
         "global_batch_size": 16,
@@ -111,6 +117,7 @@ template_config = {
 }
 
 
+@pytest.mark.skip(reason="we need to add support for dataset buckets")
 def test_train():
 
     pipeline = TRAINING_PIPELINE_MAPPING.get("gflownet-trainer")
@@ -123,7 +130,28 @@ def test_train():
 
     config: Dict[str, Any] = template_config.copy()
     for key, value in _create_training_output_filepaths(TEMPORARY_DIRECTORY).items():
-        config["pl_training_args"][key] = value
+        config["pl_trainer_args"][key] = value
+    config["pl_trainer_args"]["rng"] = np.random.default_rng(
+        config["pl_trainer_args"]["seed"]
+    )
+
+    dataset = QM9Dataset(config["dataset_args"]["dataset_path"], target="gap")
+    environment = GraphBuildingEnv()
+    context = MolBuildingEnvContext()
+
+    task = QM9GapTask(
+        configuration={
+            **config["pl_trainer_args"],
+            **config["model_args"],
+            **config["dataset_args"],
+        },
+        dataset=dataset,
+    )
+
+    config["dataset"] = dataset
+    config["environment"] = environment
+    config["context"] = context
+    config["task"] = task
 
     test_pipeline.train(**config)
 
