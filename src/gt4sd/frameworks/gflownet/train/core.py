@@ -127,8 +127,7 @@ def train_gflownet(
         max_epochs=getattr(arguments, "epoch", 10),
         check_val_every_n_epoch=getattr(arguments, "checkpoint_every_n_val_epochs", 5),
         fast_dev_run=getattr(arguments, "development_mode", False),
-        accelerator=getattr(arguments, "device", "auto"),
-        strategy=getattr(arguments, "distributed_training_strategy", "ddp"),
+        accelerator=getattr(arguments, "distributed_training_strategy", "ddp"),
     )
     trainer.fit(module, dm)
 
