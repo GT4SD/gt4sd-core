@@ -66,7 +66,7 @@ class QM9Dataset(GFlowNetDataset):
 
     def __init__(
         self,
-        h5_file: str = None,
+        h5_file: str,
         target: str = "gap",
         properties: List[str] = PROPERTIES,
     ) -> None:

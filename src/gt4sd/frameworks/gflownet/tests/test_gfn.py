@@ -23,6 +23,7 @@
 #
 from argparse import Namespace
 
+import numpy as np
 import pytest
 import pytorch_lightning as pl
 
@@ -66,12 +67,15 @@ configuration = {
     "lr": 0.0001,
     "algorithm": "trajectory_balance",
     "dataset": "qm9",
-    "dataset_path": "/GFN/qm9.h5",
+    "dataset_path": "./data/qm9.h5",
     "model": "graph_transformer_gfn",
     "sampling_model": "graph_transformer_gfn",
     "task": "qm9",
     "device": "cpu",
+    "seed": 124,
+    "test_output_path": "logs",
 }
+configuration["rng"] = np.random.default_rng(configuration["seed"])
 
 
 def test_gfn_env():
@@ -93,19 +97,19 @@ def test_gfn_model(model_name):
 
 
 @pytest.mark.skip(reason="we need to add support for dataset buckets")
-def test_gfn(configuration):
+def test_gfn():
     """test basic GFN training on QM9."""
 
-    dataset = QM9Dataset(configuration["dataset_path"], target="gap")
+    dataset = QM9Dataset(configuration["dataset_path"], target="gap")  # type: ignore
     environment = GraphBuildingEnv()
     context = MolBuildingEnvContext()
 
-    algorithm = ALGORITHM_FACTORY[getattr(configuration, "algorithm")](
+    algorithm = ALGORITHM_FACTORY[configuration["algorithm"]](  # type: ignore
         configuration=configuration,
         environment=environment,
         context=context,
     )
-    model = MODEL_FACTORY[getattr(configuration, "model")](
+    model = MODEL_FACTORY[configuration["model"]](  # type: ignore
         configuration=configuration,
         context=context,
     )
@@ -144,6 +148,6 @@ def test_gfn(configuration):
         max_epochs=1,
         flush_logs_every_n_steps=100,
         fast_dev_run=True,
-        accelerator="cpu",
+        accelerator="ddp",
     )
     trainer.fit(module, dm)

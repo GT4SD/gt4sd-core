@@ -88,31 +88,25 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
             pl_trainer_args["resume_from_checkpoint"] = None
 
         pl_trainer_args["callbacks"] = {
-            "model_checkpoint_callback": {
-                "save_top_k": pl_trainer_args["save_top_k"],
-                "mode": pl_trainer_args["mode"],
-                "every_n_train_steps": pl_trainer_args["every_n_train_steps"],
-                "every_n_val_epochs": pl_trainer_args["every_n_val_epochs"],
-                "save_last": pl_trainer_args["save_last"],
-            }
+            "model_checkpoint_callback": {"save_top_k": pl_trainer_args["save_top_k"]}
         }
-
-        del (
-            pl_trainer_args["save_top_k"],
-            pl_trainer_args["mode"],
-            pl_trainer_args["every_n_train_steps"],
-            pl_trainer_args["save_last"],
-            pl_trainer_args["every_n_val_epochs"],
-        )
 
         pl_trainer_args["callbacks"] = self.add_callbacks(pl_trainer_args["callbacks"])
 
         pl_trainer_args["logger"] = TensorBoardLogger(
             pl_trainer_args["save_dir"], name=pl_trainer_args["basename"]
         )
-        del (pl_trainer_args["save_dir"], pl_trainer_args["basename"])
 
-        trainer = Trainer(**pl_trainer_args)
+        trainer = Trainer(
+            profiler=pl_trainer_args["profiler"],
+            logger=pl_trainer_args["logger"],
+            log_every_n_steps=pl_trainer_args["trainer_log_every_n_steps"],
+            callbacks=pl_trainer_args["callbacks"],
+            max_epochs=pl_trainer_args["epochs"],
+            accelerator=pl_trainer_args["accelerator"],
+            fast_dev_run=pl_trainer_args["development_mode"],
+        )
+
         data_module, model_module = self.get_data_and_model_modules(
             model_args,
             dataset_args,
@@ -146,9 +140,8 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
         """
 
         configuration = {**model_args, **dataset_args, **pl_trainer_args}
-
         if configuration["algorithm"] in ALGORITHM_FACTORY:
-            algorithm = ALGORITHM_FACTORY[getattr(configuration, "algorithm")](
+            algorithm = ALGORITHM_FACTORY[configuration["algorithm"]](
                 configuration,
                 environment,
                 context,
@@ -159,7 +152,7 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
             )
 
         if configuration["model"] in MODEL_FACTORY:
-            model = MODEL_FACTORY[getattr(configuration, "model")](
+            model = MODEL_FACTORY[configuration["model"]](
                 configuration,
                 context,
             )
@@ -209,6 +202,12 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
             "help": "Accumulates grads every k batches or as set up in the dict."
         },
     )
+
+    trainer_log_every_n_steps: int = field(
+        default=50,
+        metadata={"help": "log every k steps."},
+    )
+
     val_check_interval: int = field(
         default=5000, metadata={"help": " How often to check the validation set."}
     )
@@ -228,6 +227,10 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
         default=500, metadata={"help": "How often to log within steps."}
     )
     max_epochs: int = field(
+        default=3,
+        metadata={"help": "Stop training once this number of epochs is reached."},
+    )
+    epochs: int = field(
         default=3,
         metadata={"help": "Stop training once this number of epochs is reached."},
     )
@@ -251,7 +254,7 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
         },
     )
     save_top_k: Optional[int] = field(
-        default=None,
+        default=-1,
         metadata={
             "help": "The best k models according to the quantity monitored will be saved."
         },
@@ -474,10 +477,6 @@ class GFlowNetDataArguments(TrainingPipelineArguments):
     dataset_path: str = field(
         default="./data/qm9",
         metadata={"help": "The path to the dataset to use for training the model. "},
-    )
-    epoch: int = field(
-        default=100,
-        metadata={"help": "The number of epochs. "},
     )
 
     batch_size: int = field(
