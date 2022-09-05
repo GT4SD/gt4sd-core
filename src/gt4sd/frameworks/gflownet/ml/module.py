@@ -143,10 +143,8 @@ class GFlowNetModule(pl.LightningModule):
 
         # logs for step
         _logs = {f"train/{k}": v for k, v in logs.items()}
-        self.log_dict(
-            _logs, on_step=True, on_epoch=True, prog_bar=True, batch_size=batch.size(0)
-        )
-        self.log("train_loss", loss, batch_size=batch.size(0))
+        self.log_dict(_logs, on_step=True, on_epoch=True, prog_bar=True)
+        self.log("train_loss", loss)
 
         # logs per epoch
         logs_epoch = {f"train_epoch/{k}": v for k, v in logs.items()}
@@ -156,7 +154,6 @@ class GFlowNetModule(pl.LightningModule):
             on_step=False,
             on_epoch=True,
             prog_bar=False,
-            batch_size=batch.size(0),
         )
 
         return {"loss": loss, "logs": logs}
@@ -193,9 +190,8 @@ class GFlowNetModule(pl.LightningModule):
             on_step=True,
             on_epoch=True,
             prog_bar=False,
-            batch_size=batch.size(0),
         )
-        self.log("val_loss", loss, batch_size=batch.size(0))
+        self.log("val_loss", loss)
         return {"loss": loss, "logs": logs}
 
     def test_step(  # type:ignore
@@ -223,9 +219,8 @@ class GFlowNetModule(pl.LightningModule):
             on_step=True,
             on_epoch=True,
             prog_bar=True,
-            batch_size=batch.size(0),
         )
-        self.log("test_loss", loss, batch_size=batch.size(0))
+        self.log("test_loss", loss)
         return {"loss": loss, "logs": logs}
 
     def prediction_step(self, batch) -> torch.Tensor:

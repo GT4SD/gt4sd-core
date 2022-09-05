@@ -89,7 +89,6 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
 
         pl_trainer_args["callbacks"] = {
             "model_checkpoint_callback": {
-                "monitor": pl_trainer_args["monitor"],
                 "save_top_k": pl_trainer_args["save_top_k"],
                 "mode": pl_trainer_args["mode"],
                 "every_n_train_steps": pl_trainer_args["every_n_train_steps"],
@@ -99,7 +98,6 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
         }
 
         del (
-            pl_trainer_args["monitor"],
             pl_trainer_args["save_top_k"],
             pl_trainer_args["mode"],
             pl_trainer_args["every_n_train_steps"],
@@ -266,17 +264,6 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
         default=None,
         metadata={"help": "Number of training steps between checkpoints."},
     )
-
-    resume_from_checkpoint: Optional[str] = field(
-        default=None,
-        metadata={"help": "Resume from checkpoint."},
-    )
-
-    basename: str = field(
-        default="gflownet",
-        metadata={"help": "The basename as the name for the run."},
-    )
-
     every_n_val_epochs: Optional[int] = field(
         default=5,
         metadata={"help": "Number of training epochs between checkpoints."},
