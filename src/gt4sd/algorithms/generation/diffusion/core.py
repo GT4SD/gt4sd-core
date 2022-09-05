@@ -188,7 +188,7 @@ class DDPMGenerator(DiffusersConfiguration):
     """DDPM - Configuration to generate using unconditional denoising diffusion models."""
 
     algorithm_version: str = "google/ddpm-celebahq-256"
-    model_type: str = "ddpm"
+    model_type: str = "diffusion"
     scheduler_type: str = "ddpm"
     modality: str = "image"
 
@@ -216,7 +216,7 @@ class DDIMGenerator(DiffusersConfiguration):
     """DDIM - Configuration to generate using a denoising diffusion implicit model."""
 
     algorithm_version: str = "google/ddim-celebahq-256"
-    model_type: str = "ddim"
+    model_type: str = "diffusion_implicit"
     scheduler_type: str = "ddim"
     modality: str = "image"
 
