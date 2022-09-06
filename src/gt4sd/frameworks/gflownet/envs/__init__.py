@@ -21,54 +21,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Parsing utilities."""
 
-import argparse
-import ast
-from typing import Union
+from .graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
+from .mol_building_env import MolBuildingEnvContext
 
 
-def str2bool(s: Union[str, bool]) -> bool:
-    """Convert a string into a bool.
+# convert to a factory/registry
+def build_env_context(
+    environment_name: str = "graph_building_env",
+    context_name: str = "graph_building_env_context",
+):
 
-    Args:
-        s: a string representation of a boolean.
-
-    Raises:
-        argparse.ArgumentTypeError: in case the conversion is failing.
-
-    Returns:
-        the converted value.
-    """
-    if isinstance(s, bool):
-        return s
-    if s.lower() in ("yes", "true", "t", "y", "1"):
-        return True
-    elif s.lower() in ("no", "false", "f", "n", "0"):
-        return False
-    else:
-        raise argparse.ArgumentTypeError("Boolean value expected.")
-
-
-def convert_string_to_class(s: str):
-    """Convert a string into a python object.
-
-    Fallback to ast in case of unexpected strings.
+    """Builds an environment and context environment.
 
     Args:
-        s: a string.
+        environment_name: The name of the environment to build.
+        context_name: The name of the context environment to build.
 
     Returns:
-        the converted python object.
+        tuple with selected environment and context environment.
     """
-    if s.lower() == "true":
-        return True
-    elif s.lower() == "false":
-        return False
-    elif s.lower() == "none":
-        return None
-    elif s:
-        try:
-            return ast.literal_eval(s)
-        except (ValueError, SyntaxError):
-            return s
+
+    env, context = None, None
+    if environment_name == "graph_building_env":
+        env = GraphBuildingEnv
+
+    if context_name == "graph_building_env_context":
+        context = GraphBuildingEnvContext
+    elif context_name == "mol_building_env_context":
+        context = MolBuildingEnvContext
+
+    return env, context
