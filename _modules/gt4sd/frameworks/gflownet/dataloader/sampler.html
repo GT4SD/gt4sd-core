@@ -1,0 +1,513 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.gflownet.dataloader.sampler &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.gflownet.dataloader.sampler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.gflownet.dataloader.sampler</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">IterableDataset</span>
+
+<span class="kn">from</span> <span class="nn">..envs.graph_building_env</span> <span class="kn">import</span> <span class="n">GraphBuildingEnvContext</span>
+<span class="kn">from</span> <span class="nn">..loss.trajectory_balance</span> <span class="kn">import</span> <span class="n">TrajectoryBalance</span><span class="p">,</span> <span class="n">TrajectoryBalanceModel</span>
+<span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">GFlowNetDataset</span><span class="p">,</span> <span class="n">GFlowNetTask</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="SamplingIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator">[docs]</a><span class="k">class</span> <span class="nc">SamplingIterator</span><span class="p">(</span><span class="n">IterableDataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sampler to speed up training based on IterableDataset.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SamplingIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">GFlowNetDataset</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">TrajectoryBalanceModel</span><span class="p">],</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">GraphBuildingEnvContext</span><span class="p">,</span>
+        <span class="n">algorithm</span><span class="p">:</span> <span class="n">TrajectoryBalance</span><span class="p">,</span>
+        <span class="n">task</span><span class="p">:</span> <span class="n">GFlowNetTask</span><span class="p">,</span>
+        <span class="n">ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">stream</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This class allows us to parallelise and train faster.</span>
+<span class="sd">        By separating sampling data/the model and building torch geometric</span>
+<span class="sd">        graphs from training the model, we can do the former in different</span>
+<span class="sd">        processes, which is much faster since much of graph construction</span>
+<span class="sd">        is CPU-bound. This sampler can handle offline and online data.</span>
+
+<span class="sd">        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset: a dataset instance.</span>
+<span class="sd">            model: the model we sample from (must be on CUDA already or share_memory() must be called so that</span>
+<span class="sd">                parameters are synchronized between each worker).</span>
+<span class="sd">            batch_size: the number of trajectories, each trajectory will be comprised of many graphs, so this is</span>
+<span class="sd">                _not_ the batch size in terms of the number of graphs (that will depend on the task).</span>
+<span class="sd">            context: the graph environment.</span>
+<span class="sd">            algorithm: the training algorithm, e.g. a TrajectoryBalance instance.</span>
+<span class="sd">            task: ConditionalTask that specifies the reward structure.</span>
+<span class="sd">            ratio: the ratio of offline trajectories in the batch.</span>
+<span class="sd">            stream: if true, data is sampled iid for every batch. Otherwise, this is a normal in-order</span>
+<span class="sd">                dataset iterator.</span>
+<span class="sd">            device: the device (cpu, cuda).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_batch_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">batch_size</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">online_batch_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">batch_size</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ratio</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ratio</span> <span class="o">=</span> <span class="n">ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">algo</span> <span class="o">=</span> <span class="n">algorithm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="n">task</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span></div>
+
+<div class="viewcode-block" id="SamplingIterator._idx_iterator"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator._idx_iterator">[docs]</a>    <span class="k">def</span> <span class="nf">_idx_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns an iterator over the indices of the dataset. The batch can be offline or online.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            Batch of indexes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline_batch_size</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="p">:</span>
+            <span class="c1"># if we&#39;re streaming data, just sample `offline_batch_size` indices</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">bs</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># figure out which indices correspond to this worker</span>
+            <span class="n">worker_info</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_worker_info</span><span class="p">()</span>
+
+            <span class="c1"># refactor this</span>
+            <span class="k">if</span> <span class="n">worker_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">n</span>
+                <span class="n">wid</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nw</span> <span class="o">=</span> <span class="n">worker_info</span><span class="o">.</span><span class="n">num_workers</span>
+                <span class="n">wid</span> <span class="o">=</span> <span class="n">worker_info</span><span class="o">.</span><span class="n">id</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">nw</span> <span class="o">*</span> <span class="n">wid</span><span class="p">))</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">nw</span> <span class="o">*</span> <span class="p">(</span><span class="n">wid</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+
+            <span class="k">if</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">bs</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">-</span> <span class="n">bs</span><span class="p">,</span> <span class="n">bs</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">bs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="n">bs</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">bs</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SamplingIterator.__len__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Length of the offline or online dataset.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The length of the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if online</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e6</span><span class="p">)</span>
+        <span class="c1"># if offline</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+
+<div class="viewcode-block" id="SamplingIterator.sample_offline"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.sample_offline">[docs]</a>    <span class="k">def</span> <span class="nf">sample_offline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idcs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Samples offline data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            idcs: the indices of the data to sample.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            trajs: the trajectories.</span>
+<span class="sd">            rewards: the rewards.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># sample offline batch (mols, rewards)</span>
+        <span class="n">mols</span><span class="p">,</span> <span class="n">_flat_rewards</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idcs</span><span class="p">]))</span>
+        <span class="c1"># rewards</span>
+        <span class="n">flat_rewards</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">flat_reward_transform</span><span class="p">(</span><span class="n">_flat_rewards</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+        <span class="c1"># build graphs</span>
+        <span class="n">graphs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ctx</span><span class="o">.</span><span class="n">mol_to_graph</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mols</span><span class="p">]</span>
+        <span class="c1"># use trajectory balance to sample trajectories</span>
+        <span class="n">trajs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">create_training_data_from_graphs</span><span class="p">(</span><span class="n">graphs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span></div>
+
+<div class="viewcode-block" id="SamplingIterator.predict_reward_model"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.predict_reward_model">[docs]</a>    <span class="k">def</span> <span class="nf">predict_reward_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Predict rewards using the model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            trajs: the trajectories.</span>
+<span class="sd">            flat_rewards: the rewards.</span>
+<span class="sd">            num_offline: the number of offline trajectories.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            flat_rewards: the updated rewards.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The model can be trained to predict its own reward,</span>
+        <span class="c1"># i.e. predict the output of cond_info_to_reward</span>
+        <span class="n">pred_reward</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="s2">&quot;reward_pred&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">trajs</span><span class="p">[</span><span class="n">num_offline</span><span class="p">:]]</span>
+        <span class="n">flat_rewards</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pred_reward</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">flat_rewards</span></div>
+
+<div class="viewcode-block" id="SamplingIterator.predict_reward_task"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.predict_reward_task">[docs]</a>    <span class="k">def</span> <span class="nf">predict_reward_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">,</span> <span class="n">is_valid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Predict rewards using the task.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            trajs: the trajectories.</span>
+<span class="sd">            flat_rewards: the rewards.</span>
+<span class="sd">            num_offline: the number of offline trajectories.</span>
+<span class="sd">            is_valid: whether the trajectories are valid.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            flat_rewards: the updated rewards.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Otherwise, query the task for flat rewards</span>
+        <span class="n">valid_idcs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">i</span> <span class="o">+</span> <span class="n">num_offline</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">online_batch_size</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">trajs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">num_offline</span><span class="p">][</span><span class="s2">&quot;is_valid&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+
+        <span class="n">pred_reward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">online_batch_size</span><span class="p">))</span>
+        <span class="c1"># fetch the valid trajectories endpoints</span>
+        <span class="n">mols</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ctx</span><span class="o">.</span><span class="n">graph_to_mol</span><span class="p">(</span><span class="n">trajs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;traj&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">valid_idcs</span><span class="p">]</span>
+
+        <span class="c1"># ask the task to compute their reward</span>
+        <span class="n">preds</span><span class="p">,</span> <span class="n">m_is_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">compute_flat_rewards</span><span class="p">(</span><span class="n">mols</span><span class="p">)</span>
+        <span class="c1"># The task may decide some of the mols are invalid, we have to again filter those</span>
+        <span class="n">valid_idcs</span> <span class="o">=</span> <span class="n">valid_idcs</span><span class="p">[</span><span class="n">m_is_valid</span><span class="p">]</span>
+        <span class="n">_preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">pred_reward</span><span class="p">[</span><span class="n">valid_idcs</span> <span class="o">-</span> <span class="n">num_offline</span><span class="p">]</span> <span class="o">=</span> <span class="n">_preds</span>
+
+        <span class="n">is_valid</span><span class="p">[</span><span class="n">num_offline</span><span class="p">:]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">is_valid</span><span class="p">[</span><span class="n">valid_idcs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">flat_rewards</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pred_reward</span><span class="p">)</span>
+
+        <span class="c1"># Override the is_valid key in case the task made some mols invalid</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">online_batch_size</span><span class="p">):</span>
+            <span class="n">trajs</span><span class="p">[</span><span class="n">num_offline</span> <span class="o">+</span> <span class="n">i</span><span class="p">][</span><span class="s2">&quot;is_valid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_valid</span><span class="p">[</span><span class="n">num_offline</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span></div>
+
+<div class="viewcode-block" id="SamplingIterator.sample_online"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.sample_online">[docs]</a>    <span class="k">def</span> <span class="nf">sample_online</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">cond_info</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sample on-policy data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            trajs: the trajectories.</span>
+<span class="sd">            flat_rewards: the rewards.</span>
+<span class="sd">            cond_info: the conditional information.</span>
+<span class="sd">            num_offline: the number of offline trajectories.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            trajs: the updated trajectories.</span>
+<span class="sd">            flat_rewards: the updated rewards.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">is_valid</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">cond_info</span><span class="p">[</span><span class="s2">&quot;beta&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">trajs</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">create_training_data_from_own_samples</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>  <span class="c1"># TODO: double-check the model here</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">online_batch_size</span><span class="p">,</span>
+                <span class="n">cond_info</span><span class="p">[</span><span class="s2">&quot;encoding&quot;</span><span class="p">][</span><span class="n">num_offline</span><span class="p">:],</span>
+            <span class="p">)</span>
+
+        <span class="c1"># predict reward with model</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">bootstrap_own_reward</span><span class="p">:</span>
+            <span class="n">flat_rewards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_reward_model</span><span class="p">(</span><span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">)</span>
+
+        <span class="c1"># predict reward with task</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_reward_task</span><span class="p">(</span>
+                <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">,</span> <span class="n">is_valid</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span></div>
+
+<div class="viewcode-block" id="SamplingIterator.set_seed"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.set_seed">[docs]</a>    <span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the seed for the workers.&quot;&quot;&quot;</span>
+        <span class="n">worker_info</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_worker_info</span><span class="p">()</span>
+        <span class="n">wid</span> <span class="o">=</span> <span class="n">worker_info</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="n">worker_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="c1"># set seed for each worker</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">142857</span> <span class="o">+</span> <span class="n">wid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctx</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span></div>
+
+<div class="viewcode-block" id="SamplingIterator.__iter__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build batch using online and offline data and multiple workers.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            batch of data using trajectories and rewards.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># we need to set a different seed for each worker to sample different batches.</span>
+        <span class="c1"># If we start with the same seed, each worker has the exact same copy of the data and will yield the same batch.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_seed</span><span class="p">()</span>
+
+        <span class="c1"># import ipdb</span>
+        <span class="c1"># ipdb.sset_trace()</span>
+        <span class="c1"># iterate over the indices in the batch and yield a bunch of indexes</span>
+        <span class="k">for</span> <span class="n">idcs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_idx_iterator</span><span class="p">():</span>
+            <span class="n">num_offline</span> <span class="o">=</span> <span class="n">idcs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># This is in [1, self.offline_batch_size]</span>
+            <span class="c1"># Sample conditional info such as temperature, trade-off weights, etc.</span>
+            <span class="n">cond_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">sample_conditional_information</span><span class="p">(</span>
+                <span class="n">num_offline</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">online_batch_size</span>
+            <span class="p">)</span>
+            <span class="n">is_valid</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">cond_info</span><span class="p">[</span><span class="s2">&quot;beta&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+
+            <span class="c1"># sample offline data</span>
+            <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_offline</span><span class="p">(</span><span class="n">idcs</span><span class="p">)</span>
+
+            <span class="c1"># Sample some on-policy data (sample online the model or the task)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">online_batch_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># update trajectories and rewards with on-policy data</span>
+                <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_online</span><span class="p">(</span>
+                    <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">cond_info</span><span class="p">,</span> <span class="n">num_offline</span>
+                <span class="p">)</span>
+
+            <span class="c1"># compute scalar rewards from conditional information &amp; flat rewards</span>
+            <span class="n">rewards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">cond_info_to_reward</span><span class="p">(</span><span class="n">cond_info</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">)</span>
+            <span class="c1"># account for illegal actions</span>
+            <span class="n">rewards</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">is_valid</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">illegal_action_logreward</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Construct batch using trajectories, rewards</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">construct_batch</span><span class="p">(</span><span class="n">trajs</span><span class="p">,</span> <span class="n">cond_info</span><span class="p">[</span><span class="s2">&quot;encoding&quot;</span><span class="p">],</span> <span class="n">rewards</span><span class="p">)</span>
+            <span class="n">batch</span><span class="o">.</span><span class="n">num_offline</span> <span class="o">=</span> <span class="n">num_offline</span>
+            <span class="k">yield</span> <span class="n">batch</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

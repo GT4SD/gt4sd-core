@@ -1,0 +1,937 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.gflownet.envs.graph_building_env &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../envs.html">gt4sd.frameworks.gflownet.envs</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.gflownet.envs.graph_building_env</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.gflownet.envs.graph_building_env</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch_geometric.data</span> <span class="k">as</span> <span class="nn">gd</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">Mol</span>
+<span class="kn">from</span> <span class="nn">torch_scatter</span> <span class="kn">import</span> <span class="n">scatter</span><span class="p">,</span> <span class="n">scatter_max</span>
+
+
+<div class="viewcode-block" id="Graph"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.Graph">[docs]</a><span class="k">class</span> <span class="nc">Graph</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclassing nx.Graph for debugging purposes.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Graph.__str__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.Graph.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Graph.__repr__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.Graph.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;v&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s1">&gt;&#39;</span></div></div>
+
+
+<div class="viewcode-block" id="graph_without_edge"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.graph_without_edge">[docs]</a><span class="k">def</span> <span class="nf">graph_without_edge</span><span class="p">(</span><span class="n">g</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build a new graph without an edge.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        g: a graph.</span>
+<span class="sd">        e: an edge to remove.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a new graph without an edge.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">gp</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gp</span></div>
+
+
+<div class="viewcode-block" id="graph_without_node"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.graph_without_node">[docs]</a><span class="k">def</span> <span class="nf">graph_without_node</span><span class="p">(</span><span class="n">g</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build a new graph without a node.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        g: a graph.</span>
+<span class="sd">        n: a node to remove.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a new graph without a node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">gp</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gp</span></div>
+
+
+<div class="viewcode-block" id="graph_without_node_attr"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.graph_without_node_attr">[docs]</a><span class="k">def</span> <span class="nf">graph_without_node_attr</span><span class="p">(</span><span class="n">g</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build a new graph without a node attribute.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        g: a graph.</span>
+<span class="sd">        n: a node.</span>
+<span class="sd">        a: a node attribute.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a new graph without a node attribute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">del</span> <span class="n">gp</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">a</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">gp</span></div>
+
+
+<div class="viewcode-block" id="graph_without_edge_attr"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.graph_without_edge_attr">[docs]</a><span class="k">def</span> <span class="nf">graph_without_edge_attr</span><span class="p">(</span><span class="n">g</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build a new graph without an edge attribute.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        g: a graph.</span>
+<span class="sd">        e: an edge.</span>
+<span class="sd">        a: an edge attribute.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a new graph without an edge attribute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">del</span> <span class="n">gp</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">][</span><span class="n">a</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">gp</span></div>
+
+
+<div class="viewcode-block" id="GraphActionType"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphActionType">[docs]</a><span class="k">class</span> <span class="nc">GraphActionType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Action types for graph building environments.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Forward actions</span>
+    <span class="n">Stop</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">AddNode</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">AddEdge</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">SetNodeAttr</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">SetEdgeAttr</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="c1"># Backward actions</span>
+    <span class="n">RemoveNode</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">RemoveEdge</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">RemoveNodeAttr</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">RemoveEdgeAttr</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GraphAction"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphAction">[docs]</a><span class="k">class</span> <span class="nc">GraphAction</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Actions on a graph environment for gflownet.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GraphAction.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphAction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">action</span><span class="p">:</span> <span class="n">GraphActionType</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">relabel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a single graph-building action.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            action: the action type.</span>
+<span class="sd">            source: the source node this action is applied on.</span>
+<span class="sd">            target: the target node (i.e. if specified this is an edge action).</span>
+<span class="sd">            value: the value (e.g. new node type) applied.</span>
+<span class="sd">            attr: the set attribute of a node/edge.</span>
+<span class="sd">            relabel: for AddNode actions, relabels the new node with that id.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="n">action</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span> <span class="o">=</span> <span class="n">attr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relabel</span> <span class="o">=</span> <span class="n">relabel</span>  <span class="c1"># TODO: deprecate this?</span></div>
+
+<div class="viewcode-block" id="GraphAction.__repr__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphAction.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">attrs</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="GraphBuildingEnv"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnv">[docs]</a><span class="k">class</span> <span class="nc">GraphBuildingEnv</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A Graph building environment which induces a dag state space compatible with gflownet.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GraphBuildingEnv.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnv.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">allow_add_edge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">allow_node_attr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">allow_edge_attr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a GraphBuildingEnv.</span>
+
+<span class="sd">        Supports forward and backward actions, with a `parents` function that list parents of</span>
+<span class="sd">        forward actions. Edges and nodes can have attributes added to them in a key:value style.</span>
+<span class="sd">        Edges and nodes are created with _implicit_ default attribute</span>
+<span class="sd">        values (e.g. chirality, single/double bondness) so that:</span>
+<span class="sd">            - an agent gets to do an extra action to set that attribute, but only</span>
+<span class="sd">            if it is still default-valued (DAG property preserved)</span>
+<span class="sd">            - we can generate a legal action for any attribute that isn&#39;t a default one.</span>
+
+<span class="sd">        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/envs</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            allow_add_edge: if True, allows this action and computes AddEdge parents (i.e. if False, this</span>
+<span class="sd">                env only allows for tree generation).</span>
+<span class="sd">            allow_node_attr: if True, allows this action and computes SetNodeAttr parents.</span>
+<span class="sd">            allow_edge_attr: if True, allows this action and computes SetEdgeAttr parents.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_add_edge</span> <span class="o">=</span> <span class="n">allow_add_edge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_node_attr</span> <span class="o">=</span> <span class="n">allow_node_attr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_edge_attr</span> <span class="o">=</span> <span class="n">allow_edge_attr</span></div>
+
+<div class="viewcode-block" id="GraphBuildingEnv.new"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnv.new">[docs]</a>    <span class="k">def</span> <span class="nf">new</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Graph</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GraphBuildingEnv.step"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnv.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">GraphAction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Step forward the given graph state with an action</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: the graph to be modified.</span>
+<span class="sd">            action: the action taken on the graph, indices must match.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            gp: the new graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">action</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddEdge</span><span class="p">:</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span>
+
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_add_edge</span>
+            <span class="k">assert</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">g</span>
+
+            <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+                <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span>
+
+            <span class="k">assert</span> <span class="n">a</span> <span class="o">!=</span> <span class="n">b</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+            <span class="c1"># Ideally the FA underlying this must only be able to send</span>
+            <span class="c1"># create_edge actions which respect this a&lt;b property (or</span>
+            <span class="c1"># its inverse!) , otherwise symmetry will be broken</span>
+            <span class="c1"># because of the way the parents method is written</span>
+            <span class="n">gp</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">action</span><span class="o">.</span><span class="n">action</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddNode</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">action</span><span class="o">.</span><span class="n">source</span> <span class="o">==</span> <span class="mi">0</span>  <span class="c1"># TODO: this may not be useful</span>
+                <span class="n">gp</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">action</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">action</span><span class="o">.</span><span class="n">source</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="p">[</span><span class="n">action</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">relabel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;deprecated&quot;</span><span class="p">)</span>
+                <span class="c1"># if kw and &#39;relabel&#39; in kw:</span>
+                <span class="c1">#     e[1] = kw[&#39;relabel&#39;]  # for `parent` consistency, allow relabeling</span>
+                <span class="k">assert</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span>
+                <span class="n">gp</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="o">=</span><span class="n">action</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">gp</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">action</span><span class="o">.</span><span class="n">action</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">SetNodeAttr</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_node_attr</span>
+            <span class="k">assert</span> <span class="n">action</span><span class="o">.</span><span class="n">source</span> <span class="ow">in</span> <span class="n">gp</span><span class="o">.</span><span class="n">nodes</span>
+            <span class="k">assert</span> <span class="n">action</span><span class="o">.</span><span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gp</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">action</span><span class="o">.</span><span class="n">source</span><span class="p">]</span>
+            <span class="n">gp</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">action</span><span class="o">.</span><span class="n">source</span><span class="p">][</span><span class="n">action</span><span class="o">.</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">elif</span> <span class="n">action</span><span class="o">.</span><span class="n">action</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">SetEdgeAttr</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_edge_attr</span>
+            <span class="k">assert</span> <span class="n">g</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">action</span><span class="o">.</span><span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gp</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">action</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">)]</span>
+            <span class="n">gp</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">action</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">)][</span><span class="n">action</span><span class="o">.</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># TODO: backward actions if we want to support MCMC-GFN style algorithms</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown action type </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">action</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">action</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">gp</span></div>
+
+<div class="viewcode-block" id="GraphBuildingEnv.count_backward_transitions"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnv.count_backward_transitions">[docs]</a>    <span class="k">def</span> <span class="nf">count_backward_transitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Counts the number of parents of g without checking for isomorphisms.&quot;&quot;&quot;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">deg</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">degree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">))]</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">deg</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">deg</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Can only remove edges connected to non-leaves and without</span>
+                <span class="c1"># attributes (the agent has to remove the attrs, then remove</span>
+                <span class="c1"># the edge). Removal cannot disconnect the graph.</span>
+                <span class="n">new_g</span> <span class="o">=</span> <span class="n">graph_without_edge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">new_g</span><span class="p">):</span>
+                    <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">c</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)])</span>  <span class="c1"># One action per edge attr</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">deg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">i</span><span class="p">))[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="p">):</span>
+                <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">c</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># One action per node attr, except &#39;v&#39;</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># special case if last node in graph</span>
+                <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">c</span></div></div>
+
+
+<div class="viewcode-block" id="generate_forward_trajectory"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.generate_forward_trajectory">[docs]</a><span class="k">def</span> <span class="nf">generate_forward_trajectory</span><span class="p">(</span>
+    <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">max_nodes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Graph</span><span class="p">,</span> <span class="n">GraphAction</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Sample (uniformly) a trajectory that generates g.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        g: the graph to be generated.</span>
+<span class="sd">        max_nodes: the maximum number of nodes to generate.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a list of (graph, action) pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gn</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">()</span>
+    <span class="c1"># Choose an arbitrary starting point, add to the stack</span>
+    <span class="n">stack</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">)),)]</span>
+    <span class="n">traj</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># This map keeps track of node labels in gn, since we have to start from 0</span>
+    <span class="n">relabeling_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">):</span>
+        <span class="c1"># We pop from the stack until all nodes and edges have been</span>
+        <span class="c1"># generated and their attributes have been set. Uninserted</span>
+        <span class="c1"># nodes/edges will be added to the stack as the graph is</span>
+        <span class="c1"># expanded from the starting point. Nodes/edges that have</span>
+        <span class="c1"># attributes will be reinserted into the stack until those</span>
+        <span class="c1"># attributes are &quot;set&quot;.</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)))</span>
+
+        <span class="n">gt</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># This is a shallow copy</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># i is an edge</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">relabeling_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">None</span><span class="p">),</span> <span class="n">relabeling_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">gn</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+                <span class="c1"># i exists in the new graph, that means some of its attributes need to be added</span>
+                <span class="n">attrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gn</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">]]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>  <span class="c1"># If nodes are in cycles edges leading to them get stack multiple times, disregard</span>
+                <span class="n">attr</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attrs</span><span class="p">))]</span>
+                <span class="n">gn</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
+                <span class="n">act</span> <span class="o">=</span> <span class="n">GraphAction</span><span class="p">(</span>
+                    <span class="n">GraphActionType</span><span class="o">.</span><span class="n">SetEdgeAttr</span><span class="p">,</span>
+                    <span class="n">source</span><span class="o">=</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">target</span><span class="o">=</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span>
+                    <span class="n">value</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">attr</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># i doesn&#39;t exist, add the edge</span>
+                <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gn</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                    <span class="c1"># The endpoint of the edge is not in the graph, this is a AddNode action</span>
+                    <span class="k">assert</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>  <span class="c1"># normally we shouldn&#39;t have relabeled i[1] yet</span>
+                    <span class="n">relabeling_map</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">relabeling_map</span><span class="p">)</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">relabeling_map</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+                    <span class="n">gn</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;v&quot;</span><span class="p">])</span>
+                    <span class="n">gn</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]:</span>  <span class="c1"># stack unadded edges/neighbours</span>
+                        <span class="n">jp</span> <span class="o">=</span> <span class="n">relabeling_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">jp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gn</span> <span class="ow">or</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">jp</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gn</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+                            <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">j</span><span class="p">))</span>
+                    <span class="n">act</span> <span class="o">=</span> <span class="n">GraphAction</span><span class="p">(</span>
+                        <span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddNode</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;v&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gn</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]):</span>
+                        <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">],)</span>
+                        <span class="p">)</span>  <span class="c1"># we still have attributes to add to node i[1]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># The endpoint is in the graph, this is an AddEdge action</span>
+                    <span class="k">assert</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">gn</span><span class="o">.</span><span class="n">nodes</span>
+                    <span class="n">gn</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span>
+                    <span class="n">act</span> <span class="o">=</span> <span class="n">GraphAction</span><span class="p">(</span><span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddEdge</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gn</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">])</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>  <span class="c1"># we still have attributes to add to edge i</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># i is a node, (u,)</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">relabeling_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gn</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                <span class="c1"># u doesn&#39;t exist yet, this should only happen for the first node</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">gn</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="n">act</span> <span class="o">=</span> <span class="n">GraphAction</span><span class="p">(</span>
+                    <span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddNode</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="s2">&quot;v&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">relabeling_map</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">relabeling_map</span><span class="p">)</span>
+                <span class="n">gn</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="s2">&quot;v&quot;</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="n">u</span><span class="p">]:</span>  <span class="c1"># For every neighbour of node u</span>
+                    <span class="k">if</span> <span class="n">relabeling_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gn</span><span class="p">:</span>
+                        <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">u</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>  <span class="c1"># push the (u,j) edge onto the stack</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># u exists, meaning we have attributes left to add</span>
+                <span class="n">attrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gn</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span>
+                <span class="n">attr</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attrs</span><span class="p">))]</span>
+                <span class="n">gn</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
+                <span class="n">act</span> <span class="o">=</span> <span class="n">GraphAction</span><span class="p">(</span>
+                    <span class="n">GraphActionType</span><span class="o">.</span><span class="n">SetNodeAttr</span><span class="p">,</span>
+                    <span class="n">source</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+                    <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span>
+                    <span class="n">value</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">attr</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gn</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">])</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">u</span><span class="p">]):</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">u</span><span class="p">,))</span>  <span class="c1"># we still have attributes to add to node u</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">gt</span><span class="p">,</span> <span class="n">act</span><span class="p">))</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">gn</span><span class="p">,</span> <span class="n">GraphAction</span><span class="p">(</span><span class="n">GraphActionType</span><span class="o">.</span><span class="n">Stop</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">traj</span></div>
+
+
+<div class="viewcode-block" id="GraphActionCategorical"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphActionCategorical">[docs]</a><span class="k">class</span> <span class="nc">GraphActionCategorical</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A multi-type categorical action class compatible with generating structured actions on a graph.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GraphActionCategorical.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphActionCategorical.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">graphs</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">Batch</span><span class="p">,</span>
+        <span class="n">logits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+        <span class="n">keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span>
+        <span class="n">types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">GraphActionType</span><span class="p">],</span>
+        <span class="n">deduplicate_edge_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a GraphActionCategorical.</span>
+
+<span class="sd">        What is meant by multi-type here is that there are multiple types of</span>
+<span class="sd">        mutually exclusive actions, e.g. AddNode and AddEdge are</span>
+<span class="sd">        mutually exclusive, but since their logits will be produced by</span>
+<span class="sd">        different variable-sized tensors (corresponding to different</span>
+<span class="sd">        elements of the graph, e.g. nodes or edges) it is inconvient</span>
+<span class="sd">        to stack them all into one single Categorical. This class</span>
+<span class="sd">        provides this convenient interaction between torch_geometric</span>
+<span class="sd">        Batch objects and lists of logit tensors.</span>
+
+<span class="sd">        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/envs</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            graphs: a Batch of graphs to which the logits correspond.</span>
+<span class="sd">            logits: a list of tensors of shape `(n, m)` representing logits</span>
+<span class="sd">                over a variable number of graph elements (e.g. nodes) for</span>
+<span class="sd">                which there are `m` possible actions. `n` should thus be</span>
+<span class="sd">                equal to the sum of the number of such elements for each</span>
+<span class="sd">                graph in the Batch object. The length of the `logits` list</span>
+<span class="sd">                should thus be equal to the number of element types (in</span>
+<span class="sd">                other words there should be one tensor per type).</span>
+<span class="sd">            keys: the keys corresponding to the Graph elements for each</span>
+<span class="sd">                tensor in the logits list. Used to extract the `_batch`</span>
+<span class="sd">                and slice attributes. For example, if the first logit</span>
+<span class="sd">                tensor is a per-node action logit, and the second is a</span>
+<span class="sd">                per-edge, `keys` could be `[&#39;x&#39;, &#39;edge_index&#39;]`. If</span>
+<span class="sd">                keys[i] is None, the corresponding logits are assumed to</span>
+<span class="sd">                be graph-level (i.e. if there are `k` graphs in the Batch</span>
+<span class="sd">                object, this logit tensor would have shape `(k, m)`).</span>
+<span class="sd">            types: the action type each logit corresponds to.</span>
+<span class="sd">            deduplicate_edge_index: if true, this means that the &#39;edge_index&#39; keys have been reduced</span>
+<span class="sd">                by e_i[::2] (presumably because the graphs are undirected).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_graphs</span> <span class="o">=</span> <span class="n">graphs</span><span class="o">.</span><span class="n">num_graphs</span>
+        <span class="c1"># The logits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logits</span> <span class="o">=</span> <span class="n">logits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="n">keys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dev</span> <span class="o">=</span> <span class="n">dev</span> <span class="o">=</span> <span class="n">graphs</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">device</span>
+
+        <span class="c1"># This is the minibatch index of each entry in the logits</span>
+        <span class="c1"># i.e., if graph i in the Batch has N[i] nodes,</span>
+        <span class="c1">#    g.batch == [0,0,0, ...,  1,1,1,1,1, ... ]</span>
+        <span class="c1">#                 N[0] times    N[1] times</span>
+        <span class="c1"># This generalizes to edges and non-edges.</span>
+        <span class="c1"># Append &#39;_batch&#39; to keys except for &#39;x&#39;, since TG has a special case (done by default for &#39;x&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">graphs</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_batch&quot;</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;x&quot;</span> <span class="k">else</span> <span class="s2">&quot;batch&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="c1"># None signals a global logit rather than a per-instance logit</span>
+            <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">graphs</span><span class="o">.</span><span class="n">num_graphs</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">dev</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span>
+        <span class="p">]</span>
+        <span class="c1"># This is the cumulative sum (prefixed by 0) of N[i]s</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slice</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">graphs</span><span class="o">.</span><span class="n">_slice_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">graphs</span><span class="o">.</span><span class="n">num_graphs</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">dev</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">deduplicate_edge_index</span> <span class="ow">and</span> <span class="s2">&quot;edge_index&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">keys</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;edge_index&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">batch</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch</span><span class="p">[</span><span class="n">idx</span><span class="p">][::</span><span class="mi">2</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slice</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slice</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">rounding_mode</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GraphActionCategorical.detach"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphActionCategorical.detach">[docs]</a>    <span class="k">def</span> <span class="nf">detach</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Detach the logits from the graph batch.&quot;&quot;&quot;</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">logits</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">logits</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">new</span><span class="o">.</span><span class="n">logprobs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">logprobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">logprobs</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">new</span></div>
+
+<div class="viewcode-block" id="GraphActionCategorical.to"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphActionCategorical.to">[docs]</a>    <span class="k">def</span> <span class="nf">to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Move everything to the specified device.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            device: the device to move to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dev</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logits</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logits</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slice</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">slice</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="GraphActionCategorical.logsoftmax"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphActionCategorical.logsoftmax">[docs]</a>    <span class="k">def</span> <span class="nf">logsoftmax</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Compute log-probabilities given logits.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a list of log-probabilities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span>
+        <span class="c1"># Use the `subtract by max` trick to avoid precision errors:</span>
+        <span class="c1"># compute max</span>
+        <span class="n">maxl</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">scatter</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dim_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_graphs</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>
+                <span class="p">],</span>
+                <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="c1"># substract by max then take exp</span>
+        <span class="c1"># x[b, None] indexes by the batch to map back to each node/edge and adds a broadcast dim</span>
+        <span class="n">exp_logits</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">maxl</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1e-40</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># sum corrected exponentiated logits, to get log(z - max) = log(sum(exp(logits)) - max)</span>
+        <span class="n">log_z</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+            <span class="p">[</span>
+                <span class="n">scatter</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dim_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_graphs</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">exp_logits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
+
+        <span class="c1"># log probabilities is log(exp(logit) / Z)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">log</span><span class="p">()</span> <span class="o">-</span> <span class="n">log_z</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">exp_logits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span></div>
+
+<div class="viewcode-block" id="GraphActionCategorical.sample"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphActionCategorical.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Use the Gumbel trick to sample categoricals.</span>
+
+<span class="sd">        if X ~ argmax(logits - log(-log(uniform(logits.shape))))</span>
+<span class="sd">        then  p(X = i) = exp(logits[i]) / Z</span>
+<span class="sd">        Here we have to do the argmax first over the variable number</span>
+<span class="sd">        of rows of each element type for each graph in the</span>
+<span class="sd">        minibatch, then over the different types (since they are</span>
+<span class="sd">        mutually exclusive).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of tuples specifying the action (type, row, column).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Uniform noise</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dev</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logits</span><span class="p">]</span>
+        <span class="c1"># Gumbel noise</span>
+        <span class="n">gumbel</span> <span class="o">=</span> <span class="p">[</span><span class="n">logit</span> <span class="o">-</span> <span class="p">(</span><span class="o">-</span><span class="n">noise</span><span class="o">.</span><span class="n">log</span><span class="p">())</span><span class="o">.</span><span class="n">log</span><span class="p">()</span> <span class="k">for</span> <span class="n">logit</span><span class="p">,</span> <span class="n">noise</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logits</span><span class="p">,</span> <span class="n">u</span><span class="p">)]</span>
+        <span class="c1"># scatter_max and .max create a (values, indices) pair</span>
+        <span class="c1"># These logits are 2d (num_obj_of_type, num_actions_of_type),</span>
+        <span class="c1"># first reduce-max over the batch, which preserves the</span>
+        <span class="c1"># columns, so we get (minibatch_size, num_actions_of_type).</span>
+        <span class="c1"># First we prefill `out` with very negative values in case</span>
+        <span class="c1"># there are no corresponding logits (this can happen if e.g. a</span>
+        <span class="c1"># graph has no edges), we don&#39;t want to accidentally take the</span>
+        <span class="c1"># max of that type.</span>
+        <span class="n">mnb_max</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_graphs</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dev</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1e6</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logits</span>
+        <span class="p">]</span>
+        <span class="n">mnb_max</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">scatter_max</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">gumbel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch</span><span class="p">,</span> <span class="n">mnb_max</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="c1"># Then over cols, this gets us which col holds the max value,</span>
+        <span class="c1"># so we get (minibatch_size,)</span>
+        <span class="n">col_max</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">values</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">mnb_max</span><span class="p">]</span>
+        <span class="c1"># Now we look up which row in those argmax cols was the max:</span>
+        <span class="n">row_pos</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">idx_mnb</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_col</span><span class="p">)),</span> <span class="n">idx_col</span><span class="p">]</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">idx_mnb</span><span class="p">),</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">idx_col</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mnb_max</span><span class="p">,</span> <span class="n">col_max</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="c1"># The maxes themselves</span>
+        <span class="n">maxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span> <span class="k">for</span> <span class="n">values</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">col_max</span><span class="p">]</span>
+        <span class="c1"># Now we need to check which type of logit has the actual max</span>
+        <span class="n">type_max_val</span><span class="p">,</span> <span class="n">type_max_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">maxs</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">type_max_val</span><span class="p">)</span><span class="o">.</span><span class="n">logical_not_</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Non finite max value in sample&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">type_max_val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logits</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Now we can return the indices of where the actions occured</span>
+        <span class="c1"># in the form List[(type, row, column)]</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">type_max_idx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">type_max_idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="c1"># Subtract from the slice of that type and index, since the computed</span>
+            <span class="c1"># row position is batch-wise rather graph-wise</span>
+            <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">row_pos</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">slice</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">i</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">col_max</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]))</span>
+            <span class="p">)</span>
+        <span class="c1"># It&#39;s now up to the Context class to create GraphBuildingAction instances</span>
+        <span class="c1"># if it wants to convert these indices to env-compatible actions</span>
+        <span class="k">return</span> <span class="n">actions</span></div>
+
+<div class="viewcode-block" id="GraphActionCategorical.log_prob"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphActionCategorical.log_prob">[docs]</a>    <span class="k">def</span> <span class="nf">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The log-probability of a list of action tuples.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            actions: A list of action tuples (type, row, column).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tensor of shape (minibatch_size,) containing the log-probability of each action.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logprobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logsoftmax</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">logprobs</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">row</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">slice</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">col</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GraphBuildingEnvContext"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext">[docs]</a><span class="k">class</span> <span class="nc">GraphBuildingEnvContext</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A context environment that defines what the graphs are, how they map to and from data.&quot;&quot;&quot;</span>
+
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">num_node_dim</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_edge_dim</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_cond_dim</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_new_node_values</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_node_attr_logits</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_edge_attr_logits</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">action_type_order</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">GraphActionType</span><span class="p">]</span>
+
+<div class="viewcode-block" id="GraphBuildingEnvContext.aidx_to_graph_action"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext.aidx_to_graph_action">[docs]</a>    <span class="k">def</span> <span class="nf">aidx_to_graph_action</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span> <span class="n">action_idx</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GraphAction</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: the graph to which the action is being applied.</span>
+<span class="sd">            action_idx: the tensor indices for the corresponding action.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a graph action that could be applied to the original graph coressponding to g.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GraphBuildingEnvContext.graph_action_to_aidx"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext.graph_action_to_aidx">[docs]</a>    <span class="k">def</span> <span class="nf">graph_action_to_aidx</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">GraphAction</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Translate a GraphAction to an action index (e.g. from a GraphActionCategorical).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: the graph to which the action is being applied.</span>
+<span class="sd">            action: a graph action that could be applied to the original graph coressponding to g.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the tensor indices for the corresponding action.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GraphBuildingEnvContext.graph_to_mol"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext.graph_to_mol">[docs]</a>    <span class="k">def</span> <span class="nf">graph_to_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mol</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Translate a graph to a molecule.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: the graph to translate.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the molecule corresponding to the graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="GraphBuildingEnvContext.sample_conditional_information"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext.sample_conditional_information">[docs]</a>    <span class="k">def</span> <span class="nf">sample_conditional_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sample conditional information.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="GraphBuildingEnvContext.graph_to_data"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext.graph_to_data">[docs]</a>    <span class="k">def</span> <span class="nf">graph_to_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Convert a networkx Graph to a torch geometric Data instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: a graph instance.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the corresponding torch_geometric graph data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GraphBuildingEnvContext.collate"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext.collate">[docs]</a>    <span class="k">def</span> <span class="nf">collate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graphs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">gd</span><span class="o">.</span><span class="n">Batch</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Convert a list of torch geometric Data instances to a Batch</span>
+<span class="sd">        instance.  This exists so that environment contexts can set</span>
+<span class="sd">        custom batching attributes, e.g. by using `follow_batch`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            graphs: graph instances.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the corresponding torch_geometric batch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">gd</span><span class="o">.</span><span class="n">Batch</span><span class="o">.</span><span class="n">from_data_list</span><span class="p">(</span><span class="n">graphs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GraphBuildingEnvContext.is_sane"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext.is_sane">[docs]</a>    <span class="k">def</span> <span class="nf">is_sane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Verifies whether a graph is sane according to the context. This can</span>
+<span class="sd">        catch, e.g. impossible molecules.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: a graph.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            true if the environment considers g to be sane.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GraphBuildingEnvContext.mol_to_graph"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext.mol_to_graph">[docs]</a>    <span class="k">def</span> <span class="nf">mol_to_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">:</span> <span class="n">Mol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Verifies whether a graph is sane according to the context. This can</span>
+<span class="sd">        catch, e.g. impossible molecules.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mol: an RDKit molecule.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the corresponding Graph representation of that molecule.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,453 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.gflownet.dataloader.sampler module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd.frameworks.gflownet.envs package" href="gt4sd.frameworks.gflownet.envs.html" />
+    <link rel="prev" title="gt4sd.frameworks.gflownet.dataloader.dataset module" href="gt4sd.frameworks.gflownet.dataloader.dataset.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.configuration.html">gt4sd.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.conftest.html">gt4sd.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.exceptions.html">gt4sd.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.s3.html">gt4sd.s3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.algorithms.html">gt4sd.algorithms package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.cli.html">gt4sd.cli package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.domains.html">gt4sd.domains package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.extras.html">gt4sd.extras package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.enzeptional.html">gt4sd.frameworks.enzeptional package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="gt4sd.frameworks.gflownet.html">gt4sd.frameworks.gflownet package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.util.html">gt4sd.frameworks.gflownet.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.arg_parser.html">gt4sd.frameworks.gflownet.arg_parser package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="gt4sd.frameworks.gflownet.dataloader.html">gt4sd.frameworks.gflownet.dataloader package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.envs.html">gt4sd.frameworks.gflownet.envs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.loss.html">gt4sd.frameworks.gflownet.loss package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.ml.html">gt4sd.frameworks.gflownet.ml package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.tests.html">gt4sd.frameworks.gflownet.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.train.html">gt4sd.frameworks.gflownet.train package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.granular.html">gt4sd.frameworks.granular package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.torch.html">gt4sd.frameworks.torch package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.properties.html">gt4sd.properties package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.tests.html">gt4sd.tests package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="gt4sd.html">gt4sd package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.html">gt4sd.frameworks package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.gflownet.html">gt4sd.frameworks.gflownet package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.gflownet.dataloader.html">gt4sd.frameworks.gflownet.dataloader package</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.gflownet.dataloader.sampler module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/gt4sd.frameworks.gflownet.dataloader.sampler.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-gt4sd.frameworks.gflownet.dataloader.sampler">
+<span id="gt4sd-frameworks-gflownet-dataloader-sampler-module"></span><h1>gt4sd.frameworks.gflownet.dataloader.sampler module<a class="headerlink" href="#module-gt4sd.frameworks.gflownet.dataloader.sampler" title="Permalink to this headline">¶</a></h1>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator" title="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SamplingIterator</span></code></a></p></td>
+<td><p>Sampler to speed up training based on IterableDataset.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator">
+<em class="property">class </em><code class="sig-name descname">SamplingIterator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">algorithm</span></em>, <em class="sig-param"><span class="n">task</span></em>, <em class="sig-param"><span class="n">ratio</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">stream</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">'cuda'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/sampler.html#SamplingIterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.dataset.Dataset</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.dataset.T_co</span></code>]</p>
+<p>Sampler to speed up training based on IterableDataset.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">algorithm</span></em>, <em class="sig-param"><span class="n">task</span></em>, <em class="sig-param"><span class="n">ratio</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">stream</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">'cuda'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/sampler.html#SamplingIterator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class allows us to parallelise and train faster.
+By separating sampling data/the model and building torch geometric
+graphs from training the model, we can do the former in different
+processes, which is much faster since much of graph construction
+is CPU-bound. This sampler can handle offline and online data.</p>
+<p>Code adapted from: <a class="reference external" href="https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data">https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<a class="reference internal" href="gt4sd.frameworks.gflownet.dataloader.dataset.html#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset" title="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GFlowNetDataset</span></code></a>) – a dataset instance.</p></li>
+<li><p><strong>model</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>, <a class="reference internal" href="gt4sd.frameworks.gflownet.loss.trajectory_balance.html#gt4sd.frameworks.gflownet.loss.trajectory_balance.TrajectoryBalanceModel" title="gt4sd.frameworks.gflownet.loss.trajectory_balance.TrajectoryBalanceModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrajectoryBalanceModel</span></code></a>]) – the model we sample from (must be on CUDA already or share_memory() must be called so that
+parameters are synchronized between each worker).</p></li>
+<li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – the number of trajectories, each trajectory will be comprised of many graphs, so this is
+_not_ the batch size in terms of the number of graphs (that will depend on the task).</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="gt4sd.frameworks.gflownet.envs.graph_building_env.html#gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext" title="gt4sd.frameworks.gflownet.envs.graph_building_env.GraphBuildingEnvContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphBuildingEnvContext</span></code></a>) – the graph environment.</p></li>
+<li><p><strong>algorithm</strong> (<a class="reference internal" href="gt4sd.frameworks.gflownet.loss.trajectory_balance.html#gt4sd.frameworks.gflownet.loss.trajectory_balance.TrajectoryBalance" title="gt4sd.frameworks.gflownet.loss.trajectory_balance.TrajectoryBalance"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrajectoryBalance</span></code></a>) – the training algorithm, e.g. a TrajectoryBalance instance.</p></li>
+<li><p><strong>task</strong> (<a class="reference internal" href="gt4sd.frameworks.gflownet.dataloader.dataset.html#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask" title="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">GFlowNetTask</span></code></a>) – ConditionalTask that specifies the reward structure.</p></li>
+<li><p><strong>ratio</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – the ratio of offline trajectories in the batch.</p></li>
+<li><p><strong>stream</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if true, data is sampled iid for every batch. Otherwise, this is a normal in-order
+dataset iterator.</p></li>
+<li><p><strong>device</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the device (cpu, cuda).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator._idx_iterator">
+<code class="sig-name descname">_idx_iterator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/sampler.html#SamplingIterator._idx_iterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator._idx_iterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an iterator over the indices of the dataset. The batch can be offline or online.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields</dt>
+<dd class="field-odd"><p>Batch of indexes.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__len__">
+<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/sampler.html#SamplingIterator.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Length of the offline or online dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The length of the dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.sample_offline">
+<code class="sig-name descname">sample_offline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idcs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/sampler.html#SamplingIterator.sample_offline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.sample_offline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Samples offline data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>idcs</strong> – the indices of the data to sample.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the trajectories.
+rewards: the rewards.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>trajs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.predict_reward_model">
+<code class="sig-name descname">predict_reward_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trajs</span></em>, <em class="sig-param"><span class="n">flat_rewards</span></em>, <em class="sig-param"><span class="n">num_offline</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/sampler.html#SamplingIterator.predict_reward_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.predict_reward_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict rewards using the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajs</strong> – the trajectories.</p></li>
+<li><p><strong>flat_rewards</strong> – the rewards.</p></li>
+<li><p><strong>num_offline</strong> – the number of offline trajectories.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the updated rewards.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flat_rewards</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.predict_reward_task">
+<code class="sig-name descname">predict_reward_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trajs</span></em>, <em class="sig-param"><span class="n">flat_rewards</span></em>, <em class="sig-param"><span class="n">num_offline</span></em>, <em class="sig-param"><span class="n">is_valid</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/sampler.html#SamplingIterator.predict_reward_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.predict_reward_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict rewards using the task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajs</strong> – the trajectories.</p></li>
+<li><p><strong>flat_rewards</strong> – the rewards.</p></li>
+<li><p><strong>num_offline</strong> – the number of offline trajectories.</p></li>
+<li><p><strong>is_valid</strong> – whether the trajectories are valid.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the updated rewards.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flat_rewards</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.sample_online">
+<code class="sig-name descname">sample_online</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trajs</span></em>, <em class="sig-param"><span class="n">flat_rewards</span></em>, <em class="sig-param"><span class="n">cond_info</span></em>, <em class="sig-param"><span class="n">num_offline</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/sampler.html#SamplingIterator.sample_online"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.sample_online" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample on-policy data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajs</strong> – the trajectories.</p></li>
+<li><p><strong>flat_rewards</strong> – the rewards.</p></li>
+<li><p><strong>cond_info</strong> – the conditional information.</p></li>
+<li><p><strong>num_offline</strong> – the number of offline trajectories.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the updated trajectories.
+flat_rewards: the updated rewards.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>trajs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.set_seed">
+<code class="sig-name descname">set_seed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/sampler.html#SamplingIterator.set_seed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.set_seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the seed for the workers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__iter__">
+<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/sampler.html#SamplingIterator.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build batch using online and offline data and multiple workers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields</dt>
+<dd class="field-odd"><p>batch of data using trajectories and rewards.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Sampler to speed up training based on IterableDataset.'</em><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.gflownet.dataloader.sampler'</em><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__parameters__">
+<code class="sig-name descname">__parameters__</code><em class="property"> = ()</em><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__parameters__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gt4sd.frameworks.gflownet.envs.html" class="btn btn-neutral float-right" title="gt4sd.frameworks.gflownet.envs package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd.frameworks.gflownet.dataloader.dataset.html" class="btn btn-neutral float-left" title="gt4sd.frameworks.gflownet.dataloader.dataset module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

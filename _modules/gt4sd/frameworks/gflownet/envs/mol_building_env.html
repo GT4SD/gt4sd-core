@@ -1,0 +1,613 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.gflownet.envs.mol_building_env &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../envs.html">gt4sd.frameworks.gflownet.envs</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.gflownet.envs.mol_building_env</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.gflownet.envs.mol_building_env</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">rdkit.Chem</span> <span class="k">as</span> <span class="nn">Chem</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch_geometric.data</span> <span class="k">as</span> <span class="nn">gd</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">Mol</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem.rdchem</span> <span class="kn">import</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">ChiralType</span>
+
+<span class="kn">from</span> <span class="nn">..envs.graph_building_env</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Graph</span><span class="p">,</span>
+    <span class="n">GraphAction</span><span class="p">,</span>
+    <span class="n">GraphActionType</span><span class="p">,</span>
+    <span class="n">GraphBuildingEnvContext</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="MolBuildingEnvContext"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext">[docs]</a><span class="k">class</span> <span class="nc">MolBuildingEnvContext</span><span class="p">(</span><span class="n">GraphBuildingEnvContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A context environment for building molecular graphs.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MolBuildingEnvContext.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">atoms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">],</span>
+        <span class="n">num_cond_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a generic context environment for molecules.</span>
+
+<span class="sd">        A specification of what is being generated for a GraphBuildingEnv.</span>
+<span class="sd">        This context specifies how to create molecules atom-by-atom (and attribute-by-attribute).</span>
+
+<span class="sd">        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/envs</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atoms: basic building blocks. In principle we can infer this information from the dataset.</span>
+<span class="sd">            num_cond_dim: number of conditional dimensions.s</span>
+<span class="sd">            device: device to use (cpu, cuda).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># idx 0 has to coincide with the default value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;v&quot;</span><span class="p">:</span> <span class="n">atoms</span><span class="p">,</span>
+            <span class="s2">&quot;chi&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">ChiralType</span><span class="o">.</span><span class="n">CHI_UNSPECIFIED</span><span class="p">,</span>
+                <span class="n">ChiralType</span><span class="o">.</span><span class="n">CHI_TETRAHEDRAL_CW</span><span class="p">,</span>
+                <span class="n">ChiralType</span><span class="o">.</span><span class="n">CHI_TETRAHEDRAL_CCW</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;charge&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;expl_H&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)),</span>  <span class="c1"># TODO: check what is the actual range of this</span>
+            <span class="s2">&quot;no_impl&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span>
+        <span class="p">}</span>
+        <span class="c1"># The size of the input vector for each atom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_attrs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="c1"># The beginning position within the input vector of each attribute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_slice</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attrs</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="c1"># The beginning position within the logit vector of each attribute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_logit_slice</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">s</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atom_attrs</span><span class="p">,</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="o">+</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span>
+                        <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attrs</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+        <span class="c1"># The attribute and value each logit dimension maps back to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_logit_map</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attrs</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;v&quot;</span>
+            <span class="c1"># index 0 is skipped because it is the default value</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_values</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">,</span>
+                <span class="n">BondType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">,</span>
+                <span class="n">BondType</span><span class="o">.</span><span class="n">TRIPLE</span><span class="p">,</span>
+                <span class="n">BondType</span><span class="o">.</span><span class="n">AROMATIC</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_values</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_values</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_values</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_attrs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_values</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_slice</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_values</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attrs</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_logit_slice</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">s</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bond_attrs</span><span class="p">,</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="o">+</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span>
+                        <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_values</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attrs</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_logit_map</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attrs</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_values</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="p">]</span>
+
+        <span class="c1"># These values are used by Models to know how many inputs/logits to produce</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_new_node_values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_node_attr_logits</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_logit_map</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_node_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_size</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_edge_attr_logits</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_logit_map</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_edge_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_cond_dim</span> <span class="o">=</span> <span class="n">num_cond_dim</span>
+
+        <span class="c1"># Order in which models have to output logits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_type_order</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">GraphActionType</span><span class="o">.</span><span class="n">Stop</span><span class="p">,</span>
+            <span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddNode</span><span class="p">,</span>
+            <span class="n">GraphActionType</span><span class="o">.</span><span class="n">SetNodeAttr</span><span class="p">,</span>
+            <span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddEdge</span><span class="p">,</span>
+            <span class="n">GraphActionType</span><span class="o">.</span><span class="n">SetEdgeAttr</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span></div>
+
+<div class="viewcode-block" id="MolBuildingEnvContext.aidx_to_graph_action"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.aidx_to_graph_action">[docs]</a>    <span class="k">def</span> <span class="nf">aidx_to_graph_action</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span> <span class="n">action_idx</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GraphAction</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: The graph to act on.</span>
+<span class="sd">            action_idx: The action index.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the action index is invalid.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The action corresponding to the action index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">act_type</span><span class="p">,</span> <span class="n">act_row</span><span class="p">,</span> <span class="n">act_col</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">action_idx</span><span class="p">]</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_type_order</span><span class="p">[</span><span class="n">act_type</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">Stop</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">GraphAction</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">t</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddNode</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">GraphAction</span><span class="p">(</span>
+                <span class="n">t</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">act_row</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span><span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">][</span><span class="n">act_col</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">t</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">SetNodeAttr</span><span class="p">:</span>
+            <span class="n">attr</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_logit_map</span><span class="p">[</span><span class="n">act_col</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">GraphAction</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">act_row</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">t</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddEdge</span><span class="p">:</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">non_edge_index</span><span class="p">[:,</span> <span class="n">act_row</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">GraphAction</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">target</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="c1"># Edges are duplicated to get undirected GNN, deduplicated for logits</span>
+        <span class="k">elif</span> <span class="n">t</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">SetEdgeAttr</span><span class="p">:</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edge_index</span><span class="p">[:,</span> <span class="n">act_row</span> <span class="o">*</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">attr</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_logit_map</span><span class="p">[</span><span class="n">act_col</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">GraphAction</span><span class="p">(</span>
+                <span class="n">t</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">target</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">val</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown action type: </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MolBuildingEnvContext.graph_action_to_aidx"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.graph_action_to_aidx">[docs]</a>    <span class="k">def</span> <span class="nf">graph_action_to_aidx</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">GraphAction</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Translate a GraphAction to an index tuple.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: The graph to act on.</span>
+<span class="sd">            action: The action to translate.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The index corresponding to the action.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">action</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">Stop</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">action</span><span class="o">.</span><span class="n">action</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddNode</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">source</span>  <span class="c1"># type: ignore</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span><span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">action</span><span class="o">.</span><span class="n">action</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">SetNodeAttr</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">source</span>  <span class="c1"># type: ignore</span>
+            <span class="c1"># - 1 because the default is index 0</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span><span class="p">[</span><span class="n">action</span><span class="o">.</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+                <span class="o">-</span> <span class="mi">1</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_logit_slice</span><span class="p">[</span><span class="n">action</span><span class="o">.</span><span class="n">attr</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">action</span><span class="o">.</span><span class="n">action</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">AddEdge</span><span class="p">:</span>
+            <span class="c1"># Here we have to retrieve the index in non_edge_index of an edge (s,t)</span>
+            <span class="c1"># that&#39;s also possibly in the reverse order (t,s).</span>
+            <span class="c1"># That&#39;s definitely not too efficient, can we do better?</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">g</span><span class="o">.</span><span class="n">non_edge_index</span><span class="o">.</span><span class="n">T</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([(</span><span class="n">action</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">)])</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">+</span> <span class="p">(</span>
+                    <span class="n">g</span><span class="o">.</span><span class="n">non_edge_index</span><span class="o">.</span><span class="n">T</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([(</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">source</span><span class="p">)])</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">action</span><span class="o">.</span><span class="n">action</span> <span class="ow">is</span> <span class="n">GraphActionType</span><span class="o">.</span><span class="n">SetEdgeAttr</span><span class="p">:</span>
+            <span class="c1"># Here the edges are duplicated, both (i,j) and (j,i) are in edge_index</span>
+            <span class="c1"># so no need for a double check.</span>
+            <span class="c1"># row = ((g.edge_index.T == torch.tensor([(action.source, action.target)])).prod(1) +</span>
+            <span class="c1">#       (g.edge_index.T == torch.tensor([(action.target, action.source)])).prod(1)).argmax()</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span class="n">T</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([(</span><span class="n">action</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">)]))</span>
+                <span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="c1"># Because edges are duplicated but logits aren&#39;t, divide by two</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">rounding_mode</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_values</span><span class="p">[</span><span class="n">action</span><span class="o">.</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+                <span class="o">-</span> <span class="mi">1</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_logit_slice</span><span class="p">[</span><span class="n">action</span><span class="o">.</span><span class="n">attr</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+            <span class="p">)</span>
+        <span class="n">type_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_type_order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">action</span><span class="p">)</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">type_idx</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MolBuildingEnvContext.graph_to_data"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.graph_to_data">[docs]</a>    <span class="k">def</span> <span class="nf">graph_to_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Convert a networkx Graph to a torch geometric Data instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: Networkx Graph to convert.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch geometric Data instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_node_dim</span><span class="p">))</span>
+        <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">):</span>
+            <span class="n">ad</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_attrs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_slice</span><span class="p">):</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_values</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ad</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ad</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">sl</span> <span class="o">+</span> <span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">edge_attr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_edge_dim</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">):</span>
+            <span class="n">ad</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_attrs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_slice</span><span class="p">):</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_values</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ad</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ad</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="n">edge_attr</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sl</span> <span class="o">+</span> <span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">edge_attr</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sl</span> <span class="o">+</span> <span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">),</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">)]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span>
+        <span class="p">)</span>
+        <span class="n">edge_index</span> <span class="o">=</span> <span class="n">edge_index</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">gc</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">complement</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+        <span class="n">non_edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">gc</span><span class="o">.</span><span class="n">edges</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_edge_index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">non_edge_index</span> <span class="o">=</span> <span class="n">non_edge_index</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">non_edge_index</span> <span class="o">=</span> <span class="n">non_edge_index</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">,</span> <span class="n">non_edge_index</span><span class="o">=</span><span class="n">non_edge_index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MolBuildingEnvContext.collate"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.collate">[docs]</a>    <span class="k">def</span> <span class="nf">collate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graphs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Batch Data instances.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            graphs: List of Data instances.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Batch of Data instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">gd</span><span class="o">.</span><span class="n">Batch</span><span class="o">.</span><span class="n">from_data_list</span><span class="p">(</span>
+            <span class="n">graphs</span><span class="p">,</span> <span class="n">follow_batch</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;edge_index&quot;</span><span class="p">,</span> <span class="s2">&quot;non_edge_index&quot;</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="MolBuildingEnvContext.mol_to_graph"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.mol_to_graph">[docs]</a>    <span class="k">def</span> <span class="nf">mol_to_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">:</span> <span class="n">Mol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Convert an RDMol to a Graph.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mol: RDKit molecule format.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Graph format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">()</span>
+        <span class="c1"># Only set an attribute tag if it is not the default attribute</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+            <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;chi&quot;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">GetChiralTag</span><span class="p">(),</span>
+                <span class="s2">&quot;charge&quot;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">GetFormalCharge</span><span class="p">(),</span>
+                <span class="s2">&quot;expl_H&quot;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">GetNumExplicitHs</span><span class="p">(),</span>
+                <span class="s2">&quot;no_impl&quot;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">GetNoImplicit</span><span class="p">(),</span>
+            <span class="p">}</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">(),</span>
+                <span class="n">v</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">(),</span>
+                <span class="o">**</span><span class="p">{</span>
+                    <span class="n">attr</span><span class="p">:</span> <span class="n">val</span>
+                    <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_attr_defaults</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetBonds</span><span class="p">():</span>
+            <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">GetBondType</span><span class="p">()}</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">GetBeginAtomIdx</span><span class="p">(),</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">GetEndAtomIdx</span><span class="p">(),</span>
+                <span class="o">**</span><span class="p">{</span>
+                    <span class="n">attr</span><span class="p">:</span> <span class="n">val</span>
+                    <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_attr_defaults</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">g</span></div>
+
+<div class="viewcode-block" id="MolBuildingEnvContext.graph_to_mol"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.graph_to_mol">[docs]</a>    <span class="k">def</span> <span class="nf">graph_to_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mol</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Convert a Graph to an RDKit molecule.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: Graph format.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            RDKit molecule format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">mp</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">RWMol</span><span class="p">()</span>
+        <span class="n">mp</span><span class="o">.</span><span class="n">BeginBatchEdit</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">)):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;chi&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">SetChiralTag</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;chi&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;charge&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">SetFormalCharge</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;charge&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;expl_H&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">SetNumExplicitHs</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;expl_H&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;no_impl&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">SetNoImplicit</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;no_impl&quot;</span><span class="p">])</span>
+            <span class="n">mp</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">]</span>
+            <span class="n">mp</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">))</span>
+        <span class="n">mp</span><span class="o">.</span><span class="n">CommitBatchEdit</span><span class="p">()</span>
+        <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">mp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mp</span></div>
+
+<div class="viewcode-block" id="MolBuildingEnvContext.is_sane"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.is_sane">[docs]</a>    <span class="k">def</span> <span class="nf">is_sane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Check if a graph is sane.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: Graph format.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if sane, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_to_mol</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="n">mol</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">mol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,1288 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.gflownet.ml.models.mxmnet &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../../_static/jquery.js"></script>
+        <script src="../../../../../../_static/underscore.js"></script>
+        <script src="../../../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.gflownet.ml.models.mxmnet</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.gflownet.ml.models.mxmnet</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span> <span class="k">as</span> <span class="n">PI</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sympy</span> <span class="k">as</span> <span class="nn">sym</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">special</span> <span class="k">as</span> <span class="n">sp</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">brentq</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Linear</span><span class="p">,</span> <span class="n">Sequential</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Data</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">global_add_pool</span><span class="p">,</span> <span class="n">radius</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span class="n">add_self_loops</span><span class="p">,</span> <span class="n">remove_self_loops</span>
+<span class="kn">from</span> <span class="nn">torch_scatter</span> <span class="kn">import</span> <span class="n">scatter</span>
+<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+
+<span class="n">HAR2EV</span> <span class="o">=</span> <span class="mf">27.2113825435</span>
+<span class="n">KCALMOL2EV</span> <span class="o">=</span> <span class="mf">0.04336414</span>
+
+
+<div class="viewcode-block" id="MXMNetConfig"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNetConfig">[docs]</a><span class="k">class</span> <span class="nc">MXMNetConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;MXMNet configuration.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MXMNetConfig.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNetConfig.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize MXMNet configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dim: dimension of the input.</span>
+<span class="sd">            n_layer: number of layers.</span>
+<span class="sd">            cutoff: cutoff radius.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_layer</span> <span class="o">=</span> <span class="n">n_layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="n">cutoff</span></div></div>
+
+
+<div class="viewcode-block" id="MXMNet"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet">[docs]</a><span class="k">class</span> <span class="nc">MXMNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;MXMNet - Multiplex Molecular Graph Neural Network&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MXMNet.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">MXMNetConfig</span><span class="p">,</span> <span class="n">num_spherical</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">num_radial</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">envelope_exponent</span><span class="o">=</span><span class="mi">5</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Construct an MXMNet.</span>
+
+<span class="sd">        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/models and https://github.com/zetayue/MXMNet.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config: model configuration</span>
+<span class="sd">            num_spherical: number of spherical harmonics to use.</span>
+<span class="sd">            num_radial: number of radial harmonics to use.</span>
+<span class="sd">            envelope_exponent: exponent of the envelope function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MXMNet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;mxmnet&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_layer</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">n_layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">cutoff</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rbf_l</span> <span class="o">=</span> <span class="n">BesselBasisLayer</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">envelope_exponent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rbf_g</span> <span class="o">=</span> <span class="n">BesselBasisLayer</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">envelope_exponent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sbf</span> <span class="o">=</span> <span class="n">SphericalBasisLayer</span><span class="p">(</span><span class="n">num_spherical</span><span class="p">,</span> <span class="n">num_radial</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">envelope_exponent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rbf_g_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="mi">16</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rbf_l_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="mi">16</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sbf_1_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="n">num_spherical</span> <span class="o">*</span> <span class="n">num_radial</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sbf_2_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="n">num_spherical</span> <span class="o">*</span> <span class="n">num_radial</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_layers</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">n_layer</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">global_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Global_MP</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_layers</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">n_layer</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">local_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Local_MP</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MXMNet.init"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">stdv</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">stdv</span><span class="p">,</span> <span class="n">stdv</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MXMNet.indices"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.indices">[docs]</a>    <span class="k">def</span> <span class="nf">indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute indices.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            edge_index: edge index of the graph.</span>
+<span class="sd">            num_nodes: number of nodes in the graph.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple of indeces.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">edge_index</span>
+
+        <span class="n">value</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">adj_t</span> <span class="o">=</span> <span class="n">SparseTensor</span><span class="p">(</span>
+            <span class="n">row</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">row</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">sparse_sizes</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Compute the node indices for two-hop angles</span>
+        <span class="n">adj_t_row</span> <span class="o">=</span> <span class="n">adj_t</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
+        <span class="n">num_triplets</span> <span class="o">=</span> <span class="n">adj_t_row</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+
+        <span class="n">idx_i</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span><span class="n">num_triplets</span><span class="p">)</span>
+        <span class="n">idx_j</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span><span class="n">num_triplets</span><span class="p">)</span>
+        <span class="n">idx_k</span> <span class="o">=</span> <span class="n">adj_t_row</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">col</span><span class="p">()</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">idx_i</span> <span class="o">!=</span> <span class="n">idx_k</span>
+        <span class="n">idx_i_1</span><span class="p">,</span> <span class="n">idx_j</span><span class="p">,</span> <span class="n">idx_k</span> <span class="o">=</span> <span class="n">idx_i</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">idx_j</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">idx_k</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+        <span class="n">idx_kj</span> <span class="o">=</span> <span class="n">adj_t_row</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">value</span><span class="p">()[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="n">idx_ji_1</span> <span class="o">=</span> <span class="n">adj_t_row</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">row</span><span class="p">()[</span><span class="n">mask</span><span class="p">]</span>
+
+        <span class="c1"># Compute the node indices for one-hop angles</span>
+        <span class="n">adj_t_col</span> <span class="o">=</span> <span class="n">adj_t</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
+
+        <span class="n">num_pairs</span> <span class="o">=</span> <span class="n">adj_t_col</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+        <span class="n">idx_i_2</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span><span class="n">num_pairs</span><span class="p">)</span>
+        <span class="n">idx_j1</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span><span class="n">num_pairs</span><span class="p">)</span>
+        <span class="n">idx_j2</span> <span class="o">=</span> <span class="n">adj_t_col</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">col</span><span class="p">()</span>
+
+        <span class="n">idx_ji_2</span> <span class="o">=</span> <span class="n">adj_t_col</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">row</span><span class="p">()</span>
+        <span class="n">idx_jj</span> <span class="o">=</span> <span class="n">adj_t_col</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">idx_i_1</span><span class="p">,</span>
+            <span class="n">idx_j</span><span class="p">,</span>
+            <span class="n">idx_k</span><span class="p">,</span>
+            <span class="n">idx_kj</span><span class="p">,</span>
+            <span class="n">idx_ji_1</span><span class="p">,</span>
+            <span class="n">idx_i_2</span><span class="p">,</span>
+            <span class="n">idx_j1</span><span class="p">,</span>
+            <span class="n">idx_j2</span><span class="p">,</span>
+            <span class="n">idx_jj</span><span class="p">,</span>
+            <span class="n">idx_ji_2</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="MXMNet.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Forward pass.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: batch of data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            gloabl pooled features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">edge_index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pos</span>
+        <span class="n">batch</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">batch</span>
+        <span class="c1"># Initialize node embeddings</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">long</span><span class="p">())</span>
+
+        <span class="c1"># Get the edges and pairwise distances in the local layer</span>
+        <span class="n">edge_index_l</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">remove_self_loops</span><span class="p">(</span><span class="n">edge_index</span><span class="p">)</span>
+        <span class="n">j_l</span><span class="p">,</span> <span class="n">i_l</span> <span class="o">=</span> <span class="n">edge_index_l</span>
+        <span class="n">dist_l</span> <span class="o">=</span> <span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="n">i_l</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="n">j_l</span><span class="p">])</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+
+        <span class="c1"># Get the edges pairwise distances in the global layer</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">radius</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">max_num_neighbors</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+        <span class="n">edge_index_g</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">edge_index_g</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">remove_self_loops</span><span class="p">(</span><span class="n">edge_index_g</span><span class="p">)</span>
+        <span class="n">j_g</span><span class="p">,</span> <span class="n">i_g</span> <span class="o">=</span> <span class="n">edge_index_g</span>
+        <span class="n">dist_g</span> <span class="o">=</span> <span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="n">i_g</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="n">j_g</span><span class="p">])</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+
+        <span class="c1"># Compute the node indices for defining the angles</span>
+        <span class="p">(</span>
+            <span class="n">idx_i_1</span><span class="p">,</span>
+            <span class="n">idx_j</span><span class="p">,</span>
+            <span class="n">idx_k</span><span class="p">,</span>
+            <span class="n">idx_kj</span><span class="p">,</span>
+            <span class="n">idx_ji</span><span class="p">,</span>
+            <span class="n">idx_i_2</span><span class="p">,</span>
+            <span class="n">idx_j1</span><span class="p">,</span>
+            <span class="n">idx_j2</span><span class="p">,</span>
+            <span class="n">idx_jj</span><span class="p">,</span>
+            <span class="n">idx_ji_2</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">(</span><span class="n">edge_index_l</span><span class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># Compute the two-hop angles</span>
+        <span class="n">pos_ji_1</span><span class="p">,</span> <span class="n">pos_kj</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">idx_j</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="n">idx_i_1</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="n">idx_k</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="n">idx_j</span><span class="p">]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">pos_ji_1</span> <span class="o">*</span> <span class="n">pos_kj</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">pos_ji_1</span><span class="p">,</span> <span class="n">pos_kj</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">angle_1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+
+        <span class="c1"># Compute the one-hop angles</span>
+        <span class="n">pos_ji_2</span><span class="p">,</span> <span class="n">pos_jj</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">idx_j1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="n">idx_i_2</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="n">idx_j2</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="n">idx_j1</span><span class="p">]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">pos_ji_2</span> <span class="o">*</span> <span class="n">pos_jj</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">pos_ji_2</span><span class="p">,</span> <span class="n">pos_jj</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">angle_2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+
+        <span class="c1"># Get the RBF and SBF embeddings</span>
+        <span class="n">rbf_g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rbf_g</span><span class="p">(</span><span class="n">dist_g</span><span class="p">)</span>
+        <span class="n">rbf_l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rbf_l</span><span class="p">(</span><span class="n">dist_l</span><span class="p">)</span>
+        <span class="n">sbf_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sbf</span><span class="p">(</span><span class="n">dist_l</span><span class="p">,</span> <span class="n">angle_1</span><span class="p">,</span> <span class="n">idx_kj</span><span class="p">)</span>
+        <span class="n">sbf_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sbf</span><span class="p">(</span><span class="n">dist_l</span><span class="p">,</span> <span class="n">angle_2</span><span class="p">,</span> <span class="n">idx_jj</span><span class="p">)</span>
+
+        <span class="n">rbf_g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rbf_g_mlp</span><span class="p">(</span><span class="n">rbf_g</span><span class="p">)</span>
+        <span class="n">rbf_l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rbf_l_mlp</span><span class="p">(</span><span class="n">rbf_l</span><span class="p">)</span>
+        <span class="n">sbf_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sbf_1_mlp</span><span class="p">(</span><span class="n">sbf_1</span><span class="p">)</span>
+        <span class="n">sbf_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sbf_2_mlp</span><span class="p">(</span><span class="n">sbf_2</span><span class="p">)</span>
+
+        <span class="c1"># Perform the message passing schemes</span>
+        <span class="n">node_sum</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_layer</span><span class="p">):</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_layers</span><span class="p">[</span><span class="n">layer</span><span class="p">](</span><span class="n">h</span><span class="p">,</span> <span class="n">rbf_g</span><span class="p">,</span> <span class="n">edge_index_g</span><span class="p">)</span>
+            <span class="n">h</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_layers</span><span class="p">[</span><span class="n">layer</span><span class="p">](</span>
+                <span class="n">h</span><span class="p">,</span> <span class="n">rbf_l</span><span class="p">,</span> <span class="n">sbf_1</span><span class="p">,</span> <span class="n">sbf_2</span><span class="p">,</span> <span class="n">idx_kj</span><span class="p">,</span> <span class="n">idx_ji</span><span class="p">,</span> <span class="n">idx_jj</span><span class="p">,</span> <span class="n">idx_ji_2</span><span class="p">,</span> <span class="n">edge_index_l</span>
+            <span class="p">)</span>
+            <span class="n">node_sum</span> <span class="o">+=</span> <span class="n">t</span>
+
+        <span class="c1"># Readout</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">global_add_pool</span><span class="p">(</span><span class="n">node_sum</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="EMA"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA">[docs]</a><span class="k">class</span> <span class="nc">EMA</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;EMA - Exponential Moving Average.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EMA.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">decay</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize ema.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model: model to ema.</span>
+<span class="sd">            decay: decay rate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decay</span> <span class="o">=</span> <span class="n">decay</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Register model parameters</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EMA.__call__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_updates</span><span class="o">=</span><span class="mi">99999</span><span class="p">):</span>
+        <span class="n">decay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decay</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">num_updates</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">10.0</span> <span class="o">+</span> <span class="n">num_updates</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span>
+                <span class="n">new_average</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">decay</span><span class="p">)</span> <span class="o">*</span> <span class="n">param</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="n">decay</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_average</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EMA.assign"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.assign">[docs]</a>    <span class="k">def</span> <span class="nf">assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">original</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+                <span class="n">param</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="EMA.resume"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.resume">[docs]</a>    <span class="k">def</span> <span class="nf">resume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span>
+                <span class="n">param</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="MLP"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MLP">[docs]</a><span class="k">def</span> <span class="nf">MLP</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;multi-layer perceptron.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        channels: list of number of channels.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        MLP model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Sequential</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">[</span>
+            <span class="n">Sequential</span><span class="p">(</span><span class="n">Linear</span><span class="p">(</span><span class="n">channels</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">channels</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">SiLU</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">))</span>
+        <span class="p">]</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Res"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Res">[docs]</a><span class="k">class</span> <span class="nc">Res</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Residual Block.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Res.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Res.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize residual block.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dim: dimension of the layer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Res</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Res.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Res.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">m_out</span> <span class="o">=</span> <span class="n">m1</span> <span class="o">+</span> <span class="n">m</span>
+        <span class="k">return</span> <span class="n">m_out</span></div></div>
+
+
+<div class="viewcode-block" id="compute_idx"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.compute_idx">[docs]</a><span class="k">def</span> <span class="nf">compute_idx</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the indices for the edges and angles.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pos: node positions.</span>
+<span class="sd">        edge_index: edge indices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pos_i</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">pos_j</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+    <span class="n">d_ij</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">pos_j</span> <span class="o">-</span> <span class="n">pos_i</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-5</span>
+    <span class="n">v_ji</span> <span class="o">=</span> <span class="p">(</span><span class="n">pos_i</span> <span class="o">-</span> <span class="n">pos_j</span><span class="p">)</span> <span class="o">/</span> <span class="n">d_ij</span>
+
+    <span class="n">unique</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+        <span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>  <span class="c1"># Get central values</span>
+    <span class="n">full_index</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
+    <span class="p">)</span>  <span class="c1"># init full index</span>
+
+    <span class="c1"># Compute 1</span>
+    <span class="n">repeat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">counts</span><span class="p">)</span>
+    <span class="n">counts_repeat1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span><span class="n">full_index</span><span class="p">,</span> <span class="n">repeat</span><span class="p">)</span>  <span class="c1"># 0,...,0,1,...,1,...</span>
+
+    <span class="c1"># Compute 2</span>
+    <span class="n">split</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">full_index</span><span class="p">,</span> <span class="n">counts</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>  <span class="c1"># split full index</span>
+    <span class="n">index2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>  <span class="c1"># get repeat index</span>
+    <span class="n">counts_repeat2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="o">*</span><span class="n">index2</span><span class="p">)(</span><span class="n">split</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># 0,1,2,...,0,1,2,..</span>
+
+    <span class="c1"># Compute angle embeddings</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">v_ji</span><span class="p">[</span><span class="n">counts_repeat1</span><span class="o">.</span><span class="n">long</span><span class="p">()]</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">v_ji</span><span class="p">[</span><span class="n">counts_repeat2</span><span class="o">.</span><span class="n">long</span><span class="p">()]</span>
+
+    <span class="n">angle</span> <span class="o">=</span> <span class="p">(</span><span class="n">v1</span> <span class="o">*</span> <span class="n">v2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-6</span> <span class="o">+</span> <span class="mf">1.0</span>
+
+    <span class="k">return</span> <span class="n">counts_repeat1</span><span class="o">.</span><span class="n">long</span><span class="p">(),</span> <span class="n">counts_repeat2</span><span class="o">.</span><span class="n">long</span><span class="p">(),</span> <span class="n">angle</span></div>
+
+
+<div class="viewcode-block" id="Jn"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Jn">[docs]</a><span class="k">def</span> <span class="nf">Jn</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span><span class="p">))</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">jv</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Jn_zeros"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Jn_zeros">[docs]</a><span class="k">def</span> <span class="nf">Jn_zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">zerosj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
+    <span class="n">zerosj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">racines</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">):</span>
+            <span class="n">foo</span> <span class="o">=</span> <span class="n">brentq</span><span class="p">(</span><span class="n">Jn</span><span class="p">,</span> <span class="n">points</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="n">i</span><span class="p">,))</span>
+            <span class="n">racines</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">foo</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">racines</span>
+        <span class="n">zerosj</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">racines</span><span class="p">[:</span><span class="n">k</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">zerosj</span></div>
+
+
+<div class="viewcode-block" id="spherical_bessel_formulas"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.spherical_bessel_formulas">[docs]</a><span class="k">def</span> <span class="nf">spherical_bessel_formulas</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span><span class="p">]</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span>
+        <span class="n">f</span> <span class="o">+=</span> <span class="p">[</span><span class="n">sym</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="n">i</span><span class="p">)]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="bessel_basis"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.bessel_basis">[docs]</a><span class="k">def</span> <span class="nf">bessel_basis</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">zeros</span> <span class="o">=</span> <span class="n">Jn_zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">normalizer</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">_normalizer_tmp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="n">_normalizer_tmp</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">Jn</span><span class="p">(</span><span class="n">zeros</span><span class="p">[</span><span class="n">order</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">normalizer_tmp</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">_normalizer_tmp</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">normalizer</span> <span class="o">+=</span> <span class="p">[</span><span class="n">normalizer_tmp</span><span class="p">]</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">spherical_bessel_formulas</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+    <span class="n">bess_basis</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">bess_basis_tmp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="n">bess_basis_tmp</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">sym</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span>
+                    <span class="n">normalizer</span><span class="p">[</span><span class="n">order</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">f</span><span class="p">[</span><span class="n">order</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">zeros</span><span class="p">[</span><span class="n">order</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+        <span class="n">bess_basis</span> <span class="o">+=</span> <span class="p">[</span><span class="n">bess_basis_tmp</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">bess_basis</span></div>
+
+
+<div class="viewcode-block" id="sph_harm_prefactor"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.sph_harm_prefactor">[docs]</a><span class="k">def</span> <span class="nf">sph_harm_prefactor</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+        <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">m</span><span class="p">)))</span>
+    <span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span></div>
+
+
+<div class="viewcode-block" id="associated_legendre_polynomials"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.associated_legendre_polynomials">[docs]</a><span class="k">def</span> <span class="nf">associated_legendre_polynomials</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">zero_m_only</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">)</span>
+    <span class="n">P_l_m</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
+
+    <span class="n">P_l_m</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">P_l_m</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+            <span class="n">P_l_m</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span>
+                <span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span> <span class="o">*</span> <span class="n">P_l_m</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">P_l_m</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">j</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">zero_m_only</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+                <span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">simplify</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">k</span><span class="p">:</span>
+                    <span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">simplify</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span> <span class="o">*</span> <span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+                    <span class="n">P_l_m</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span>
+                        <span class="p">(</span>
+                            <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span> <span class="o">*</span> <span class="n">P_l_m</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                            <span class="o">-</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">P_l_m</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">2</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                        <span class="p">)</span>
+                        <span class="o">/</span> <span class="p">(</span><span class="n">j</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">P_l_m</span></div>
+
+
+<div class="viewcode-block" id="real_sph_harm"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.real_sph_harm">[docs]</a><span class="k">def</span> <span class="nf">real_sph_harm</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">zero_m_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">spherical_coordinates</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">zero_m_only</span><span class="p">:</span>
+        <span class="n">S_m</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">C_m</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+            <span class="n">S_m</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span> <span class="o">*</span> <span class="n">S_m</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">C_m</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="n">C_m</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span> <span class="o">*</span> <span class="n">C_m</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span> <span class="o">*</span> <span class="n">S_m</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span>
+
+    <span class="n">P_l_m</span> <span class="o">=</span> <span class="n">associated_legendre_polynomials</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">zero_m_only</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">spherical_coordinates</span><span class="p">:</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;theta&quot;</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">P_l_m</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">:</span>
+                    <span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">sym</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">zero_m_only</span><span class="p">:</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S_m</span><span class="p">)):</span>
+                <span class="n">S_m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">S_m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+                    <span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">sym</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span>
+                    <span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">C_m</span><span class="p">)):</span>
+                <span class="n">C_m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">C_m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+                    <span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">sym</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span>
+                    <span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span>
+                <span class="p">)</span>
+
+    <span class="n">Y_func_l_m</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;0&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="n">Y_func_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span><span class="n">sph_harm_prefactor</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">zero_m_only</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">Y_func_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span>
+                    <span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">sph_harm_prefactor</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">C_m</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">Y_func_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span>
+                    <span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">sph_harm_prefactor</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">S_m</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">P_l_m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Y_func_l_m</span></div>
+
+
+<div class="viewcode-block" id="BesselBasisLayer"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer">[docs]</a><span class="k">class</span> <span class="nc">BesselBasisLayer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Bessel Basis Layer.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BesselBasisLayer.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_radial</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">envelope_exponent</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize Bessel basis layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_radial: number of radial basis functions.</span>
+<span class="sd">            cutoff: cutoff radius.</span>
+<span class="sd">            envelope_exponent: envelope exponent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">BesselBasisLayer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="n">cutoff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">envelope</span> <span class="o">=</span> <span class="n">Envelope</span><span class="p">(</span><span class="n">envelope_exponent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">freq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">num_radial</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BesselBasisLayer.reset_parameters"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer.reset_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">freq</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">freq</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">PI</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BesselBasisLayer.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Forward pass.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dist: distance matrix.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Bessel basis.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">envelope</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">freq</span> <span class="o">*</span> <span class="n">dist</span><span class="p">)</span><span class="o">.</span><span class="n">sin</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="SiLU"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SiLU">[docs]</a><span class="k">class</span> <span class="nc">SiLU</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;SiLU Activation Function.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SiLU.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SiLU.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the SiLU activation function.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SiLU.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SiLU.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">silu</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="silu"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.silu">[docs]</a><span class="k">def</span> <span class="nf">silu</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">input</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Envelope"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Envelope">[docs]</a><span class="k">class</span> <span class="nc">Envelope</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Envelope.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Envelope.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Envelope.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize envelope.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            exponent: exponent of the envelope.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Envelope</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">exponent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
+
+<div class="viewcode-block" id="Envelope.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Envelope.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Forward pass.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: input.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Envelope of x.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">p</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="n">x_pow_p0</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">x_pow_p1</span> <span class="o">=</span> <span class="n">x_pow_p0</span> <span class="o">*</span> <span class="n">x</span>
+        <span class="n">env_val</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span> <span class="o">*</span> <span class="n">x_pow_p0</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">x_pow_p1</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">x_pow_p1</span> <span class="o">*</span> <span class="n">x</span>
+
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="n">env_val</span><span class="p">,</span> <span class="n">zero</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SphericalBasisLayer"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SphericalBasisLayer">[docs]</a><span class="k">class</span> <span class="nc">SphericalBasisLayer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Spherical Basis Layer.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SphericalBasisLayer.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SphericalBasisLayer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">num_spherical</span><span class="p">,</span> <span class="n">num_radial</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">envelope_exponent</span><span class="o">=</span><span class="mi">5</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize spherical basis layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_spherical: number of spherical harmonics.</span>
+<span class="sd">            num_radial: number of radial functions.</span>
+<span class="sd">            cutoff: cutoff radius.</span>
+<span class="sd">            envelope_exponent: envelope exponent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SphericalBasisLayer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">num_radial</span> <span class="o">&lt;=</span> <span class="mi">64</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_spherical</span> <span class="o">=</span> <span class="n">num_spherical</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_radial</span> <span class="o">=</span> <span class="n">num_radial</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="n">cutoff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">envelope</span> <span class="o">=</span> <span class="n">Envelope</span><span class="p">(</span><span class="n">envelope_exponent</span><span class="p">)</span>
+
+        <span class="n">bessel_forms</span> <span class="o">=</span> <span class="n">bessel_basis</span><span class="p">(</span><span class="n">num_spherical</span><span class="p">,</span> <span class="n">num_radial</span><span class="p">)</span>
+        <span class="n">sph_harm_forms</span> <span class="o">=</span> <span class="n">real_sph_harm</span><span class="p">(</span><span class="n">num_spherical</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sph_funcs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bessel_funcs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">x</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;x theta&quot;</span><span class="p">)</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sin&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">,</span> <span class="s2">&quot;cos&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_spherical</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">sph1</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">lambdify</span><span class="p">([</span><span class="n">theta</span><span class="p">],</span> <span class="n">sph_harm_forms</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">modules</span><span class="p">)(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sph_funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">sph1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sph</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">lambdify</span><span class="p">([</span><span class="n">theta</span><span class="p">],</span> <span class="n">sph_harm_forms</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">modules</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sph_funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sph</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_radial</span><span class="p">):</span>
+                <span class="n">bessel</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">lambdify</span><span class="p">([</span><span class="n">x</span><span class="p">],</span> <span class="n">bessel_forms</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">modules</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bessel_funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bessel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SphericalBasisLayer.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SphericalBasisLayer.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">idx_kj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Forward pass.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dist: distance matrix.</span>
+<span class="sd">            angle: angle matrix.</span>
+<span class="sd">            idx_kj: index matrix.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Spherical basis.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span>
+        <span class="n">rbf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">f</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bessel_funcs</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">rbf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">envelope</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">rbf</span>
+
+        <span class="n">cbf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">f</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sph_funcs</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">n</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_spherical</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_radial</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">rbf</span><span class="p">[</span><span class="n">idx_kj</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">cbf</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">*</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+
+
+<span class="n">msg_special_args</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;edge_index&quot;</span><span class="p">,</span> <span class="s2">&quot;edge_index_i&quot;</span><span class="p">,</span> <span class="s2">&quot;edge_index_j&quot;</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">,</span> <span class="s2">&quot;size_i&quot;</span><span class="p">,</span> <span class="s2">&quot;size_j&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">aggr_special_args</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;dim_size&quot;</span><span class="p">])</span>
+
+<span class="n">update_special_args</span><span class="p">:</span> <span class="n">Set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+
+
+<div class="viewcode-block" id="MessagePassing"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing">[docs]</a><span class="k">class</span> <span class="nc">MessagePassing</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Message Passing Layer.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \mathbf{x}_i^{\prime} = \gamma_{\mathbf{\Theta}} \left( \mathbf{x}_i,</span>
+<span class="sd">        \square_{j \in \mathcal{N}(i)} \, \phi_{\mathbf{\Theta}}</span>
+<span class="sd">        \left(\mathbf{x}_i, \mathbf{x}_j,\mathbf{e}_{i,j}\right) \right),</span>
+<span class="sd">    where :math:`\square` denotes a differentiable, permutation invariant</span>
+<span class="sd">    function, *e.g.*, sum, mean or max, and :math:`\gamma_{\mathbf{\Theta}}`</span>
+<span class="sd">    and :math:`\phi_{\mathbf{\Theta}}` denote differentiable functions such as</span>
+<span class="sd">    MLPs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MessagePassing.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggr</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s2">&quot;target_to_source&quot;</span><span class="p">,</span> <span class="n">node_dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize message passing layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            aggr: the aggregation scheme to use (add, mean, max).</span>
+<span class="sd">            flow: the flow direction of message passing (source_to_target, target_to_source).</span>
+<span class="sd">            node_dim: the axis along which to propagate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MessagePassing</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggr</span> <span class="o">=</span> <span class="n">aggr</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggr</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">flow</span> <span class="o">=</span> <span class="n">flow</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;source_to_target&quot;</span><span class="p">,</span> <span class="s2">&quot;target_to_source&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_dim</span> <span class="o">=</span> <span class="n">node_dim</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dim</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__msg_params__tmp</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__msg_params__</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__msg_params__tmp</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__aggr_params__tmp</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__aggr_params__</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__aggr_params__tmp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__aggr_params__</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_params__tmp</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_params__</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__update_params__tmp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_params__</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">msg_args</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__msg_params__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="n">msg_special_args</span>
+        <span class="n">aggr_args</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__aggr_params__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="n">aggr_special_args</span>
+        <span class="n">update_args</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__update_params__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="n">update_special_args</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__args__</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">msg_args</span><span class="p">,</span> <span class="n">aggr_args</span><span class="p">,</span> <span class="n">update_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MessagePassing.__set_size__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__set_size__">[docs]</a>    <span class="k">def</span> <span class="nf">__set_size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">size</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">size</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dim</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">size</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">!=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dim</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Encountered node tensor with size </span><span class="si">{</span><span class="n">tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dim</span><span class="p">)</span><span class="si">}</span><span class="s2"> in dimension </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dim</span><span class="si">}</span><span class="s2">, but expected size </span><span class="si">{</span><span class="n">size</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="MessagePassing.__collect__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__collect__">[docs]</a>    <span class="k">def</span> <span class="nf">__collect__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow</span> <span class="o">==</span> <span class="s2">&quot;target_to_source&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">ij</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;_i&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;_j&quot;</span><span class="p">:</span> <span class="n">j</span><span class="p">}</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__args__</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">arg</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ij</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">ij</span><span class="p">[</span><span class="n">arg</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]]</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__set_size__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">idx</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="n">idx</span><span class="p">])</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+                    <span class="k">continue</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">__set_size__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dim</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+        <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Add special message arguments.</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;edge_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_index</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;edge_index_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;edge_index_j&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;size_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;size_j&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+        <span class="c1"># Add special aggregate arguments.</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;edge_index_i&quot;</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;dim_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;size_i&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="MessagePassing.__distribute__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__distribute__">[docs]</a>    <span class="k">def</span> <span class="nf">__distribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Required parameter </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> is empty.&quot;</span><span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">default</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="MessagePassing.propagate"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The initial call to start propagating messages.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            edge_index: the indices of a general (sparse) assignment</span>
+<span class="sd">                matrix with shape :obj:`[N, M]` (can be directed or</span>
+<span class="sd">                undirected).</span>
+<span class="sd">            size: the size :obj:`[N, M]` of the</span>
+<span class="sd">                assignment matrix. If set to :obj:`None`, the size will be</span>
+<span class="sd">                automatically inferred and assumed to be quadratic.</span>
+<span class="sd">            **kwargs: any additional data which is needed to construct and</span>
+<span class="sd">                aggregate messages, and to update node embeddings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">size</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">size</span>  <span class="c1"># type: ignore</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="p">[</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="n">size</span>  <span class="c1"># type: ignore</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="k">else</span> <span class="n">size</span>  <span class="c1"># type: ignore</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="k">else</span> <span class="n">size</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__collect__</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">msg_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__distribute__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__msg_params__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="o">**</span><span class="n">msg_kwargs</span><span class="p">)</span>
+        <span class="n">aggr_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__distribute__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__aggr_params__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">**</span><span class="n">aggr_kwargs</span><span class="p">)</span>
+
+        <span class="n">update_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__distribute__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__update_params__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">**</span><span class="n">update_kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">m</span></div>
+
+<div class="viewcode-block" id="MessagePassing.message"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.message">[docs]</a>    <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_j</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Constructs messages to node :math:`i` in analogy to</span>
+<span class="sd">        :math:`\phi_{\mathbf{\Theta}}` for each edge in</span>
+<span class="sd">        :math:`(j,i) \in \mathcal{E}` if :obj:`flow=&quot;source_to_target&quot;` and</span>
+<span class="sd">        :math:`(i,j) \in \mathcal{E}` if :obj:`flow=&quot;target_to_source&quot;`.</span>
+<span class="sd">        Can take any argument which was initially passed to :meth:`propagate`.</span>
+<span class="sd">        In addition, tensors passed to :meth:`propagate` can be mapped to the</span>
+<span class="sd">        respective nodes :math:`i` and :math:`j` by appending :obj:`_i` or</span>
+<span class="sd">        :obj:`_j` to the variable name, *.e.g.* :obj:`x_i` and :obj:`x_j`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">x_j</span></div>
+
+<div class="viewcode-block" id="MessagePassing.aggregate"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.aggregate">[docs]</a>    <span class="k">def</span> <span class="nf">aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">dim_size</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Aggregates messages from neighbors as</span>
+<span class="sd">        :math:`\square_{j \in \mathcal{N}(i)}`.</span>
+<span class="sd">        By default, delegates call to scatter functions that support</span>
+<span class="sd">        &quot;add&quot;, &quot;mean&quot; and &quot;max&quot; operations specified in :meth:`__init__` by</span>
+<span class="sd">        the :obj:`aggr` argument.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">scatter</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dim</span><span class="p">,</span> <span class="n">dim_size</span><span class="o">=</span><span class="n">dim_size</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aggr</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="MessagePassing.update"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Updates node embeddings in analogy to</span>
+<span class="sd">        :math:`\gamma_{\mathbf{\Theta}}` for each node</span>
+<span class="sd">        :math:`i \in \mathcal{V}`.</span>
+<span class="sd">        Takes in the output of aggregation as first argument and any argument</span>
+<span class="sd">        which was initially passed to :meth:`propagate`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">inputs</span></div></div>
+
+
+<span class="n">params</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">ETKDGv3</span><span class="p">()</span>
+<span class="n">params</span><span class="o">.</span><span class="n">useSmallRingTorsions</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<div class="viewcode-block" id="rdkit_conformation"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.rdkit_conformation">[docs]</a><span class="k">def</span> <span class="nf">rdkit_conformation</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">addHs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An function that finds the lowest energy conformation of a molecule.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol: RDKit molecule object.</span>
+<span class="sd">        n: Number of conformations to find.</span>
+<span class="sd">        addHs: Whether to add hydrogens to the molecule.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        RDKit molecule object with lowest energy conformation. If none, no conformation is found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">addHs</span><span class="p">:</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">confs</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">EmbedMultipleConfs</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">numConfs</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">minc</span><span class="p">,</span> <span class="n">aminc</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">confs</span><span class="p">)):</span>
+        <span class="n">mp</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">MMFFGetMoleculeProperties</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">mmffVariant</span><span class="o">=</span><span class="s2">&quot;MMFF94s&quot;</span><span class="p">)</span>
+        <span class="n">ff</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">MMFFGetMoleculeForceField</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">mp</span><span class="p">,</span> <span class="n">confId</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ff</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">CalcEnergy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">e</span> <span class="o">&lt;</span> <span class="n">minc</span><span class="p">:</span>
+            <span class="n">minc</span> <span class="o">=</span> <span class="n">e</span>
+            <span class="n">aminc</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">confs</span><span class="p">):</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">aminc</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()):</span>
+            <span class="n">pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="mol2graph"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.mol2graph">[docs]</a><span class="k">def</span> <span class="nf">mol2graph</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts a RDKit molecule to a graph.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol: RDKit molecule.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A graph with node features and edge features.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">rdkit_conformation</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">pos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;no conformations found&quot;</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+    <span class="n">type_idx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+        <span class="n">type_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">types</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()])</span>
+
+    <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>  <span class="c1"># ,edge_type = [], [], []</span>
+    <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetBonds</span><span class="p">():</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetBeginAtomIdx</span><span class="p">(),</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetEndAtomIdx</span><span class="p">()</span>
+        <span class="n">row</span> <span class="o">+=</span> <span class="p">[</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">]</span>
+        <span class="n">col</span> <span class="o">+=</span> <span class="p">[</span><span class="n">end</span><span class="p">,</span> <span class="n">start</span><span class="p">]</span>
+
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+    <span class="n">perm</span> <span class="o">=</span> <span class="p">(</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N</span> <span class="o">+</span> <span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[:,</span> <span class="n">perm</span><span class="p">]</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">type_idx</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">Data</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="Global_MP"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP">[docs]</a><span class="k">class</span> <span class="nc">Global_MP</span><span class="p">(</span><span class="n">MessagePassing</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Global message passing.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Global_MP.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initializes the global message passing.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config: configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Global_MP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dim</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">res1</span> <span class="o">=</span> <span class="n">Res</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">res2</span> <span class="o">=</span> <span class="n">Res</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">res3</span> <span class="o">=</span> <span class="n">Res</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_edge_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Global_MP.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">):</span>
+        <span class="n">edge_index</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">add_self_loops</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="n">res_h</span> <span class="o">=</span> <span class="n">h</span>
+
+        <span class="c1"># Integrate the Cross Layer Mapping inside the Global Message Passing</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_mlp</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+        <span class="c1"># Message Passing operation</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">edge_attr</span><span class="o">=</span><span class="n">edge_attr</span><span class="p">)</span>
+
+        <span class="c1"># Update function f_u</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res1</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="o">+</span> <span class="n">res_h</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res2</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res3</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+        <span class="c1"># Message Passing operation</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">edge_attr</span><span class="o">=</span><span class="n">edge_attr</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">h</span></div>
+
+<div class="viewcode-block" id="Global_MP.message"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.message">[docs]</a>    <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_i</span><span class="p">,</span> <span class="n">x_j</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">):</span>
+        <span class="n">num_edge</span> <span class="o">=</span> <span class="n">edge_attr</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">x_edge</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">x_i</span><span class="p">[:</span><span class="n">num_edge</span><span class="p">],</span> <span class="n">x_j</span><span class="p">[:</span><span class="n">num_edge</span><span class="p">],</span> <span class="n">edge_attr</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">x_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_edge_mlp</span><span class="p">(</span><span class="n">x_edge</span><span class="p">)</span>
+
+        <span class="n">x_j</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">edge_attr</span><span class="p">)</span> <span class="o">*</span> <span class="n">x_edge</span><span class="p">,</span> <span class="n">x_j</span><span class="p">[</span><span class="n">num_edge</span><span class="p">:]),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x_j</span></div>
+
+<div class="viewcode-block" id="Global_MP.update"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggr_out</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="n">aggr_out</span></div></div>
+
+
+<div class="viewcode-block" id="Local_MP"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Local_MP">[docs]</a><span class="k">class</span> <span class="nc">Local_MP</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Local message passing.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Local_MP.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Local_MP.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize local message passing.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config: configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">Local_MP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dim</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_kj</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_ji_1</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_ji_2</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_jj</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_sbf1</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_sbf2</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin_rbf1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin_rbf2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">res1</span> <span class="o">=</span> <span class="n">Res</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">res2</span> <span class="o">=</span> <span class="n">Res</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">res3</span> <span class="o">=</span> <span class="n">Res</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin_rbf_out</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_W</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Local_MP.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Local_MP.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">h</span><span class="p">,</span>
+        <span class="n">rbf</span><span class="p">,</span>
+        <span class="n">sbf1</span><span class="p">,</span>
+        <span class="n">sbf2</span><span class="p">,</span>
+        <span class="n">idx_kj</span><span class="p">,</span>
+        <span class="n">idx_ji_1</span><span class="p">,</span>
+        <span class="n">idx_jj</span><span class="p">,</span>
+        <span class="n">idx_ji_2</span><span class="p">,</span>
+        <span class="n">edge_index</span><span class="p">,</span>
+        <span class="n">num_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">res_h</span> <span class="o">=</span> <span class="n">h</span>
+
+        <span class="c1"># Integrate the Cross Layer Mapping inside the Local Message Passing</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_mlp</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+        <span class="c1"># Message Passing 1</span>
+        <span class="n">j</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">edge_index</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">h</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">rbf</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">m_kj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp_kj</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">m_kj</span> <span class="o">=</span> <span class="n">m_kj</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin_rbf1</span><span class="p">(</span><span class="n">rbf</span><span class="p">)</span>
+        <span class="n">m_kj</span> <span class="o">=</span> <span class="n">m_kj</span><span class="p">[</span><span class="n">idx_kj</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp_sbf1</span><span class="p">(</span><span class="n">sbf1</span><span class="p">)</span>
+        <span class="n">m_kj</span> <span class="o">=</span> <span class="n">scatter</span><span class="p">(</span><span class="n">m_kj</span><span class="p">,</span> <span class="n">idx_ji_1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dim_size</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">)</span>
+
+        <span class="n">m_ji_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp_ji_1</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="n">m_ji_1</span> <span class="o">+</span> <span class="n">m_kj</span>
+
+        <span class="c1"># Message Passing 2       (index jj denotes j&#39;i in the main paper)</span>
+        <span class="n">m_jj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp_jj</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">m_jj</span> <span class="o">=</span> <span class="n">m_jj</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin_rbf2</span><span class="p">(</span><span class="n">rbf</span><span class="p">)</span>
+        <span class="n">m_jj</span> <span class="o">=</span> <span class="n">m_jj</span><span class="p">[</span><span class="n">idx_jj</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp_sbf2</span><span class="p">(</span><span class="n">sbf2</span><span class="p">)</span>
+        <span class="n">m_jj</span> <span class="o">=</span> <span class="n">scatter</span><span class="p">(</span><span class="n">m_jj</span><span class="p">,</span> <span class="n">idx_ji_2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dim_size</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">)</span>
+
+        <span class="n">m_ji_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp_ji_2</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="n">m_ji_2</span> <span class="o">+</span> <span class="n">m_jj</span>
+
+        <span class="c1"># Aggregation</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin_rbf_out</span><span class="p">(</span><span class="n">rbf</span><span class="p">)</span> <span class="o">*</span> <span class="n">m</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">scatter</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dim_size</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update function f_u</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res1</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_mlp</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="o">+</span> <span class="n">res_h</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res2</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res3</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+        <span class="c1"># Output Module</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mlp</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_W</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="n">y</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

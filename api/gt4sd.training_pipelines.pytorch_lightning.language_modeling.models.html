@@ -33,6 +33,8 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -92,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
@@ -113,6 +116,7 @@
 <li class="toctree-l3"><a class="reference internal" href="gt4sd.training_pipelines.paccmann.html">gt4sd.training_pipelines.paccmann package</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="gt4sd.training_pipelines.pytorch_lightning.html">gt4sd.training_pipelines.pytorch_lightning package</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="gt4sd.training_pipelines.pytorch_lightning.core.html">gt4sd.training_pipelines.pytorch_lightning.core module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.training_pipelines.pytorch_lightning.gflownet.html">gt4sd.training_pipelines.pytorch_lightning.gflownet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="gt4sd.training_pipelines.pytorch_lightning.granular.html">gt4sd.training_pipelines.pytorch_lightning.granular package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="gt4sd.training_pipelines.pytorch_lightning.language_modeling.html">gt4sd.training_pipelines.pytorch_lightning.language_modeling package</a></li>
 </ul>
@@ -340,11 +344,6 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.__abstractmethods__">
-<code class="sig-name descname">__abstractmethods__</code><em class="property"> = frozenset({})</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.__doc__">
 <code class="sig-name descname">__doc__</code><em class="property"> = 'Pytorch lightning model for LM training.'</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.__doc__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -352,11 +351,6 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.__module__">
 <code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.training_pipelines.pytorch_lightning.language_modeling.models'</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule._abc_impl">
-<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.LMModule._abc_impl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -388,11 +382,6 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.__abstractmethods__">
-<code class="sig-name descname">__abstractmethods__</code><em class="property"> = frozenset({})</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.__doc__">
 <code class="sig-name descname">__doc__</code><em class="property"> = 'Pytorch lightning model for MLM training.'</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.__doc__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -400,11 +389,6 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.__module__">
 <code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.training_pipelines.pytorch_lightning.language_modeling.models'</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._abc_impl">
-<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._abc_impl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -430,33 +414,16 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.use_amp">
 <code class="sig-name descname">use_amp</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.use_amp" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if using amp</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.precision">
 <code class="sig-name descname">precision</code><em class="property">: int</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.precision" title="Permalink to this definition">¶</a></dt>
-<dd><p>The precision used</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._results">
-<code class="sig-name descname">_results</code><em class="property">: Optional<span class="p">[</span>Result<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._results" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._current_fx_name">
-<code class="sig-name descname">_current_fx_name</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._current_fx_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._running_manual_backward">
-<code class="sig-name descname">_running_manual_backward</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._running_manual_backward" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._current_hook_fx_name">
-<code class="sig-name descname">_current_hook_fx_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._current_hook_fx_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_current_fx_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._current_fx_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -472,6 +439,31 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._truncated_bptt_steps">
 <code class="sig-name descname">_truncated_bptt_steps</code><em class="property">: int</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._truncated_bptt_steps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._metric_attributes">
+<code class="sig-name descname">_metric_attributes</code><em class="property">: Optional<span class="p">[</span>Dict<span class="p">[</span>int<span class="p">, </span>str<span class="p">]</span><span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._metric_attributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._should_prevent_trainer_and_dataloaders_deepcopy">
+<code class="sig-name descname">_should_prevent_trainer_and_dataloaders_deepcopy</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._should_prevent_trainer_and_dataloaders_deepcopy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._dtype">
+<code class="sig-name descname">_dtype</code><em class="property">: Union<span class="p">[</span>str<span class="p">, </span>torch.dtype<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule._dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.prepare_data_per_node">
+<code class="sig-name descname">prepare_data_per_node</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.prepare_data_per_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.allow_zero_length_dataloader_with_multiple_devices">
+<code class="sig-name descname">allow_zero_length_dataloader_with_multiple_devices</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.MLMModule.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -543,11 +535,6 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.__abstractmethods__">
-<code class="sig-name descname">__abstractmethods__</code><em class="property"> = frozenset({})</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.__doc__">
 <code class="sig-name descname">__doc__</code><em class="property"> = 'Pytorch lightning model for conditional generation training.'</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.__doc__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -555,11 +542,6 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.__module__">
 <code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.training_pipelines.pytorch_lightning.language_modeling.models'</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._abc_impl">
-<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._abc_impl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -585,33 +567,16 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.use_amp">
 <code class="sig-name descname">use_amp</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.use_amp" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if using amp</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.precision">
 <code class="sig-name descname">precision</code><em class="property">: int</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.precision" title="Permalink to this definition">¶</a></dt>
-<dd><p>The precision used</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._results">
-<code class="sig-name descname">_results</code><em class="property">: Optional<span class="p">[</span>Result<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._results" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._current_fx_name">
-<code class="sig-name descname">_current_fx_name</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._current_fx_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._running_manual_backward">
-<code class="sig-name descname">_running_manual_backward</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._running_manual_backward" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._current_hook_fx_name">
-<code class="sig-name descname">_current_hook_fx_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._current_hook_fx_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_current_fx_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._current_fx_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -627,6 +592,31 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._truncated_bptt_steps">
 <code class="sig-name descname">_truncated_bptt_steps</code><em class="property">: int</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._truncated_bptt_steps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._metric_attributes">
+<code class="sig-name descname">_metric_attributes</code><em class="property">: Optional<span class="p">[</span>Dict<span class="p">[</span>int<span class="p">, </span>str<span class="p">]</span><span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._metric_attributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._should_prevent_trainer_and_dataloaders_deepcopy">
+<code class="sig-name descname">_should_prevent_trainer_and_dataloaders_deepcopy</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._should_prevent_trainer_and_dataloaders_deepcopy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._dtype">
+<code class="sig-name descname">_dtype</code><em class="property">: Union<span class="p">[</span>str<span class="p">, </span>torch.dtype<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule._dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.prepare_data_per_node">
+<code class="sig-name descname">prepare_data_per_node</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.prepare_data_per_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.allow_zero_length_dataloader_with_multiple_devices">
+<code class="sig-name descname">allow_zero_length_dataloader_with_multiple_devices</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CGMModule.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -698,11 +688,6 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.__abstractmethods__">
-<code class="sig-name descname">__abstractmethods__</code><em class="property"> = frozenset({})</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.__doc__">
 <code class="sig-name descname">__doc__</code><em class="property"> = 'Pytorch lightning model for CLM training.'</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.__doc__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -710,11 +695,6 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.__module__">
 <code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.training_pipelines.pytorch_lightning.language_modeling.models'</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._abc_impl">
-<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._abc_impl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -740,33 +720,16 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.use_amp">
 <code class="sig-name descname">use_amp</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.use_amp" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if using amp</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.precision">
 <code class="sig-name descname">precision</code><em class="property">: int</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.precision" title="Permalink to this definition">¶</a></dt>
-<dd><p>The precision used</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._results">
-<code class="sig-name descname">_results</code><em class="property">: Optional<span class="p">[</span>Result<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._results" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._current_fx_name">
-<code class="sig-name descname">_current_fx_name</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._current_fx_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._running_manual_backward">
-<code class="sig-name descname">_running_manual_backward</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._running_manual_backward" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._current_hook_fx_name">
-<code class="sig-name descname">_current_hook_fx_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._current_hook_fx_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_current_fx_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._current_fx_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -782,6 +745,31 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._truncated_bptt_steps">
 <code class="sig-name descname">_truncated_bptt_steps</code><em class="property">: int</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._truncated_bptt_steps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._metric_attributes">
+<code class="sig-name descname">_metric_attributes</code><em class="property">: Optional<span class="p">[</span>Dict<span class="p">[</span>int<span class="p">, </span>str<span class="p">]</span><span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._metric_attributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._should_prevent_trainer_and_dataloaders_deepcopy">
+<code class="sig-name descname">_should_prevent_trainer_and_dataloaders_deepcopy</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._should_prevent_trainer_and_dataloaders_deepcopy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._dtype">
+<code class="sig-name descname">_dtype</code><em class="property">: Union<span class="p">[</span>str<span class="p">, </span>torch.dtype<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule._dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.prepare_data_per_node">
+<code class="sig-name descname">prepare_data_per_node</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.prepare_data_per_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.allow_zero_length_dataloader_with_multiple_devices">
+<code class="sig-name descname">allow_zero_length_dataloader_with_multiple_devices</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.CLMModule.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -853,11 +841,6 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.__abstractmethods__">
-<code class="sig-name descname">__abstractmethods__</code><em class="property"> = frozenset({})</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.__doc__">
 <code class="sig-name descname">__doc__</code><em class="property"> = 'Pytorch lightning model for PLM training.'</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.__doc__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -865,11 +848,6 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.__module__">
 <code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.training_pipelines.pytorch_lightning.language_modeling.models'</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._abc_impl">
-<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._abc_impl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -895,33 +873,16 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.use_amp">
 <code class="sig-name descname">use_amp</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.use_amp" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if using amp</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.precision">
 <code class="sig-name descname">precision</code><em class="property">: int</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.precision" title="Permalink to this definition">¶</a></dt>
-<dd><p>The precision used</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._results">
-<code class="sig-name descname">_results</code><em class="property">: Optional<span class="p">[</span>Result<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._results" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._current_fx_name">
-<code class="sig-name descname">_current_fx_name</code><em class="property">: str</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._current_fx_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._running_manual_backward">
-<code class="sig-name descname">_running_manual_backward</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._running_manual_backward" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._current_hook_fx_name">
-<code class="sig-name descname">_current_hook_fx_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._current_hook_fx_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_current_fx_name</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._current_fx_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -937,6 +898,31 @@
 <dl class="py attribute">
 <dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._truncated_bptt_steps">
 <code class="sig-name descname">_truncated_bptt_steps</code><em class="property">: int</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._truncated_bptt_steps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._metric_attributes">
+<code class="sig-name descname">_metric_attributes</code><em class="property">: Optional<span class="p">[</span>Dict<span class="p">[</span>int<span class="p">, </span>str<span class="p">]</span><span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._metric_attributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._should_prevent_trainer_and_dataloaders_deepcopy">
+<code class="sig-name descname">_should_prevent_trainer_and_dataloaders_deepcopy</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._should_prevent_trainer_and_dataloaders_deepcopy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._dtype">
+<code class="sig-name descname">_dtype</code><em class="property">: Union<span class="p">[</span>str<span class="p">, </span>torch.dtype<span class="p">]</span></em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule._dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.prepare_data_per_node">
+<code class="sig-name descname">prepare_data_per_node</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.prepare_data_per_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.allow_zero_length_dataloader_with_multiple_devices">
+<code class="sig-name descname">allow_zero_length_dataloader_with_multiple_devices</code><em class="property">: bool</em><a class="headerlink" href="#gt4sd.training_pipelines.pytorch_lightning.language_modeling.models.PLMModule.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

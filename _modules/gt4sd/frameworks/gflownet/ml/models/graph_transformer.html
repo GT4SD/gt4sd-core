@@ -1,0 +1,432 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.gflownet.ml.models.graph_transformer &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../../_static/jquery.js"></script>
+        <script src="../../../../../../_static/underscore.js"></script>
+        <script src="../../../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.gflownet.ml.models.graph_transformer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.gflownet.ml.models.graph_transformer</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch_geometric.data</span> <span class="k">as</span> <span class="nn">gd</span>
+<span class="kn">import</span> <span class="nn">torch_geometric.nn</span> <span class="k">as</span> <span class="nn">gnn</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span class="n">add_self_loops</span>
+
+<span class="kn">from</span> <span class="nn">...envs.graph_building_env</span> <span class="kn">import</span> <span class="n">GraphActionCategorical</span><span class="p">,</span> <span class="n">GraphBuildingEnvContext</span>
+
+
+<div class="viewcode-block" id="mlp"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.graph_transformer.html#gt4sd.frameworks.gflownet.ml.models.graph_transformer.mlp">[docs]</a><span class="k">def</span> <span class="nf">mlp</span><span class="p">(</span><span class="n">n_in</span><span class="p">,</span> <span class="n">n_hid</span><span class="p">,</span> <span class="n">n_out</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_in</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">n_hid</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_layer</span> <span class="o">+</span> <span class="p">[</span><span class="n">n_out</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+        <span class="o">*</span><span class="nb">sum</span><span class="p">([[</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">n</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">act</span><span class="p">()]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_layer</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span> <span class="p">[])[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GraphTransformer"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.graph_transformer.html#gt4sd.frameworks.gflownet.ml.models.graph_transformer.GraphTransformer">[docs]</a><span class="k">class</span> <span class="nc">GraphTransformer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;GraphTransformer.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GraphTransformer.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.graph_transformer.html#gt4sd.frameworks.gflownet.ml.models.graph_transformer.GraphTransformer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">GraphBuildingEnvContext</span><span class="p">,</span>
+        <span class="n">x_dim</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">e_dim</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">g_dim</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">num_emb</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">num_layers</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">num_heads</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Construct GraphTransformer.</span>
+
+<span class="sd">        Code adapted from: https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/models.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: model configuration.</span>
+<span class="sd">            context: context environment.</span>
+<span class="sd">            x_dim: dimension of input node features.</span>
+<span class="sd">            e_dim: dimension of input edge features.</span>
+<span class="sd">            g_dim: dimension of input graph features.</span>
+<span class="sd">            num_emb: dimension of embedding layer.</span>
+<span class="sd">            num_layers: number of layers in the graph transformer.</span>
+<span class="sd">            num_heads: number of heads in the graph transformer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">=</span> <span class="n">num_layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;graph_transformer&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x2h</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e2h</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span><span class="n">e_dim</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c2h</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span><span class="n">g_dim</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph2emb</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="nb">sum</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">[</span>
+                        <span class="n">gnn</span><span class="o">.</span><span class="n">GENConv</span><span class="p">(</span>
+                            <span class="n">num_emb</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">aggr</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">None</span>
+                        <span class="p">),</span>
+                        <span class="n">gnn</span><span class="o">.</span><span class="n">TransformerConv</span><span class="p">(</span>
+                            <span class="n">num_emb</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="n">edge_dim</span><span class="o">=</span><span class="n">num_emb</span><span class="p">,</span> <span class="n">heads</span><span class="o">=</span><span class="n">num_heads</span>
+                        <span class="p">),</span>
+                        <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_heads</span> <span class="o">*</span> <span class="n">num_emb</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">),</span>
+                        <span class="n">gnn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">num_emb</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                        <span class="n">mlp</span><span class="p">(</span><span class="n">num_emb</span><span class="p">,</span> <span class="n">num_emb</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="n">gnn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">num_emb</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                    <span class="p">]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">)</span>
+                <span class="p">],</span>
+                <span class="p">[],</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GraphTransformer.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.graph_transformer.html#gt4sd.frameworks.gflownet.ml.models.graph_transformer.GraphTransformer.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">Batch</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Forward pass.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: graph data.</span>
+<span class="sd">            cond: conditioning.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            embeddings and pooled features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x2h</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">e2h</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">edge_attr</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2h</span><span class="p">(</span><span class="n">cond</span><span class="p">)</span>
+        <span class="n">num_total_nodes</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Augment the edges with a new edge to the conditioning</span>
+        <span class="c1"># information node. This new node is connected to every node</span>
+        <span class="c1"># within its graph.</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_total_nodes</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">o</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">g</span><span class="o">.</span><span class="n">batch</span> <span class="o">+</span> <span class="n">num_total_nodes</span>
+        <span class="n">aug_edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">])],</span> <span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="n">e_p</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_total_nodes</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">device</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">e_p</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Manually create a bias term</span>
+        <span class="n">aug_e</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">e</span><span class="p">,</span> <span class="n">e_p</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">aug_edge_index</span><span class="p">,</span> <span class="n">aug_e</span> <span class="o">=</span> <span class="n">add_self_loops</span><span class="p">(</span><span class="n">aug_edge_index</span><span class="p">,</span> <span class="n">aug_e</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+        <span class="n">aug_batch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">g</span><span class="o">.</span><span class="n">batch</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">o</span><span class="o">.</span><span class="n">device</span><span class="p">)],</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Append the conditioning information node embedding to o</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">o</span><span class="p">,</span> <span class="n">c</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">):</span>
+            <span class="c1"># Run the graph transformer forward</span>
+            <span class="n">gen</span><span class="p">,</span> <span class="n">trans</span><span class="p">,</span> <span class="n">linear</span><span class="p">,</span> <span class="n">norm1</span><span class="p">,</span> <span class="n">ff</span><span class="p">,</span> <span class="n">norm2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph2emb</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">6</span> <span class="p">:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">6</span><span class="p">]</span>
+            <span class="n">agg</span> <span class="o">=</span> <span class="n">gen</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">aug_edge_index</span><span class="p">,</span> <span class="n">aug_e</span><span class="p">)</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">norm1</span><span class="p">(</span>
+                <span class="n">o</span> <span class="o">+</span> <span class="n">linear</span><span class="p">(</span><span class="n">trans</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">o</span><span class="p">,</span> <span class="n">agg</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">aug_edge_index</span><span class="p">,</span> <span class="n">aug_e</span><span class="p">)),</span>
+                <span class="n">aug_batch</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">norm2</span><span class="p">(</span><span class="n">o</span> <span class="o">+</span> <span class="n">ff</span><span class="p">(</span><span class="n">o</span><span class="p">),</span> <span class="n">aug_batch</span><span class="p">)</span>
+
+        <span class="n">glob</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">gnn</span><span class="o">.</span><span class="n">global_mean_pool</span><span class="p">(</span><span class="n">o</span><span class="p">[:</span> <span class="o">-</span><span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">g</span><span class="o">.</span><span class="n">batch</span><span class="p">),</span> <span class="n">o</span><span class="p">[</span><span class="o">-</span><span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:],</span> <span class="n">c</span><span class="p">],</span> <span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="n">o_final</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">o</span><span class="p">[:</span> <span class="o">-</span><span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">c</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">batch</span><span class="p">]],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">o_final</span><span class="p">,</span> <span class="n">glob</span></div></div>
+
+
+<div class="viewcode-block" id="GraphTransformerGFN"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.graph_transformer.html#gt4sd.frameworks.gflownet.ml.models.graph_transformer.GraphTransformerGFN">[docs]</a><span class="k">class</span> <span class="nc">GraphTransformerGFN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;GraphTransformerGFN.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GraphTransformerGFN.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.graph_transformer.html#gt4sd.frameworks.gflownet.ml.models.graph_transformer.GraphTransformerGFN.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">GraphBuildingEnvContext</span><span class="p">,</span>
+        <span class="n">num_emb</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">num_layers</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">num_heads</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Construct GraphTransformerGFN.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: model configuration.</span>
+<span class="sd">            context: context environment.</span>
+<span class="sd">            num_emb: dimension of embedding layer.</span>
+<span class="sd">            num_layers: number of layers in the graph transformer.</span>
+<span class="sd">            num_heads: number of heads in the graph transformer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;graph_transformer_gfn&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transf</span> <span class="o">=</span> <span class="n">GraphTransformer</span><span class="p">(</span>
+            <span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
+            <span class="n">x_dim</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">num_node_dim</span><span class="p">,</span>
+            <span class="n">e_dim</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">num_edge_dim</span><span class="p">,</span>
+            <span class="n">g_dim</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">num_cond_dim</span><span class="p">,</span>
+            <span class="n">num_emb</span><span class="o">=</span><span class="n">num_emb</span><span class="p">,</span>
+            <span class="n">num_layers</span><span class="o">=</span><span class="n">num_layers</span><span class="p">,</span>
+            <span class="n">num_heads</span><span class="o">=</span><span class="n">num_heads</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">num_final</span> <span class="o">=</span> <span class="n">num_emb</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="n">num_mlp_layers</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emb2add_edge</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span><span class="n">num_final</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_mlp_layers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emb2add_node</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span>
+            <span class="n">num_final</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">num_new_node_values</span><span class="p">,</span> <span class="n">num_mlp_layers</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emb2set_node_attr</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span>
+            <span class="n">num_final</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">num_node_attr_logits</span><span class="p">,</span> <span class="n">num_mlp_layers</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emb2set_edge_attr</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span>
+            <span class="n">num_final</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">num_edge_attr_logits</span><span class="p">,</span> <span class="n">num_mlp_layers</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emb2stop</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span><span class="n">num_emb</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_mlp_layers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emb2reward</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span><span class="n">num_emb</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="n">num_emb</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_mlp_layers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_z</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">num_cond_dim</span><span class="p">,</span> <span class="n">num_emb</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_type_order</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">action_type_order</span></div>
+
+<div class="viewcode-block" id="GraphTransformerGFN.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.graph_transformer.html#gt4sd.frameworks.gflownet.ml.models.graph_transformer.GraphTransformerGFN.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">Batch</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Forward pass. Given a graph and a conditioning, return the action logits and rewards.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g: graph data.</span>
+<span class="sd">            cond: conditioning.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            categorical action and rewards.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">node_embeddings</span><span class="p">,</span> <span class="n">graph_embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transf</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">cond</span><span class="p">)</span>
+        <span class="n">ne_row</span><span class="p">,</span> <span class="n">ne_col</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">non_edge_index</span>
+        <span class="c1"># On `::2`, edges are duplicated to make graphs undirected, only take the even ones</span>
+        <span class="n">e_row</span><span class="p">,</span> <span class="n">e_col</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edge_index</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="n">GraphActionCategorical</span><span class="p">(</span>
+            <span class="n">g</span><span class="p">,</span>
+            <span class="n">logits</span><span class="o">=</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">emb2stop</span><span class="p">(</span><span class="n">graph_embeddings</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">emb2add_node</span><span class="p">(</span><span class="n">node_embeddings</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">emb2set_node_attr</span><span class="p">(</span><span class="n">node_embeddings</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">emb2add_edge</span><span class="p">(</span><span class="n">node_embeddings</span><span class="p">[</span><span class="n">ne_row</span><span class="p">]</span> <span class="o">+</span> <span class="n">node_embeddings</span><span class="p">[</span><span class="n">ne_col</span><span class="p">]),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">emb2set_edge_attr</span><span class="p">(</span><span class="n">node_embeddings</span><span class="p">[</span><span class="n">e_row</span><span class="p">]</span> <span class="o">+</span> <span class="n">node_embeddings</span><span class="p">[</span><span class="n">e_col</span><span class="p">]),</span>
+            <span class="p">],</span>
+            <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;non_edge_index&quot;</span><span class="p">,</span> <span class="s2">&quot;edge_index&quot;</span><span class="p">],</span>
+            <span class="n">types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_type_order</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">cat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">emb2reward</span><span class="p">(</span><span class="n">graph_embeddings</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,575 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.gflownet.dataloader.dataset module &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gt4sd.frameworks.gflownet.dataloader.sampler module" href="gt4sd.frameworks.gflownet.dataloader.sampler.html" />
+    <link rel="prev" title="gt4sd.frameworks.gflownet.dataloader.data_module module" href="gt4sd.frameworks.gflownet.dataloader.data_module.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="gt4sd.html">API of the gt4sd package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.configuration.html">gt4sd.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.conftest.html">gt4sd.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.exceptions.html">gt4sd.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.s3.html">gt4sd.s3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.algorithms.html">gt4sd.algorithms package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.cli.html">gt4sd.cli package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.domains.html">gt4sd.domains package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.extras.html">gt4sd.extras package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="gt4sd.frameworks.html">gt4sd.frameworks package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.enzeptional.html">gt4sd.frameworks.enzeptional package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="gt4sd.frameworks.gflownet.html">gt4sd.frameworks.gflownet package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.util.html">gt4sd.frameworks.gflownet.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.arg_parser.html">gt4sd.frameworks.gflownet.arg_parser package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="gt4sd.frameworks.gflownet.dataloader.html">gt4sd.frameworks.gflownet.dataloader package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.envs.html">gt4sd.frameworks.gflownet.envs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.loss.html">gt4sd.frameworks.gflownet.loss package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.ml.html">gt4sd.frameworks.gflownet.ml package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.tests.html">gt4sd.frameworks.gflownet.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gt4sd.frameworks.gflownet.train.html">gt4sd.frameworks.gflownet.train package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.granular.html">gt4sd.frameworks.granular package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gt4sd.frameworks.torch.html">gt4sd.frameworks.torch package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.properties.html">gt4sd.properties package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.tests.html">gt4sd.tests package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gt4sd.training_pipelines.html">gt4sd.training_pipelines package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="gt4sd.html">gt4sd package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.html">gt4sd.frameworks package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.gflownet.html">gt4sd.frameworks.gflownet package</a> &raquo;</li>
+        
+          <li><a href="gt4sd.frameworks.gflownet.dataloader.html">gt4sd.frameworks.gflownet.dataloader package</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.gflownet.dataloader.dataset module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/gt4sd.frameworks.gflownet.dataloader.dataset.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-gt4sd.frameworks.gflownet.dataloader.dataset">
+<span id="gt4sd-frameworks-gflownet-dataloader-dataset-module"></span><h1>gt4sd.frameworks.gflownet.dataloader.dataset module<a class="headerlink" href="#module-gt4sd.frameworks.gflownet.dataloader.dataset" title="Permalink to this headline">¶</a></h1>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset" title="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GFlowNetDataset</span></code></a></p></td>
+<td><p>A dataset for gflownet.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask" title="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GFlowNetTask</span></code></a></p></td>
+<td><p>A task for gflownet.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset">
+<em class="property">class </em><code class="sig-name descname">GFlowNetDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">h5_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">target</span><span class="o">=</span><span class="default_value">'gap'</span></em>, <em class="sig-param"><span class="n">properties</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.dataset.T_co</span></code>]</p>
+<p>A dataset for gflownet.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">h5_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">target</span><span class="o">=</span><span class="default_value">'gap'</span></em>, <em class="sig-param"><span class="n">properties</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a gflownet dataset.
+If the dataset is in a format compatible with h5 file, we can directly load it.
+If the dataset is in a format compatible with xyz file, we have to convert it to h5 file.</p>
+<p>Code adapted from: <a class="reference external" href="https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data">https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/data</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h5_file</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – data file in h5 format.</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – reward target.</p></li>
+<li><p><strong>properties</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – relevant properties for the task.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if the dataset is not in a format compatible with h5 file or not present.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.set_indexes">
+<code class="sig-name descname">set_indexes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ixs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetDataset.set_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.set_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the indexes of the dataset split (train/val/test).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ixs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – indexes of the dataset split.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.get_len">
+<code class="sig-name descname">get_len</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetDataset.get_len"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.get_len" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the length of the full dataset (before splitting).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the length of the full dataset.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>len</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.get_stats">
+<code class="sig-name descname">get_stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">percentile</span><span class="o">=</span><span class="default_value">0.95</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetDataset.get_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.get_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the stats of the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>percentile</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – percentile.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>min, max, percentile.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.convert_xyz_to_h5">
+<em class="property">static </em><code class="sig-name descname">convert_xyz_to_h5</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xyz_path</span><span class="o">=</span><span class="default_value">'data/xyz'</span></em>, <em class="sig-param"><span class="n">h5_path</span><span class="o">=</span><span class="default_value">'data/qm9.h5'</span></em>, <em class="sig-param"><span class="n">property_names</span><span class="o">=</span><span class="default_value">['rA', 'rB', 'rC', 'mu', 'alpha', 'homo', 'lumo', 'gap', 'r2', 'zpve', 'U0', 'U', 'H', 'G', 'Cv']</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetDataset.convert_xyz_to_h5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.convert_xyz_to_h5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the data from xyz to h5. Assumes that the xyz files are extracted in the xyz_path folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xyz_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the xyz file in input.</p></li>
+<li><p><strong>h5_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the h5 file in output.</p></li>
+<li><p><strong>property_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – names of the properties we want to use/overwrite.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset._read_xyz">
+<em class="property">static </em><code class="sig-name descname">_read_xyz</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetDataset._read_xyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset._read_xyz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the xyz files in the directory on ‘path’.</p>
+<p>Code adapted from: <a class="reference external" href="https://www.kaggle.com/code/rmonge/predicting-molecule-properties-based-on-its-smiles/notebook">https://www.kaggle.com/code/rmonge/predicting-molecule-properties-based-on-its-smiles/notebook</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the path to the folder.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list with the characters representing the atoms of a molecule.
+coordinates: list with the cartesian coordinates of each atom.
+smile: list with the SMILE representation of a molecule.
+prop: list with the scalar properties.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>atoms</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__len__">
+<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetDataset.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset split (train/val/test) length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>length of the dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetDataset.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve an item from the dataset by index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>index</strong> – index for the item.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>an tuple (item, reward).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'A dataset for gflownet.'</em><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.gflownet.dataloader.dataset'</em><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__parameters__">
+<code class="sig-name descname">__parameters__</code><em class="property"> = ()</em><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset.__parameters__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask">
+<em class="property">class </em><code class="sig-name descname">GFlowNetTask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configuration</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">reward_model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wrap_model</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A task for gflownet.</p>
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configuration</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">reward_model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wrap_model</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetTask.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a generic gflownet task.
+The task specifies the reward model for the trajectory.
+We consider the task as part of the dataset.</p>
+<p>Code adapted from: <a class="reference external" href="https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/tasks">https://github.com/recursionpharma/gflownet/tree/trunk/src/gflownet/tasks</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>configuration</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – a dictionary with the task configuration.</p></li>
+<li><p><strong>dataset</strong> (<a class="reference internal" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset" title="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GFlowNetDataset</span></code></a>) – a dataset instance.</p></li>
+<li><p><strong>reward_model</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>]) – The model that is used to generate the conditional reward.</p></li>
+<li><p><strong>wrap_model</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>]]) – a wrapper function that is applied to the model.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.load_task_models">
+<code class="sig-name descname">load_task_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetTask.load_task_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.load_task_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the task models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a dictionary with the task models.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.sample_conditional_information">
+<code class="sig-name descname">sample_conditional_information</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetTask.sample_conditional_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.sample_conditional_information" title="Permalink to this definition">¶</a></dt>
+<dd><p>Samples conditional information for a minibatch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of samples.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a dictionary with the sampled conditional information.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>cond_info</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.cond_info_to_reward">
+<code class="sig-name descname">cond_info_to_reward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cond_info</span></em>, <em class="sig-param"><span class="n">flat_reward</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetTask.cond_info_to_reward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.cond_info_to_reward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combines a minibatch of reward signal vectors and conditional information into a scalar reward.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cond_info</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – a dictionary with various conditional informations (e.g. temperature).</p></li>
+<li><p><strong>flat_reward</strong> (<code class="xref py py-func docutils literal notranslate"><span class="pre">NewType()</span></code>(<code class="xref py py-data docutils literal notranslate"><span class="pre">FlatRewards</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">tensor</span></code>)) – a 2d tensor where each row represents a series of flat rewards.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a 1d tensor, a scalar reward for each minibatch entry.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>reward</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.compute_flat_rewards">
+<code class="sig-name descname">compute_flat_rewards</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetTask.compute_flat_rewards"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.compute_flat_rewards" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the flat rewards of mols according the the tasks’ proxies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mols</strong> – a list of RDKit molecules.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a 1d tensor, a scalar reward for each molecule.
+is_valid: a 1d tensor, a boolean indicating whether the molecule is valid.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>reward</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.flat_reward_transform">
+<code class="sig-name descname">flat_reward_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetTask.flat_reward_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.flat_reward_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms a reward with a generic structure to a flat vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>y</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>]) – scalar reward for a trajectory.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-func docutils literal notranslate"><span class="pre">NewType()</span></code>(<code class="xref py py-data docutils literal notranslate"><span class="pre">FlatRewards</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">tensor</span></code>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.frameworks.gflownet.dataloader.dataset', '__doc__': 'A task for gflownet.', '__init__': &lt;function GFlowNetTask.__init__&gt;, 'load_task_models': &lt;function GFlowNetTask.load_task_models&gt;, 'sample_conditional_information': &lt;function GFlowNetTask.sample_conditional_information&gt;, 'cond_info_to_reward': &lt;function GFlowNetTask.cond_info_to_reward&gt;, 'compute_flat_rewards': &lt;function GFlowNetTask.compute_flat_rewards&gt;, 'flat_reward_transform': &lt;function GFlowNetTask.flat_reward_transform&gt;, '_wrap_model_mp': &lt;function GFlowNetTask._wrap_model_mp&gt;, '__dict__': &lt;attribute '__dict__' of 'GFlowNetTask' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'GFlowNetTask' objects&gt;, '__annotations__': {}})</em><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'A task for gflownet.'</em><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'gt4sd.frameworks.gflownet.dataloader.dataset'</em><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask._wrap_model_mp">
+<code class="sig-name descname">_wrap_model_mp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/dataloader/dataset.html#GFlowNetTask._wrap_model_mp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.dataloader.dataset.GFlowNetTask._wrap_model_mp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a nn.Module instance so that it can be shared to <cite>DataLoader</cite> workers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>) – a nn.Module instance.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>, <a class="reference internal" href="gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder" title="gt4sd.frameworks.gflownet.util.MPModelPlaceholder"><code class="xref py py-class docutils literal notranslate"><span class="pre">MPModelPlaceholder</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gt4sd.frameworks.gflownet.dataloader.sampler.html" class="btn btn-neutral float-right" title="gt4sd.frameworks.gflownet.dataloader.sampler module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gt4sd.frameworks.gflownet.dataloader.data_module.html" class="btn btn-neutral float-left" title="gt4sd.frameworks.gflownet.dataloader.data_module module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
