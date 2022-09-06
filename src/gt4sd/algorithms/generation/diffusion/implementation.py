@@ -29,7 +29,7 @@ Parts of the implementation inspired by: https://github.com/huggingface/diffuser
 
 import logging
 import os
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 import numpy as np
 import torch
@@ -143,25 +143,29 @@ class Generator:
         else:
             model_name_or_path = self.model_name
 
-        self.model = model_class.from_pretrained(model_name_or_path)
+        if self.model_type == "stable_diffusion":
+            self.model = model_class.from_pretrained(
+                model_name_or_path,
+                use_auth_token="your_auth_token",
+            )
+        else:
+            self.model = model_class.from_pretrained(model_name_or_path)
         self.model.to(self.device)
 
-    def sample(self) -> List[str]:
-        """Sample text snippets.
-
-        Returns:
-            generated text snippets.
-        """
-
-        return self.model()["sample"]
-
-    def conditional_sample(self, prompt: Union[str, List[str]]) -> List[str]:
-        """Sample text snippets.
+    def sample(
+        self, batch_size: int = 1, prompt: Union[str, List[str]] = None
+    ) -> List[Any]:
+        """Sample images with optional conditioning.
 
         Args:
-            prompt: text to condition the model on.
+            batch_size: number of images to generate.
+            prompt: text to use as prompt.
         Returns:
-            generated text snippets.
+            generated samples.
         """
-
-        return self.model(prompt)["sample"]
+        if prompt:
+            images = self.model(batch_size=batch_size, prompt=prompt)
+        else:
+            images = self.model(batch_size=batch_size)
+        images = images["sample"]
+        return images

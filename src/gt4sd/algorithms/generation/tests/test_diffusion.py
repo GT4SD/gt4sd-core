@@ -25,6 +25,7 @@
 
 from typing import ClassVar, Type
 
+import PIL
 import pytest
 
 from gt4sd.algorithms.core import AlgorithmConfiguration
@@ -172,9 +173,10 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
     ],
 )
 def test_generation_via_import(config, algorithm):
-    algorithm = algorithm(configuration=config())
-    items = list(algorithm.sample(1))
-    assert len(items) == 1
+    configuration = config()
+    algorithm = algorithm(configuration=configuration)
+    sample = algorithm.generator()[0]
+    assert isinstance(sample, PIL.Image)
 
 
 @pytest.mark.parametrize(
@@ -233,5 +235,5 @@ def test_generation_via_registry(
         algorithm_name=algorithm_name,
         algorithm_application=algorithm_application,
     )
-    items = list(algorithm.sample(1))
-    assert len(items) == 1
+    sample = algorithm.generator()[0] # type:ignore
+    assert isinstance(sample, PIL.Image)

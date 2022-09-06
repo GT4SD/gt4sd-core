@@ -187,7 +187,7 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
 class DDPMGenerator(DiffusersConfiguration):
     """DDPM - Configuration to generate using unconditional denoising diffusion models."""
 
-    algorithm_version: str = "google/ddpm-celebahq-256"
+    algorithm_version: str = "google/ddpm-cifar10-32"
     model_type: str = "diffusion"
     scheduler_type: str = "ddpm"
     modality: str = "image"
@@ -215,7 +215,7 @@ class DDPMGenerator(DiffusersConfiguration):
 class DDIMGenerator(DiffusersConfiguration):
     """DDIM - Configuration to generate using a denoising diffusion implicit model."""
 
-    algorithm_version: str = "google/ddim-celebahq-256"
+    algorithm_version: str = "dboshardy/ddim-butterflies-128"
     model_type: str = "diffusion_implicit"
     scheduler_type: str = "ddim"
     modality: str = "image"
@@ -243,7 +243,7 @@ class DDIMGenerator(DiffusersConfiguration):
 class LDMGenerator(DiffusersConfiguration):
     """Unconditional Latent Diffusion Model - Configuration to generate using a latent diffusion model."""
 
-    algorithm_version: str = ""
+    algorithm_version: str = "CompVis/ldm-celebahq-256"
     model_type: str = "latent_diffusion"
     scheduler_type: str = "discrete"
     modality: str = "image"
@@ -271,7 +271,7 @@ class LDMGenerator(DiffusersConfiguration):
 class ScoreSdeGenerator(DiffusersConfiguration):
     """Score SDE Generative Model - Configuration to generate using a score-based diffusion generative model."""
 
-    algorithm_version: str = ""
+    algorithm_version: str = "google/ncsnpp-celebahq-256"
     model_type: str = "score_sde"
     scheduler_type: str = "continuous"
     modality: str = "image"
@@ -325,9 +325,11 @@ class LDMTextToImageGenerator(DiffusersConfiguration):
 
 @ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
 class StableDiffusionGenerator(DiffusersConfiguration):
-    """Stable Diffusion Model - Configuration for conditional text2image generation using a stable diffusion model."""
+    """Stable Diffusion Model - Configuration for conditional text2image generation using a stable diffusion model.
+    You have to provide authentication credentials to use this model.
+    """
 
-    algorithm_version: str = "CompVis/stable-diffusion-v1-3"
+    algorithm_version: str = "CompVis/stable-diffusion-v1-4"
     model_type: str = "stable_diffusion"
     scheduler_type: str = "discrete"
     modality: str = "token2image"

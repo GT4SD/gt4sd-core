@@ -326,9 +326,7 @@ class DiffusionDataArguments(TrainingPipelineArguments):
     num_epochs: int = field(default=100, metadata={"help": "Number of epochs."})
 
 
-dataclass
-
-
+@dataclass
 class DiffusionModelArguments(TrainingPipelineArguments):
     """Saving arguments related to Diffusion model."""
 
