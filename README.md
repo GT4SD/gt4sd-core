@@ -209,6 +209,7 @@ The trainer currently supports the following training pipelines:
 - `torchdrug-gcpn-trainer`: TorchDrug Graph Convolutional Policy Network model.
 - `torchdrug-graphaf-trainer`: TorchDrug autoregressive GraphAF model.
 - `diffusion-trainer`: Diffusers model.
+- `gflownet-trainer`: GFlowNet model.
 
 ```console
 $ gt4sd-trainer --help
@@ -336,6 +337,7 @@ Beyond implementing various generative modeling inference and training pipelines
 - [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as training pipelines for the generative VAEs.
 - [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from [HuggingFace Models](https://huggingface.co/models)
 - [diffusers](https://github.com/huggingface/diffusers): training and inference pipelines for generative models from [Diffusers Models](https://github.com/huggingface/diffusers)
+- [GFlowNets](https://github.com/recursionpharma/gflownet): training and inference pipeline for [Generative Flow Networks](https://yoshuabengio.org/2022/03/05/generative-flow-networks/)
 
 ## References
 

@@ -21,17 +21,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Module initialization."""
 
-__version__ = "0.49.0"
-__name__ = "gt4sd"
+from .graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
+from .mol_building_env import MolBuildingEnvContext
 
-# NOTE: configure SSL to allow unverified contexts by default
-from .configuration import GT4SDConfiguration
 
-gt4sd_configuration_instance = GT4SDConfiguration.get_instance()
+# convert to a factory/registry
+def build_env_context(
+    environment_name: str = "graph_building_env",
+    context_name: str = "graph_building_env_context",
+):
 
-if gt4sd_configuration_instance.gt4sd_create_unverified_ssl_context:
-    import ssl
+    """Builds an environment and context environment.
 
-    ssl._create_default_https_context = ssl._create_unverified_context
+    Args:
+        environment_name: The name of the environment to build.
+        context_name: The name of the context environment to build.
+
+    Returns:
+        tuple with selected environment and context environment.
+    """
+
+    env, context = None, None
+    if environment_name == "graph_building_env":
+        env = GraphBuildingEnv
+
+    if context_name == "graph_building_env_context":
+        context = GraphBuildingEnvContext
+    elif context_name == "mol_building_env_context":
+        context = MolBuildingEnvContext
+
+    return env, context
