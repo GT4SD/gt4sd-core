@@ -1,9 +1,9 @@
 # GT4SD CLI
 The command-line interface (CLI) provides access to four commands:
-    - `gt4sd-inference`: To generate data with pretrained models.
-    - `gt4sd-trainer`: To train (or finetune) generative models on custom data.
-    - `gt4sd-saving`: To save a trained model so that it can be used via `gt4sd-inference`.
-    - `gt4sd-upload`: Uploading a model to be used by others via `gt4sd-inference`.
+ - `gt4sd-inference`: To generate data with pretrained models.
+ - `gt4sd-trainer`: To train (or finetune) generative models on custom data.
+ - `gt4sd-saving`: To save a trained model so that it can be used via `gt4sd-inference`.
+ - `gt4sd-upload`: Uploading a model to be used by others via `gt4sd-inference`.
 
 
 ## `gt4sd-inference`
