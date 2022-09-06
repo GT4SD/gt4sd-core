@@ -75,7 +75,7 @@ configuration = {
     "seed": 124,
     "test_output_path": "logs",
 }
-configuration["rng"] = np.random.default_rng(configuration["seed"])
+configuration["rng"] = np.random.default_rng(configuration["seed"])  # type: ignore
 
 
 def test_gfn_env():
