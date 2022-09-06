@@ -172,7 +172,7 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
     ],
 )
 def test_generation_via_import(config, algorithm):
-    algorithm = algorithm(configuration=config(length=10, number_of_sequences=1))
+    algorithm = algorithm(configuration=config())
     items = list(algorithm.sample(1))
     assert len(items) == 1
 

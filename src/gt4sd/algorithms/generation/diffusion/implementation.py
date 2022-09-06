@@ -132,9 +132,6 @@ class Generator:
 
         try:
             model_class = MODEL_TYPES[self.model_type]
-
-            noise_scheduler_class = SCHEDULER_TYPES[self.scheduler_type]
-
         except KeyError:
             raise KeyError(f"model type: {self.model_type} not supported")
 
@@ -145,10 +142,6 @@ class Generator:
             model_name_or_path = self.resources_path
         else:
             model_name_or_path = self.model_name
-
-        self.noise_scheduler = noise_scheduler_class.from_pretrained(  # type:ignore
-            model_name_or_path
-        )
 
         self.model = model_class.from_pretrained(model_name_or_path)
         self.model.to(self.device)
