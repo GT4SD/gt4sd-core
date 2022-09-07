@@ -160,10 +160,21 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
             DiffusersGenerationAlgorithm,
             marks=pytest.mark.skip(reason="slow_sampling"),
         ),
+    ],
+)
+def test_generation_via_import(config, algorithm):
+    configuration = config()
+    algorithm = algorithm(configuration=configuration)
+    sample = algorithm.generator()[0]
+    assert isinstance(sample, PIL.Image.Image)
+
+
+@pytest.mark.parametrize(
+    "config, algorithm",
+    [
         pytest.param(
             LDMTextToImageGenerator,
             DiffusersGenerationAlgorithm,
-            marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             StableDiffusionGenerator,
@@ -172,10 +183,11 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
         ),
     ],
 )
-def test_generation_via_import(config, algorithm):
+def test_conditional_generation_via_import(config, algorithm):
     configuration = config()
     algorithm = algorithm(configuration=configuration)
-    sample = algorithm.generator()[0]
+    prompt = "generative models"
+    sample = algorithm.generator(prompt=prompt)[0]
     assert isinstance(sample, PIL.Image.Image)
 
 
@@ -208,20 +220,6 @@ def test_generation_via_import(config, algorithm):
             "generic",
             DiffusersGenerationAlgorithm.__name__,
             marks=pytest.mark.skip(reason="slow_sampling"),
-        ),
-        pytest.param(
-            LDMTextToImageGenerator.__name__,
-            "generation",
-            "generic",
-            DiffusersGenerationAlgorithm.__name__,
-            marks=pytest.mark.skip(reason="slow_sampling"),
-        ),
-        pytest.param(
-            StableDiffusionGenerator.__name__,
-            "generation",
-            "generic",
-            DiffusersGenerationAlgorithm.__name__,
-            marks=pytest.mark.skip(reason="auth_token"),
         ),
     ],
 )

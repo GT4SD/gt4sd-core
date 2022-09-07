@@ -389,7 +389,7 @@ class DiffusionModelArguments(TrainingPipelineArguments):
 class DiffusionTrainingArguments(TrainingPipelineArguments):
     """Saving arguments related to Diffusion trainer."""
 
-    __name__ = "saving_args"
+    __name__ = "training_args"
 
     local_rank: int = field(default=-1, metadata={"help": "Local rank of the process."})
     output_dir: str = field(

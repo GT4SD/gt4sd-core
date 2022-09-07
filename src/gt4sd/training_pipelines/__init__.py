@@ -162,6 +162,7 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         DiffusionTrainingArguments,
         DiffusionDataArguments,
         DiffusionModelArguments,
+    ),
     "gflownet-trainer": (
         GFlowNetPytorchLightningTrainingArguments,
         GFlowNetDataArguments,
