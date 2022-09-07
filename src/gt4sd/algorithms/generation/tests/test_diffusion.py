@@ -148,27 +148,27 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
         pytest.param(
             DDIMGenerator,
             DiffusersGenerationAlgorithm,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             ScoreSdeGenerator,
             DiffusersGenerationAlgorithm,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             LDMGenerator,
             DiffusersGenerationAlgorithm,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             LDMTextToImageGenerator,
             DiffusersGenerationAlgorithm,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             StableDiffusionGenerator,
             DiffusersGenerationAlgorithm,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skip(reason="auth_token"),
         ),
     ],
 )
@@ -176,7 +176,7 @@ def test_generation_via_import(config, algorithm):
     configuration = config()
     algorithm = algorithm(configuration=configuration)
     sample = algorithm.generator()[0]
-    assert isinstance(sample, PIL.Image)
+    assert isinstance(sample, PIL.Image.Image)
 
 
 @pytest.mark.parametrize(
@@ -193,35 +193,35 @@ def test_generation_via_import(config, algorithm):
             "generation",
             "generic",
             DiffusersGenerationAlgorithm.__name__,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             ScoreSdeGenerator.__name__,
             "generation",
             "generic",
             DiffusersGenerationAlgorithm.__name__,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             LDMGenerator.__name__,
             "generation",
             "generic",
             DiffusersGenerationAlgorithm.__name__,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             LDMTextToImageGenerator.__name__,
             "generation",
             "generic",
             DiffusersGenerationAlgorithm.__name__,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             StableDiffusionGenerator.__name__,
             "generation",
             "generic",
             DiffusersGenerationAlgorithm.__name__,
-            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+            marks=pytest.mark.skip(reason="auth_token"),
         ),
     ],
 )
@@ -235,5 +235,5 @@ def test_generation_via_registry(
         algorithm_name=algorithm_name,
         algorithm_application=algorithm_application,
     )
-    sample = algorithm.generator()[0] # type:ignore
-    assert isinstance(sample, PIL.Image)
+    sample = algorithm.generator()[0]  # type:ignore
+    assert isinstance(sample, PIL.Image.Image)
