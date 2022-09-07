@@ -158,7 +158,7 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
         pytest.param(
             LDMGenerator,
             DiffusersGenerationAlgorithm,
-            marks=pytest.mark.skip(reason="slow_sampling"),
+            marks=pytest.mark.skip(reason="high_memory"),
         ),
     ],
 )
@@ -175,6 +175,7 @@ def test_generation_via_import(config, algorithm):
         pytest.param(
             LDMTextToImageGenerator,
             DiffusersGenerationAlgorithm,
+            marks=pytest.mark.skip(reason="high_memory"),
         ),
         pytest.param(
             StableDiffusionGenerator,
