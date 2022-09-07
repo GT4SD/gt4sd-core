@@ -21,17 +21,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Module initialization."""
 
-__version__ = "0.49.0"
-__name__ = "gt4sd"
 
-# NOTE: configure SSL to allow unverified contexts by default
-from .configuration import GT4SDConfiguration
+class TDLoss:
+    """Temporal Difference implementation, see
+    `Flow Network based Generative Models for Non-Iterative Diverse Candidate Generation`
+    Emmanuel Bengio, Moksh Jain, Maksym Korablyov, Doina Precup, Yoshua Bengio
+    https://arxiv.org/abs/2106.04399.
 
-gt4sd_configuration_instance = GT4SDConfiguration.get_instance()
+    Code adapted from: https://github.com/GFNOrg/gflownet
+    """
 
-if gt4sd_configuration_instance.gt4sd_create_unverified_ssl_context:
-    import ssl
-
-    ssl._create_default_https_context = ssl._create_unverified_context
+    def __init__(
+        self,
+    ):
+        """
+        Args:
+        """
+        pass
