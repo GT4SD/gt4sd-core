@@ -57,7 +57,7 @@ logger.addHandler(logging.NullHandler())
 Descriptors
 
 
-class DiffusionTrainingPipelineVision(TrainingPipeline):
+class DiffusionForVisionTrainingPipeline(TrainingPipeline):
     """Diffusion training pipelines for image generation."""
 
     def train(  # type: ignore

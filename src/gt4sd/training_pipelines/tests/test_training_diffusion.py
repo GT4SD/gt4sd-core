@@ -32,7 +32,7 @@ import pkg_resources
 
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
-    DiffusionTrainingPipeline,
+    DiffusionForVisionTrainingPipeline,
 )
 
 TEST_DATA_DIRECTORY = pkg_resources.resource_filename(
@@ -107,7 +107,7 @@ def test_train():
 
     TEMPORARY_DIRECTORY = tempfile.mkdtemp()
 
-    test_pipeline = cast(DiffusionTrainingPipeline, pipeline())
+    test_pipeline = cast(DiffusionForVisionTrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
     for key, value in _create_training_output_filepaths(TEMPORARY_DIRECTORY).items():

@@ -32,10 +32,10 @@ import pkg_resources
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
 from .diffusion.core import (
     DiffusionDataArguments,
+    DiffusionForVisionTrainingPipeline,
     DiffusionModelArguments,
     DiffusionSavingArguments,
     DiffusionTrainingArguments,
-    DiffusionTrainingPipelineVision,
 )
 from .guacamol_baselines.core import GuacaMolDataArguments, GuacaMolSavingArguments
 from .guacamol_baselines.smiles_lstm.core import (
@@ -180,7 +180,7 @@ TRAINING_PIPELINE_MAPPING = {
     "moses-organ-trainer": MosesOrganTrainingPipeline,
     "moses-vae-trainer": MosesVAETrainingPipeline,
     "regression-transformer-trainer": RegressionTransformerTrainingPipeline,
-    "diffusion-trainer": DiffusionTrainingPipelineVision,
+    "diffusion-trainer": DiffusionForVisionTrainingPipeline,
     "gflownet-trainer": GFlowNetTrainingPipeline,
 }
 
