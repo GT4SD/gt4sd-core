@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""HuggingFace Diffusers generation algorithm."""
+"""HuggingFace Diffusers generation algorithm. Code and models adapted from https://github.com/huggingface/diffusers."""
 
 import logging
 from dataclasses import field

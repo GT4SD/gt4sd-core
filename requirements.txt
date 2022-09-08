@@ -26,10 +26,16 @@ tape-proteins>=0.4
 protobuf<3.20
 tensorboard!=2.5.0,>=2.2.0
 tensorflow==2.1.0
-torch>=1.0
-torch-cluster>=1.6.0
-torch-geometric>=2.0.4
-torch-sparse>=0.6.14
+# ensure cpu version for linux (docker image)
+--find-links https://download.pytorch.org/whl/torch_stable.html
+torch>=1.0+cpu; sys_platform == "linux"
+torch>=1.0; sys_platform != "linux"
+torch-cluster>=1.6.0+cpu; sys_platform == 'linux'
+torch-cluster>=1.6.0; sys_platform != 'linux'
+torch-geometric>=2.0.4+cpu; sys_platform == 'linux'
+torch-geometric>=2.0.4; sys_platform != 'linux'
+torch-sparse>=0.6.14+cpu; sys_platform == 'linux'
+torch-sparse>=0.6.14; sys_platform != 'linux'
 torchdrug>=0.1.2
 torchvision>=0.12.0
 transformers>=4.2.1

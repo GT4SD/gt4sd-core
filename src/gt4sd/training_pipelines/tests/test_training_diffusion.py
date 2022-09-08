@@ -74,7 +74,7 @@ template_config = {
     },
     "training_args": {
         "local_rank": -1,
-        "output_dir": "./cifar10/",
+        "output_dir": "./outputs/",
         "save_images_epochs": 10,
         "save_model_epochs": 10,
         "mixed_precision": "no",

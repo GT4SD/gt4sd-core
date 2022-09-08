@@ -96,6 +96,7 @@ class Generator:
         p: float,
         prefix: str,
         number_of_sequences: int,
+        auth_token: bool = True,
         device: Optional[Union[torch.device, str]] = None,
     ):
         """A Difffusers generation algorithm.
@@ -111,6 +112,7 @@ class Generator:
             p: only tokens with cumulative probabilities summing up to this value are kept.
             prefix: text defining context provided prior to the prompt.
             number_of_sequences: number of generated sequences.
+            auth_token: authentication token for private models.
             device: device where the inference
                 is running either as a dedicated class or a string. If not provided is inferred.
         """
@@ -125,6 +127,7 @@ class Generator:
         self.p = p
         self.prefix = prefix
         self.number_of_sequences = number_of_sequences
+        self.auth_token = auth_token
         self.load_model()
 
     def load_model(self) -> None:
@@ -146,7 +149,7 @@ class Generator:
         if self.model_type == "stable_diffusion":
             self.model = model_class.from_pretrained(
                 model_name_or_path,
-                use_auth_token="your_auth_token",
+                use_auth_token=self.auth_token,
             )
         else:
             self.model = model_class.from_pretrained(model_name_or_path)
