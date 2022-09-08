@@ -35,7 +35,7 @@ from .diffusion.core import (
     DiffusionModelArguments,
     DiffusionSavingArguments,
     DiffusionTrainingArguments,
-    DiffusionTrainingPipeline,
+    DiffusionTrainingPipelineVision,
 )
 from .guacamol_baselines.core import GuacaMolDataArguments, GuacaMolSavingArguments
 from .guacamol_baselines.smiles_lstm.core import (
@@ -180,7 +180,7 @@ TRAINING_PIPELINE_MAPPING = {
     "moses-organ-trainer": MosesOrganTrainingPipeline,
     "moses-vae-trainer": MosesVAETrainingPipeline,
     "regression-transformer-trainer": RegressionTransformerTrainingPipeline,
-    "diffusion-trainer": DiffusionTrainingPipeline,
+    "diffusion-trainer": DiffusionTrainingPipelineVision,
     "gflownet-trainer": GFlowNetTrainingPipeline,
 }
 

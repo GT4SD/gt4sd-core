@@ -57,8 +57,8 @@ logger.addHandler(logging.NullHandler())
 Descriptors
 
 
-class DiffusionTrainingPipeline(TrainingPipeline):
-    """Diffusion training pipelines."""
+class DiffusionTrainingPipelineVision(TrainingPipeline):
+    """Diffusion training pipelines for image generation."""
 
     def train(  # type: ignore
         self,
@@ -66,7 +66,7 @@ class DiffusionTrainingPipeline(TrainingPipeline):
         model_args: Dict[str, Any],
         dataset_args: Dict[str, Any],
     ) -> None:
-        """Generic training function for GuacaMol Baselines training.
+        """Generic training function for Diffusion models.
 
         Args:
             training_args: training arguments passed to the configuration.
@@ -321,7 +321,7 @@ class DiffusionTrainingPipeline(TrainingPipeline):
 
 @dataclass
 class DiffusionDataArguments(TrainingPipelineArguments):
-    """Arguments related to data loading."""
+    """Data arguments related to diffusion trainer."""
 
     __name__ = "dataset_args"
 
@@ -338,7 +338,7 @@ class DiffusionDataArguments(TrainingPipelineArguments):
 
 @dataclass
 class DiffusionModelArguments(TrainingPipelineArguments):
-    """Saving arguments related to Diffusion model."""
+    """Model arguments related to Diffusion trainer."""
 
     __name__ = "model_args"
 
@@ -371,7 +371,7 @@ class DiffusionModelArguments(TrainingPipelineArguments):
 
 @dataclass
 class DiffusionTrainingArguments(TrainingPipelineArguments):
-    """Saving arguments related to Diffusion trainer."""
+    """Training arguments related to Diffusion trainer."""
 
     __name__ = "training_args"
 
@@ -398,19 +398,16 @@ class DiffusionTrainingArguments(TrainingPipelineArguments):
         default="no",
         metadata={"help": "Mixed precision. Choose from 'no', 'fp16', 'bf16'."},
     )
-
     use_auth_token: bool = field(
         default=False,
         metadata={
             "help": "Use the token generated when using huggingface-hub (necessary to use this script with private models)."
         },
     )
-
     dummy_training: bool = field(
         default=False,
         metadata={"help": "Run dummy training to test the pipeline."},
     )
-
     is_sampling: bool = field(
         default=True,
         metadata={"help": "Run sampling."},
@@ -419,6 +416,6 @@ class DiffusionTrainingArguments(TrainingPipelineArguments):
 
 @dataclass
 class DiffusionSavingArguments(TrainingPipelineArguments):
-    """Saving arguments related to PaccMann trainer."""
+    """Saving arguments related to Diffusion trainer."""
 
     __name__ = "saving_args"
