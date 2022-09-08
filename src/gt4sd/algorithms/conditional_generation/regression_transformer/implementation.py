@@ -404,6 +404,7 @@ class ConditionalGenerator:
             Tuple[Tuple[str, float]]: a tuple of tuples, each containing the generated
                 sequence alongside its predicted property value.
         """
+        self.target = sequence
 
         # If we are in sampling mode, the sampled sequence changes per iteration.
         if self.sampling_wrapper != {}:
@@ -798,7 +799,10 @@ class ChemicalLanguageRT(ConditionalGenerator):
         else:
             # Convert SELFIES to SMILES
             smiles_list = list(
-                filter(lambda x: x is not None, list(zip(*sequences))[0])
+                filter(
+                    lambda x: x != self.target and x is not None,
+                    list(zip(*sequences))[0],
+                )
             )
             if smiles_list == []:
                 return ([None], [-1])
@@ -947,6 +951,7 @@ class ProteinLanguageRT(ConditionalGenerator):
                         item[0] == item[0].upper()
                         and self.tokenizer.mask_token not in item[0]
                         and not any([s.isdigit() for s in item[0]])
+                        and item[0] != self.target
                     )
                     and self.validate_numerical(item[1])
                 )
