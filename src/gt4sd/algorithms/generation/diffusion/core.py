@@ -25,11 +25,12 @@
 
 import logging
 from dataclasses import field
-from typing import ClassVar, Dict, Optional, Set, TypeVar
+from typing import ClassVar, Dict, Optional, Set, TypeVar, Union
 
 from ...core import (
     AlgorithmConfiguration,
     GeneratorAlgorithm,
+    Targeted,
     Untargeted,
     get_configuration_class_with_attributes,
 )
@@ -45,20 +46,27 @@ S = TypeVar("S", bound=str)
 
 class DiffusersGenerationAlgorithm(GeneratorAlgorithm[S, T]):
     def __init__(
-        self, configuration: AlgorithmConfiguration, target: Optional[T] = None
+        self, configuration: AlgorithmConfiguration, target: Optional[S] = None
     ):
         """Diffusers generation algorithm.
 
         Args:
             configuration: domain and application
                 specification, defining types and validations.
-            target: unused since it is not a conditional generator.
+            target: none if unconditional generation, else a context or conditioning string.
 
         Example:
             An example for using a generative algorithm from Diffusers::
 
                 configuration = GeneratorConfiguration()
                 algorithm = DiffusersGenerationAlgorithm(configuration=configuration)
+                items = list(algorithm.sample(1))
+                print(items)
+
+            An example for using a conditional generative algorithm from Diffusers::
+
+                configuration = GeneratorConfiguration()
+                algorithm = DiffusersGenerationAlgorithm(configuration=configuration, target="the moon")
                 items = list(algorithm.sample(1))
                 print(items)
         """
@@ -68,19 +76,19 @@ class DiffusersGenerationAlgorithm(GeneratorAlgorithm[S, T]):
 
         super().__init__(
             configuration=configuration,
-            target=None,  # type:ignore
+            target=target,  # type:ignore
         )
 
     def get_generator(
         self,
         configuration: AlgorithmConfiguration[S, T],
-        target: Optional[T],
-    ) -> Untargeted:
+        target: Optional[Union[S, T]],
+    ) -> Union[Targeted, Untargeted]:
         """Get the function to sample batches.
 
         Args:
             configuration: helps to set up the application.
-            target: context or condition for the generation. Unused in the algorithm.
+            target: context or condition for the generation.
 
         Returns:
             callable generating a batch of items.
@@ -88,7 +96,7 @@ class DiffusersGenerationAlgorithm(GeneratorAlgorithm[S, T]):
         logger.info("ensure artifacts for the application are present.")
         self.local_artifacts = configuration.ensure_artifacts()
         implementation: Generator = configuration.get_conditional_generator(  # type: ignore
-            self.local_artifacts
+            self.local_artifacts, target
         )
         return implementation.sample
 
@@ -104,12 +112,12 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
     """Basic configuration for a diffusion algorithm."""
 
     algorithm_type: ClassVar[str] = "generation"
-    domain: ClassVar[str] = "generic"
+    domain: ClassVar[str] = "vision"
 
     modality: str = field(
         default="image",
         metadata=dict(
-            description="Model domain.  Supported: 'image', 'text', 'audio', 'token2image', 'token2sample', 'molecule'."
+            description="Model domain.  Supported: 'image', 'text', 'audio', 'molecule'."
         ),
     )
 
@@ -127,39 +135,6 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         ),
     )
 
-    temperature: float = field(
-        default=1.0,
-        metadata=dict(
-            description="Temperature for sampling, the lower the greedier the sampling."
-        ),
-    )
-    repetition_penalty: float = field(
-        default=1.0,
-        metadata=dict(
-            description="Primarily useful for CTRL model, where 1.2 should be used."
-        ),
-    )
-    k: int = field(
-        default=50,
-        metadata=dict(description="Number of top-k probability tokens to keep."),
-    )
-    p: float = field(
-        default=1.0,
-        metadata=dict(
-            description="Only tokens with cumulative probabilities summing up to this value are kept."
-        ),
-    )
-    prefix: str = field(
-        default="",
-        metadata=dict(
-            description="Text defining context provided prior to the prompt."
-        ),
-    )
-    number_of_sequences: int = field(
-        default=8,
-        metadata=dict(description="Number of text sequences to generate."),
-    )
-
     def get_target_description(self) -> Optional[Dict[str, str]]:
         """Get description of the target for generation.
 
@@ -168,18 +143,15 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         """
         return None
 
-    def get_conditional_generator(self, resources_path: str, **kwargs) -> Generator:
+    def get_conditional_generator(
+        self, resources_path: str, target: str, **kwargs
+    ) -> Generator:
         return Generator(
             resources_path=resources_path,
             model_type=self.model_type,
             model_name=self.algorithm_version,
             scheduler_type=self.scheduler_type,
-            temperature=self.temperature,
-            repetition_penalty=self.repetition_penalty,
-            k=self.k,
-            p=self.p,
-            prefix=self.prefix,
-            number_of_sequences=self.number_of_sequences,
+            target=target,
         )
 
 

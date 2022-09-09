@@ -55,37 +55,37 @@ def get_classvar_type(class_var):
         (
             DDPMGenerator,
             "generation",
-            "generic",
+            "vision",
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
             DDIMGenerator,
             "generation",
-            "generic",
+            "vision",
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
             ScoreSdeGenerator,
             "generation",
-            "generic",
+            "vision",
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
             LDMGenerator,
             "generation",
-            "generic",
+            "vision",
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
             LDMTextToImageGenerator,
             "generation",
-            "generic",
+            "vision",
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
             StableDiffusionGenerator,
             "generation",
-            "generic",
+            "vision",
             DiffusersGenerationAlgorithm.__name__,
         ),
     ],
@@ -165,7 +165,9 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
 def test_generation_via_import(config, algorithm):
     configuration = config()
     algorithm = algorithm(configuration=configuration)
-    sample = algorithm.generator()[0]
+    samples = list(algorithm.sample(1))
+    assert len(samples) == 1
+    sample = samples[0]
     assert isinstance(sample, PIL.Image.Image)
 
 
@@ -186,9 +188,11 @@ def test_generation_via_import(config, algorithm):
 )
 def test_conditional_generation_via_import(config, algorithm):
     configuration = config()
-    algorithm = algorithm(configuration=configuration)
     prompt = "generative models"
-    sample = algorithm.generator(prompt=prompt)[0]
+    algorithm = algorithm(configuration=configuration, target=prompt)
+    samples = list(algorithm.sample(1))
+    assert len(samples) == 1
+    sample = samples[0]
     assert isinstance(sample, PIL.Image.Image)
 
 
@@ -198,27 +202,27 @@ def test_conditional_generation_via_import(config, algorithm):
         pytest.param(
             DDPMGenerator.__name__,
             "generation",
-            "generic",
+            "vision",
             DiffusersGenerationAlgorithm.__name__,
         ),
         pytest.param(
             DDIMGenerator.__name__,
             "generation",
-            "generic",
+            "vision",
             DiffusersGenerationAlgorithm.__name__,
             marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             ScoreSdeGenerator.__name__,
             "generation",
-            "generic",
+            "vision",
             DiffusersGenerationAlgorithm.__name__,
             marks=pytest.mark.skip(reason="slow_sampling"),
         ),
         pytest.param(
             LDMGenerator.__name__,
             "generation",
-            "generic",
+            "vision",
             DiffusersGenerationAlgorithm.__name__,
             marks=pytest.mark.skip(reason="slow_sampling"),
         ),
@@ -234,5 +238,7 @@ def test_generation_via_registry(
         algorithm_name=algorithm_name,
         algorithm_application=algorithm_application,
     )
-    sample = algorithm.generator()[0]  # type:ignore
+    samples = list(algorithm.sample(1))
+    assert len(samples) == 1
+    sample = samples[0]
     assert isinstance(sample, PIL.Image.Image)

@@ -90,29 +90,19 @@ class Generator:
         model_type: str,
         model_name: str,
         scheduler_type: str,
-        temperature: float,
-        repetition_penalty: float,
-        k: int,
-        p: float,
-        prefix: str,
-        number_of_sequences: int,
         auth_token: bool = True,
+        target: Optional[str] = None,
         device: Optional[Union[torch.device, str]] = None,
     ):
-        """A Difffusers generation algorithm.
+        """A Diffusers generation algorithm.
 
         Args:
             resources_path: path to the cache.
             model_type: type of the model.
             model_name: name of the model weights/version.
             scheduler_type: type of the schedule.
-            temperature: temperature for sampling, the lower the greedier the sampling.
-            repetition_penalty: primarily useful for CTRL model, where 1.2 should be used.
-            k: number of top-k probability token to keep.
-            p: only tokens with cumulative probabilities summing up to this value are kept.
-            prefix: text defining context provided prior to the prompt.
-            number_of_sequences: number of generated sequences.
             auth_token: authentication token for private models.
+            target: target image/text to use for conditional generation.
             device: device where the inference
                 is running either as a dedicated class or a string. If not provided is inferred.
         """
@@ -121,12 +111,7 @@ class Generator:
         self.model_type = model_type
         self.model_name = model_name
         self.scheduler_type = scheduler_type
-        self.temperature = temperature
-        self.repetition_penalty = repetition_penalty
-        self.k = k
-        self.p = p
-        self.prefix = prefix
-        self.number_of_sequences = number_of_sequences
+        self.target = target
         self.auth_token = auth_token
         self.load_model()
 
@@ -167,8 +152,10 @@ class Generator:
             generated samples.
         """
         if prompt:
-            images = self.model(batch_size=batch_size, prompt=prompt)
+            item = self.model(batch_size=batch_size, prompt=prompt)
+        elif self.target:
+            item = self.model(batch_size=batch_size, prompt=self.target)
         else:
-            images = self.model(batch_size=batch_size)
-        images = images["sample"]
-        return images
+            item = self.model(batch_size=batch_size)
+        item = item["sample"]
+        return item
