@@ -103,7 +103,7 @@ class GFlowNetTrainingPipeline(PyTorchLightningTrainingPipeline):
             log_every_n_steps=pl_trainer_args["trainer_log_every_n_steps"],
             callbacks=pl_trainer_args["callbacks"],
             max_epochs=pl_trainer_args["epochs"],
-            accelerator=pl_trainer_args["accelerator"],
+            strategy=pl_trainer_args["strategy"],
             fast_dev_run=pl_trainer_args["development_mode"],
         )
 
@@ -193,8 +193,8 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
 
     __name__ = "pl_trainer_args"
 
-    accelerator: Optional[str] = field(
-        default="ddp", metadata={"help": "Accelerator type."}
+    strategy: Optional[str] = field(
+        default="ddp", metadata={"help": "Strategy type."}
     )
     accumulate_grad_batches: int = field(
         default=1,
@@ -322,10 +322,6 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
     device: str = field(
         default="cpu",
         metadata={"help": "The device to use."},
-    )
-    distributed_training_strategy: str = field(
-        default="ddp",
-        metadata={"help": "The distributed training strategy. "},
     )
 
     development_mode: bool = field(

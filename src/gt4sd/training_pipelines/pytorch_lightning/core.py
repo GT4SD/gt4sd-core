@@ -150,8 +150,8 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
 
     __name__ = "pl_trainer_args"
 
-    accelerator: Optional[str] = field(
-        default="ddp", metadata={"help": "Accelerator type."}
+    strategy: Optional[str] = field(
+        default="ddp", metadata={"help": "Training strategy."}
     )
     accumulate_grad_batches: int = field(
         default=1,
