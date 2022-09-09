@@ -92,7 +92,7 @@ class LMDataset(Dataset):
 
         def _make_gen(reader):
             while True:
-                b = reader(2**16)
+                b = reader(2 ** 16)
                 if not b:
                     break
                 yield b

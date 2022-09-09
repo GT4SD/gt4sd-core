@@ -193,9 +193,7 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
 
     __name__ = "pl_trainer_args"
 
-    strategy: Optional[str] = field(
-        default="ddp", metadata={"help": "Strategy type."}
-    )
+    strategy: Optional[str] = field(default="ddp", metadata={"help": "Strategy type."})
     accumulate_grad_batches: int = field(
         default=1,
         metadata={
