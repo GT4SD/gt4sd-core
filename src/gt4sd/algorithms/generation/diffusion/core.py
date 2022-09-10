@@ -127,8 +127,8 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         ),
     )
 
-    prompt: str = field( # type: ignore
-        default=None, 
+    prompt: str = field(  # type: ignore
+        default=None,
         metadata=dict(description="Prompt for text generation."),
     )
 
