@@ -53,20 +53,13 @@ class DiffusersGenerationAlgorithm(GeneratorAlgorithm[S, T]):
         Args:
             configuration: domain and application
                 specification, defining types and validations.
-            target: none if unconditional generation, else a context or conditioning string.
+            target: none for untargeted generation.
 
         Example:
             An example for using a generative algorithm from Diffusers::
 
                 configuration = GeneratorConfiguration()
                 algorithm = DiffusersGenerationAlgorithm(configuration=configuration)
-                items = list(algorithm.sample(1))
-                print(items)
-
-            An example for using a conditional generative algorithm from Diffusers::
-
-                configuration = GeneratorConfiguration()
-                algorithm = DiffusersGenerationAlgorithm(configuration=configuration, target="the moon")
                 items = list(algorithm.sample(1))
                 print(items)
         """
@@ -76,14 +69,14 @@ class DiffusersGenerationAlgorithm(GeneratorAlgorithm[S, T]):
 
         super().__init__(
             configuration=configuration,
-            target=target,  # type:ignore
+            target=None,  # type:ignore
         )
 
     def get_generator(
         self,
         configuration: AlgorithmConfiguration[S, T],
-        target: Optional[Union[S, T]],
-    ) -> Union[Targeted, Untargeted]:
+        target: Optional[T],
+    ) -> Untargeted:
         """Get the function to sample batches.
 
         Args:
@@ -96,7 +89,7 @@ class DiffusersGenerationAlgorithm(GeneratorAlgorithm[S, T]):
         logger.info("ensure artifacts for the application are present.")
         self.local_artifacts = configuration.ensure_artifacts()
         implementation: Generator = configuration.get_conditional_generator(  # type: ignore
-            self.local_artifacts, target
+            self.local_artifacts
         )
         return implementation.sample
 
@@ -135,6 +128,11 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         ),
     )
 
+    prompt: str = field(
+        default=None,
+        metadata=dict(description="Prompt for text generation."),
+    )
+
     def get_target_description(self) -> Optional[Dict[str, str]]:
         """Get description of the target for generation.
 
@@ -144,14 +142,14 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         return None
 
     def get_conditional_generator(
-        self, resources_path: str, target: str, **kwargs
+        self, resources_path: str, **kwargs
     ) -> Generator:
         return Generator(
             resources_path=resources_path,
             model_type=self.model_type,
             model_name=self.algorithm_version,
             scheduler_type=self.scheduler_type,
-            target=target,
+            prompt=self.prompt,
         )
 
 

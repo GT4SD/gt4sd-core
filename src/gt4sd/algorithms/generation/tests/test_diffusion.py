@@ -187,9 +187,9 @@ def test_generation_via_import(config, algorithm):
     ],
 )
 def test_conditional_generation_via_import(config, algorithm):
-    configuration = config()
     prompt = "generative models"
-    algorithm = algorithm(configuration=configuration, target=prompt)
+    configuration = config(prompt=prompt)
+    algorithm = algorithm(configuration=configuration)
     samples = list(algorithm.sample(1))
     assert len(samples) == 1
     sample = samples[0]

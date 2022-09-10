@@ -91,7 +91,7 @@ class Generator:
         model_name: str,
         scheduler_type: str,
         auth_token: bool = True,
-        target: Optional[str] = None,
+        prompt: Optional[str] = None,
         device: Optional[Union[torch.device, str]] = None,
     ):
         """A Diffusers generation algorithm.
@@ -102,7 +102,7 @@ class Generator:
             model_name: name of the model weights/version.
             scheduler_type: type of the schedule.
             auth_token: authentication token for private models.
-            target: target image/text to use for conditional generation.
+            prompt: target text to use for conditional generation.
             device: device where the inference
                 is running either as a dedicated class or a string. If not provided is inferred.
         """
@@ -111,7 +111,7 @@ class Generator:
         self.model_type = model_type
         self.model_name = model_name
         self.scheduler_type = scheduler_type
-        self.target = target
+        self.prompt = prompt
         self.auth_token = auth_token
         self.load_model()
 
@@ -153,8 +153,8 @@ class Generator:
         """
         if prompt:
             item = self.model(batch_size=batch_size, prompt=prompt)
-        elif self.target:
-            item = self.model(batch_size=batch_size, prompt=self.target)
+        elif self.prompt:
+            item = self.model(batch_size=batch_size, prompt=self.prompt)
         else:
             item = self.model(batch_size=batch_size)
         item = item["sample"]
