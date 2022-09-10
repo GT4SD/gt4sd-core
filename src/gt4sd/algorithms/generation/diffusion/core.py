@@ -25,12 +25,11 @@
 
 import logging
 from dataclasses import field
-from typing import ClassVar, Dict, Optional, Set, TypeVar, Union
+from typing import ClassVar, Dict, Optional, Set, TypeVar
 
 from ...core import (
     AlgorithmConfiguration,
     GeneratorAlgorithm,
-    Targeted,
     Untargeted,
     get_configuration_class_with_attributes,
 )
@@ -128,8 +127,8 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         ),
     )
 
-    prompt: str = field(
-        default=None,
+    prompt: str = field( # type: ignore
+        default=None, 
         metadata=dict(description="Prompt for text generation."),
     )
 
@@ -141,9 +140,7 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         """
         return None
 
-    def get_conditional_generator(
-        self, resources_path: str, **kwargs
-    ) -> Generator:
+    def get_conditional_generator(self, resources_path: str, **kwargs) -> Generator:
         return Generator(
             resources_path=resources_path,
             model_type=self.model_type,

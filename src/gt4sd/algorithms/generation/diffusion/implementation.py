@@ -151,6 +151,7 @@ class Generator:
         Returns:
             generated samples.
         """
+        # if explicit prompt is provided in sample, use it
         if prompt:
             item = self.model(batch_size=batch_size, prompt=prompt)
         elif self.prompt:
