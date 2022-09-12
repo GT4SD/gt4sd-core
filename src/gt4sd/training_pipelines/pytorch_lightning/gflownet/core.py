@@ -251,7 +251,7 @@ class GFlowNetPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
             "help": "When True, always saves the model at the end of the epoch to a file last.ckpt"
         },
     )
-    save_top_k: Optional[int] = field(
+    save_top_k: int = field(
         default=-1,
         metadata={
             "help": "The best k models according to the quantity monitored will be saved."
