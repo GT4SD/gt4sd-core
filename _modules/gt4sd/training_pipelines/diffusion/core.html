@@ -1,0 +1,632 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.training_pipelines.diffusion.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../training_pipelines.html">gt4sd.training_pipelines</a> &raquo;</li>
+        
+      <li>gt4sd.training_pipelines.diffusion.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.training_pipelines.diffusion.core</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Diffusion training utilities. Code adapted from: https://github.com/huggingface/diffusers/blob/main/examples/unconditional_image_generation/train_unconditional.py&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">accelerate</span> <span class="kn">import</span> <span class="n">Accelerator</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span> <span class="nn">diffusers</span> <span class="kn">import</span> <span class="n">DDPMPipeline</span><span class="p">,</span> <span class="n">DDPMScheduler</span><span class="p">,</span> <span class="n">UNet2DModel</span>
+<span class="kn">from</span> <span class="nn">diffusers.optimization</span> <span class="kn">import</span> <span class="n">get_scheduler</span>
+<span class="kn">from</span> <span class="nn">diffusers.training_utils</span> <span class="kn">import</span> <span class="n">EMAModel</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">Descriptors</span>
+<span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CenterCrop</span><span class="p">,</span>
+    <span class="n">Compose</span><span class="p">,</span>
+    <span class="n">InterpolationMode</span><span class="p">,</span>
+    <span class="n">Normalize</span><span class="p">,</span>
+    <span class="n">RandomHorizontalFlip</span><span class="p">,</span>
+    <span class="n">Resize</span><span class="p">,</span>
+    <span class="n">ToTensor</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">TrainingPipeline</span><span class="p">,</span> <span class="n">TrainingPipelineArguments</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="c1"># NOTE: This import is needed because importing torchvision before rdkit Descriptors</span>
+<span class="c1"># can cause segmentation faults.</span>
+<span class="n">Descriptors</span>
+
+
+<div class="viewcode-block" id="DiffusionForVisionTrainingPipeline"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionForVisionTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">DiffusionForVisionTrainingPipeline</span><span class="p">(</span><span class="n">TrainingPipeline</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Diffusion training pipelines for image generation.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DiffusionForVisionTrainingPipeline.train"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionForVisionTrainingPipeline.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">training_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generic training function for Diffusion models.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            training_args: training arguments passed to the configuration.</span>
+<span class="sd">            model_args: model arguments passed to the configuration.</span>
+<span class="sd">            dataset_args: dataset arguments passed to the configuration.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: the generic trainer does not implement the pipeline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">training_args</span><span class="p">,</span> <span class="o">**</span><span class="n">dataset_args</span><span class="p">,</span> <span class="o">**</span><span class="n">model_args</span><span class="p">}</span>
+
+        <span class="n">env_local_rank</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LOCAL_RANK&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">env_local_rank</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">env_local_rank</span> <span class="o">!=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;local_rank&quot;</span><span class="p">]:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;local_rank&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_local_rank</span>
+
+        <span class="n">logging_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;logging_dir&quot;</span><span class="p">])</span>
+        <span class="n">model_path</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]</span>
+        <span class="n">training_name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;training_name&quot;</span><span class="p">]</span>
+
+        <span class="n">accelerator</span> <span class="o">=</span> <span class="n">Accelerator</span><span class="p">(</span>
+            <span class="n">mixed_precision</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;mixed_precision&quot;</span><span class="p">],</span>
+            <span class="n">log_with</span><span class="o">=</span><span class="s2">&quot;tensorboard&quot;</span><span class="p">,</span>
+            <span class="n">logging_dir</span><span class="o">=</span><span class="n">logging_dir</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model with name </span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2"> starts.&quot;</span><span class="p">)</span>
+
+        <span class="n">model_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">training_name</span><span class="p">)</span>
+        <span class="n">log_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span>
+        <span class="n">val_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="s2">&quot;val_logs&quot;</span><span class="p">)</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;weights&quot;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;results&quot;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">val_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># unet decoder</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">UNet2DModel</span><span class="p">(</span>
+            <span class="n">sample_size</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">],</span>
+            <span class="n">in_channels</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;in_channels&quot;</span><span class="p">],</span>
+            <span class="n">out_channels</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;out_channels&quot;</span><span class="p">],</span>
+            <span class="n">layers_per_block</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;layers_per_block&quot;</span><span class="p">],</span>
+            <span class="n">block_out_channels</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+            <span class="n">down_block_types</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;DownBlock2D&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;DownBlock2D&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;DownBlock2D&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;DownBlock2D&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;AttnDownBlock2D&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;DownBlock2D&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">up_block_types</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;UpBlock2D&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;AttnUpBlock2D&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;UpBlock2D&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;UpBlock2D&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;UpBlock2D&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;UpBlock2D&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="c1"># ddpm noise schedule</span>
+        <span class="n">noise_scheduler</span> <span class="o">=</span> <span class="n">DDPMScheduler</span><span class="p">(</span>
+            <span class="n">num_train_timesteps</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;num_train_timesteps&quot;</span><span class="p">],</span> <span class="n">tensor_format</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
+        <span class="p">)</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
+            <span class="n">lr</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">],</span>
+            <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;adam_beta1&quot;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;adam_beta2&quot;</span><span class="p">]),</span>
+            <span class="n">weight_decay</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;adam_weight_decay&quot;</span><span class="p">],</span>
+            <span class="n">eps</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;adam_epsilon&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">augmentations</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">Resize</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">],</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">InterpolationMode</span><span class="o">.</span><span class="n">BILINEAR</span><span class="p">),</span>
+                <span class="n">CenterCrop</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">]),</span>
+                <span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+                <span class="n">ToTensor</span><span class="p">(),</span>
+                <span class="n">Normalize</span><span class="p">([</span><span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">]),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="c1"># specify dataset by name or path</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;dataset_name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;dataset_name&quot;</span><span class="p">],</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;dataset_config_name&quot;</span><span class="p">],</span>
+                <span class="n">cache_dir</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">],</span>
+                <span class="n">use_auth_token</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;use_auth_token&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;dataset name: &quot;</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;dataset_name&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;train_data_dir&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;You must specify either a dataset name from the hub or a train data directory.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span>
+                <span class="s2">&quot;imagefolder&quot;</span><span class="p">,</span>
+                <span class="n">data_dir</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;train_data_dir&quot;</span><span class="p">],</span>
+                <span class="n">cache_dir</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">],</span>
+                <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;dataset path: &quot;</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;train_data_dir&quot;</span><span class="p">])</span>
+
+        <span class="k">def</span> <span class="nf">transforms</span><span class="p">(</span><span class="n">examples</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">images</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">augmentations</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]</span>
+                <span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">images</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">augmentations</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span>
+                <span class="p">]</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="n">images</span><span class="p">}</span>
+
+        <span class="n">dataset</span><span class="o">.</span><span class="n">set_transform</span><span class="p">(</span><span class="n">transforms</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+            <span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;train_batch_size&quot;</span><span class="p">],</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># type: ignore</span>
+        <span class="p">)</span>
+
+        <span class="c1"># specify learning rate scheduler</span>
+        <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">get_scheduler</span><span class="p">(</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;lr_scheduler&quot;</span><span class="p">],</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+            <span class="n">num_warmup_steps</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;lr_warmup_steps&quot;</span><span class="p">],</span>
+            <span class="n">num_training_steps</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">)</span> <span class="o">*</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;num_epochs&quot;</span><span class="p">])</span>
+            <span class="o">//</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;gradient_accumulation_steps&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="c1"># preparare for distributed training if neeeded</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">accelerator</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">lr_scheduler</span>
+        <span class="p">)</span>
+
+        <span class="c1"># initialize the ema model</span>
+        <span class="n">ema_model</span> <span class="o">=</span> <span class="n">EMAModel</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span>
+            <span class="n">inv_gamma</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;ema_inv_gamma&quot;</span><span class="p">],</span>
+            <span class="n">power</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;ema_power&quot;</span><span class="p">],</span>
+            <span class="n">max_value</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;ema_max_decay&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">accelerator</span><span class="o">.</span><span class="n">is_main_process</span><span class="p">:</span>
+            <span class="n">run</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">accelerator</span><span class="o">.</span><span class="n">init_trackers</span><span class="p">(</span><span class="n">run</span><span class="p">)</span>
+
+        <span class="n">global_step</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># start training</span>
+        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;num_epochs&quot;</span><span class="p">]):</span>
+
+            <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+            <span class="c1"># progress bar visualization</span>
+            <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
+                <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">),</span>
+                <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">accelerator</span><span class="o">.</span><span class="n">is_local_main_process</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">):</span>
+
+                <span class="n">clean_images</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span>
+                <span class="c1"># Sample noise that we&#39;ll add to the images</span>
+                <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">clean_images</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">clean_images</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">bsz</span> <span class="o">=</span> <span class="n">clean_images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># Sample a random timestep for each image</span>
+                <span class="n">timesteps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">noise_scheduler</span><span class="o">.</span><span class="n">num_train_timesteps</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">bsz</span><span class="p">,),</span>
+                    <span class="n">device</span><span class="o">=</span><span class="n">clean_images</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+
+                <span class="c1"># Add noise to the clean images according to the noise magnitude at each timestep</span>
+                <span class="c1"># (this is the forward diffusion process)</span>
+                <span class="n">noisy_images</span> <span class="o">=</span> <span class="n">noise_scheduler</span><span class="o">.</span><span class="n">add_noise</span><span class="p">(</span><span class="n">clean_images</span><span class="p">,</span> <span class="n">noise</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">accelerator</span><span class="o">.</span><span class="n">accumulate</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+                    <span class="c1"># Predict the noise residual</span>
+                    <span class="n">noise_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">noisy_images</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">)[</span><span class="s2">&quot;sample&quot;</span><span class="p">]</span>
+                    <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">noise_pred</span><span class="p">,</span> <span class="n">noise</span><span class="p">)</span>
+                    <span class="n">accelerator</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+                    <span class="n">accelerator</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span>
+                    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+                    <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;use_ema&quot;</span><span class="p">]:</span>
+                        <span class="n">ema_model</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+                    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+                <span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">logs</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">loss</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+                    <span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">get_last_lr</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="s2">&quot;step&quot;</span><span class="p">:</span> <span class="n">global_step</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;use_ema&quot;</span><span class="p">]:</span>
+                    <span class="n">logs</span><span class="p">[</span><span class="s2">&quot;ema_decay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ema_model</span><span class="o">.</span><span class="n">decay</span>
+                <span class="n">progress_bar</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">(</span><span class="o">**</span><span class="n">logs</span><span class="p">)</span>
+
+                <span class="n">accelerator</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">logs</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">global_step</span><span class="p">)</span>
+                <span class="n">global_step</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;dummy_training&quot;</span><span class="p">]:</span>
+                    <span class="k">break</span>
+
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="c1"># wait for all the processes to finish</span>
+            <span class="n">accelerator</span><span class="o">.</span><span class="n">wait_for_everyone</span><span class="p">()</span>
+
+            <span class="c1"># Generate sample images for visual inspection</span>
+            <span class="k">if</span> <span class="n">accelerator</span><span class="o">.</span><span class="n">is_main_process</span> <span class="ow">and</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;is_sampling&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">epoch</span> <span class="o">%</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;save_images_epochs&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+                    <span class="ow">or</span> <span class="n">epoch</span> <span class="o">==</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;num_epochs&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="p">):</span>
+                    <span class="c1"># inference/sampling</span>
+                    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">DDPMPipeline</span><span class="p">(</span>
+                        <span class="n">unet</span><span class="o">=</span><span class="n">accelerator</span><span class="o">.</span><span class="n">unwrap_model</span><span class="p">(</span>
+                            <span class="n">ema_model</span><span class="o">.</span><span class="n">averaged_model</span> <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;use_ema&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="n">model</span>
+                        <span class="p">),</span>
+                        <span class="n">scheduler</span><span class="o">=</span><span class="n">noise_scheduler</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="n">generator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="c1"># run pipeline in inference (sample random noise and denoise)</span>
+                    <span class="n">images</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
+                        <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span>
+                        <span class="n">batch_size</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;eval_batch_size&quot;</span><span class="p">],</span>
+                        <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;numpy&quot;</span><span class="p">,</span>
+                    <span class="p">)[</span><span class="s2">&quot;sample&quot;</span><span class="p">]</span>
+
+                    <span class="c1"># denormalize the images and save to tensorboard</span>
+                    <span class="n">images_processed</span> <span class="o">=</span> <span class="p">(</span><span class="n">images</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+                    <span class="n">accelerator</span><span class="o">.</span><span class="n">trackers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">add_images</span><span class="p">(</span>
+                        <span class="s2">&quot;test_samples&quot;</span><span class="p">,</span>
+                        <span class="n">images_processed</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                        <span class="n">epoch</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">epoch</span> <span class="o">%</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;save_model_epochs&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+                    <span class="ow">or</span> <span class="n">epoch</span> <span class="o">==</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;num_epochs&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="p">):</span>
+                    <span class="n">pipeline</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">])</span>
+            <span class="n">accelerator</span><span class="o">.</span><span class="n">wait_for_everyone</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;dummy_training&quot;</span><span class="p">]:</span>
+                <span class="k">break</span>
+
+        <span class="n">accelerator</span><span class="o">.</span><span class="n">end_training</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training done, shutting down.&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DiffusionDataArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionDataArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DiffusionDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Data arguments related to diffusion trainer.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;dataset_args&quot;</span>
+
+    <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Dataset name.&quot;</span><span class="p">})</span>
+    <span class="n">dataset_config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Dataset config name.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">train_data_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Train data directory.&quot;</span><span class="p">})</span>
+    <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Resolution.&quot;</span><span class="p">})</span>
+    <span class="n">train_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Train batch size.&quot;</span><span class="p">})</span>
+    <span class="n">eval_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Eval batch size.&quot;</span><span class="p">})</span>
+    <span class="n">num_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of epochs.&quot;</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="DiffusionModelArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionModelArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DiffusionModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Model arguments related to Diffusion trainer.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>
+
+    <span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path to the model file.&quot;</span><span class="p">})</span>
+    <span class="n">training_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Name of the training run.&quot;</span><span class="p">})</span>
+
+    <span class="n">num_train_timesteps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of noise steps.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Learning rate.&quot;</span><span class="p">})</span>
+    <span class="n">lr_scheduler</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Learning rate scheduler.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">lr_warm_up_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Learning rate warm up steps.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">adam_beta1</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Adam beta1.&quot;</span><span class="p">})</span>
+    <span class="n">adam_beta2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.999</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Adam beta2.&quot;</span><span class="p">})</span>
+    <span class="n">adam_weight_decay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Adam weights decay.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">adam_epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Adam eps.&quot;</span><span class="p">})</span>
+    <span class="n">gradient_accumulation_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Gradient accumulation steps.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Input channels.&quot;</span><span class="p">})</span>
+    <span class="n">out_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Output channels.&quot;</span><span class="p">})</span>
+    <span class="n">layers_per_block</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Layers per block.&quot;</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="DiffusionTrainingArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionTrainingArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DiffusionTrainingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Training arguments related to Diffusion trainer.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;training_args&quot;</span>
+
+    <span class="n">local_rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Local rank of the process.&quot;</span><span class="p">})</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ddpm-cifar10-32&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Output directory.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">logging_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;logs/&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Logging directory.&quot;</span><span class="p">})</span>
+    <span class="n">overwrite_output_dir</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Overwrite output directory.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">cache_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;.cache/&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Cache directory.&quot;</span><span class="p">})</span>
+    <span class="n">save_images_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Save images every n epochs.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">save_model_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Save model every n epochs.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">use_ema</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Use ema.&quot;</span><span class="p">})</span>
+    <span class="n">ema_inv_gamma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Ema inverse gamma.&quot;</span><span class="p">})</span>
+    <span class="n">ema_power</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Ema power.&quot;</span><span class="p">})</span>
+    <span class="n">ema_max_decay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.9999</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Ema max delay.&quot;</span><span class="p">})</span>
+    <span class="n">mixed_precision</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;no&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Mixed precision. Choose from &#39;no&#39;, &#39;fp16&#39;, &#39;bf16&#39;.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">use_auth_token</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Use the token generated when using huggingface-hub (necessary to use this script with private models).&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">dummy_training</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Run dummy training to test the pipeline.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">is_sampling</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Run sampling.&quot;</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DiffusionSavingArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionSavingArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DiffusionSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Saving arguments related to Diffusion trainer.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_args&quot;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
