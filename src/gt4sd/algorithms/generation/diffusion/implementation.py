@@ -140,23 +140,18 @@ class Generator:
             self.model = model_class.from_pretrained(model_name_or_path)
         self.model.to(self.device)
 
-    def sample(
-        self, batch_size: int = 1, prompt: Union[str, List[str]] = None
-    ) -> List[Any]:
+    def sample(self, number_samples: int = 1) -> List[Any]:
         """Sample images with optional conditioning.
 
         Args:
-            batch_size: number of images to generate.
-            prompt: text to use as prompt.
+            number_samples: number of images to generate.
         Returns:
             generated samples.
         """
-        # if explicit prompt is provided in sample, use it
-        if prompt:
-            item = self.model(batch_size=batch_size, prompt=prompt)
-        elif self.prompt:
-            item = self.model(batch_size=batch_size, prompt=self.prompt)
+        # if prompt is provided, use it
+        if self.prompt:
+            item = self.model(batch_size=number_samples, prompt=self.prompt)
         else:
-            item = self.model(batch_size=batch_size)
+            item = self.model(batch_size=number_samples)
         item = item["sample"]
         return item
