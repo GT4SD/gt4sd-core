@@ -338,6 +338,7 @@ Beyond implementing various generative modeling inference and training pipelines
 - [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as training pipelines for the generative VAEs.
 - [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from [HuggingFace Models](https://huggingface.co/models)
 - [GFlowNets](https://github.com/recursionpharma/gflownet): training and inference pipeline for [Generative Flow Networks](https://yoshuabengio.org/2022/03/05/generative-flow-networks/)
+- [MolGX](https://github.com/GT4SD/gt4sd-core/tree/main/src/gt4sd/frameworks): training and inference pipelines to generate small molecules satisfying target properties. The full functions of MolGX is available [here](https://github.com/GT4SD/gt4sd-core/tree/main/src/gt4sd/frameworks). 
 
 ## References
 
