@@ -28,7 +28,7 @@ MolGX generation algorithm.
 
 import logging
 from dataclasses import field
-import molgx
+from ....frameworks import molgx
 from typing import Any, ClassVar, Dict, Iterator, Optional, TypeVar
 
 logger = logging.getLogger(__name__)

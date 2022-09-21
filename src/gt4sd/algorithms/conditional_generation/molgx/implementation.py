@@ -30,7 +30,7 @@ from typing import Any, Dict, List
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-from molgx.molgxsdk import MolgxSdk
+from ....frameworks.molgx.molgxsdk import MolgxSdk
 
 class MolGXGenerator:
     """Interface for MolGX generator."""
