@@ -1,6 +1,9 @@
 # Generative Toolkit for Scientific Discovery
 
+<img src="_static/gt4sd_graphical_abstract.png" alt="logo" width="500"/>
+
 ## Site contents
+
 
 ```{toctree}
 ---
@@ -21,3 +24,5 @@ maxdepth: 1
 ---
 API of the gt4sd package <api/gt4sd>
 ```
+
+<img src="_static/gt4sd_components.png" alt="logo" width="500"/>

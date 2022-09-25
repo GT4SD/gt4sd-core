@@ -12,7 +12,9 @@
 [![DOI](https://zenodo.org/badge/458309249.svg)](https://zenodo.org/badge/latestdoi/458309249)
 [![2022 IEEE Open Software Services Award](https://img.shields.io/badge/Award-2022%20IEEE%20Open%20Software%20Services%20Award-yellow)](https://conferences.computer.org/services/2022/awards/oss_award.html)
 
-<img src="./docs/_static/gt4sd_logo.png" alt="logo" width="500"/>
+<img src="./docs/_static/gt4sd_logo.png" alt="logo" width="300"/> 
+<img src="./docs/_static/gt4sd_case_study.png" alt="logo" width="500"/>
+
 
 The GT4SD (Generative Toolkit for Scientific Discovery) is an open-source platform to accelerate hypothesis generation in the scientific discovery process. It provides a library for making state-of-the-art generative AI models easier to use.
 
@@ -73,6 +75,9 @@ Learn more in [CONTRIBUTING.md](./CONTRIBUTING.md)
 ## Getting started
 
 After install you can use `gt4sd` right away in your discovery workflows.
+
+<img src="./docs/_static/gt4sd_graphical_abstract.png" alt="logo" width="800"/>
+
 
 ### Running inference pipelines in your python code
 
