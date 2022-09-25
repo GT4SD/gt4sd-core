@@ -12,7 +12,7 @@
 [![DOI](https://zenodo.org/badge/458309249.svg)](https://zenodo.org/badge/latestdoi/458309249)
 [![2022 IEEE Open Software Services Award](https://img.shields.io/badge/Award-2022%20IEEE%20Open%20Software%20Services%20Award-yellow)](https://conferences.computer.org/services/2022/awards/oss_award.html)
 
-<img src="./docs/_static/gt4sd_logo.png" alt="logo" width="300"/> 
+<img align="right" width="200" height="200" src="./docs/_static/gt4sd_logo.png" alt="logo">
 <img src="./docs/_static/gt4sd_case_study.png" alt="logo" width="500"/>
 
 
