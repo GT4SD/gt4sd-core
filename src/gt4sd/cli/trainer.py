@@ -103,7 +103,7 @@ class TrainerArgumentParser(ArgumentParser):
         except Exception:
             super().print_help()
 
-    def parse_json_file(self, json_file: str) -> Tuple[DataClass, ...]:
+    def parse_json_file(self, json_file: str) -> Tuple[DataClass, ...]:  # type: ignore
         """Overriding default .json parser.
 
         It by-passes all command line arguments and simply add the training pipeline.

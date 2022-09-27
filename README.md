@@ -38,6 +38,13 @@ conda env create -f conda.yml
 conda activate gt4sd
 ```
 
+**Note:** by default `gt4sd` is installed with CPU requirements on linux systems. If you have GPU available, run:
+
+```sh
+conda env create -f conda_gpu.yml
+conda activate gt4sd
+```
+
 And install the package via `pip` from [PyPI](https://pypi.org/project/gt4sd/):
 
 ```sh
