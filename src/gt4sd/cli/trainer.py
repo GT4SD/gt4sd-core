@@ -117,7 +117,7 @@ class TrainerArgumentParser(ArgumentParser):
         number_of_dataclass_types = len(self.dataclass_types)  # type:ignore
         self.dataclass_types = [
             dataclass_type
-            for dataclass_type in self.dataclass_types # type:ignore
+            for dataclass_type in self.dataclass_types  # type:ignore
             if "gt4sd.cli.trainer.TrainerArguments" not in str(dataclass_type)
         ]
         try:
