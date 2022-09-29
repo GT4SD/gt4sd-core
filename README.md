@@ -32,9 +32,11 @@ We are actively working on relaxing these, so stay tuned or help us with this by
 
 ### conda
 
-The recommended way to install the `gt4sd` is to create a dedicated conda environment, this will ensure all requirements are satisfied:
+The recommended way to install the `gt4sd` is to create a dedicated conda environment, this will ensure all requirements are satisfied. For CPU:
 
 ```sh
+git clone https://github.com/GT4SD/gt4sd-core.git
+cd gt4sd-core/
 conda env create -f conda.yml
 conda activate gt4sd
 ```
@@ -42,6 +44,8 @@ conda activate gt4sd
 **Note:** by default `gt4sd` is installed with CPU requirements on linux systems. If you have GPU available, run:
 
 ```sh
+git clone https://github.com/GT4SD/gt4sd-core.git
+cd gt4sd-core/
 conda env create -f conda_gpu.yml
 conda activate gt4sd
 ```
