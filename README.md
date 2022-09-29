@@ -36,6 +36,7 @@ The recommended way to install the `gt4sd` is to create a dedicated conda enviro
 
 ```sh
 git clone https://github.com/GT4SD/gt4sd-core.git
+cd gt4sd-core/
 conda env create -f conda.yml
 conda activate gt4sd
 ```
@@ -44,6 +45,7 @@ conda activate gt4sd
 
 ```sh
 git clone https://github.com/GT4SD/gt4sd-core.git
+cd gt4sd-core/
 conda env create -f conda_gpu.yml
 conda activate gt4sd
 ```
