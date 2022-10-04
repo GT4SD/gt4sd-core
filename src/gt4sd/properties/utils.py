@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import ipaddress
 import json
 from typing import Any, Callable, Dict, List, Tuple, Type, Union
 
@@ -31,7 +32,7 @@ from tdc.chem_utils.oracle.oracle import fp2fpfunc
 from tdc.metadata import download_oracle_names
 
 from ..domains.materials import MacroMolecule, SmallMolecule
-from .core import PropertyValue
+from .core import PropertyValue, IpAdressParameters, ApiTokenParameters
 from .scores import SCORING_FACTORY
 
 
@@ -188,3 +189,38 @@ def get_target_parameters(
         score_list.append(SCORING_FACTORY[scoring_function_name](**parameters))
         weights.append(weight)
     return (score_list, weights)
+
+
+def validate_ip(ip: str, message: str = "") -> None:
+    """
+    Validates whether the parameter configuration contains a correct IP
+    address.
+
+    Args:
+        ip: The IP address to validate.
+        message: Additional error message to be displayed.
+    """
+
+    try:
+        ipaddress.ip_address(ip)
+    except ValueError:
+        raise ValueError(f"{ip} is not a IPv4 or IPv6 address\n {message}")
+
+
+def validate_api_token(parameters: ApiTokenParameters, message: str = "") -> None:
+    """
+    Validates whether the parameter configuration contains something
+    that _could_ be a valid API key.
+
+    Args:
+        parameters: ApiTokenParameters.
+        message: Additional error message to be displayed.
+    """
+
+    if not hasattr(parameters, "api_token"):
+        raise AttributeError(f"API key missing in {parameters}")
+
+    if not isinstance(parameters.api_token, str):
+        raise TypeError(
+            f"API key has to be a string not {parameters.api_token}\n {message}"
+        )

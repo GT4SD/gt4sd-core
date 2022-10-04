@@ -24,12 +24,13 @@
 from enum import Enum
 from typing import List
 
-from paccmann_generator.drug_evaluators import SIDER as _SIDER
+from paccmann_generator.drug_evaluators import SIDER
 from paccmann_generator.drug_evaluators import ClinTox as _ClinTox
 from paccmann_generator.drug_evaluators import OrganDB as _OrganTox
 from paccmann_generator.drug_evaluators import SCScore
 from paccmann_generator.drug_evaluators import Tox21 as _Tox21
 from pydantic import Field
+from tdc import Oracle
 
 from ...algorithms.core import (
     ConfigurablePropertyAlgorithmConfiguration,
@@ -38,13 +39,22 @@ from ...algorithms.core import (
 )
 from ...domains.materials import SmallMolecule
 from ..core import (
+    ApiTokenParameters,
     CallablePropertyPredictor,
+    ConfigurableCallablePropertyPredictor,
     DomainSubmodule,
+    IpAdressParameters,
     PropertyPredictorParameters,
     PropertyValue,
     S3Parameters,
 )
-from ..utils import get_activity_fn, get_similarity_fn, to_smiles
+from ..utils import (
+    get_activity_fn,
+    get_similarity_fn,
+    to_smiles,
+    validate_api_token,
+    validate_ip,
+)
 from .functions import (
     bertz,
     esol,
@@ -82,6 +92,49 @@ class SimilaritySeedParameters(PropertyPredictorParameters):
 
 class ActivityAgainstTargetParameters(PropertyPredictorParameters):
     target: str = Field(..., example="drd2", description="name of the target.")
+
+
+class AskcosParameters(IpAdressParameters):
+    class Output(str, Enum):
+        plausability: str = "plausibility"
+        num_step: str = "num_step"
+        synthesizability: str = "synthesizability"
+        price: str = "price"
+
+    output: Output = Field(
+        default=Output.plausability,
+        example=Output.synthesizability,
+        description="Main output return type from ASKCOS",
+        options=["plausibility", "num_step", "synthesizability", "price"],
+    )
+    save_json: bool = Field(default=False)
+    file_name: str = Field(default="tree_builder_result.json")
+    num_trials: int = Field(default=5)
+    max_depth: int = Field(default=9)
+    max_branching: int = Field(default=25)
+    expansion_time: int = Field(default=60)
+    max_ppg: int = Field(default=100)
+    template_count: int = Field(default=1000)
+    max_cum_prob: float = Field(default=0.999)
+    chemical_property_logic: str = Field(default="none")
+    max_chemprop_c: int = Field(default=0)
+    max_chemprop_n: int = Field(default=0)
+    max_chemprop_o: int = Field(default=0)
+    max_chemprop_h: int = Field(default=0)
+    chemical_popularity_logic: str = Field(default="none")
+    min_chempop_reactants: int = Field(default=5)
+    min_chempop_products: int = Field(default=5)
+    filter_threshold: float = Field(default=0.1)
+    return_first: str = Field(default="true")
+
+    # Convert enum items back to strings
+    class Config:
+        use_enum_values = True
+
+
+class MoleculeOneParameters(ApiTokenParameters):
+
+    oracle_name: str = "Molecule One Synthesis"
 
 
 class S3ParametersMolecules(S3Parameters):
@@ -355,6 +408,50 @@ class ActivityAgainstTarget(CallablePropertyPredictor):
         )
 
 
+class Askcos(ConfigurableCallablePropertyPredictor):
+    def __init__(self, parameters: AskcosParameters):
+
+        # Raises if IP is not valid
+        msg = (
+            "You have to point to an IP address of a running ASKCOS instance. "
+            "For details on setting this up, see: https://tdcommons.ai/functions/oracles/#askcos"
+        )
+        if not isinstance(parameters.host_ip, str):
+            raise TypeError(f"IP adress must be a string, not {parameters.host_ip}")
+
+        if not hasattr(parameters, "host_ip"):
+            raise AttributeError(f"IP adress missing in {parameters}")
+
+        if not "http" in parameters.host_ip:
+            raise ValueError(
+                f"ASKCOS requires an IP prepended with a http, e.g., "
+                f"'http://xx.xx.xxx.xxx' and not {parameters.host_ip}."
+            )
+        ip = parameters.host_ip.split("//")[1]
+
+        validate_ip(ip, message=msg)
+        super().__init__(callable_fn=Oracle(name="ASKCOS"), parameters=parameters)
+
+
+class MoleculeOne(CallablePropertyPredictor):
+    def __init__(self, parameters: MoleculeOneParameters):
+
+        msg = (
+            "You have to provide a valid API key, for details on setting this up, see: "
+            "https://tdcommons.ai/functions/oracles/#moleculeone"
+        )
+
+        # Only performs type checking on API key
+        validate_api_token(parameters, message=msg)
+
+        super().__init__(
+            callable_fn=Oracle(
+                name=parameters.oracle_name, api_token=parameters.api_token
+            ),
+            parameters=parameters,
+        )
+
+
 class _MCA(PredictorAlgorithm):
     """Base class for all MCA-based predictive algorithms."""
 
@@ -440,7 +537,7 @@ class ClinTox(_MCA):
         return text
 
 
-class SIDER(_MCA):
+class Sider(_MCA):
     def get_model(self, resources_path: str) -> Predictor:
         """Instantiate the actual model.
 
@@ -451,7 +548,7 @@ class SIDER(_MCA):
             Predictor: the model.
         """
         # This model returns a singular reward and not a prediction for both classes.
-        model = _SIDER(model_path=resources_path)
+        model = SIDER(model_path=resources_path)
 
         # Wrapper to get toxicity-endpoint-level predictions
         def informative_model(x: SmallMolecule) -> List[PropertyValue]:

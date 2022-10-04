@@ -26,9 +26,10 @@ from typing import Dict, Tuple, Type, Union
 from ...algorithms.core import PredictorAlgorithm
 from ..core import PropertyPredictor, PropertyPredictorParameters
 from .core import (
-    SIDER,
     ActivityAgainstTarget,
     ActivityAgainstTargetParameters,
+    Askcos,
+    AskcosParameters,
     Bertz,
     ClinTox,
     ClinToxParameters,
@@ -37,6 +38,8 @@ from .core import (
     Lipinski,
     Logp,
     MolecularWeight,
+    MoleculeOne,
+    MoleculeOneParameters,
     NumberAromaticRings,
     NumberAtoms,
     NumberHAcceptors,
@@ -53,6 +56,7 @@ from .core import (
     Sas,
     Scscore,
     ScscoreConfiguration,
+    Sider,
     SiderParameters,
     SimilaritySeed,
     SimilaritySeedParameters,
@@ -96,9 +100,12 @@ MOLECULE_PROPERTY_PREDICTOR_FACTORY: Dict[
     "scscore": (Scscore, ScscoreConfiguration),
     "activity_against_target": (ActivityAgainstTarget, ActivityAgainstTargetParameters),
     "tox21": (Tox21, Tox21Parameters),
-    "sider": (SIDER, SiderParameters),
+    "sider": (Sider, SiderParameters),
     "organtox": (OrganTox, OrganToxParameters),
     "clintox": (ClinTox, ClinToxParameters),
+    # properties from models requiring authentification
+    "askcos": (Askcos, AskcosParameters),
+    "molecule_one": (MoleculeOne, MoleculeOneParameters),
 }
 
 
