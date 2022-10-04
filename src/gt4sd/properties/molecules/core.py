@@ -31,6 +31,7 @@ from paccmann_generator.drug_evaluators import SCScore
 from paccmann_generator.drug_evaluators import Tox21 as _Tox21
 from pydantic import Field
 from tdc import Oracle
+from tdc.metadata import download_receptor_oracle_name
 
 from ...algorithms.core import (
     ConfigurablePropertyAlgorithmConfiguration,
@@ -135,6 +136,28 @@ class AskcosParameters(IpAdressParameters):
 class MoleculeOneParameters(ApiTokenParameters):
 
     oracle_name: str = "Molecule One Synthesis"
+
+
+class DockingTdcParameters(PropertyPredictorParameters):
+    # To dock against a receptor defined via TDC
+    target: str = Field(
+        ...,
+        example="1iep_docking",
+        description="Target for docking, provided via TDC",
+        options=download_receptor_oracle_name,
+    )
+
+
+class DockingParameters(PropertyPredictorParameters):
+    # To dock against a user-provided receptor
+    name: str = Field(default="pyscreener")
+    receptor_pdb_file: str = Field(
+        example="/tmp/2hbs.pdb", description="Path to receptor PDB file"
+    )
+    box_center: List[int] = Field(
+        example=[15.190, 53.903, 16.917], description="Docking box center"
+    )
+    box_size: List[float] = Field(example=[20, 20, 20], description="Docking box size")
 
 
 class S3ParametersMolecules(S3Parameters):
@@ -409,6 +432,11 @@ class ActivityAgainstTarget(CallablePropertyPredictor):
 
 
 class Askcos(ConfigurableCallablePropertyPredictor):
+    """
+    A property predictor that uses the ASKCOs API to calculate the synthesizability
+    of a molecule.
+    """
+
     def __init__(self, parameters: AskcosParameters):
 
         # Raises if IP is not valid
@@ -422,7 +450,7 @@ class Askcos(ConfigurableCallablePropertyPredictor):
         if not hasattr(parameters, "host_ip"):
             raise AttributeError(f"IP adress missing in {parameters}")
 
-        if not "http" in parameters.host_ip:
+        if "http" not in parameters.host_ip:
             raise ValueError(
                 f"ASKCOS requires an IP prepended with a http, e.g., "
                 f"'http://xx.xx.xxx.xxx' and not {parameters.host_ip}."
@@ -434,6 +462,11 @@ class Askcos(ConfigurableCallablePropertyPredictor):
 
 
 class MoleculeOne(CallablePropertyPredictor):
+    """
+    A property predictor that uses the MoleculeOne API to calculate the synthesizability
+    of a molecule.
+    """
+
     def __init__(self, parameters: MoleculeOneParameters):
 
         msg = (
@@ -450,6 +483,57 @@ class MoleculeOne(CallablePropertyPredictor):
             ),
             parameters=parameters,
         )
+
+
+class DockingTdc(ConfigurableCallablePropertyPredictor):
+    """
+    A property predictor that computes the docking score against a target
+    provided via the TDC package (see: https://tdcommons.ai/functions/oracles/#docking-scores)
+    """
+
+    def __init__(self, parameters: DockingTdcParameters):
+
+        self.import_check()
+        callable = Oracle(name=parameters.target)
+        super().__init__(callable_fn=callable, parameters=parameters)
+
+    def import_check(self):
+        """
+        Verifies that __some__ of the required packages for docking are installed.
+
+        Raises:
+            ModuleNotFoundError: _description_
+        """
+        try:
+            import openbabel
+            import pdbfixer
+            import pyscreener
+
+            openbabel, pdbfixer, pyscreener
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError(
+                "You dont seem to have a valid installation for docking. You at "
+                "least need `pdbfixer`, `openbabel` and `pyscreener` installed."
+                "See here for details: https://tdcommons.ai/functions/oracles/#docking-scores"
+            )
+
+
+class Docking(DockingTdc):
+    """
+    A property predictor that computes the docking score against a user-defined target.
+    Relies on TDC backend, see https://tdcommons.ai/functions/oracles/#docking-scores for setup.
+    """
+
+    def __init__(self, parameters: DockingParameters):
+
+        self.import_check()
+        callable = Oracle(
+            name=parameters.name,
+            receptor_pdb_file=parameters.receptor_pdb_file,
+            box_center=parameters.box_center,
+            box_size=parameters.box_size,
+        )
+        super().__init__(callable_fn=callable, parameters=parameters)
 
 
 class _MCA(PredictorAlgorithm):

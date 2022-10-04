@@ -33,6 +33,10 @@ from .core import (
     Bertz,
     ClinTox,
     ClinToxParameters,
+    Docking,
+    DockingParameters,
+    DockingTdc,
+    DockingTdcParameters,
     Esol,
     IsScaffold,
     Lipinski,
@@ -103,9 +107,12 @@ MOLECULE_PROPERTY_PREDICTOR_FACTORY: Dict[
     "sider": (Sider, SiderParameters),
     "organtox": (OrganTox, OrganToxParameters),
     "clintox": (ClinTox, ClinToxParameters),
-    # properties from models requiring authentification
+    # # properties from models requiring authentification
     "askcos": (Askcos, AskcosParameters),
     "molecule_one": (MoleculeOne, MoleculeOneParameters),
+    # # properties from models require additional installations
+    "docking_tdc": (DockingTdc, DockingTdcParameters),
+    "docking": (Docking, DockingParameters),
 }
 
 

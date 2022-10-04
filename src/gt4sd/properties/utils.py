@@ -32,7 +32,7 @@ from tdc.chem_utils.oracle.oracle import fp2fpfunc
 from tdc.metadata import download_oracle_names
 
 from ..domains.materials import MacroMolecule, SmallMolecule
-from .core import PropertyValue, IpAdressParameters, ApiTokenParameters
+from .core import ApiTokenParameters, PropertyValue
 from .scores import SCORING_FACTORY
 
 
