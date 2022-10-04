@@ -50,6 +50,7 @@ from ..core import (
     S3Parameters,
 )
 from ..utils import (
+    docking_import_check,
     get_activity_fn,
     get_similarity_fn,
     to_smiles,
@@ -493,32 +494,12 @@ class DockingTdc(ConfigurableCallablePropertyPredictor):
 
     def __init__(self, parameters: DockingTdcParameters):
 
-        self.import_check()
+        docking_import_check()
         callable = Oracle(name=parameters.target)
         super().__init__(callable_fn=callable, parameters=parameters)
 
-    def import_check(self):
-        """
-        Verifies that __some__ of the required packages for docking are installed.
 
-        Raises:
-            ModuleNotFoundError: _description_
-        """
-        try:
-            import openbabel
-            import pdbfixer
-            import pyscreener
-
-            openbabel, pdbfixer, pyscreener
-        except ModuleNotFoundError:
-            raise ModuleNotFoundError(
-                "You dont seem to have a valid installation for docking. You at "
-                "least need `pdbfixer`, `openbabel` and `pyscreener` installed."
-                "See here for details: https://tdcommons.ai/functions/oracles/#docking-scores"
-            )
-
-
-class Docking(DockingTdc):
+class Docking(ConfigurableCallablePropertyPredictor):
     """
     A property predictor that computes the docking score against a user-defined target.
     Relies on TDC backend, see https://tdcommons.ai/functions/oracles/#docking-scores for setup.
@@ -526,7 +507,7 @@ class Docking(DockingTdc):
 
     def __init__(self, parameters: DockingParameters):
 
-        self.import_check()
+        docking_import_check()
         callable = Oracle(
             name=parameters.name,
             receptor_pdb_file=parameters.receptor_pdb_file,

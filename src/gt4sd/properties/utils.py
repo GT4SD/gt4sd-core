@@ -224,3 +224,24 @@ def validate_api_token(parameters: ApiTokenParameters, message: str = "") -> Non
         raise TypeError(
             f"API key has to be a string not {parameters.api_token}\n {message}"
         )
+
+
+def docking_import_check() -> None:
+    """
+    Verifies that __some__ of the required packages for docking are installed.
+
+    Raises:
+        ModuleNotFoundError: If a necessary module was not found.
+    """
+    try:
+        import openbabel
+        import pdbfixer
+        import pyscreener
+
+        openbabel, pdbfixer, pyscreener
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError(
+            "You dont seem to have a valid installation for docking. You at "
+            "least need `pdbfixer`, `openbabel` and `pyscreener` installed."
+            "See here for details: https://tdcommons.ai/functions/oracles/#docking-scores"
+        )
