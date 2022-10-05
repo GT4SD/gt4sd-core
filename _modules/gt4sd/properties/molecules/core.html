@@ -189,12 +189,14 @@
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">SIDER</span> <span class="k">as</span> <span class="n">_SIDER</span>
+<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">SIDER</span>
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">ClinTox</span> <span class="k">as</span> <span class="n">_ClinTox</span>
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">OrganDB</span> <span class="k">as</span> <span class="n">_OrganTox</span>
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">SCScore</span>
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">Tox21</span> <span class="k">as</span> <span class="n">_Tox21</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">Field</span>
+<span class="kn">from</span> <span class="nn">tdc</span> <span class="kn">import</span> <span class="n">Oracle</span>
+<span class="kn">from</span> <span class="nn">tdc.metadata</span> <span class="kn">import</span> <span class="n">download_receptor_oracle_name</span>
 
 <span class="kn">from</span> <span class="nn">...algorithms.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ConfigurablePropertyAlgorithmConfiguration</span><span class="p">,</span>
@@ -203,13 +205,23 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">...domains.materials</span> <span class="kn">import</span> <span class="n">SmallMolecule</span>
 <span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ApiTokenParameters</span><span class="p">,</span>
     <span class="n">CallablePropertyPredictor</span><span class="p">,</span>
+    <span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">,</span>
     <span class="n">DomainSubmodule</span><span class="p">,</span>
+    <span class="n">IpAdressParameters</span><span class="p">,</span>
     <span class="n">PropertyPredictorParameters</span><span class="p">,</span>
     <span class="n">PropertyValue</span><span class="p">,</span>
     <span class="n">S3Parameters</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">get_activity_fn</span><span class="p">,</span> <span class="n">get_similarity_fn</span><span class="p">,</span> <span class="n">to_smiles</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">docking_import_check</span><span class="p">,</span>
+    <span class="n">get_activity_fn</span><span class="p">,</span>
+    <span class="n">get_similarity_fn</span><span class="p">,</span>
+    <span class="n">to_smiles</span><span class="p">,</span>
+    <span class="n">validate_api_token</span><span class="p">,</span>
+    <span class="n">validate_ip</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">bertz</span><span class="p">,</span>
     <span class="n">esol</span><span class="p">,</span>
@@ -247,6 +259,71 @@
 
 <div class="viewcode-block" id="ActivityAgainstTargetParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ActivityAgainstTargetParameters">[docs]</a><span class="k">class</span> <span class="nc">ActivityAgainstTargetParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
     <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">example</span><span class="o">=</span><span class="s2">&quot;drd2&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;name of the target.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AskcosParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.AskcosParameters">[docs]</a><span class="k">class</span> <span class="nc">AskcosParameters</span><span class="p">(</span><span class="n">IpAdressParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="AskcosParameters.Output"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.AskcosParameters.Output">[docs]</a>    <span class="k">class</span> <span class="nc">Output</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+        <span class="n">plausability</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plausibility&quot;</span>
+        <span class="n">num_step</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;num_step&quot;</span>
+        <span class="n">synthesizability</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;synthesizability&quot;</span>
+        <span class="n">price</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;price&quot;</span></div>
+
+    <span class="n">output</span><span class="p">:</span> <span class="n">Output</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">Output</span><span class="o">.</span><span class="n">plausability</span><span class="p">,</span>
+        <span class="n">example</span><span class="o">=</span><span class="n">Output</span><span class="o">.</span><span class="n">synthesizability</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Main output return type from ASKCOS&quot;</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;plausibility&quot;</span><span class="p">,</span> <span class="s2">&quot;num_step&quot;</span><span class="p">,</span> <span class="s2">&quot;synthesizability&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">save_json</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;tree_builder_result.json&quot;</span><span class="p">)</span>
+    <span class="n">num_trials</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">max_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+    <span class="n">max_branching</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+    <span class="n">expansion_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">max_ppg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">template_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+    <span class="n">max_cum_prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.999</span><span class="p">)</span>
+    <span class="n">chemical_property_logic</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+    <span class="n">max_chemprop_c</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">max_chemprop_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">max_chemprop_o</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">max_chemprop_h</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">chemical_popularity_logic</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+    <span class="n">min_chempop_reactants</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">min_chempop_products</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">filter_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">return_first</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Convert enum items back to strings</span>
+<div class="viewcode-block" id="AskcosParameters.Config"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.AskcosParameters.Config">[docs]</a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">use_enum_values</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+
+
+<div class="viewcode-block" id="MoleculeOneParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MoleculeOneParameters">[docs]</a><span class="k">class</span> <span class="nc">MoleculeOneParameters</span><span class="p">(</span><span class="n">ApiTokenParameters</span><span class="p">):</span>
+
+    <span class="n">oracle_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Molecule One Synthesis&quot;</span></div>
+
+
+<div class="viewcode-block" id="DockingTdcParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingTdcParameters">[docs]</a><span class="k">class</span> <span class="nc">DockingTdcParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
+    <span class="c1"># To dock against a receptor defined via TDC</span>
+    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span>
+        <span class="n">example</span><span class="o">=</span><span class="s2">&quot;1iep_docking&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Target for docking, provided via TDC&quot;</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">download_receptor_oracle_name</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DockingParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingParameters">[docs]</a><span class="k">class</span> <span class="nc">DockingParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
+    <span class="c1"># To dock against a user-provided receptor</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;pyscreener&quot;</span><span class="p">)</span>
+    <span class="n">receptor_pdb_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">example</span><span class="o">=</span><span class="s2">&quot;/tmp/2hbs.pdb&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Path to receptor PDB file&quot;</span>
+    <span class="p">)</span>
+    <span class="n">box_center</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">example</span><span class="o">=</span><span class="p">[</span><span class="mf">15.190</span><span class="p">,</span> <span class="mf">53.903</span><span class="p">,</span> <span class="mf">16.917</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Docking box center&quot;</span>
+    <span class="p">)</span>
+    <span class="n">box_size</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">example</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Docking box size&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="S3ParametersMolecules"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.S3ParametersMolecules">[docs]</a><span class="k">class</span> <span class="nc">S3ParametersMolecules</span><span class="p">(</span><span class="n">S3Parameters</span><span class="p">):</span>
@@ -520,6 +597,91 @@
         <span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="Askcos"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Askcos">[docs]</a><span class="k">class</span> <span class="nc">Askcos</span><span class="p">(</span><span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A property predictor that uses the ASKCOs API to calculate the synthesizability</span>
+<span class="sd">    of a molecule.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Askcos.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Askcos.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">AskcosParameters</span><span class="p">):</span>
+
+        <span class="c1"># Raises if IP is not valid</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;You have to point to an IP address of a running ASKCOS instance. &quot;</span>
+            <span class="s2">&quot;For details on setting this up, see: https://tdcommons.ai/functions/oracles/#askcos&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">host_ip</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;IP adress must be a string, not </span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">host_ip</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="s2">&quot;host_ip&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;IP adress missing in </span><span class="si">{</span><span class="n">parameters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;http&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">host_ip</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;ASKCOS requires an IP prepended with a http, e.g., &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;http://xx.xx.xxx.xxx&#39; and not </span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">host_ip</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">host_ip</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;//&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">validate_ip</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">Oracle</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ASKCOS&quot;</span><span class="p">),</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MoleculeOne"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MoleculeOne">[docs]</a><span class="k">class</span> <span class="nc">MoleculeOne</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A property predictor that uses the MoleculeOne API to calculate the synthesizability</span>
+<span class="sd">    of a molecule.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MoleculeOne.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MoleculeOne.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">MoleculeOneParameters</span><span class="p">):</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;You have to provide a valid API key, for details on setting this up, see: &quot;</span>
+            <span class="s2">&quot;https://tdcommons.ai/functions/oracles/#moleculeone&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Only performs type checking on API key</span>
+        <span class="n">validate_api_token</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">callable_fn</span><span class="o">=</span><span class="n">Oracle</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">oracle_name</span><span class="p">,</span> <span class="n">api_token</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">api_token</span>
+            <span class="p">),</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DockingTdc"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingTdc">[docs]</a><span class="k">class</span> <span class="nc">DockingTdc</span><span class="p">(</span><span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A property predictor that computes the docking score against a target</span>
+<span class="sd">    provided via the TDC package (see: https://tdcommons.ai/functions/oracles/#docking-scores)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DockingTdc.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingTdc.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">DockingTdcParameters</span><span class="p">):</span>
+
+        <span class="n">docking_import_check</span><span class="p">()</span>
+        <span class="n">callable</span> <span class="o">=</span> <span class="n">Oracle</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">callable</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Docking"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Docking">[docs]</a><span class="k">class</span> <span class="nc">Docking</span><span class="p">(</span><span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A property predictor that computes the docking score against a user-defined target.</span>
+<span class="sd">    Relies on TDC backend, see https://tdcommons.ai/functions/oracles/#docking-scores for setup.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Docking.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Docking.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">DockingParameters</span><span class="p">):</span>
+
+        <span class="n">docking_import_check</span><span class="p">()</span>
+        <span class="n">callable</span> <span class="o">=</span> <span class="n">Oracle</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">receptor_pdb_file</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">receptor_pdb_file</span><span class="p">,</span>
+            <span class="n">box_center</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">box_center</span><span class="p">,</span>
+            <span class="n">box_size</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">box_size</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">callable</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
+
+
 <span class="k">class</span> <span class="nc">_MCA</span><span class="p">(</span><span class="n">PredictorAlgorithm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Base class for all MCA-based predictive algorithms.&quot;&quot;&quot;</span>
 
@@ -605,8 +767,8 @@
         <span class="k">return</span> <span class="n">text</span></div></div>
 
 
-<div class="viewcode-block" id="SIDER"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SIDER">[docs]</a><span class="k">class</span> <span class="nc">SIDER</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
-<div class="viewcode-block" id="SIDER.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SIDER.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<div class="viewcode-block" id="Sider"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sider">[docs]</a><span class="k">class</span> <span class="nc">Sider</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
+<div class="viewcode-block" id="Sider.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sider.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
 
 <span class="sd">        Args:</span>
@@ -616,7 +778,7 @@
 <span class="sd">            Predictor: the model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># This model returns a singular reward and not a prediction for both classes.</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">_SIDER</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">SIDER</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
 
         <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
         <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
@@ -626,7 +788,7 @@
 
         <span class="k">return</span> <span class="n">informative_model</span></div>
 
-<div class="viewcode-block" id="SIDER.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SIDER.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Sider.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sider.get_description">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        This model is a multitask classifier to predict side effects of drugs across</span>
