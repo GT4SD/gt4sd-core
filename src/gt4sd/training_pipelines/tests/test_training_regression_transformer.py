@@ -44,7 +44,7 @@ from gt4sd.training_pipelines.core import TrainingPipelineArguments
 
 template_config = {
     "model_args": {},
-    "dataset_args": {"test_fraction": 0.5},
+    "dataset_args": {},
     "training_args": {
         "training_name": "regression-transformer-test",
         "batch_size": 4,

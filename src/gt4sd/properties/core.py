@@ -55,6 +55,23 @@ class S3Parameters(PropertyPredictorParameters):
     algorithm_application: str = Field(..., example="Tox21")
 
 
+class ApiTokenParameters(PropertyPredictorParameters):
+    api_token: str = Field(
+        ...,
+        example="apk-c9db......",
+        description="The API token/key to access the service",
+    )
+
+
+class IpAdressParameters(PropertyPredictorParameters):
+
+    host_ip: str = Field(
+        ...,
+        example="xx.xx.xxx.xxx",
+        description="The host IP address to access the service",
+    )
+
+
 class PropertyPredictor:
     """PropertyPredictor base class."""
 
