@@ -121,7 +121,9 @@ class TrainerArgumentParser(ArgumentParser):
             if "gt4sd.cli.trainer.TrainerArguments" not in str(dataclass_type)
         ]
         try:
-            parsed_arguments = super().parse_json_file(json_file=json_file)
+            parsed_arguments = super().parse_json_file(
+                json_file=json_file, allow_extra_keys=True
+            )
         except Exception:
             logger.exception(
                 f"error parsing configuration file: {json_file}, printing error and exiting"
