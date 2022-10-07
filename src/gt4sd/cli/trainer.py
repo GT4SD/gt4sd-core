@@ -44,6 +44,11 @@ SUPPORTED_TRAINING_PIPELINES = sorted(
     list(set(TRAINING_PIPELINE_ARGUMENTS_MAPPING) & set(TRAINING_PIPELINE_MAPPING))
 )
 
+import torch
+
+# deactivate cudnn to avoid errors with gpu training
+torch.backends.cudnn.enabled = False
+
 
 @dataclass
 class TrainerArguments:

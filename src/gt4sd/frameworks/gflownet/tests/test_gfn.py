@@ -148,6 +148,6 @@ def test_gfn():
         max_epochs=1,
         flush_logs_every_n_steps=100,
         fast_dev_run=True,
-        accelerator="ddp",
+        strategy="ddp",
     )
     trainer.fit(module, dm)

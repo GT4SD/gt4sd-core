@@ -42,6 +42,11 @@ _sentencepiece
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
+import torch
+
+# deactivate cudnn to avoid cuda errors
+torch.backends.cudnn.enabled = False
+
 
 class PyTorchLightningTrainingPipeline(TrainingPipeline):
     """PyTorch lightining training pipelines."""
@@ -75,7 +80,7 @@ class PyTorchLightningTrainingPipeline(TrainingPipeline):
                 "save_top_k": pl_trainer_args["save_top_k"],
                 "mode": pl_trainer_args["mode"],
                 "every_n_train_steps": pl_trainer_args["every_n_train_steps"],
-                "every_n_val_epochs": pl_trainer_args["every_n_val_epochs"],
+                "every_n_epochs": pl_trainer_args["every_n_epochs"],
                 "save_last": pl_trainer_args["save_last"],
             }
         }
@@ -86,7 +91,7 @@ class PyTorchLightningTrainingPipeline(TrainingPipeline):
             pl_trainer_args["mode"],
             pl_trainer_args["every_n_train_steps"],
             pl_trainer_args["save_last"],
-            pl_trainer_args["every_n_val_epochs"],
+            pl_trainer_args["every_n_epochs"],
         )
 
         pl_trainer_args["callbacks"] = self.add_callbacks(pl_trainer_args["callbacks"])
@@ -150,8 +155,8 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
 
     __name__ = "pl_trainer_args"
 
-    accelerator: Optional[str] = field(
-        default="ddp", metadata={"help": "Accelerator type."}
+    strategy: Optional[str] = field(
+        default="ddp", metadata={"help": "Training strategy."}
     )
     accumulate_grad_batches: int = field(
         default=1,
@@ -199,8 +204,8 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
             "help": "When True, always saves the model at the end of the epoch to a file last.ckpt"
         },
     )
-    save_top_k: Optional[int] = field(
-        default=None,
+    save_top_k: int = field(
+        default=1,
         metadata={
             "help": "The best k models according to the quantity monitored will be saved."
         },
@@ -212,4 +217,12 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
     every_n_train_steps: Optional[int] = field(
         default=None,
         metadata={"help": "Number of training steps between checkpoints."},
+    )
+    every_n_epochs: Optional[int] = field(
+        default=None,
+        metadata={"help": "Number of epochs between checkpoints."},
+    )
+    check_val_every_n_epoch: Optional[int] = field(
+        default=None,
+        metadata={"help": "Number of validation epochs between evaluations."},
     )
