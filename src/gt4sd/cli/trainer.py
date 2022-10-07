@@ -31,6 +31,7 @@ import sys
 from dataclasses import dataclass, field
 from typing import IO, Iterable, Optional, Tuple, cast
 
+from ..configuration import GT4SDConfiguration
 from ..training_pipelines import (
     TRAINING_PIPELINE_ARGUMENTS_MAPPING,
     TRAINING_PIPELINE_MAPPING,
@@ -43,6 +44,12 @@ logger = logging.getLogger(__name__)
 SUPPORTED_TRAINING_PIPELINES = sorted(
     list(set(TRAINING_PIPELINE_ARGUMENTS_MAPPING) & set(TRAINING_PIPELINE_MAPPING))
 )
+
+# disable cudnn if issues with gpu training
+if GT4SDConfiguration.get_instance().gt4sd_disable_cudnn:
+    import torch
+
+    torch.backends.cudnn.enabled = False
 
 
 @dataclass

@@ -29,7 +29,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import sentencepiece as _sentencepiece
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer
-from pytorch_lightning.callbacks.base import Callback
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -120,7 +119,7 @@ class PyTorchLightningTrainingPipeline(TrainingPipeline):
             "Can't get data and model modules for an abstract training pipeline."
         )
 
-    def add_callbacks(self, callback_args: Dict[str, Any]) -> List[Callback]:
+    def add_callbacks(self, callback_args: Dict[str, Any]) -> List[Any]:
         """Create the requested callbacks for training.
 
         Args:
@@ -130,7 +129,7 @@ class PyTorchLightningTrainingPipeline(TrainingPipeline):
             list of pytorch lightning callbacks.
         """
 
-        callbacks: List[Callback] = []
+        callbacks: List[Any] = []
         if "early_stopping_callback" in callback_args:
             callbacks.append(EarlyStopping(**callback_args["early_stopping_callback"]))
 
