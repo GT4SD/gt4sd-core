@@ -44,11 +44,6 @@ SUPPORTED_TRAINING_PIPELINES = sorted(
     list(set(TRAINING_PIPELINE_ARGUMENTS_MAPPING) & set(TRAINING_PIPELINE_MAPPING))
 )
 
-import torch
-
-# deactivate cudnn to avoid errors with gpu training
-torch.backends.cudnn.enabled = False
-
 
 @dataclass
 class TrainerArguments:
@@ -126,7 +121,7 @@ class TrainerArgumentParser(ArgumentParser):
             if "gt4sd.cli.trainer.TrainerArguments" not in str(dataclass_type)
         ]
         try:
-            parsed_arguments = super().parse_json_file(
+            parsed_arguments = super().parse_json_file(  # type:ignore
                 json_file=json_file, allow_extra_keys=True
             )
         except Exception:

@@ -42,11 +42,6 @@ _sentencepiece
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-import torch
-
-# deactivate cudnn to avoid cuda errors
-torch.backends.cudnn.enabled = False
-
 
 class PyTorchLightningTrainingPipeline(TrainingPipeline):
     """PyTorch lightining training pipelines."""
