@@ -29,7 +29,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import sentencepiece as _sentencepiece
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer
-from pytorch_lightning.callbacks.base import Callback
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -75,7 +74,7 @@ class PyTorchLightningTrainingPipeline(TrainingPipeline):
                 "save_top_k": pl_trainer_args["save_top_k"],
                 "mode": pl_trainer_args["mode"],
                 "every_n_train_steps": pl_trainer_args["every_n_train_steps"],
-                "every_n_val_epochs": pl_trainer_args["every_n_val_epochs"],
+                "every_n_epochs": pl_trainer_args["every_n_epochs"],
                 "save_last": pl_trainer_args["save_last"],
             }
         }
@@ -86,7 +85,7 @@ class PyTorchLightningTrainingPipeline(TrainingPipeline):
             pl_trainer_args["mode"],
             pl_trainer_args["every_n_train_steps"],
             pl_trainer_args["save_last"],
-            pl_trainer_args["every_n_val_epochs"],
+            pl_trainer_args["every_n_epochs"],
         )
 
         pl_trainer_args["callbacks"] = self.add_callbacks(pl_trainer_args["callbacks"])
@@ -120,7 +119,7 @@ class PyTorchLightningTrainingPipeline(TrainingPipeline):
             "Can't get data and model modules for an abstract training pipeline."
         )
 
-    def add_callbacks(self, callback_args: Dict[str, Any]) -> List[Callback]:
+    def add_callbacks(self, callback_args: Dict[str, Any]) -> List[Any]:
         """Create the requested callbacks for training.
 
         Args:
@@ -130,7 +129,7 @@ class PyTorchLightningTrainingPipeline(TrainingPipeline):
             list of pytorch lightning callbacks.
         """
 
-        callbacks: List[Callback] = []
+        callbacks: List[Any] = []
         if "early_stopping_callback" in callback_args:
             callbacks.append(EarlyStopping(**callback_args["early_stopping_callback"]))
 
@@ -150,8 +149,8 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
 
     __name__ = "pl_trainer_args"
 
-    accelerator: Optional[str] = field(
-        default="ddp", metadata={"help": "Accelerator type."}
+    strategy: Optional[str] = field(
+        default="ddp", metadata={"help": "Training strategy."}
     )
     accumulate_grad_batches: int = field(
         default=1,
@@ -199,8 +198,8 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
             "help": "When True, always saves the model at the end of the epoch to a file last.ckpt"
         },
     )
-    save_top_k: Optional[int] = field(
-        default=None,
+    save_top_k: int = field(
+        default=1,
         metadata={
             "help": "The best k models according to the quantity monitored will be saved."
         },
@@ -212,4 +211,12 @@ class PytorchLightningTrainingArguments(TrainingPipelineArguments):
     every_n_train_steps: Optional[int] = field(
         default=None,
         metadata={"help": "Number of training steps between checkpoints."},
+    )
+    every_n_epochs: Optional[int] = field(
+        default=None,
+        metadata={"help": "Number of epochs between checkpoints."},
+    )
+    check_val_every_n_epoch: Optional[int] = field(
+        default=None,
+        metadata={"help": "Number of validation epochs between evaluations."},
     )

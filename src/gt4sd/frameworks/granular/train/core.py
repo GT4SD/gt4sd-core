@@ -91,7 +91,7 @@ def train_granular(configuration: Dict[str, Any]) -> None:
         "logs", name=getattr(arguments, "basename", "default")
     )
     checkpoint_callback = ModelCheckpoint(
-        every_n_val_epochs=getattr(arguments, "checkpoint_every_n_val_epochs", 5),
+        every_n_epochs=getattr(arguments, "checkpoint_every_n_val_epochs", 5),
         save_top_k=-1,
     )
     trainer = pl.Trainer.from_argparse_args(
