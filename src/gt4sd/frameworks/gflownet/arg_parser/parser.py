@@ -167,7 +167,7 @@ def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Nam
     parser.add_argument("--num_offline", type=int, default=10)
     parser.add_argument("--sampling_iterator", type=bool, default=True)
     parser.add_argument("--ratio", type=float, default=0.9)
-    parser.add_argument("--distributed_training_strategy", type=str, default="ddp")
+    parser.add_argument("--strategy", type=str, default="ddp")
     parser.add_argument("--development_mode", type=bool, default=False)
 
     args_dictionary = vars(parser.parse_args(remaining_argv))

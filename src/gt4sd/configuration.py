@@ -50,6 +50,7 @@ class GT4SDConfiguration(BaseSettings):
     gt4sd_max_number_of_samples: int = 1000000
     gt4sd_max_runtime: int = 86400
     gt4sd_create_unverified_ssl_context: bool = False
+    gt4sd_disable_cudnn: bool = False
 
     gt4sd_s3_host: str = "s3.par01.cloud-object-storage.appdomain.cloud"
     gt4sd_s3_access_key: str = "6e9891531d724da89997575a65f4592e"
