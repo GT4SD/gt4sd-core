@@ -127,7 +127,7 @@ class GranularPytorchLightningTrainingArguments(PytorchLightningTrainingArgument
 
     __name__ = "pl_trainer_args"
 
-    every_n_val_epochs: Optional[int] = field(
+    check_val_every_n_epoch: Optional[int] = field(
         default=5,
         metadata={"help": "Number of training epochs between checkpoints."},
     )
