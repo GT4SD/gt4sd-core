@@ -120,12 +120,12 @@ class GFlowNetDataModule(pl.LightningDataModule):
         self.ix_test = ixs[thresh:]
 
         if stage == "fit" or stage is None:
-            self.train_dataset.set_indexes(self.ix_train)
-            self.val_dataset.set_indexes(self.ix_val)
+            self.train_dataset.set_indexes(self.ix_train)  # type: ignore
+            self.val_dataset.set_indexes(self.ix_val)  # type: ignore
         if stage == "test" or stage is None:
-            self.test_dataset.set_indexes(self.ix_test)
+            self.test_dataset.set_indexes(self.ix_test)  # type: ignore
         if stage == "predict" or stage is None:
-            self.test_dataset.set_indexes(self.ix_test)
+            self.test_dataset.set_indexes(self.ix_test)  # type: ignore
 
         logger.info(
             f"number of data points used for training: {len(self.train_dataset)}"
