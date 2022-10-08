@@ -27,7 +27,7 @@ import shutil
 import tempfile
 from typing import Any, Dict, cast
 
-import pkg_resources
+import importlib_resources
 
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
@@ -82,27 +82,26 @@ def test_train():
     shutil.rmtree(TEMPORARY_DIRECTORY)
 
     # Now test with a custom dataset
-    file_path = pkg_resources.resource_filename(
-        "gt4sd",
-        "training_pipelines/tests/molecules.csv",
-    )
-    config["dataset_args"]["dataset_name"] = "custom"
-    config["dataset_args"]["file_path"] = file_path
-    config["dataset_args"]["smiles_field"] = "smiles"
-    config["dataset_args"]["target_field"] = "qed"
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "training_pipelines/tests/molecules.csv"
+    ) as file_path:
+        config["dataset_args"]["dataset_name"] = "custom"
+        config["dataset_args"]["file_path"] = file_path
+        config["dataset_args"]["smiles_field"] = "smiles"
+        config["dataset_args"]["target_field"] = "qed"
 
-    test_pipeline.train(**config)
-    shutil.rmtree(TEMPORARY_DIRECTORY)
+        test_pipeline.train(**config)
+        shutil.rmtree(TEMPORARY_DIRECTORY)
 
-    # Test the property optimization
-    """
-    Disabled for now due to multiple downstream torchdrug issues, most importantly:
-    - https://github.com/DeepGraphLearning/torchdrug/issues/83
-    """
-    # config["dataset_args"]["target_field"] = 'qed'
-    # config['training_args']['task'] = 'qed'
-    # config['data_args']['node_feature'] = 'symbol'
-    # config['model_args']['criterion'] = "{'ppo': 1}"
+        # Test the property optimization
+        """
+        Disabled for now due to multiple downstream torchdrug issues, most importantly:
+        - https://github.com/DeepGraphLearning/torchdrug/issues/83
+        """
+        # config["dataset_args"]["target_field"] = 'qed'
+        # config['training_args']['task'] = 'qed'
+        # config['data_args']['node_feature'] = 'symbol'
+        # config['model_args']['criterion'] = "{'ppo': 1}"
 
-    # test_pipeline.train(**config)
-    # shutil.rmtree(TEMPORARY_DIRECTORY)
+        # test_pipeline.train(**config)
+        # shutil.rmtree(TEMPORARY_DIRECTORY)

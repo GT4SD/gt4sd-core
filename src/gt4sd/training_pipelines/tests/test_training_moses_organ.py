@@ -23,22 +23,24 @@
 #
 """Moses Organ trainer unit tests."""
 
+import atexit
 import os
 import shutil
 import tempfile
+from contextlib import ExitStack
 from typing import Any, Dict, cast
 
-import pkg_resources
+import importlib_resources
 
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
     MosesOrganTrainingPipeline,
 )
 
-TEST_DATA_DIRECTORY = pkg_resources.resource_filename(
-    "gt4sd",
-    "training_pipelines/tests/",
-)
+file_manager = ExitStack()
+atexit.register(file_manager.close)
+ref = importlib_resources.files("gt4sd") / "training_pipelines/tests/molecules.smiles"
+data_path = file_manager.enter_context(importlib_resources.as_file(ref))
 
 
 def _create_training_output_filepaths(directory: str) -> Dict[str, str]:
@@ -88,10 +90,7 @@ template_config = {
         "device": "cpu",
         "save_frequency": 1,
     },
-    "dataset_args": {
-        "train_load": os.path.join(TEST_DATA_DIRECTORY, "molecules.smiles"),
-        "val_load": os.path.join(TEST_DATA_DIRECTORY, "molecules.smiles"),
-    },
+    "dataset_args": {"train_load": data_path, "val_load": data_path},
 }
 
 
