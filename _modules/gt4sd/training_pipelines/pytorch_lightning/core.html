@@ -194,7 +194,6 @@
 
 <span class="kn">import</span> <span class="nn">sentencepiece</span> <span class="k">as</span> <span class="nn">_sentencepiece</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span><span class="p">,</span> <span class="n">Trainer</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning.callbacks.base</span> <span class="kn">import</span> <span class="n">Callback</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning.callbacks.early_stopping</span> <span class="kn">import</span> <span class="n">EarlyStopping</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning.callbacks.model_checkpoint</span> <span class="kn">import</span> <span class="n">ModelCheckpoint</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning.loggers</span> <span class="kn">import</span> <span class="n">TensorBoardLogger</span>
@@ -240,7 +239,7 @@
                 <span class="s2">&quot;save_top_k&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;save_top_k&quot;</span><span class="p">],</span>
                 <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">],</span>
                 <span class="s2">&quot;every_n_train_steps&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;every_n_train_steps&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;every_n_val_epochs&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;every_n_val_epochs&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;every_n_epochs&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;every_n_epochs&quot;</span><span class="p">],</span>
                 <span class="s2">&quot;save_last&quot;</span><span class="p">:</span> <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;save_last&quot;</span><span class="p">],</span>
             <span class="p">}</span>
         <span class="p">}</span>
@@ -251,7 +250,7 @@
             <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">],</span>
             <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;every_n_train_steps&quot;</span><span class="p">],</span>
             <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;save_last&quot;</span><span class="p">],</span>
-            <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;every_n_val_epochs&quot;</span><span class="p">],</span>
+            <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;every_n_epochs&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
         <span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;callbacks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_callbacks</span><span class="p">(</span><span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;callbacks&quot;</span><span class="p">])</span>
@@ -285,7 +284,7 @@
             <span class="s2">&quot;Can&#39;t get data and model modules for an abstract training pipeline.&quot;</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="PyTorchLightningTrainingPipeline.add_callbacks"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.pytorch_lightning.core.html#gt4sd.training_pipelines.pytorch_lightning.core.PyTorchLightningTrainingPipeline.add_callbacks">[docs]</a>    <span class="k">def</span> <span class="nf">add_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Callback</span><span class="p">]:</span>
+<div class="viewcode-block" id="PyTorchLightningTrainingPipeline.add_callbacks"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.pytorch_lightning.core.html#gt4sd.training_pipelines.pytorch_lightning.core.PyTorchLightningTrainingPipeline.add_callbacks">[docs]</a>    <span class="k">def</span> <span class="nf">add_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Create the requested callbacks for training.</span>
 
 <span class="sd">        Args:</span>
@@ -295,7 +294,7 @@
 <span class="sd">            list of pytorch lightning callbacks.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">callbacks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Callback</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">callbacks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="s2">&quot;early_stopping_callback&quot;</span> <span class="ow">in</span> <span class="n">callback_args</span><span class="p">:</span>
             <span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EarlyStopping</span><span class="p">(</span><span class="o">**</span><span class="n">callback_args</span><span class="p">[</span><span class="s2">&quot;early_stopping_callback&quot;</span><span class="p">]))</span>
 
@@ -315,8 +314,8 @@
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;pl_trainer_args&quot;</span>
 
-    <span class="n">accelerator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ddp&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Accelerator type.&quot;</span><span class="p">}</span>
+    <span class="n">strategy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ddp&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Training strategy.&quot;</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">accumulate_grad_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -364,8 +363,8 @@
             <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;When True, always saves the model at the end of the epoch to a file last.ckpt&quot;</span>
         <span class="p">},</span>
     <span class="p">)</span>
-    <span class="n">save_top_k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">save_top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The best k models according to the quantity monitored will be saved.&quot;</span>
         <span class="p">},</span>
@@ -377,6 +376,14 @@
     <span class="n">every_n_train_steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of training steps between checkpoints.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">every_n_epochs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of epochs between checkpoints.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">check_val_every_n_epoch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of validation epochs between evaluations.&quot;</span><span class="p">},</span>
     <span class="p">)</span></div>
 </pre></div>
 

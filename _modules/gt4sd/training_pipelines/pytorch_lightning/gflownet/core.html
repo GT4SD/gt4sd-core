@@ -268,7 +268,7 @@
             <span class="n">log_every_n_steps</span><span class="o">=</span><span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;trainer_log_every_n_steps&quot;</span><span class="p">],</span>
             <span class="n">callbacks</span><span class="o">=</span><span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;callbacks&quot;</span><span class="p">],</span>
             <span class="n">max_epochs</span><span class="o">=</span><span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">],</span>
-            <span class="n">accelerator</span><span class="o">=</span><span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;accelerator&quot;</span><span class="p">],</span>
+            <span class="n">strategy</span><span class="o">=</span><span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">],</span>
             <span class="n">fast_dev_run</span><span class="o">=</span><span class="n">pl_trainer_args</span><span class="p">[</span><span class="s2">&quot;development_mode&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
@@ -358,8 +358,8 @@
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;pl_trainer_args&quot;</span>
 
-    <span class="n">accelerator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ddp&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Accelerator type.&quot;</span><span class="p">}</span>
+    <span class="n">strategy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ddp&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Training strategy.&quot;</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">accumulate_grad_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -418,8 +418,8 @@
             <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;When True, always saves the model at the end of the epoch to a file last.ckpt&quot;</span>
         <span class="p">},</span>
     <span class="p">)</span>
-    <span class="n">save_top_k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">save_top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The best k models according to the quantity monitored will be saved.&quot;</span>
         <span class="p">},</span>
@@ -432,9 +432,9 @@
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of training steps between checkpoints.&quot;</span><span class="p">},</span>
     <span class="p">)</span>
-    <span class="n">every_n_val_epochs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+    <span class="n">check_val_every_n_epoch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of training epochs between checkpoints.&quot;</span><span class="p">},</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of validation epochs between checkpoints.&quot;</span><span class="p">},</span>
     <span class="p">)</span>
     <span class="n">auto_lr_find</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -488,11 +488,6 @@
         <span class="n">default</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The device to use.&quot;</span><span class="p">},</span>
     <span class="p">)</span>
-    <span class="n">distributed_training_strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ddp&quot;</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The distributed training strategy. &quot;</span><span class="p">},</span>
-    <span class="p">)</span>
-
     <span class="n">development_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether to run in development mode. &quot;</span><span class="p">},</span>

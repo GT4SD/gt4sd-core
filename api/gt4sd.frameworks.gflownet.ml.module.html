@@ -279,7 +279,7 @@ info: logged information about model predictions.</p>
 <dl class="py class">
 <dt id="gt4sd.frameworks.gflownet.ml.module.GFlowNetModule">
 <em class="property">class </em><code class="sig-name descname">GFlowNetModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configuration</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">environment</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">task</span></em>, <em class="sig-param"><span class="n">algorithm</span></em>, <em class="sig-param"><span class="n">model</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/ml/module.html#GFlowNetModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.ml.module.GFlowNetModule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.module.LightningModule</span></code></p>
 <p>Module from gflownet.</p>
 <dl class="py method">
 <dt id="gt4sd.frameworks.gflownet.ml.module.GFlowNetModule.__init__">
@@ -324,8 +324,8 @@ info: logged information about model predictions.</p>
 <dl class="py method">
 <dt id="gt4sd.frameworks.gflownet.ml.module.GFlowNetModule.training_step_end">
 <code class="sig-name descname">training_step_end</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_parts</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/frameworks/gflownet/ml/module.html#GFlowNetModule.training_step_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.frameworks.gflownet.ml.module.GFlowNetModule.training_step_end" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use this when training with dp or ddp2 because <a class="reference internal" href="#gt4sd.frameworks.gflownet.ml.module.GFlowNetModule.training_step" title="gt4sd.frameworks.gflownet.ml.module.GFlowNetModule.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a> will operate on only part of the
-batch. However, this is still optional and only needed for things like softmax or NCE loss.</p>
+<dd><p>Use this when training with dp because <a class="reference internal" href="#gt4sd.frameworks.gflownet.ml.module.GFlowNetModule.training_step" title="gt4sd.frameworks.gflownet.ml.module.GFlowNetModule.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a> will operate on only part of the batch.
+However, this is still optional and only needed for things like softmax or NCE loss.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If you later switch to ddp or some other mode, this will still be called
@@ -333,19 +333,19 @@ so that you don’t have to change your code</p>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># pseudocode</span>
 <span class="n">sub_batches</span> <span class="o">=</span> <span class="n">split_batches_for_dp</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-<span class="n">batch_parts_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">training_step</span><span class="p">(</span><span class="n">sub_batch</span><span class="p">)</span> <span class="k">for</span> <span class="n">sub_batch</span> <span class="ow">in</span> <span class="n">sub_batches</span><span class="p">]</span>
-<span class="n">training_step_end</span><span class="p">(</span><span class="n">batch_parts_outputs</span><span class="p">)</span>
+<span class="n">step_output</span> <span class="o">=</span> <span class="p">[</span><span class="n">training_step</span><span class="p">(</span><span class="n">sub_batch</span><span class="p">)</span> <span class="k">for</span> <span class="n">sub_batch</span> <span class="ow">in</span> <span class="n">sub_batches</span><span class="p">]</span>
+<span class="n">training_step_end</span><span class="p">(</span><span class="n">step_output</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>batch_parts_outputs</strong> – What you return in <cite>training_step</cite> for each batch part.</p>
+<dd class="field-odd"><p><strong>step_output</strong> – What you return in <cite>training_step</cite> for each batch part.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Anything</p>
 </dd>
 </dl>
-<p>When using dp/ddp2 distributed backends, only a portion of the batch is inside the training_step:</p>
+<p>When using the DP strategy, only a portion of the batch is inside the training_step:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
     <span class="c1"># batch is 1/num_gpus big</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
@@ -379,7 +379,7 @@ so that you don’t have to change your code</p>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>See the <span class="xref std std-ref">advanced/multi_gpu:Multi-GPU training</span> guide for more details.</p>
+<p>See the <span class="xref std std-ref">Multi GPU Training</span> guide for more details.</p>
 </div>
 </dd></dl>
 
