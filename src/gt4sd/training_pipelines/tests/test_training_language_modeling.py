@@ -26,7 +26,7 @@
 from typing import cast
 
 import sentencepiece as _sentencepiece
-import pkg_resources
+import importlib_resources
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 
 from gt4sd.training_pipelines import (
@@ -94,25 +94,24 @@ def test_get_data_and_model_modules_mlm():
 
     config = template_config.copy()
 
-    file_path = pkg_resources.resource_filename(
-        "gt4sd",
-        "training_pipelines/tests/lm_example.jsonl",
-    )
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "training_pipelines/tests/lm_example.jsonl"
+    ) as file_path:
 
-    config["dataset_args"]["train_file"] = file_path
+        config["dataset_args"]["train_file"] = file_path
 
-    config["dataset_args"]["validation_file"] = file_path
-    config["model_args"]["type"] = "mlm"
+        config["dataset_args"]["validation_file"] = file_path
+        config["model_args"]["type"] = "mlm"
 
-    data_module, model_module = test_pipeline.get_data_and_model_modules(
-        config["model_args"], config["dataset_args"]  # type: ignore
-    )
+        data_module, model_module = test_pipeline.get_data_and_model_modules(
+            config["model_args"], config["dataset_args"]  # type: ignore
+        )
 
-    assert isinstance(model_module, MLMModule)
-    assert isinstance(data_module, MLMDataModule)
+        assert isinstance(model_module, MLMModule)
+        assert isinstance(data_module, MLMDataModule)
 
-    check_model_config(model_module, config["model_args"])
-    check_data_config(data_module, config["dataset_args"])
+        check_model_config(model_module, config["model_args"])
+        check_data_config(data_module, config["dataset_args"])
 
 
 def test_get_data_and_model_modules_clm():
@@ -125,25 +124,24 @@ def test_get_data_and_model_modules_clm():
 
     config = template_config.copy()
 
-    file_path = pkg_resources.resource_filename(
-        "gt4sd",
-        "training_pipelines/tests/lm_example.jsonl",
-    )
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "training_pipelines/tests/lm_example.jsonl"
+    ) as file_path:
 
-    config["dataset_args"]["train_file"] = file_path
-    config["dataset_args"]["validation_file"] = file_path
-    config["model_args"]["type"] = "clm"
-    config["model_args"]["model_name_or_path"] = "gpt2"
+        config["dataset_args"]["train_file"] = file_path
+        config["dataset_args"]["validation_file"] = file_path
+        config["model_args"]["type"] = "clm"
+        config["model_args"]["model_name_or_path"] = "gpt2"
 
-    data_module, model_module = test_pipeline.get_data_and_model_modules(
-        config["model_args"], config["dataset_args"]  # type: ignore
-    )
+        data_module, model_module = test_pipeline.get_data_and_model_modules(
+            config["model_args"], config["dataset_args"]  # type: ignore
+        )
 
-    assert isinstance(model_module, CLMModule)
-    assert isinstance(data_module, CLMDataModule)
+        assert isinstance(model_module, CLMModule)
+        assert isinstance(data_module, CLMDataModule)
 
-    check_model_config(model_module, config["model_args"])
-    check_data_config(data_module, config["dataset_args"])
+        check_model_config(model_module, config["model_args"])
+        check_data_config(data_module, config["dataset_args"])
 
 
 def test_get_data_and_model_modules_cgm():
@@ -156,25 +154,24 @@ def test_get_data_and_model_modules_cgm():
 
     config = template_config.copy()
 
-    file_path = pkg_resources.resource_filename(
-        "gt4sd",
-        "training_pipelines/tests/lm_example.jsonl",
-    )
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "training_pipelines/tests/lm_example.jsonl"
+    ) as file_path:
 
-    config["dataset_args"]["train_file"] = file_path
-    config["dataset_args"]["validation_file"] = file_path
-    config["model_args"]["type"] = "cgm"
-    config["model_args"]["model_name_or_path"] = "t5-base"
+        config["dataset_args"]["train_file"] = file_path
+        config["dataset_args"]["validation_file"] = file_path
+        config["model_args"]["type"] = "cgm"
+        config["model_args"]["model_name_or_path"] = "t5-base"
 
-    data_module, model_module = test_pipeline.get_data_and_model_modules(
-        config["model_args"], config["dataset_args"]  # type: ignore
-    )
+        data_module, model_module = test_pipeline.get_data_and_model_modules(
+            config["model_args"], config["dataset_args"]  # type: ignore
+        )
 
-    assert isinstance(model_module, CGMModule)
-    assert isinstance(data_module, CGMDataModule)
+        assert isinstance(model_module, CGMModule)
+        assert isinstance(data_module, CGMDataModule)
 
-    check_model_config(model_module, config["model_args"])
-    check_data_config(data_module, config["dataset_args"])
+        check_model_config(model_module, config["model_args"])
+        check_data_config(data_module, config["dataset_args"])
 
 
 def test_get_data_and_model_modules_plm():
@@ -187,25 +184,24 @@ def test_get_data_and_model_modules_plm():
 
     config = template_config.copy()
 
-    file_path = pkg_resources.resource_filename(
-        "gt4sd",
-        "training_pipelines/tests/lm_example.jsonl",
-    )
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "training_pipelines/tests/lm_example.jsonl"
+    ) as file_path:
 
-    config["dataset_args"]["train_file"] = file_path
-    config["dataset_args"]["validation_file"] = file_path
-    config["model_args"]["type"] = "plm"
-    config["model_args"]["model_name_or_path"] = "xlnet-base-cased"
+        config["dataset_args"]["train_file"] = file_path
+        config["dataset_args"]["validation_file"] = file_path
+        config["model_args"]["type"] = "plm"
+        config["model_args"]["model_name_or_path"] = "xlnet-base-cased"
 
-    data_module, model_module = test_pipeline.get_data_and_model_modules(
-        config["model_args"], config["dataset_args"]  # type: ignore
-    )
+        data_module, model_module = test_pipeline.get_data_and_model_modules(
+            config["model_args"], config["dataset_args"]  # type: ignore
+        )
 
-    assert isinstance(model_module, PLMModule)
-    assert isinstance(data_module, PLMDataModule)
+        assert isinstance(model_module, PLMModule)
+        assert isinstance(data_module, PLMDataModule)
 
-    check_model_config(model_module, config["model_args"])
-    check_data_config(data_module, config["dataset_args"])
+        check_model_config(model_module, config["model_args"])
+        check_data_config(data_module, config["dataset_args"])
 
 
 def test_add_callbacks():

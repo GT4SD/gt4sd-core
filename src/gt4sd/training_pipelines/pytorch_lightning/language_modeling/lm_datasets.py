@@ -27,6 +27,7 @@ import json
 import logging
 import os
 from functools import lru_cache
+from pathlib import PosixPath
 from typing import Any, Callable, Dict, List, Union
 
 import sentencepiece as _sentencepiece
@@ -155,7 +156,7 @@ class DataModule(pl.LightningDataModule):
                     self.dataset_args["num_dataloader_workers"], cpus_count
                 )
 
-    def build_dataset(self, path: str) -> Dataset:
+    def build_dataset(self, path: Union[str, PosixPath]) -> Dataset:
         """
         Build the dataset.
 
@@ -164,7 +165,7 @@ class DataModule(pl.LightningDataModule):
         Returns:
             a torch Dataset.
         """
-
+        path = str(path)
         if path.endswith(".jsonl") or path.endswith(".json"):
             return LMDataset(path, self.tokenize_function)
         elif os.path.isdir(path):

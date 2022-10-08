@@ -23,11 +23,13 @@
 #
 """Module initialization for gt4sd traning pipelines."""
 
+import atexit
 import json
 import logging
+from contextlib import ExitStack
 from typing import Any, Dict
 
-import pkg_resources
+import importlib_resources
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
 from .diffusion.core import (
@@ -208,16 +210,15 @@ def training_pipeline_name_to_metadata(name: str) -> Dict[str, Any]:
     Returns:
         dictionary describing the parameters of the pipeline. If the pipeline is not found, no metadata (a.k.a., an empty dictionary is returned).
     """
+    file_manager = ExitStack()
+    atexit.register(file_manager.close)
+
     metadata: Dict[str, Any] = {"training_pipeline": name, "parameters": {}}
     if name in TRAINING_PIPELINE_NAME_METADATA_MAPPING:
         try:
-            with open(
-                pkg_resources.resource_filename(
-                    "gt4sd",
-                    f"training_pipelines/{TRAINING_PIPELINE_NAME_METADATA_MAPPING[name]}",
-                ),
-                "rt",
-            ) as fp:
+            ref = importlib_resources.files("my.package") / "resource.dat"
+            path = file_manager.enter_context(importlib_resources.as_file(ref))
+            with open(path, "rt") as fp:
                 metadata["parameters"] = json.load(fp)
         except Exception:
             logger.exception(
