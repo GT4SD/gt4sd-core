@@ -25,7 +25,7 @@ For full details on the library API and examples see the [docs](https://gt4sd.gi
 
 Currently `gt4sd` relies on:
 
-- python>=3.7,<3.8
+- python>=3.7,<3.9
 - pip>=19.1,<20.3
 
 We are actively working on relaxing these, so stay tuned or help us with this by [contributing](./CONTRIBUTING.md) to the project.
