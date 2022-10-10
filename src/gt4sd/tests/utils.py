@@ -23,8 +23,12 @@
 #
 """Utilities used in the tests."""
 
+import atexit
+from contextlib import ExitStack
 from functools import lru_cache
+from pathlib import PosixPath
 
+import importlib_resources
 from pydantic import BaseSettings
 
 
@@ -45,3 +49,21 @@ class GT4SDTestSettings(BaseSettings):
     @lru_cache(maxsize=None)
     def get_instance() -> "GT4SDTestSettings":
         return GT4SDTestSettings()
+
+
+def exitclose_file_creator(file_path: str) -> PosixPath:
+    """
+    Creates an absolute filepath that is closed at exit time.
+
+    Args:
+        file_path: A relative path to a file for which the context handler is created.
+
+    Returns:
+        PosixPath: An absolute filepath.
+    """
+
+    file_manager = ExitStack()
+    atexit.register(file_manager.close)
+    ref = importlib_resources.files("gt4sd") / file_path
+    absolute_path = file_manager.enter_context(importlib_resources.as_file(ref))
+    return absolute_path
