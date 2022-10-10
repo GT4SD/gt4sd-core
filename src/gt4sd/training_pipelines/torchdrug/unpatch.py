@@ -24,7 +24,7 @@
 import typing
 from typing import List
 
-import pkg_resources
+import importlib_metadata
 import torch
 from packaging import version
 from torch.optim.lr_scheduler import (  # type: ignore
@@ -61,7 +61,7 @@ sane_datasets = [
     TensorDataset,
 ]
 
-torch_version = version.parse(pkg_resources.get_distribution("torch").version)
+torch_version = version.parse(importlib_metadata.version("torch"))
 
 if torch_version < version.parse("1.12") and torch_version >= version.parse("1.10"):
     from torch.utils.data.dataset import DFIterDataPipe  # type: ignore

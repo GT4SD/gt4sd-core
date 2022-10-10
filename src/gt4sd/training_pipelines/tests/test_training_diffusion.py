@@ -28,16 +28,9 @@ import shutil
 import tempfile
 from typing import Any, Dict, cast
 
-import pkg_resources
-
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
     DiffusionForVisionTrainingPipeline,
-)
-
-TEST_DATA_DIRECTORY = pkg_resources.resource_filename(
-    "gt4sd",
-    "training_pipelines/tests/",
 )
 
 

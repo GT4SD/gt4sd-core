@@ -29,18 +29,12 @@ import tempfile
 from typing import Any, Dict, cast
 
 import numpy as np
-import pkg_resources
 import pytest
 
 from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
 from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
 from gt4sd.frameworks.gflownet.tests.qm9 import QM9Dataset, QM9GapTask
 from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, GFlowNetTrainingPipeline
-
-TEST_DATA_DIRECTORY = pkg_resources.resource_filename(
-    "gt4sd",
-    "training_pipelines/tests/",
-)
 
 
 def _create_training_output_filepaths(directory: str) -> Dict[str, str]:

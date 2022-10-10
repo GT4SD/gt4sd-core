@@ -22,7 +22,6 @@
 # SOFTWARE.
 #
 """Make pytest fixtures available to multiple test directories."""
-
 import pytest
 
 
