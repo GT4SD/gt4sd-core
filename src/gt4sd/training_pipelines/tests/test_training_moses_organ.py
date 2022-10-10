@@ -22,12 +22,9 @@
 # SOFTWARE.
 #
 """Moses Organ trainer unit tests."""
-
-import atexit
 import os
 import shutil
 import tempfile
-from contextlib import ExitStack
 from typing import Any, Dict, cast
 
 from gt4sd.training_pipelines import (
