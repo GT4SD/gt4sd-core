@@ -22,11 +22,8 @@
 # SOFTWARE.
 #
 """Module initialization for gt4sd traning pipelines."""
-
-import atexit
 import json
 import logging
-from contextlib import ExitStack
 from typing import Any, Dict
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
