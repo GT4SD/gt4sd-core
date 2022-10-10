@@ -491,8 +491,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">define_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">representation_order</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GaussianProcessRepresentationsSampler._get_bounds"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler._get_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">_get_bounds</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">minimum_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">maximum_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z_dimension</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">minimum_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">],</span>
+        <span class="n">maximum_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">],</span>
+        <span class="n">z_dimension</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define a list of bounds for an hypercube.</span>
 
@@ -529,7 +532,7 @@
         <span class="k">for</span> <span class="n">representation_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">z_dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">representations</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span><span class="o">.</span><span class="n">z_dimension</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">representation_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_bounds</span><span class="p">(</span>
-                <span class="n">MINIMUM_REAL</span><span class="p">,</span> <span class="n">MAXIMUM_REAL</span><span class="p">,</span> <span class="n">z_dimension</span>
+                <span class="n">MINIMUM_REAL</span><span class="p">,</span> <span class="n">MAXIMUM_REAL</span><span class="p">,</span> <span class="n">z_dimension</span>  <span class="c1"># type: ignore</span>
             <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GaussianProcessRepresentationsSampler.define_dimensions"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.core.GaussianProcessRepresentationsSampler.define_dimensions">[docs]</a>    <span class="k">def</span> <span class="nf">define_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">representation_order</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Real</span><span class="p">]:</span>
@@ -551,8 +554,8 @@
             <span class="p">)</span>
             <span class="n">latent_index</span> <span class="o">+=</span> <span class="n">representation</span><span class="o">.</span><span class="n">z_dimension</span>
             <span class="n">dimensions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="n">Real</span><span class="p">(</span><span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">)</span>  <span class="c1"># type:ignore</span>
+                <span class="p">[</span>  <span class="c1"># type:ignore</span>
+                    <span class="n">Real</span><span class="p">(</span><span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="ow">in</span> <span class="n">representation_bounds</span>
                 <span class="p">]</span>
             <span class="p">)</span>

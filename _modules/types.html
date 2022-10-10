@@ -178,6 +178,13 @@
 <span class="n">MappingProxyType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="nb">type</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
 <span class="n">SimpleNamespace</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">implementation</span><span class="p">)</span>
 
+<span class="k">def</span> <span class="nf">_cell_factory</span><span class="p">():</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+        <span class="k">nonlocal</span> <span class="n">a</span>
+    <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="vm">__closure__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">CellType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">_cell_factory</span><span class="p">())</span>
+
 <span class="k">def</span> <span class="nf">_g</span><span class="p">():</span>
     <span class="k">yield</span> <span class="mi">1</span>
 <span class="n">GeneratorType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">_g</span><span class="p">())</span>
@@ -418,14 +425,8 @@
         <span class="k">if</span> <span class="n">co_flags</span> <span class="o">&amp;</span> <span class="mh">0x20</span><span class="p">:</span>
             <span class="c1"># TODO: Implement this in C.</span>
             <span class="n">co</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__code__</span>
-            <span class="n">func</span><span class="o">.</span><span class="vm">__code__</span> <span class="o">=</span> <span class="n">CodeType</span><span class="p">(</span>
-                <span class="n">co</span><span class="o">.</span><span class="n">co_argcount</span><span class="p">,</span> <span class="n">co</span><span class="o">.</span><span class="n">co_kwonlyargcount</span><span class="p">,</span> <span class="n">co</span><span class="o">.</span><span class="n">co_nlocals</span><span class="p">,</span>
-                <span class="n">co</span><span class="o">.</span><span class="n">co_stacksize</span><span class="p">,</span>
-                <span class="n">co</span><span class="o">.</span><span class="n">co_flags</span> <span class="o">|</span> <span class="mh">0x100</span><span class="p">,</span>  <span class="c1"># 0x100 == CO_ITERABLE_COROUTINE</span>
-                <span class="n">co</span><span class="o">.</span><span class="n">co_code</span><span class="p">,</span>
-                <span class="n">co</span><span class="o">.</span><span class="n">co_consts</span><span class="p">,</span> <span class="n">co</span><span class="o">.</span><span class="n">co_names</span><span class="p">,</span> <span class="n">co</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">,</span> <span class="n">co</span><span class="o">.</span><span class="n">co_filename</span><span class="p">,</span>
-                <span class="n">co</span><span class="o">.</span><span class="n">co_name</span><span class="p">,</span> <span class="n">co</span><span class="o">.</span><span class="n">co_firstlineno</span><span class="p">,</span> <span class="n">co</span><span class="o">.</span><span class="n">co_lnotab</span><span class="p">,</span> <span class="n">co</span><span class="o">.</span><span class="n">co_freevars</span><span class="p">,</span>
-                <span class="n">co</span><span class="o">.</span><span class="n">co_cellvars</span><span class="p">)</span>
+            <span class="c1"># 0x100 == CO_ITERABLE_COROUTINE</span>
+            <span class="n">func</span><span class="o">.</span><span class="vm">__code__</span> <span class="o">=</span> <span class="n">co</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">co_flags</span><span class="o">=</span><span class="n">co</span><span class="o">.</span><span class="n">co_flags</span> <span class="o">|</span> <span class="mh">0x100</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">func</span>
 
     <span class="c1"># The following code is primarily to support functions that</span>
