@@ -186,8 +186,12 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Utilities used in the tests.&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">atexit</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">ExitStack</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">PosixPath</span>
 
+<span class="kn">import</span> <span class="nn">importlib_resources</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseSettings</span>
 
 
@@ -208,6 +212,24 @@
     <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_instance</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;GT4SDTestSettings&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">GT4SDTestSettings</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="exitclose_file_creator"><a class="viewcode-back" href="../../../api/gt4sd.tests.utils.html#gt4sd.tests.utils.exitclose_file_creator">[docs]</a><span class="k">def</span> <span class="nf">exitclose_file_creator</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PosixPath</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates an absolute filepath that is closed at exit time.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path: A relative path to a file for which the context handler is created.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        PosixPath: An absolute filepath.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">file_manager</span> <span class="o">=</span> <span class="n">ExitStack</span><span class="p">()</span>
+    <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">file_manager</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">importlib_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;gt4sd&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">file_path</span>
+    <span class="n">absolute_path</span> <span class="o">=</span> <span class="n">file_manager</span><span class="o">.</span><span class="n">enter_context</span><span class="p">(</span><span class="n">importlib_resources</span><span class="o">.</span><span class="n">as_file</span><span class="p">(</span><span class="n">ref</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">absolute_path</span></div>
 </pre></div>
 
            </div>

@@ -189,7 +189,7 @@
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">import</span> <span class="nn">importlib_metadata</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">packaging</span> <span class="kn">import</span> <span class="n">version</span>
 <span class="kn">from</span> <span class="nn">torch.optim.lr_scheduler</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># type: ignore</span>
@@ -226,7 +226,7 @@
     <span class="n">TensorDataset</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="n">torch_version</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">pkg_resources</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+<span class="n">torch_version</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">importlib_metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">))</span>
 
 <span class="k">if</span> <span class="n">torch_version</span> <span class="o">&lt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.12&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch_version</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.10&quot;</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">torch.utils.data.dataset</span> <span class="kn">import</span> <span class="n">DFIterDataPipe</span>  <span class="c1"># type: ignore</span>
