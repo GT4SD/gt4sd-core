@@ -22,7 +22,6 @@
 # SOFTWARE.
 #
 """Module initialization for gt4sd traning pipelines."""
-
 import json
 import logging
 from typing import Any, Dict

@@ -22,7 +22,6 @@
 # SOFTWARE.
 #
 """Moses Organ trainer unit tests."""
-
 import os
 import shutil
 import tempfile
