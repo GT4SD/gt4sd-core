@@ -27,10 +27,8 @@ import json
 import logging
 from typing import Any, Dict
 
-import importlib_resources
-
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
-from ..conftest import exitclose_file_creator
+from ..tests.utils import exitclose_file_creator
 from .diffusion.core import (
     DiffusionDataArguments,
     DiffusionForVisionTrainingPipeline,

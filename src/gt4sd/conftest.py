@@ -22,11 +22,6 @@
 # SOFTWARE.
 #
 """Make pytest fixtures available to multiple test directories."""
-import atexit
-from contextlib import ExitStack
-from pathlib import PosixPath
-
-import importlib_resources
 import pytest
 
 
@@ -34,21 +29,3 @@ import pytest
 def mock_wrong_s3_env(monkeypatch):
     """Changes an environment variable to break the s3 connection."""
     monkeypatch.setenv("GT4SD_S3_SECRET_KEY", "(╯°□°）╯︵ ┻━┻")
-
-
-def exitclose_file_creator(file_path: str) -> PosixPath:
-    """
-    Creates an absolute filepath that is closed at exit time.
-
-    Args:
-        file_path: A relative path to a file for which the context handler is created.
-
-    Returns:
-        PosixPath: An absolute filepath.
-    """
-
-    file_manager = ExitStack()
-    atexit.register(file_manager.close)
-    ref = importlib_resources.files("gt4sd") / file_path
-    absolute_path = file_manager.enter_context(importlib_resources.as_file(ref))
-    return absolute_path

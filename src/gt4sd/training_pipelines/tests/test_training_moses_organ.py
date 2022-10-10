@@ -33,7 +33,7 @@ from gt4sd.training_pipelines import (
     MosesOrganTrainingPipeline,
 )
 
-from ...conftest import exitclose_file_creator
+from ...tests.utils import exitclose_file_creator
 
 DATA_PATH = exitclose_file_creator("training_pipelines/tests/molecules.smiles")
 

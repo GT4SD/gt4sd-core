@@ -30,7 +30,7 @@ from typing import Any, Dict, cast
 
 from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, MosesVAETrainingPipeline
 
-from ...conftest import exitclose_file_creator
+from ...tests.utils import exitclose_file_creator
 
 DATA_PATH = exitclose_file_creator("training_pipelines/tests/molecules.smiles")
 
