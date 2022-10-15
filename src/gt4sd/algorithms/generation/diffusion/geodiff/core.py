@@ -145,7 +145,7 @@ class MoleculeDiffusionPipeline(DiffusionPipeline):
         pos_gen = pos.cpu()
 
         if self.save_traj:
-            pos_gen_traj = pos_traj.cpu()
+            pos_gen_traj = [pt.cpu() for pt in pos_traj]
             data.pos_gen = torch.stack(pos_gen_traj)
         else:
             data.pos_gen = pos_gen

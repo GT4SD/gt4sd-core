@@ -28,14 +28,6 @@ from diffusers.configuration_utils import ConfigMixin
 from diffusers.modeling_utils import ModelMixin
 from torch import nn
 from torch_geometric.data import Data
-from utils_model import (
-    assemble_atom_pair_feature,
-    clip_norm,
-    extend_graph_order_radius,
-    get_distance,
-    graph_field_network,
-    is_local_edge,
-)
 
 from .layers import (
     GINEncoder,
@@ -43,6 +35,14 @@ from .layers import (
     MoleculeGNNOutput,
     MultiLayerPerceptron,
     SchNetEncoder,
+)
+from .utils_model import (
+    assemble_atom_pair_feature,
+    clip_norm,
+    extend_graph_order_radius,
+    get_distance,
+    graph_field_network,
+    is_local_edge,
 )
 
 
@@ -123,6 +123,7 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
         bond_index: torch.Tensor,
         bond_type: torch.Tensor,
         batch: torch.Tensor,
+        time_step: torch.Tensor = None,
         edge_index: torch.Tensor = None,
         edge_type: torch.Tensor = None,
         edge_length: int = None,
@@ -139,6 +140,7 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
             bond_index: Indices of bonds (not extended, not radius-graph), (2, E).
             bond_type:  Bond types, (E, ).
             batch:      Node index to graph index, (N, ).
+            time_step:  Time step of the graph, (N, ).
             edge_index: Indices of edges (extended, radius-graph), (2, E').
             edge_type:  Edge types, (E', ).
             edge_length: Edge lengths, (E', ).
@@ -172,7 +174,7 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
         # with the parameterization of NCSNv2
         # DDPM loss implicit handle the noise variance scale conditioning
         sigma_edge = torch.ones(
-            size=(edge_index.size(1), 1), device=pos.device
+            size=(edge_index.size(1), 1), device=pos.device  # type: ignore
         )  # (E, 1)
 
         # Encoding global
@@ -207,13 +209,13 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
         # Local
         node_attr_local = self.encoder_local(
             z=atom_type,
-            edge_index=edge_index[:, local_edge_mask],
+            edge_index=edge_index[:, local_edge_mask],  # type: ignore
             edge_attr=edge_attr_local[local_edge_mask],
         )
         # Assemble pairwise features
         h_pair_local = assemble_atom_pair_feature(
             node_attr=node_attr_local,
-            edge_index=edge_index[:, local_edge_mask],
+            edge_index=edge_index[:, local_edge_mask],  # type: ignore
             edge_attr=edge_attr_local[local_edge_mask],
         )  # (E_local, 2H)
 
@@ -242,7 +244,7 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
     def forward(
         self,
         sample: Data,
-        timestep: Union[torch.Tensor, float, int],
+        timestep: Union[float, int],
         return_dict: bool = True,
         sigma: float = 1.0,
         global_start_sigma: float = 0.5,
@@ -330,4 +332,4 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
         if not return_dict:
             return (-eps_pos,)
 
-        return MoleculeGNNOutput(sample=torch.FloatTensor(-eps_pos).to(pos.device))
+        return MoleculeGNNOutput(sample=torch.FloatTensor(-eps_pos).to(pos.device))  # type: ignore

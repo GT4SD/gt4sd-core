@@ -111,7 +111,7 @@ def _extend_to_radius_graph(
     assert edge_type.dim() == 1
     N = pos.size(0)
 
-    bgraph_adj = torch.sparse.LongTensor(edge_index, edge_type, torch.Size([N, N]))
+    bgraph_adj = torch.sparse.LongTensor(edge_index, edge_type, torch.Size([N, N]))  # type: ignore
 
     if is_sidechain is None:
         rgraph_edge_index = radius_graph(pos, r=cutoff, batch=batch)  # (2, E_r)
@@ -140,7 +140,7 @@ def _extend_to_radius_graph(
             :, (rgraph_edge_index[0] != rgraph_edge_index[1])
         ]
 
-    rgraph_adj = torch.sparse.LongTensor(
+    rgraph_adj = torch.sparse.LongTensor(  # type: ignore
         rgraph_edge_index,
         torch.ones(rgraph_edge_index.size(1)).long().to(pos.device)
         * unspecified_type_number,

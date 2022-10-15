@@ -92,7 +92,7 @@ def get_classvar_type(class_var):
         (
             MoleculeDiffusionGenerator,
             "generation",
-            "chemistry",
+            "vision",  # TODO: change to "chemistry"
             DiffusersGenerationAlgorithm.__name__,
         ),
     ],

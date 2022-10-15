@@ -109,7 +109,7 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
     modality: str = field(
         default="image",
         metadata=dict(
-            description="Model domain.  Supported: 'image', 'text', 'audio', 'molecule'."
+            description="Modality.  Supported: 'image', 'text', 'audio', 'molecule'."
         ),
     )
 
@@ -328,7 +328,6 @@ class MoleculeDiffusionGenerator(DiffusersConfiguration):
     model_type: str = "molecule_diffusion"
     scheduler_type: str = "ddpm"
     modality: str = "molecule"
-    domain: str = "chemistry"
 
     @classmethod
     def list_versions(cls) -> Set[str]:

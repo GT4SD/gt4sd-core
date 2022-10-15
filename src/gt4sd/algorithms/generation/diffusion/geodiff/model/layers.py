@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 from dataclasses import dataclass
-from typing import Callable, Union
+from typing import Callable, List, Union
 
 import numpy as np
 import torch
@@ -52,7 +52,7 @@ class MultiLayerPerceptron(nn.Module):
     def __init__(
         self,
         input_dim: int,
-        hidden_dims: int,
+        hidden_dims: List[int],
         activation: str = "relu",
         dropout: float = 0,
     ):
@@ -75,7 +75,7 @@ class MultiLayerPerceptron(nn.Module):
         if dropout > 0:
             self.dropout = nn.Dropout(dropout)
         else:
-            self.dropout = None
+            self.dropout = None  # type: ignore
 
         self.layers = nn.ModuleList()
         for i in range(len(self.dims) - 1):
@@ -112,7 +112,15 @@ class ShiftedSoftplus(torch.nn.Module):
 class CFConv(MessagePassing):
     """CFConv."""
 
-    def __init__(self, in_channels, out_channels, num_filters, mlp, cutoff, smooth):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        num_filters: int,
+        mlp: Callable,
+        cutoff: float,
+        smooth: bool,
+    ):
         """
         Args:
             in_channels (int): Size of each input.
@@ -156,7 +164,14 @@ class CFConv(MessagePassing):
 
 
 class InteractionBlock(torch.nn.Module):
-    def __init__(self, hidden_channels, num_gaussians, num_filters, cutoff, smooth):
+    def __init__(
+        self,
+        hidden_channels: int,
+        num_gaussians: int,
+        num_filters: int,
+        cutoff: float,
+        smooth: bool,
+    ):
         super(InteractionBlock, self).__init__()
         mlp = Sequential(
             Linear(num_gaussians, num_filters),
@@ -179,12 +194,12 @@ class InteractionBlock(torch.nn.Module):
 class SchNetEncoder(Module):
     def __init__(
         self,
-        hidden_channels=128,
-        num_filters=128,
-        num_interactions=6,
-        edge_channels=100,
-        cutoff=10.0,
-        smooth=False,
+        hidden_channels: int = 128,
+        num_filters: int = 128,
+        num_interactions: int = 6,
+        edge_channels: int = 100,
+        cutoff: float = 10.0,
+        smooth: bool = False,
     ):
         super().__init__()
 
@@ -249,9 +264,9 @@ class GINEConv(MessagePassing):
         edge_attr: OptTensor = None,
         size: Size = None,
     ) -> torch.Tensor:
-        """"""
+
         if isinstance(x, torch.Tensor):
-            x: OptPairTensor = (x, x)
+            x = (x, x)
 
         # Node and edge feature dimensionalites need to match.
         if isinstance(edge_index, torch.Tensor):
