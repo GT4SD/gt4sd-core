@@ -47,6 +47,7 @@ from diffusers import (
 )
 
 from ....frameworks.torch import device_claim
+from .geodiff.core import MoleculeDiffusionPipeline
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -71,6 +72,7 @@ MODEL_TYPES = {
     "latent_diffusion_conditional": LDMTextToImagePipeline,
     "stable_diffusion": StableDiffusionPipeline,
     "score_sde": ScoreSdeVePipeline,
+    "molecule_diffusion": MoleculeDiffusionPipeline,
 }
 
 SCHEDULER_TYPES = {

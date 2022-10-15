@@ -35,6 +35,7 @@ from gt4sd.algorithms.generation.diffusion import (
     DiffusersGenerationAlgorithm,
     LDMGenerator,
     LDMTextToImageGenerator,
+    MoleculeDiffusionGenerator,
     ScoreSdeGenerator,
     StableDiffusionGenerator,
 )
@@ -88,6 +89,12 @@ def get_classvar_type(class_var):
             "vision",
             DiffusersGenerationAlgorithm.__name__,
         ),
+        (
+            MoleculeDiffusionGenerator,
+            "generation",
+            "chemistry",
+            DiffusersGenerationAlgorithm.__name__,
+        ),
     ],
 )
 def test_config_class(
@@ -115,6 +122,7 @@ def test_config_class(
         (LDMGenerator),
         (LDMTextToImageGenerator),
         (StableDiffusionGenerator),
+        (MoleculeDiffusionGenerator),
     ],
 )
 def test_config_instance(config_class: Type[AlgorithmConfiguration]):
@@ -131,6 +139,7 @@ def test_config_instance(config_class: Type[AlgorithmConfiguration]):
         (LDMGenerator),
         (LDMTextToImageGenerator),
         (StableDiffusionGenerator),
+        (MoleculeDiffusionGenerator),
     ],
 )
 def test_available_versions(config_class: Type[AlgorithmConfiguration]):

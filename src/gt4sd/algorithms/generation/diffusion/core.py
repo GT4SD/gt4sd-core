@@ -318,3 +318,32 @@ class StableDiffusionGenerator(DiffusersConfiguration):
             .list_versions()
             .union({cls.algorithm_version})
         )
+
+
+@ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
+class MoleculeDiffusionGenerator(DiffusersConfiguration):
+    """Molecule Diffusion Model - Configuration for conditional 3D molecule structure generation given 2D information using a GeoDiff diffusion model."""
+
+    algorithm_version: str = "fusing/gfn-molecule-gen-drugs"
+    model_type: str = "molecule_diffusion"
+    scheduler_type: str = "ddpm"
+    modality: str = "molecule"
+    domain: str = "chemistry"
+
+    @classmethod
+    def list_versions(cls) -> Set[str]:
+        """Get possible algorithm versions.
+
+        Standard S3 and cache search adding the version used in the configuration.
+
+        Returns:
+            viable values as :attr:`algorithm_version` for the environment.
+        """
+        logger.warning(
+            "more algorithm versions can be found on https://github.com/huggingface/diffusers"
+        )
+        return (
+            get_configuration_class_with_attributes(cls)
+            .list_versions()
+            .union({cls.algorithm_version})
+        )

@@ -21,27 +21,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""DiffusersGenerationAlgorithm initialization."""
+from copy import deepcopy
 
-from .core import (
-    DDIMGenerator,
-    DDPMGenerator,
-    DiffusersGenerationAlgorithm,
-    LDMGenerator,
-    LDMTextToImageGenerator,
-    MoleculeDiffusionGenerator,
-    ScoreSdeGenerator,
-    StableDiffusionGenerator,
-)
 
-__all__ = [
-    "DiffusersGenerationAlgorithm",
-    "DDPMGenerator",
-    "DDIMGenerator",
-    "DiffusionGenerator",
-    "StableDiffusionGenerator",
-    "ScoreSdeGenerator",
-    "LDMGenerator",
-    "LDMTextToImageGenerator",
-    "MoleculeDiffusionGenerator",
-]
+def set_rdmol_positions(rdkit_mol, pos):
+    """
+    Args:
+        rdkit_mol:  An `rdkit.Chem.rdchem.Mol` object.
+        pos: (N_atoms, 3)
+
+    Returns:
+        mol: A copy of `rdkit_mol` with the positions set to `pos`.
+    """
+    mol = deepcopy(rdkit_mol)
+    set_rdmol_positions_(mol, pos)
+    return mol
+
+
+def set_rdmol_positions_(mol, pos):
+    """
+    Args:
+        rdkit_mol:  An `rdkit.Chem.rdchem.Mol` object.
+        pos: (N_atoms, 3)
+
+    Returns:
+        mol: A copy of `rdkit_mol` with the positions set to `pos`.
+    """
+    for i in range(pos.shape[0]):
+        mol.GetConformer(0).SetAtomPosition(i, pos[i].tolist())
+    return mol
