@@ -393,7 +393,7 @@ class GaussianProcessRepresentationsSampler:
             dimensions.extend(
                 [
                     Real(lower_bound, upper_bound)  # type:ignore
-                    for lower_bound, upper_bound in representation_bounds
+                    for lower_bound, upper_bound in representation_bounds  # type:ignore
                 ]
             )
         return dimensions

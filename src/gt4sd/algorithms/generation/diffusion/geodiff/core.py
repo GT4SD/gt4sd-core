@@ -34,9 +34,8 @@ from rdkit.Chem.Draw import rdMolDraw2D as MD2
 from torch_geometric.data import Data
 from torch_scatter import scatter_mean
 
-from .data.utils_data import repeat_data
 from .model.core import MoleculeGNN
-from .utils.utils_vis import set_rdmol_positions
+from .model.utils import repeat_data, set_rdmol_positions
 
 
 class MoleculeDiffusionPipeline(DiffusionPipeline):

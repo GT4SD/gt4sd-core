@@ -21,7 +21,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import copy
+from copy import deepcopy
+
 import torch
+from torch_geometric.data import Batch, Data
 from torch_geometric.nn import radius, radius_graph
 from torch_geometric.utils import dense_to_sparse, to_dense_adj
 from torch_scatter import scatter_add
@@ -212,3 +216,58 @@ def clip_norm(vec, limit, p=2):
 
 def is_local_edge(edge_type):
     return edge_type > 0
+
+
+def repeat_data(data: Data, num_repeat: int) -> Batch:
+    """
+    Args:
+        data:  An `torch_geometric.data.Data` object.
+
+    Returns:
+        batch: A copy of `data` repetead `num_repeat` times.
+    """
+    datas = [copy.deepcopy(data) for i in range(num_repeat)]
+    return Batch.from_data_list(datas)
+
+
+def repeat_batch(batch: Batch, num_repeat: int) -> Batch:
+    """
+    Args:
+        batch:  An `torch_geometric.data.Batch` object.
+
+    Returns:
+        batch: A copy of `batch` repetead `num_repeat` times.
+    """
+    datas = batch.to_data_list()
+    new_data = []
+    for i in range(num_repeat):
+        new_data += copy.deepcopy(datas)
+    return Batch.from_data_list(new_data)
+
+
+def set_rdmol_positions(rdkit_mol, pos):
+    """
+    Args:
+        rdkit_mol:  An `rdkit.Chem.rdchem.Mol` object.
+        pos: (N_atoms, 3)
+
+    Returns:
+        mol: A copy of `rdkit_mol` with the positions set to `pos`.
+    """
+    mol = deepcopy(rdkit_mol)
+    set_rdmol_positions_(mol, pos)
+    return mol
+
+
+def set_rdmol_positions_(mol, pos):
+    """
+    Args:
+        rdkit_mol:  An `rdkit.Chem.rdchem.Mol` object.
+        pos: (N_atoms, 3)
+
+    Returns:
+        mol: A copy of `rdkit_mol` with the positions set to `pos`.
+    """
+    for i in range(pos.shape[0]):
+        mol.GetConformer(0).SetAtomPosition(i, pos[i].tolist())
+    return mol

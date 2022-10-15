@@ -36,7 +36,7 @@ from .layers import (
     MultiLayerPerceptron,
     SchNetEncoder,
 )
-from .utils_model import (
+from .utils import (
     assemble_atom_pair_feature,
     clip_norm,
     extend_graph_order_radius,
