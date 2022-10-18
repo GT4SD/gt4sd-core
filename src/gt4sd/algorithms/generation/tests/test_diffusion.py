@@ -23,10 +23,13 @@
 #
 """Diffusers tests."""
 
+import pickle
 from typing import ClassVar, Type
 
 import PIL
 import pytest
+from rdkit.Chem.rdchem import Mol
+from torch_geometric.data import Data
 
 from gt4sd.algorithms.core import AlgorithmConfiguration
 from gt4sd.algorithms.generation.diffusion import (
@@ -264,16 +267,12 @@ def test_generation_via_registry(
     ],
 )
 def test_geodiff_conditional_generation_via_import(config, algorithm):
-    from torch_geometric.data import Data
-    from torch_geometric.datasets import QM7b
-
-    dataset = QM7b(
-        root="./",
-    )
-    prompt = dataset[0]
+    with open("./mol_dct.pkl", "rb") as f:
+        loaded_dict = pickle.load(f)
+    prompt = Data.from_dict(loaded_dict[0])
     configuration = config(prompt=prompt)
     algorithm = algorithm(configuration=configuration)
     samples = list(algorithm.sample(1))
     assert len(samples) == 1
     sample = samples[0]
-    assert isinstance(sample, Data)
+    assert isinstance(sample, Mol)

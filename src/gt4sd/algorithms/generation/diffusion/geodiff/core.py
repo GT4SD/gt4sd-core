@@ -173,7 +173,7 @@ class MoleculeDiffusionPipeline:
                 pickle.dump(results, f)
 
         mols_gen, mols_orig = self.postprocess_output(results)
-        return mols_gen
+        return {"sample": mols_gen}
 
     def postprocess_output(self, results: List[Data]):
         """Postprocess output of diffusion pipeline.
