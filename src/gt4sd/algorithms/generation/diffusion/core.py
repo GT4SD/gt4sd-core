@@ -25,7 +25,7 @@
 
 import logging
 from dataclasses import field
-from typing import ClassVar, Dict, Optional, Set, TypeVar
+from typing import Any, ClassVar, Dict, Optional, Set, TypeVar, Union
 
 from ...core import (
     AlgorithmConfiguration,
@@ -127,9 +127,9 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         ),
     )
 
-    prompt: str = field(  # type: ignore
+    prompt: Union[str, Any] = field(  # type: ignore
         default=None,
-        metadata=dict(description="Prompt for text generation."),
+        metadata=dict(description="Prompt for generation."),
     )
 
     def get_target_description(self) -> Optional[Dict[str, str]]:

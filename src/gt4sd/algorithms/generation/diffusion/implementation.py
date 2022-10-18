@@ -140,6 +140,7 @@ class Generator:
             )
         else:
             self.model = model_class.from_pretrained(model_name_or_path)
+
         self.model.to(self.device)
 
     def sample(self, number_samples: int = 1) -> List[Any]:

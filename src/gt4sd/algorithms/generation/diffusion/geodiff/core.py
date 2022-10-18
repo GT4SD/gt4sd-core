@@ -23,11 +23,11 @@
 #
 import os
 import pickle
-from typing import List
+from typing import List, Optional
 
 import torch
 from rdkit import Chem
-from diffusers import DDPMScheduler, DiffusionPipeline
+from diffusers import DDPMScheduler
 from IPython.display import SVG, display
 from nglview import show_rdkit as show
 from rdkit.Chem.Draw import rdMolDraw2D as MD2
@@ -38,10 +38,12 @@ from .model.core import MoleculeGNN
 from .model.utils import repeat_data, set_rdmol_positions
 
 
-class MoleculeDiffusionPipeline(DiffusionPipeline):
-    """Pipeline for molecular conformation generation."""
+class MoleculeDiffusionPipeline:
+    """Pipeline for molecular conformation generation.
+    The pipeline defined here is slightly different than the pipeline used in diffusers.
+    """
 
-    def __init__(self, model_name_or_path: str = None, device: str = "cuda"):
+    def __init__(self, model_name_or_path: str = None):
         """GeoDiff pipeline for molecular conformation generation.
         Code adapted from colab: https://colab.research.google.com/drive/1pLYYWQhdLuv1q-JtEHGZybxp2RBF8gPs#scrollTo=-3-P4w5sXkRU written by Nathan Lambert.
 
@@ -49,9 +51,10 @@ class MoleculeDiffusionPipeline(DiffusionPipeline):
             model_name_or_path: pretrained model name or path to model directory.
             device: device to use.
         """
-        super().__init__()
 
-        self.self.device = device if torch.cuda.is_available() else "cpu"
+        # super().__init__()
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model_name_or_path = model_name_or_path
 
         num_timesteps = 1000
         self.scheduler = DDPMScheduler(
@@ -65,7 +68,7 @@ class MoleculeDiffusionPipeline(DiffusionPipeline):
             torch.tensor(1.0 - self.scheduler.alphas_cumprod).sqrt()
             / torch.tensor(self.scheduler.alphas_cumprod).sqrt()
         )
-        self.sigmas = sigmas.to(self.self.device)
+        self.sigmas = sigmas.to(self.device)
 
         self.num_samples = 1  # solutions per molecule
         self.num_molecules = 3
@@ -78,12 +81,21 @@ class MoleculeDiffusionPipeline(DiffusionPipeline):
         # constands for data handling
         self.save_traj = False
         self.save_data = False
-        self.output_dir = "./tmp/"
-        os.mkdir(self.output_dir)
+        self.output_dir = "out"
+        os.makedirs(self.output_dir, exist_ok=True)
 
-        self.model = MoleculeGNN.from_pretrained(model_name_or_path).to(self.device)
+        # load pretrained model
+        self.model = MoleculeGNN.from_pretrained(model_name_or_path)
 
-    def __call__(self, batch_size: int, prompt: Data):
+    def to(self, device: Optional[str] = "cuda"):
+        self.model.to(self.device)
+
+    @classmethod
+    def from_pretrained(self, model_name_or_path: str):
+        return MoleculeDiffusionPipeline(model_name_or_path=model_name_or_path)
+
+    @torch.no_grad()
+    def __call__(self, batch_size: int, prompt: Optional[Data] = None):
         """Generate conformations for a molecule.
 
         Args:
@@ -95,8 +107,11 @@ class MoleculeDiffusionPipeline(DiffusionPipeline):
             mols_orig: list of original conformations.
         """
 
-        results = []
+        if prompt is None:
+            raise AttributeError("Specify a 2d representation as prompt for the model.")
 
+        results = []
+        # 2d representation for the molecule
         data = prompt
         num_samples = max(data.pos_ref.size(0) // data.num_nodes, 1)
 

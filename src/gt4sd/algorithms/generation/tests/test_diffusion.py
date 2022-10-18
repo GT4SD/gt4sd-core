@@ -251,3 +251,29 @@ def test_generation_via_registry(
     assert len(samples) == 1
     sample = samples[0]
     assert isinstance(sample, PIL.Image.Image)
+
+
+@pytest.mark.parametrize(
+    "config, algorithm",
+    [
+        pytest.param(
+            MoleculeDiffusionGenerator,
+            DiffusersGenerationAlgorithm,
+            marks=pytest.mark.skip(reason="no_dataset_available"),
+        ),
+    ],
+)
+def test_geodiff_conditional_generation_via_import(config, algorithm):
+    from torch_geometric.data import Data
+    from torch_geometric.datasets import QM7b
+
+    dataset = QM7b(
+        root="./",
+    )
+    prompt = dataset[0]
+    configuration = config(prompt=prompt)
+    algorithm = algorithm(configuration=configuration)
+    samples = list(algorithm.sample(1))
+    assert len(samples) == 1
+    sample = samples[0]
+    assert isinstance(sample, Data)
