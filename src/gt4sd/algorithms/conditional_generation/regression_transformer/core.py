@@ -192,10 +192,15 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
         default=8,
         metadata=dict(description="Batch size for the conditional generation"),
     )
-    tolerance: float = field(
+    tolerance: Union[float, Dict[str, float]] = field(
         default=20.0,
         metadata=dict(
-            description="Precision tolerance for the conditional generation task. Given in percent"
+            description="""Precision tolerance for the conditional generation task. This is the
+            tolerated eviation between desired/primed property and predicted property of the
+            generated molecule. Given in percentage with respect to the property range encountered
+            during training. Either a single float or a dict of floats with properties as
+            NOTE: The tolerance is *only* used for post-hoc filtering of the generated molecules.
+            """
         ),
     )
     sampling_wrapper: Dict = field(
@@ -342,10 +347,15 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
         default=32,
         metadata=dict(description="Batch size for the conditional generation"),
     )
-    tolerance: float = field(
+    tolerance: Union[float, Dict[str, float]] = field(
         default=20.0,
         metadata=dict(
-            description="Precision tolerance for the conditional generation task. Given in percent"
+            description="""Precision tolerance for the conditional generation task. This is the
+            tolerated eviation between desired/primed property and predicted property of the
+            generated molecule. Given in percentage with respect to the property range encountered
+            during training. Either a single float or a dict of floats with properties as
+            NOTE: The tolerance is *only* used for post-hoc filtering of the generated proteins.
+            """
         ),
     )
     sampling_wrapper: Dict = field(
