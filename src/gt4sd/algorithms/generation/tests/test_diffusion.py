@@ -266,7 +266,10 @@ def test_generation_via_registry(
     ],
 )
 def test_geodiff_conditional_generation_via_import(config, algorithm):
-    with open("./mol_dct.pkl", "rb") as f:
+    with open(
+        "/home/runner/work/gt4sd-core/gt4sd-core/src/gt4sd/algorithms/generation/tests/mol_dct.pkl",
+        "rb",
+    ) as f:
         loaded_dict = pickle.load(f)
     prompt = Data.from_dict(loaded_dict[0])
     configuration = config(prompt=prompt)
