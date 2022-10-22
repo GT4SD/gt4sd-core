@@ -31,6 +31,7 @@ import logging
 import os
 from typing import Any, List, Optional, Union
 
+import importlib_metadata
 import numpy as np
 import torch
 from diffusers import (
@@ -45,9 +46,15 @@ from diffusers import (
     ScoreSdeVeScheduler,
     StableDiffusionPipeline,
 )
+from packaging import version
 
 from ....frameworks.torch import device_claim
 from .geodiff.core import GeoDiffPipeline
+
+OLD_DIFFUSERS = version.parse(importlib_metadata.version("diffusers")) < version.parse(
+    "0.6.0"
+)
+
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -157,8 +164,10 @@ class Generator:
         else:
             item = self.model(batch_size=number_samples)
 
-        if self.model_type in ["geodiff"]:
+        # To support old diffusers versions (<0.6.0)
+        if OLD_DIFFUSERS or self.model_type in ["geodiff"]:
             item = item["sample"]
         else:
             item = item.images
+
         return item

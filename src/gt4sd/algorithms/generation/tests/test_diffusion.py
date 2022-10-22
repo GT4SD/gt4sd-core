@@ -262,7 +262,6 @@ def test_generation_via_registry(
         pytest.param(
             GeoDiffGenerator,
             DiffusersGenerationAlgorithm,
-            marks=pytest.mark.skip(reason="no_dataset_available"),
         ),
     ],
 )
