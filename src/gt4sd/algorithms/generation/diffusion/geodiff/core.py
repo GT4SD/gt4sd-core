@@ -21,9 +21,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import json
 import os
 import pickle
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import torch
 from rdkit import Chem
@@ -38,31 +39,33 @@ from .model.core import MoleculeGNN
 from .model.utils import repeat_data, set_rdmol_positions
 
 
-class MoleculeDiffusionPipeline:
+class GeoDiffPipeline:
     """Pipeline for molecular conformation generation.
     The pipeline defined here is slightly different than the pipeline used in diffusers.
     """
 
-    def __init__(self, model_name_or_path: str = None):
+    def __init__(self, model_name_or_path: str = None, params_json: str = None):
         """GeoDiff pipeline for molecular conformation generation.
         Code adapted from colab: https://colab.research.google.com/drive/1pLYYWQhdLuv1q-JtEHGZybxp2RBF8gPs#scrollTo=-3-P4w5sXkRU written by Nathan Lambert.
 
         Args:
             model_name_or_path: pretrained model name or path to model directory.
-            device: device to use.
         """
 
-        # super().__init__()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model_name_or_path = model_name_or_path
 
-        num_timesteps = 1000
+        config = {}
+        if params_json:
+            with open(params_json, "rb") as f:
+                config = json.load(f)
+
         self.scheduler = DDPMScheduler(
-            num_train_timesteps=num_timesteps,
-            beta_schedule="linear",
-            beta_start=1e-7,
-            beta_end=2e-3,
-            clip_sample=False,
+            num_train_timesteps=getattr(config, "num_timesteps", 1000),
+            beta_schedule=getattr(config, "beta_schedule", "linear"),
+            beta_start=getattr(config, "beta_start", 1e-7),
+            beta_end=getattr(config, "beta_end", 2e-3),
+            clip_sample=getattr(config, "clip_sample", False),
         )
         sigmas = (
             torch.tensor(1.0 - self.scheduler.alphas_cumprod).sqrt()
@@ -78,7 +81,7 @@ class MoleculeDiffusionPipeline:
         self.clip_local = None
         self.clip_pos = None
 
-        # constands for data handling
+        # constants for data handling
         self.save_traj = False
         self.save_data = False
         self.output_dir = "out"
@@ -91,11 +94,21 @@ class MoleculeDiffusionPipeline:
         self.model.to(self.device)
 
     @classmethod
-    def from_pretrained(self, model_name_or_path: str):
-        return MoleculeDiffusionPipeline(model_name_or_path=model_name_or_path)
+    def from_pretrained(self, model_name_or_path: str, params_json: str = None):
+        """Load pretrained model.
+
+        Args:
+            model_name_or_path: pretrained model name or path to model directory.
+            params_json: path to model config.
+        """
+        return GeoDiffPipeline(
+            model_name_or_path=model_name_or_path, params_json=params_json
+        )
 
     @torch.no_grad()
-    def __call__(self, batch_size: int, prompt: Optional[Data] = None):
+    def __call__(
+        self, batch_size: int, prompt: Optional[Data] = None
+    ) -> Dict[str, List[Chem.Mol]]:
         """Generate conformations for a molecule.
 
         Args:
@@ -175,7 +188,9 @@ class MoleculeDiffusionPipeline:
         mols_gen, mols_orig = self.postprocess_output(results)
         return {"sample": mols_gen}
 
-    def postprocess_output(self, results: List[Data]):
+    def postprocess_output(
+        self, results: List[Data]
+    ) -> Tuple[List[Chem.Mol], List[Chem.Mol]]:
         """Postprocess output of diffusion pipeline.
 
         Args:
@@ -213,7 +228,7 @@ class MoleculeDiffusionPipeline:
         print(f"collect {len(mols_gen)} generated molecules in `mols`")
         return mols_gen, mols_orig
 
-    def visualize_2d_input(self, data: Data):
+    def visualize_2d_input(self, data: Data) -> None:
         """Visualize 2D input.
 
         Args:
@@ -228,7 +243,7 @@ class MoleculeDiffusionPipeline:
         svg = drawer.GetDrawingText()
         display(SVG(svg.replace("svg:", "")))
 
-    def visualize_3d(self, mols_gen):
+    def visualize_3d(self, mols_gen) -> None:
         """Visualize 3D output.
 
         Args:

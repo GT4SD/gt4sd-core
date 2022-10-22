@@ -147,17 +147,17 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
             return_edges: Whether to return edge_index, edge_type, edge_length.
             extend_order: Whether to extend the graph by bond order.
             extend_radius: Whether to extend the graph by radius.
-            is_sidechain: Whether the atom is a sidechain atom, (N, ).
+            is_sidechain: Whether the atom is a sidechain atom.
 
         Returns:
             output: Local and global invariant edge features.
-                If `return_edges` is True, it also returns edge_index, edge_type, edge_length, local_edge_index.
+                If return_edges is True, it also returns edge_index, edge_type, edge_length, local_edge_index.
 
         """
-        N = atom_type.size(0)
+        n = atom_type.size(0)
         if edge_index is None or edge_type is None or edge_length is None:
             edge_index, edge_type = extend_graph_order_radius(
-                num_nodes=N,
+                num_nodes=n,
                 pos=pos,
                 edge_index=bond_index,
                 edge_type=bond_type,

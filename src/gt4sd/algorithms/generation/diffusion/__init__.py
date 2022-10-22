@@ -27,9 +27,9 @@ from .core import (
     DDIMGenerator,
     DDPMGenerator,
     DiffusersGenerationAlgorithm,
+    GeoDiffGenerator,
     LDMGenerator,
     LDMTextToImageGenerator,
-    MoleculeDiffusionGenerator,
     ScoreSdeGenerator,
     StableDiffusionGenerator,
 )
@@ -43,5 +43,5 @@ __all__ = [
     "ScoreSdeGenerator",
     "LDMGenerator",
     "LDMTextToImageGenerator",
-    "MoleculeDiffusionGenerator",
+    "GeoDiffGenerator",
 ]

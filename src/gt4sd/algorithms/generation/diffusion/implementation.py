@@ -47,7 +47,7 @@ from diffusers import (
 )
 
 from ....frameworks.torch import device_claim
-from .geodiff.core import MoleculeDiffusionPipeline
+from .geodiff.core import GeoDiffPipeline
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -72,7 +72,7 @@ MODEL_TYPES = {
     "latent_diffusion_conditional": LDMTextToImagePipeline,
     "stable_diffusion": StableDiffusionPipeline,
     "score_sde": ScoreSdeVePipeline,
-    "molecule_diffusion": MoleculeDiffusionPipeline,
+    "geodiff": GeoDiffPipeline,
 }
 
 SCHEDULER_TYPES = {
@@ -156,5 +156,9 @@ class Generator:
             item = self.model(batch_size=number_samples, prompt=self.prompt)
         else:
             item = self.model(batch_size=number_samples)
-        item = item["sample"]
+
+        if self.model_type in ["geodiff"]:
+            item = item["sample"]
+        else:
+            item = item.images
         return item

@@ -321,11 +321,11 @@ class StableDiffusionGenerator(DiffusersConfiguration):
 
 
 @ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
-class MoleculeDiffusionGenerator(DiffusersConfiguration):
-    """Molecule Diffusion Model - Configuration for conditional 3D molecule structure generation given 2D information using a GeoDiff diffusion model."""
+class GeoDiffGenerator(DiffusersConfiguration):
+    """GeoDiff Diffusion Model - Configuration for conditional 3D molecule structure generation given 2D information using a GeoDiff diffusion model."""
 
     algorithm_version: str = "fusing/gfn-molecule-gen-drugs"
-    model_type: str = "molecule_diffusion"
+    model_type: str = "geodiff"
     scheduler_type: str = "ddpm"
     modality: str = "molecule"
 

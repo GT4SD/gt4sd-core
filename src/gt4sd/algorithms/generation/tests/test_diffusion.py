@@ -36,9 +36,9 @@ from gt4sd.algorithms.generation.diffusion import (
     DDIMGenerator,
     DDPMGenerator,
     DiffusersGenerationAlgorithm,
+    GeoDiffGenerator,
     LDMGenerator,
     LDMTextToImageGenerator,
-    MoleculeDiffusionGenerator,
     ScoreSdeGenerator,
     StableDiffusionGenerator,
 )
@@ -93,7 +93,7 @@ def get_classvar_type(class_var):
             DiffusersGenerationAlgorithm.__name__,
         ),
         (
-            MoleculeDiffusionGenerator,
+            GeoDiffGenerator,
             "generation",
             "vision",  # TODO: change to "chemistry"
             DiffusersGenerationAlgorithm.__name__,
@@ -125,7 +125,7 @@ def test_config_class(
         (LDMGenerator),
         (LDMTextToImageGenerator),
         (StableDiffusionGenerator),
-        (MoleculeDiffusionGenerator),
+        (GeoDiffGenerator),
     ],
 )
 def test_config_instance(config_class: Type[AlgorithmConfiguration]):
@@ -142,7 +142,7 @@ def test_config_instance(config_class: Type[AlgorithmConfiguration]):
         (LDMGenerator),
         (LDMTextToImageGenerator),
         (StableDiffusionGenerator),
-        (MoleculeDiffusionGenerator),
+        (GeoDiffGenerator),
     ],
 )
 def test_available_versions(config_class: Type[AlgorithmConfiguration]):
@@ -260,7 +260,7 @@ def test_generation_via_registry(
     "config, algorithm",
     [
         pytest.param(
-            MoleculeDiffusionGenerator,
+            GeoDiffGenerator,
             DiffusersGenerationAlgorithm,
             marks=pytest.mark.skip(reason="no_dataset_available"),
         ),
