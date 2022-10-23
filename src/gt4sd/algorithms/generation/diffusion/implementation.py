@@ -49,9 +49,9 @@ from packaging import version
 
 from ....frameworks.torch import device_claim
 
-DIFFUSERS_VERSION_LT_0_6_0 = version.parse(importlib_metadata.version("diffusers")) < version.parse(
-    "0.6.0"
-)
+DIFFUSERS_VERSION_LT_0_6_0 = version.parse(
+    importlib_metadata.version("diffusers")
+) < version.parse("0.6.0")
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
