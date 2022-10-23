@@ -49,7 +49,7 @@ from packaging import version
 
 from ....frameworks.torch import device_claim
 
-OLD_DIFFUSERS = version.parse(importlib_metadata.version("diffusers")) < version.parse(
+DIFFUSERS_VERSION_LT_0_6_0 = version.parse(importlib_metadata.version("diffusers")) < version.parse(
     "0.6.0"
 )
 
@@ -159,7 +159,7 @@ class Generator:
         else:
             item = self.model(batch_size=number_samples)
         # To support old diffusers versions (<0.6.0)
-        if OLD_DIFFUSERS:
+        if DIFFUSERS_VERSION_LT_0_6_0:
             item = item["sample"]
         else:
             item = item.images
