@@ -22,6 +22,7 @@
 # SOFTWARE.
 #
 import json
+import logging
 import os
 import pickle
 from typing import Dict, List, Optional, Tuple
@@ -38,25 +39,33 @@ from torch_scatter import scatter_mean
 from .model.core import MoleculeGNN
 from .model.utils import repeat_data, set_rdmol_positions
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
 
 class GeoDiffPipeline:
-    """Pipeline for molecular conformation generation.
+    """Pipeline for molecular conformation generation using GeoDiff.
     The pipeline defined here is slightly different than the pipeline used in diffusers.
+
+    GeoDiff: a Geometric Diffusion Model for Molecular Conformation Generation, Minkai Xu, Lantao Yu, Yang Song, Chence Shi, Stefano Ermon, Jian Tang - https://arxiv.org/abs/2203.02923
     """
 
-    def __init__(self, model_name_or_path: str = None, params_json: str = None):
-        """GeoDiff pipeline for molecular conformation generation.
-        Code adapted from colab: https://colab.research.google.com/drive/1pLYYWQhdLuv1q-JtEHGZybxp2RBF8gPs#scrollTo=-3-P4w5sXkRU written by Nathan Lambert.
+    def __init__(
+        self, model_name_or_path: str, params_json: Optional[str] = None
+    ) -> None:
+        """GeoDiff pipeline for molecular conformation generation. Code adapted from colab:
+                https://colab.research.google.com/drive/1pLYYWQhdLuv1q-JtEHGZybxp2RBF8gPs#scrollTo=-3-P4w5sXkRU written by Nathan Lambert.
 
         Args:
             model_name_or_path: pretrained model name or path to model directory.
+            params_json: parameters as a JSON file. Defaults to None, a.k.a., use default configuration.
         """
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model_name_or_path = model_name_or_path
 
         config = {}
-        if params_json:
+        if params_json is not None:
             with open(params_json, "rb") as f:
                 config = json.load(f)
 
@@ -90,25 +99,33 @@ class GeoDiffPipeline:
         # load pretrained model
         self.model = MoleculeGNN.from_pretrained(model_name_or_path)
 
-    def to(self, device: Optional[str] = "cuda"):
+    def to(self, device: str = "cuda") -> None:
+        """Move model to a device.
+
+        Args:
+            device: device where to move the model. Defaults to "cuda".
+        """
         self.model.to(self.device)
 
     @classmethod
-    def from_pretrained(self, model_name_or_path: str, params_json: str = None):
+    def from_pretrained(
+        self, model_name_or_path: str, params_json: Optional[str] = None
+    ) -> "GeoDiffPipeline":
         """Load pretrained model.
 
         Args:
             model_name_or_path: pretrained model name or path to model directory.
             params_json: path to model config.
+
+        Returns:
+            a GeoDiff pipeline.
         """
         return GeoDiffPipeline(
             model_name_or_path=model_name_or_path, params_json=params_json
         )
 
     @torch.no_grad()
-    def __call__(
-        self, batch_size: int, prompt: Optional[Data] = None
-    ) -> Dict[str, List[Chem.Mol]]:
+    def __call__(self, batch_size: int, prompt: Data) -> Dict[str, List[Chem.Mol]]:
         """Generate conformations for a molecule.
 
         Args:
@@ -116,12 +133,8 @@ class GeoDiffPipeline:
             prompt: `torch_geometric.data.Data` object containing the molecular graph in 2D format. This information is given as conditioning for the model.
 
         Returns:
-            mols_gen: list of generated conformations.
-            mols_orig: list of original conformations.
+            a dict containing a list of postprocessed generated conformations.
         """
-
-        if prompt is None:
-            raise AttributeError("Specify a 2d representation as prompt for the model.")
 
         results = []
         # 2d representation for the molecule
@@ -197,8 +210,7 @@ class GeoDiffPipeline:
             results: list of `torch_geometric.data.Data` objects containing the molecular graph in 3D format.
 
         Returns:
-            mols_gen: list of postprocessed generated conformations.
-            mols_orig: list of postprocessed original conformations.
+            tuple with list of postprocessed generated conformations and list of postprocessed original conformations.
         """
 
         # the model can generate multiple conformations per 2d geometry
@@ -243,7 +255,7 @@ class GeoDiffPipeline:
         svg = drawer.GetDrawingText()
         display(SVG(svg.replace("svg:", "")))
 
-    def visualize_3d(self, mols_gen) -> None:
+    def visualize_3d(self, mols_gen: List[Chem.Mol]) -> None:
         """Visualize 3D output.
 
         Args:

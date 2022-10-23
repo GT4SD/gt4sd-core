@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import logging
 from dataclasses import dataclass
 from typing import Callable, List, Union
 
@@ -34,20 +35,19 @@ from torch_geometric.nn import MessagePassing
 from torch_geometric.typing import Adj, OptPairTensor, OptTensor, Size
 from torch_sparse import SparseTensor
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
 
 @dataclass
 class MoleculeGNNOutput(BaseOutput):
-    """
-    Hidden states output. Output of last layer of model.
-    """
+    """Hidden states output. Output of last layer of model."""
 
     sample: torch.FloatTensor
 
 
 class MultiLayerPerceptron(nn.Module):
-    """
-    Multi-layer Perceptron. Note there is no activation or dropout in the last layer.
-    """
+    """Multi-layer Perceptron. Note there is no activation or dropout in the last layer."""
 
     def __init__(
         self,
@@ -55,14 +55,14 @@ class MultiLayerPerceptron(nn.Module):
         hidden_dims: List[int],
         activation: str = "relu",
         dropout: float = 0,
-    ):
-        """Multi-layer Perceptron.
+    ) -> None:
+        """Initialize multi-layer perceptron.
 
         Args:
-            input_dim (int): input dimension
-            hidden_dim (list of int): hidden dimensions
-            activation (str or function, optional): activation function
-            dropout (float, optional): dropout rate
+            input_dim: input dimension
+            hidden_dim: hidden dimensions
+            activation: activation function
+            dropout: dropout rate
         """
         super(MultiLayerPerceptron, self).__init__()
 
@@ -70,7 +70,9 @@ class MultiLayerPerceptron(nn.Module):
         if isinstance(activation, str):
             self.activation = getattr(F, activation)
         else:
-            print(f"Warning, activation passed {activation} is not string and ignored")
+            logger.info(
+                f"Warning, activation passed {activation} is not string and ignored"
+            )
             self.activation = None
         if dropout > 0:
             self.dropout = nn.Dropout(dropout)
@@ -81,14 +83,14 @@ class MultiLayerPerceptron(nn.Module):
         for i in range(len(self.dims) - 1):
             self.layers.append(nn.Linear(self.dims[i], self.dims[i + 1]))
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass.
 
         Args:
-            x (torch.Tensor): input tensor of shape (batch_size, input_dim)
+            x: input tensor of shape (batch_size, input_dim)
 
         Returns:
-            Output MLP.
+            output mlp.
         """
         for i, layer in enumerate(self.layers):
             x = layer(x)
@@ -101,16 +103,18 @@ class MultiLayerPerceptron(nn.Module):
 
 
 class ShiftedSoftplus(torch.nn.Module):
-    def __init__(self):
+    """Shifted softplus activation function."""
+
+    def __init__(self) -> None:
         super(ShiftedSoftplus, self).__init__()
         self.shift = torch.log(torch.tensor(2.0)).item()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         return F.softplus(x) - self.shift
 
 
 class CFConv(MessagePassing):
-    """CFConv."""
+    """CFConv layer."""
 
     def __init__(
         self,
@@ -120,15 +124,16 @@ class CFConv(MessagePassing):
         mlp: Callable,
         cutoff: float,
         smooth: bool,
-    ):
-        """
+    ) -> None:
+        """Construct a CFConv layer.
+
         Args:
-            in_channels (int): Size of each input.
-            out_channels (int): Size of each output.
-            num_filters (int): Number of filters.
-            mlp (list of int): MLP hidden dimensions.
-            cutoff (float): Cutoff distance.
-            smooth (bool): Whether to use smooth cutoff.
+            in_channels: size of each input.
+            out_channels: size of each output.
+            num_filters: number of filters.
+            mlp: mlp hidden dimensions.
+            cutoff: cutoff distance.
+            smooth: whether to use smooth cutoff.
         """
         super(CFConv, self).__init__(aggr="add")
         self.lin1 = Linear(in_channels, num_filters, bias=False)
@@ -139,12 +144,26 @@ class CFConv(MessagePassing):
 
         self.reset_parameters()
 
-    def reset_parameters(self):
+    def reset_parameters(self) -> None:
+        """Initialize parameters."""
         torch.nn.init.xavier_uniform_(self.lin1.weight)
         torch.nn.init.xavier_uniform_(self.lin2.weight)
         self.lin2.bias.data.fill_(0)
 
-    def forward(self, x, edge_index, edge_length, edge_attr):
+    def forward(
+        self, x: torch.Tensor, edge_index, edge_length, edge_attr
+    ) -> torch.Tensor:
+        """Forward pass.
+
+        Args:
+            x: input tensor.
+            edge_index: edge indices.
+            edge_length: edge lengths.
+            edge_attr: edge attributes.
+
+        Returns:
+            output tensor.
+        """
         if self.smooth:
             C = 0.5 * (torch.cos(edge_length * np.pi / self.cutoff) + 1.0)
             C = (
@@ -164,6 +183,8 @@ class CFConv(MessagePassing):
 
 
 class InteractionBlock(torch.nn.Module):
+    """Interaction block."""
+
     def __init__(
         self,
         hidden_channels: int,
@@ -171,7 +192,16 @@ class InteractionBlock(torch.nn.Module):
         num_filters: int,
         cutoff: float,
         smooth: bool,
-    ):
+    ) -> None:
+        """Construct an interaction block.
+
+        Args:
+            hidden_channels: number of hidden channels.
+            num_gaussians: number of gaussians.
+            num_filters: number of filters.
+            cutoff: cutoff distance.
+            smooth: whether to use smooth cutoff.
+        """
         super(InteractionBlock, self).__init__()
         mlp = Sequential(
             Linear(num_gaussians, num_filters),
@@ -184,7 +214,20 @@ class InteractionBlock(torch.nn.Module):
         self.act = ShiftedSoftplus()
         self.lin = Linear(hidden_channels, hidden_channels)
 
-    def forward(self, x, edge_index, edge_length, edge_attr):
+    def forward(
+        self, x: torch.Tensor, edge_index, edge_length, edge_attr
+    ) -> torch.Tensor:
+        """Forward pass.
+
+        Args:
+            x: input tensor.
+            edge_index: edge indices.
+            edge_length: edge lengths.
+            edge_attr: edge attributes.
+
+        Returns:
+            output tensor.
+        """
         x = self.conv(x, edge_index, edge_length, edge_attr)
         x = self.act(x)
         x = self.lin(x)
@@ -192,6 +235,8 @@ class InteractionBlock(torch.nn.Module):
 
 
 class SchNetEncoder(Module):
+    """SchNet encoder."""
+
     def __init__(
         self,
         hidden_channels: int = 128,
@@ -200,7 +245,17 @@ class SchNetEncoder(Module):
         edge_channels: int = 100,
         cutoff: float = 10.0,
         smooth: bool = False,
-    ):
+    ) -> None:
+        """Construct a SchNet encoder.
+
+        Args:
+            hidden_channels: number of hidden channels.
+            num_filters: number of filters.
+            num_interactions: number of interactions.
+            edge_channels: number of edge channels.
+            cutoff: cutoff distance.
+            smooth: whether to use smooth cutoff.
+        """
         super().__init__()
 
         self.hidden_channels = hidden_channels
@@ -217,7 +272,26 @@ class SchNetEncoder(Module):
             )
             self.interactions.append(block)
 
-    def forward(self, z, edge_index, edge_length, edge_attr, embed_node=True):
+    def forward(
+        self,
+        z: torch.Tensor,
+        edge_index: torch.Tensor,
+        edge_length: torch.Tensor,
+        edge_attr: torch.Tensor,
+        embed_node: bool = True,
+    ) -> torch.Tensor:
+        """Forward pass.
+
+        Args:
+            z: input tensor.
+            edge_index: edge indices.
+            edge_length: edge lengths.
+            edge_attr: edge attributes.
+            embed_node: whether to embed node.
+
+        Returns:
+            output tensor.
+        """
         if embed_node:
             assert z.dim() == 1 and z.dtype == torch.long
             h = self.embedding(z)
@@ -230,7 +304,7 @@ class SchNetEncoder(Module):
 
 
 class GINEConv(MessagePassing):
-    """
+    """GINECONV layer.
     Custom class of the graph isomorphism operator from the "How Powerful are Graph Neural Networks?
     https://arxiv.org/abs/1810.00826 paper. Note that this implementation has the added option of a custom activation.
     """
@@ -240,9 +314,17 @@ class GINEConv(MessagePassing):
         mlp: Callable,
         eps: float = 0.0,
         train_eps: bool = False,
-        activation="softplus",
+        activation: str = "softplus",
         **kwargs,
-    ):
+    ) -> None:
+        """Construct a GINEConv layer.
+
+        Args:
+            mlp: MLP.
+            eps: epsilon.
+            train_eps: whether to train epsilon.
+            activation: activation function.
+        """
         super(GINEConv, self).__init__(aggr="add", **kwargs)
         self.nn = mlp
         self.initial_eps = eps
@@ -264,6 +346,17 @@ class GINEConv(MessagePassing):
         edge_attr: OptTensor = None,
         size: Size = None,
     ) -> torch.Tensor:
+        """Forward pass.
+
+        Args:
+            x: input tensor.
+            edge_index: edge indices.
+            edge_attr: edge attributes.
+            size: size.
+
+        Returns:
+            output tensor.
+        """
 
         if isinstance(x, torch.Tensor):
             x = (x, x)
@@ -285,6 +378,15 @@ class GINEConv(MessagePassing):
         return self.nn(out)
 
     def message(self, x_j: torch.Tensor, edge_attr: torch.Tensor) -> torch.Tensor:
+        """Message function.
+
+        Args:
+            x_j: input tensor.
+            edge_attr: edge attributes.
+
+        Returns:
+            message passing aggregation.
+        """
         if self.activation:
             return self.activation(x_j + edge_attr)
         else:
@@ -295,14 +397,25 @@ class GINEConv(MessagePassing):
 
 
 class GINEncoder(torch.nn.Module):
+    """GIN encoder."""
+
     def __init__(
         self,
-        hidden_dim,
-        num_convs=3,
-        activation="relu",
-        short_cut=True,
-        concat_hidden=False,
-    ):
+        hidden_dim: int,
+        num_convs: int = 3,
+        activation: str = "relu",
+        short_cut: bool = True,
+        concat_hidden: bool = False,
+    ) -> None:
+        """Construct a GIN encoder.
+
+        Args:
+            hidden_dim: number of hidden channels.
+            num_convs: number of convolutions.
+            activation: activation function.
+            short_cut: whether to use short cut.
+            concat_hidden: whether to concatenate hidden.
+        """
         super().__init__()
 
         self.hidden_dim = hidden_dim
@@ -327,13 +440,18 @@ class GINEncoder(torch.nn.Module):
                 )
             )
 
-    def forward(self, z, edge_index, edge_attr):
-        """
-        Input:
-            data: (torch_geometric.data.Data): batched graph edge_index: bond indices of the original graph (num_node,
-            hidden) edge_attr: edge feature tensor with shape (num_edge, hidden)
-        Output:
-            node_feature: graph feature
+    def forward(
+        self, z: torch.Tensor, edge_index: torch.Tensor, edge_attr: torch.Tensor
+    ) -> torch.Tensor:
+        """Forward pass.
+
+        args:
+            z: input tensor.
+            edge_index: edge indices.
+            edge_attr: edge attributes.
+
+        returns:
+            graph with node feature.
         """
 
         node_attr = self.node_emb(z)  # (num_node, hidden)
@@ -361,7 +479,15 @@ class GINEncoder(torch.nn.Module):
 
 
 class MLPEdgeEncoder(Module):
-    def __init__(self, hidden_dim=100, activation="relu"):
+    """MLP edge encoder."""
+
+    def __init__(self, hidden_dim: int = 100, activation: str = "relu") -> None:
+        """Construct a MLP edge encoder.
+
+        Args:
+            hidden_dim: number of hidden channels.
+            activation: activation function.
+        """
         super().__init__()
         self.hidden_dim = hidden_dim
         self.bond_emb = Embedding(100, embedding_dim=self.hidden_dim)
@@ -373,12 +499,15 @@ class MLPEdgeEncoder(Module):
     def out_channels(self):
         return self.hidden_dim
 
-    def forward(self, edge_length, edge_type):
+    def forward(
+        self, edge_length: torch.Tensor, edge_type: torch.Tensor
+    ) -> torch.Tensor:
         """
-        Input:
-            edge_length: The length of edges, shape=(E, 1). edge_type: The type pf edges, shape=(E,)
+        Args:
+            edge_length: The length of edges.
+            edge_type: The type of edges.
         Returns:
-            edge_attr: The representation of edges. (E, 2 * num_gaussians)
+            the output representation of edges.
         """
         d_emb = self.mlp(edge_length)  # (num_edge, hidden_dim)
         edge_attr = self.bond_emb(edge_type)  # (num_edge, hidden_dim)

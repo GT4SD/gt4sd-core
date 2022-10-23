@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Tuple, Union
+from typing import Any, Tuple, Union
 
 import torch
 from diffusers.configuration_utils import ConfigMixin
@@ -47,7 +47,11 @@ from .utils import (
 
 
 class MoleculeGNN(ModelMixin, ConfigMixin):
-    """Graph Neural Network Model for molecule conformation."""
+    """Graph Neural Network Model for molecule conformation.
+
+    Code adapted from colab:
+        https://colab.research.google.com/drive/1pLYYWQhdLuv1q-JtEHGZybxp2RBF8gPs#scrollTo=-3-P4w5sXkRU written by Nathan Lambert.
+    """
 
     def __init__(
         self,
@@ -59,17 +63,17 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
         edge_order: int = 3,
         edge_encoder: str = "mlp",
         smooth_conv: bool = True,
-    ):
-        """
+    ) -> None:
+        """Constructor for MoleculeGNN.
         Args:
-            hidden_dim: Hidden dimension of the GNN.
-            num_convs: Number of GNN layers.
-            num_convs_local: Number of GNN layers for local edges.
-            cutoff: Cutoff radius for the GNN.
-            mlp_act: Activation function for the MLP.
-            edge_order: Order of the edge features.
-            edge_encoder: Type of edge encoder.
-            smooth_conv: Whether to use smooth convolution.
+            hidden_dim: hidden dimension of the GNN.
+            num_convs: number of GNN layers.
+            num_convs_local: number of GNN layers for local edges.
+            cutoff: nutoff radius for the GNN.
+            mlp_act: activation function for the MLP.
+            edge_order: order of the edge features.
+            edge_encoder: type of edge encoder.
+            smooth_conv: whether to use smooth convolution.
         """
         super().__init__()
         self.cutoff = cutoff
@@ -123,7 +127,6 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
         bond_index: torch.Tensor,
         bond_type: torch.Tensor,
         batch: torch.Tensor,
-        time_step: torch.Tensor = None,
         edge_index: torch.Tensor = None,
         edge_type: torch.Tensor = None,
         edge_length: int = None,
@@ -131,26 +134,25 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
         extend_order: bool = True,
         extend_radius: bool = True,
         is_sidechain: bool = None,
-    ):
+    ) -> Tuple[Any, ...]:
         """Forward pass for edges features.
 
         Args:
-            atom_type:  Types of atoms, (N, ).
-            pos:        Positions of atoms, (N, 3).
-            bond_index: Indices of bonds (not extended, not radius-graph), (2, E).
-            bond_type:  Bond types, (E, ).
-            batch:      Node index to graph index, (N, ).
-            time_step:  Time step of the graph, (N, ).
-            edge_index: Indices of edges (extended, radius-graph), (2, E').
-            edge_type:  Edge types, (E', ).
-            edge_length: Edge lengths, (E', ).
-            return_edges: Whether to return edge_index, edge_type, edge_length.
-            extend_order: Whether to extend the graph by bond order.
-            extend_radius: Whether to extend the graph by radius.
-            is_sidechain: Whether the atom is a sidechain atom.
+            atom_type:  types of atoms, (N, ).
+            pos:        positions of atoms, (N, 3).
+            bond_index: indices of bonds (not extended, not radius-graph), (2, E).
+            bond_type:  bond types, (E, ).
+            batch:      node index to graph index, (N, ).
+            edge_index: indices of edges (extended, radius-graph), (2, E'). If None, determined by extend_graph_order_radius.
+            edge_type: edge types, (E', ). If None, determined by extend_graph_order_radius.
+            edge_length: edge lengths, (E', ). If None, determined by extend_graph_order_radius.
+            return_edges: whether to return edge_index, edge_type, edge_length.
+            extend_order: whether to extend the graph by bond order.
+            extend_radius: whether to extend the graph by radius.
+            is_sidechain: whether the atom is a sidechain atom.
 
         Returns:
-            output: Local and global invariant edge features.
+            tuple with local and global invariant edge features.
                 If return_edges is True, it also returns edge_index, edge_type, edge_length, local_edge_index.
 
         """
@@ -239,7 +241,7 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
                 local_edge_mask,
             )
         else:
-            return edge_inv_global, edge_inv_local
+            return (edge_inv_global, edge_inv_local)
 
     def forward(
         self,
@@ -257,39 +259,32 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
         """Forward pass for the model.
 
         Args:
-            sample: packed torch geometric object
-            timestep (`torch.FloatTensor` or `float` or `int)
-            return_dict (`bool`, *optional*, defaults to `True`)
-                Whether or not to return a [`~models.molecule_gnn.MoleculeGNNOutput`] instead of a plain tuple.
-            sigma (`float` or `torch.FloatTensor`, *optional*, defaults to `1.0`): The noise variance scale.
-            global_start_sigma (`float` or `torch.FloatTensor`, *optional*, defaults to `0.5`): The noise variance scale for global edges.
-            w_global (`float` or `torch.FloatTensor`, *optional*, defaults to `1.0`): The weight for global edges.
-            extend_order (`bool`, *optional*, defaults to `False`): Whether to extend the graph by bond order.
-            extend_radius (`bool`, *optional*, defaults to `True`): Whether to extend the graph by radius.
-            clip_local (`float` or `torch.FloatTensor`, *optional*, defaults to `None`): The clip value for local edges.
-            clip_global (`float` or `torch.FloatTensor`, *optional*, defaults to `1000.0`): The clip value for global edges.
+            sample: packed torch geometric object.
+            timestep timesteps.
+            return_dict: whether or not to return a MoleculeGNNOutput instead of a plain tuple.
+            sigma: the noise variance scale.
+            global_start_sigma: the noise variance scale for global edges.
+            w_global: the weight for global edges.
+            extend_order: whether to extend the graph by bond order.
+            extend_radius: whether to extend the graph by radius.
+            clip_local: the clip value for local edges.
+            clip_global: the clip value for global edges.
 
         Returns:
-            [`~models.molecule_gnn.MoleculeGNNOutput`] or `tuple`: [`~models.molecule_gnn.MoleculeGNNOutput`] if
-            `return_dict` is True, otherwise a `tuple`. When returning a tuple, the first element is the sample tensor.
+            dict with samples. If return_dict is false, return positions.
         """
 
         # unpack sample
         atom_type = sample.atom_type
         bond_index = sample.edge_index
         bond_type = sample.edge_type
-        num_graphs = sample.num_graphs
         pos = sample.pos
-
-        timesteps = torch.full(
-            size=(num_graphs,), fill_value=timestep, dtype=torch.long, device=pos.device
-        )
 
         (
             edge_inv_global,
             edge_inv_local,
             edge_index,
-            edge_type,
+            _,
             edge_length,
             local_edge_mask,
         ) = self._forward(
@@ -298,7 +293,6 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
             bond_index=bond_index,
             bond_type=bond_type,
             batch=sample.batch,
-            time_step=timesteps,
             return_edges=True,
             extend_order=extend_order,
             extend_radius=extend_radius,
