@@ -26,11 +26,11 @@ Implementation details for huggingface diffusers generation algorithms.
 
 Parts of the implementation inspired by: https://github.com/huggingface/diffusers/blob/main/examples/train_unconditional.py.
 """
-
 import logging
 import os
 from typing import Any, List, Optional, Union
 
+import importlib_metadata
 import numpy as np
 import torch
 from diffusers import (
@@ -45,8 +45,13 @@ from diffusers import (
     ScoreSdeVeScheduler,
     StableDiffusionPipeline,
 )
+from packaging import version
 
 from ....frameworks.torch import device_claim
+
+DIFFUSERS_VERSION_LT_0_6_0 = version.parse(
+    importlib_metadata.version("diffusers")
+) < version.parse("0.6.0")
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -153,5 +158,9 @@ class Generator:
             item = self.model(batch_size=number_samples, prompt=self.prompt)
         else:
             item = self.model(batch_size=number_samples)
-        item = item["sample"]
+        # To support old diffusers versions (<0.6.0)
+        if DIFFUSERS_VERSION_LT_0_6_0:
+            item = item["sample"]
+        else:
+            item = item.images
         return item

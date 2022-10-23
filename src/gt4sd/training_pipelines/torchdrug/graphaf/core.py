@@ -221,7 +221,9 @@ class TorchDrugGraphAFTrainingPipeline(TorchDrugTrainingPipeline):
             # Save model
             task_name = f"task={params.get('task')}_" if params.get("task") else ""
             data_name = "data=" + (
-                dataset_name + "_" + params["file_path"].split(os.sep)[-1].split(".")[0]
+                dataset_name
+                + "_"
+                + str(params["file_path"]).split(os.sep)[-1].split(".")[0]
                 if dataset_name == "custom"
                 else dataset_name
             )
