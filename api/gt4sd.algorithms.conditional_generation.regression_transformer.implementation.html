@@ -235,7 +235,7 @@
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator">
-<em class="property">class </em><code class="sig-name descname">ConditionalGenerator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">ConditionalGenerator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">20.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Main interface for a regression transformer.</p>
 <dl class="py attribute">
@@ -254,11 +254,6 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.tolerance">
-<code class="sig-name descname">tolerance</code><em class="property">: float</em><em class="property"> = 20</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.tolerance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.batch_size">
 <code class="sig-name descname">batch_size</code><em class="property">: int</em><em class="property"> = 8</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.batch_size" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -270,19 +265,17 @@
 
 <dl class="py method">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources_path</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tolerance</span><span class="o">=</span><span class="default_value">20.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/implementation.html#ConditionalGenerator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the generator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>resources_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – directory where to find models and parameters.</p></li>
-<li><p><strong>temperature</strong> – temperature for the sampling. Defaults to 1.4.</p></li>
-<li><p><strong>generated_length</strong> – maximum length of the generated molecules.
-Defaults to 100.</p></li>
-<li><p><strong>samples_per_protein</strong> – number of points sampled per protein.
-It has to be greater than 1. Defaults to 10.</p></li>
 <li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">device</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – device where the inference is running either as a dedicated class
 or a string. If not provided is inferred.</p></li>
+<li><p><strong>tolerance</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – percentage of tolerated deviation between desired and obtained property.
+Either a single float or a dictionary of floats, where the keys are the properties.
+Note that the tolerance is <em>only</em> used for post-hoc filtering of the generated molecules.</p></li>
 </ul>
 </dd>
 </dl>
@@ -616,12 +609,12 @@ only mask fluorine atoms</p></li>
 
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__annotations__">
-<code class="sig-name descname">__annotations__</code><em class="property"> = {'batch_size': &lt;class 'int'&gt;, 'device': &lt;class 'torch.device'&gt;, 'property_collator': &lt;class 'terminator.collators.PropertyCollator'&gt;, 'sampling_wrapper': typing.Dict[str, typing.Any], 'search': &lt;class 'terminator.search.Search'&gt;, 'task': &lt;class 'str'&gt;, 'tolerance': &lt;class 'float'&gt;}</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__annotations__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__annotations__</code><em class="property"> = {'batch_size': &lt;class 'int'&gt;, 'device': &lt;class 'torch.device'&gt;, 'property_collator': &lt;class 'terminator.collators.PropertyCollator'&gt;, 'sampling_wrapper': typing.Dict[str, typing.Any], 'search': &lt;class 'terminator.search.Search'&gt;, 'task': &lt;class 'str'&gt;}</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__annotations__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__dict__">
-<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.conditional_generation.regression_transformer.implementation', '__annotations__': {'device': &lt;class 'torch.device'&gt;, 'task': &lt;class 'str'&gt;, 'search': &lt;class 'terminator.search.Search'&gt;, 'property_collator': &lt;class 'terminator.collators.PropertyCollator'&gt;, 'tolerance': &lt;class 'float'&gt;, 'batch_size': &lt;class 'int'&gt;, 'sampling_wrapper': typing.Dict[str, typing.Any]}, '__doc__': 'Main interface for a regression transformer.', 'tolerance': 20, 'batch_size': 8, 'sampling_wrapper': {}, '__init__': &lt;function ConditionalGenerator.__init__&gt;, 'load_model': &lt;function ConditionalGenerator.load_model&gt;, 'load_inference': &lt;function ConditionalGenerator.load_inference&gt;, 'denormalize': &lt;function ConditionalGenerator.denormalize&gt;, 'normalize': &lt;function ConditionalGenerator.normalize&gt;, 'validate_input': &lt;function ConditionalGenerator.validate_input&gt;, 'validate_input_molecule': &lt;function ConditionalGenerator.validate_input_molecule&gt;, 'validate_input_numerical': &lt;function ConditionalGenerator.validate_input_numerical&gt;, 'safely_determine_task': &lt;function ConditionalGenerator.safely_determine_task&gt;, 'generate_batch_regression': &lt;function ConditionalGenerator.generate_batch_regression&gt;, 'compile_regression_result': &lt;function ConditionalGenerator.compile_regression_result&gt;, 'generate_batch_generation': &lt;function ConditionalGenerator.generate_batch_generation&gt;, 'normalize_sequence': &lt;function ConditionalGenerator.normalize_sequence&gt;, 'isfloat': &lt;staticmethod object&gt;, 'validate_numerical': &lt;function ConditionalGenerator.validate_numerical&gt;, 'validate_sampling_wrapper': &lt;function ConditionalGenerator.validate_sampling_wrapper&gt;, 'sample_sequence': &lt;function ConditionalGenerator.sample_sequence&gt;, 'get_maskable_tokens': &lt;function ConditionalGenerator.get_maskable_tokens&gt;, 'language_encoding': &lt;function ConditionalGenerator.language_encoding&gt;, '__dict__': &lt;attribute '__dict__' of 'ConditionalGenerator' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'ConditionalGenerator' objects&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.conditional_generation.regression_transformer.implementation', '__annotations__': {'device': &lt;class 'torch.device'&gt;, 'task': &lt;class 'str'&gt;, 'search': &lt;class 'terminator.search.Search'&gt;, 'property_collator': &lt;class 'terminator.collators.PropertyCollator'&gt;, 'batch_size': &lt;class 'int'&gt;, 'sampling_wrapper': typing.Dict[str, typing.Any]}, '__doc__': 'Main interface for a regression transformer.', 'batch_size': 8, 'sampling_wrapper': {}, '__init__': &lt;function ConditionalGenerator.__init__&gt;, 'load_model': &lt;function ConditionalGenerator.load_model&gt;, 'load_inference': &lt;function ConditionalGenerator.load_inference&gt;, 'denormalize': &lt;function ConditionalGenerator.denormalize&gt;, 'normalize': &lt;function ConditionalGenerator.normalize&gt;, 'validate_input': &lt;function ConditionalGenerator.validate_input&gt;, 'validate_input_molecule': &lt;function ConditionalGenerator.validate_input_molecule&gt;, 'validate_input_numerical': &lt;function ConditionalGenerator.validate_input_numerical&gt;, 'safely_determine_task': &lt;function ConditionalGenerator.safely_determine_task&gt;, 'generate_batch_regression': &lt;function ConditionalGenerator.generate_batch_regression&gt;, 'compile_regression_result': &lt;function ConditionalGenerator.compile_regression_result&gt;, 'generate_batch_generation': &lt;function ConditionalGenerator.generate_batch_generation&gt;, 'normalize_sequence': &lt;function ConditionalGenerator.normalize_sequence&gt;, 'isfloat': &lt;staticmethod object&gt;, 'validate_numerical': &lt;function ConditionalGenerator.validate_numerical&gt;, 'validate_sampling_wrapper': &lt;function ConditionalGenerator.validate_sampling_wrapper&gt;, 'sample_sequence': &lt;function ConditionalGenerator.sample_sequence&gt;, 'get_maskable_tokens': &lt;function ConditionalGenerator.get_maskable_tokens&gt;, 'language_encoding': &lt;function ConditionalGenerator.language_encoding&gt;, '__dict__': &lt;attribute '__dict__' of 'ConditionalGenerator' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'ConditionalGenerator' objects&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -692,11 +685,6 @@ only mask fluorine atoms</p></li>
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.tolerance">
 <code class="sig-name descname">tolerance</code><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.tolerance" title="Permalink to this definition">¶</a></dt>
 <dd><p>the tolerance for the property of the generated molecules.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -711,7 +699,7 @@ only mask fluorine atoms</p></li>
 <li><p><strong>search</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – search key to instantiate a search, defaults to <cite>sample</cite>.</p></li>
 <li><p><strong>temperature</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – temperature for the sampling. Defaults to 1.4.</p></li>
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of points sampled per call. Defaults to 8.</p></li>
-<li><p><strong>tolerance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – the tolerance for the property of the generated molecules.
+<li><p><strong>tolerance</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – the tolerance for the property of the generated molecules.
 Given in percent. Defaults to 20.</p></li>
 <li><p><strong>sampling_wrapper</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>A high-level entry point that allows specifying a seed
 SMILES alongside some target conditions.
@@ -887,11 +875,6 @@ For details on the stability task see: <a class="reference external" href="https
 <dt id="gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.tolerance">
 <code class="sig-name descname">tolerance</code><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.tolerance" title="Permalink to this definition">¶</a></dt>
 <dd><p>the tolerance for the property of the generated molecules.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -905,8 +888,8 @@ For details on the stability task see: <a class="reference external" href="https
 <li><p><strong>search</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – search key to instantiate a search, defaults to <cite>sample</cite>.</p></li>
 <li><p><strong>temperature</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – temperature for the sampling. Defaults to 1.4.</p></li>
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of points sampled per call. Defaults to 8.</p></li>
-<li><p><strong>tolerance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – the tolerance for the property of the generated molecules.
-Given in percent. Defaults to 20.</p></li>
+<li><p><strong>tolerance</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – the tolerance for the property of the generated molecules.
+Given in percent. Defaults to 20.0.</p></li>
 <li><p><strong>sampling_wrapper</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>A high-level entry point that allows specifying a seed
 SMILES alongside some target conditions.
 NOTE: If this is used, the <cite>target</cite> needs to be a single SMILES string.

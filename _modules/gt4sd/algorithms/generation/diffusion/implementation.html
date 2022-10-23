@@ -189,11 +189,11 @@
 
 <span class="sd">Parts of the implementation inspired by: https://github.com/huggingface/diffusers/blob/main/examples/train_unconditional.py.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">import</span> <span class="nn">importlib_metadata</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">diffusers</span> <span class="kn">import</span> <span class="p">(</span>
@@ -208,8 +208,13 @@
     <span class="n">ScoreSdeVeScheduler</span><span class="p">,</span>
     <span class="n">StableDiffusionPipeline</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">packaging</span> <span class="kn">import</span> <span class="n">version</span>
 
 <span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+
+<span class="n">DIFFUSERS_VERSION_LT_0_6_0</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+    <span class="n">importlib_metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;diffusers&quot;</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">&lt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;0.6.0&quot;</span><span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -316,7 +321,11 @@
             <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">number_samples</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">number_samples</span><span class="p">)</span>
-        <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;sample&quot;</span><span class="p">]</span>
+        <span class="c1"># To support old diffusers versions (&lt;0.6.0)</span>
+        <span class="k">if</span> <span class="n">DIFFUSERS_VERSION_LT_0_6_0</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;sample&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">images</span>
         <span class="k">return</span> <span class="n">item</span></div></div>
 </pre></div>
 
