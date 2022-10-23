@@ -26,7 +26,6 @@ Implementation details for huggingface diffusers generation algorithms.
 
 Parts of the implementation inspired by: https://github.com/huggingface/diffusers/blob/main/examples/train_unconditional.py.
 """
-
 import logging
 import os
 from typing import Any, List, Optional, Union
@@ -55,6 +54,10 @@ OLD_DIFFUSERS = version.parse(importlib_metadata.version("diffusers")) < version
     "0.6.0"
 )
 
+
+DIFFUSERS_VERSION_LT_0_6_0 = version.parse(
+    importlib_metadata.version("diffusers")
+) < version.parse("0.6.0")
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -163,11 +166,10 @@ class Generator:
             item = self.model(batch_size=number_samples, prompt=self.prompt)
         else:
             item = self.model(batch_size=number_samples)
-
         # To support old diffusers versions (<0.6.0)
-        if OLD_DIFFUSERS or self.model_type in ["geodiff"]:
+        if DIFFUSERS_VERSION_LT_0_6_0:
             item = item["sample"]
         else:
             item = item.images
-
+            
         return item
