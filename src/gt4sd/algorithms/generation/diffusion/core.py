@@ -127,12 +127,12 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         ),
     )
 
-    prompt: Union[str, Any] = field(  # type: ignore
+    prompt: Union[str, Dict[str, Any]] = field(  # type: ignore
         default=None,
-        metadata=dict(description="Prompt for generation."),
+        metadata=dict(description="Prompt for conditional generation."),
     )
 
-    def get_target_description(self) -> Optional[Dict[str, str]]:
+    def get_target_description(self) -> Optional[Any]:
         """Get description of the target for generation.
 
         Returns:
@@ -346,3 +346,11 @@ class GeoDiffGenerator(DiffusersConfiguration):
             .list_versions()
             .union({cls.algorithm_version})
         )
+
+    def get_target_description(self) -> Dict[str, Any]:
+        """Get description of the target for generation.
+
+        Returns:
+            target description, returns None in case no target is used.
+        """
+        return None  # type: ignore

@@ -30,7 +30,6 @@ import importlib_resources
 import PIL
 import pytest
 from rdkit.Chem.rdchem import Mol
-from torch_geometric.data import Data
 
 from gt4sd.algorithms.core import AlgorithmConfiguration
 from gt4sd.algorithms.generation.diffusion import (
@@ -273,7 +272,7 @@ def test_geodiff_conditional_generation_via_import(config, algorithm):
     ) as path:
         with open(path, "rb") as f:
             loaded_dict = pickle.load(f)
-        prompt = Data.from_dict(loaded_dict[0])
+        prompt = loaded_dict[0]
         configuration = config(prompt=prompt)
         algorithm = algorithm(configuration=configuration)
         samples = list(algorithm.sample(1))

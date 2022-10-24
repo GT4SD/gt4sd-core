@@ -25,7 +25,7 @@ import json
 import logging
 import os
 import pickle
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 from rdkit import Chem
@@ -66,7 +66,7 @@ class GeoDiffPipeline:
 
         config = {}
         if params_json is not None:
-            with open(params_json, "rb") as f:
+            with open(params_json, "r") as f:
                 config = json.load(f)
 
         self.scheduler = DDPMScheduler(
@@ -125,7 +125,9 @@ class GeoDiffPipeline:
         )
 
     @torch.no_grad()
-    def __call__(self, batch_size: int, prompt: Data) -> Dict[str, List[Chem.Mol]]:
+    def __call__(
+        self, batch_size: int, prompt: Dict[str, Any]
+    ) -> Dict[str, List[Chem.Mol]]:
         """Generate conformations for a molecule.
 
         Args:
@@ -138,7 +140,8 @@ class GeoDiffPipeline:
 
         results = []
         # 2d representation for the molecule
-        data = prompt
+        # convert dict in torch_geometric.data.Data
+        data = Data.from_dict(prompt)
         num_samples = max(data.pos_ref.size(0) // data.num_nodes, 1)
 
         data_input = data.clone()
@@ -171,8 +174,7 @@ class GeoDiffPipeline:
                 pos = reconstructed_pos
 
                 if torch.isnan(pos).any():
-                    print("NaN detected. Please restart.")
-                    raise FloatingPointError()
+                    raise FloatingPointError("NaN detected. Please restart.")
 
                 # recenter graph of positions for next iteration
                 pos = pos - scatter_mean(pos, batch.batch, dim=0)[batch.batch]
@@ -237,7 +239,7 @@ class GeoDiffPipeline:
             mols_gen.append(new_mol)
             mols_orig.append(to_process.rdmol)
 
-        print(f"collect {len(mols_gen)} generated molecules in `mols`")
+        logger.info(f"collect {len(mols_gen)} generated molecules in `mols`")
         return mols_gen, mols_orig
 
     def visualize_2d_input(self, data: Data) -> None:
