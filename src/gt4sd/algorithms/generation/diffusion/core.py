@@ -347,10 +347,15 @@ class GeoDiffGenerator(DiffusersConfiguration):
             .union({cls.algorithm_version})
         )
 
-    def get_target_description(self) -> Dict[str, Any]:
+    def get_target_description(self) -> Dict[str, str]:
         """Get description of the target for generation.
 
         Returns:
             target description, returns None in case no target is used.
         """
-        return None  # type: ignore
+        return {
+            "title": "Prompt 2d representation for the molecule.",
+            "description": "A dictionary containing all the information to build a molecule graph.",
+            "keys": "['atom_type', 'bond_edge_index', 'edge_index', 'edge_order', 'edge_type', 'idx', 'is_bond', 'num_nodes_per_graph', 'num_pos_ref', 'nx', 'pos', 'pos_ref', 'rdmol', 'smiles']",
+            "type": "dictionary",
+        }
