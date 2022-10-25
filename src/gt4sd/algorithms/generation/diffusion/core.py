@@ -355,7 +355,6 @@ class GeoDiffGenerator(DiffusersConfiguration):
         """
         return {
             "title": "Prompt 2d representation for the molecule.",
-            "description": "A dictionary containing all the information to build a molecule graph.",
-            "keys": "['atom_type', 'bond_edge_index', 'edge_index', 'edge_order', 'edge_type', 'idx', 'is_bond', 'num_nodes_per_graph', 'num_pos_ref', 'nx', 'pos', 'pos_ref', 'rdmol', 'smiles']",
+            "description": "A dictionary containing all the information to build a molecule graph. Supported keys: ['atom_type', 'bond_edge_index', 'edge_index', 'edge_order', 'edge_type', 'idx', 'is_bond', 'num_nodes_per_graph', 'num_pos_ref', 'nx', 'pos', 'pos_ref', 'rdmol', 'smiles']",
             "type": "dictionary",
         }
