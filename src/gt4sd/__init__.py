@@ -23,7 +23,7 @@
 #
 """Module initialization."""
 
-__version__ = "0.54.1"
+__version__ = "0.55.0"
 __name__ = "gt4sd"
 
 # NOTE: configure SSL to allow unverified contexts by default
