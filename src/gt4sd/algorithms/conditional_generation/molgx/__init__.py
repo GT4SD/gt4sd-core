@@ -22,9 +22,9 @@
 # SOFTWARE.
 #
 """MolGX initialization."""
-from .core import MolGX, MolGXQM9Generator
-
 import logging
+
+from .core import MolGX, MolGXQM9Generator
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

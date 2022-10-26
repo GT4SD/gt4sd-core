@@ -36,6 +36,7 @@ from .conditional_generation.guacamol.core import (  # noqa: F401
     VaeGenerator,
 )
 from .conditional_generation.key_bert.core import KeyBERTGenerator  # noqa: F401
+from .conditional_generation.molgx.core import MolGXQM9Generator  # noqa: F401
 from .conditional_generation.paccmann_rl.core import (  # noqa: F401
     PaccMannRLOmicBasedGenerator,
     PaccMannRLProteinBasedGenerator,
@@ -76,8 +77,6 @@ from .generation.polymer_blocks.core import PolymerBlocksGenerator  # noqa: F401
 from .generation.torchdrug.core import TorchDrugGCPN, TorchDrugGraphAF  # noqa: F401
 from .prediction.paccmann.core import PaccMann  # noqa: F401
 from .prediction.topics_zero_shot.core import TopicsPredictor  # noqa: F401
-
-from .conditional_generation.molgx.core import MolGXQM9Generator  # noqa: F401
 
 # extras requirements
 if EXTRAS_ENABLED:
