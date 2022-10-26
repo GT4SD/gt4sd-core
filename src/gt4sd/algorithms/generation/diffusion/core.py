@@ -132,14 +132,6 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         metadata=dict(description="Prompt for conditional generation."),
     )
 
-    def get_target_description(self) -> Optional[Any]:
-        """Get description of the target for generation.
-
-        Returns:
-            target description, returns None in case no target is used.
-        """
-        return None
-
     def get_conditional_generator(self, resources_path: str, **kwargs) -> Generator:
         return Generator(
             resources_path=resources_path,
@@ -347,7 +339,7 @@ class GeoDiffGenerator(DiffusersConfiguration):
             .union({cls.algorithm_version})
         )
 
-    def get_target_description(self) -> Optional[Any]:
+    def get_target_description(self) -> Optional[Dict[str, str]]:
         """Get description of the target for generation.
 
         Returns:
