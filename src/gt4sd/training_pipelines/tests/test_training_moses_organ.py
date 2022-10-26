@@ -22,23 +22,19 @@
 # SOFTWARE.
 #
 """Moses Organ trainer unit tests."""
-
 import os
 import shutil
 import tempfile
 from typing import Any, Dict, cast
-
-import pkg_resources
 
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
     MosesOrganTrainingPipeline,
 )
 
-TEST_DATA_DIRECTORY = pkg_resources.resource_filename(
-    "gt4sd",
-    "training_pipelines/tests/",
-)
+from ...tests.utils import exitclose_file_creator
+
+DATA_PATH = exitclose_file_creator("training_pipelines/tests/molecules.smiles")
 
 
 def _create_training_output_filepaths(directory: str) -> Dict[str, str]:
@@ -88,10 +84,7 @@ template_config = {
         "device": "cpu",
         "save_frequency": 1,
     },
-    "dataset_args": {
-        "train_load": os.path.join(TEST_DATA_DIRECTORY, "molecules.smiles"),
-        "val_load": os.path.join(TEST_DATA_DIRECTORY, "molecules.smiles"),
-    },
+    "dataset_args": {"train_load": DATA_PATH, "val_load": DATA_PATH},
 }
 
 

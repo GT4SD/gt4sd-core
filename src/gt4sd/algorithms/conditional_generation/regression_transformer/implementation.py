@@ -59,9 +59,6 @@ class ConditionalGenerator:
     # data collator for property prediction of self-generated items.
     property_collator: PropertyCollator
 
-    # percentage of tolerated deviation between desired and obtained property.
-    tolerance: float = 20
-
     # number of samples obtained per call.
     batch_size: int = 8
 
@@ -69,20 +66,21 @@ class ConditionalGenerator:
     sampling_wrapper: Dict[str, Any] = {}
 
     def __init__(
-        self, resources_path: str, device: Optional[Union[torch.device, str]] = None
+        self,
+        resources_path: str,
+        device: Optional[Union[torch.device, str]] = None,
+        tolerance: Union[float, Dict[str, float]] = 20.0,
     ) -> None:
         """
         Initialize the generator.
 
         Args:
             resources_path: directory where to find models and parameters.
-            temperature: temperature for the sampling. Defaults to 1.4.
-            generated_length: maximum length of the generated molecules.
-                Defaults to 100.
-            samples_per_protein: number of points sampled per protein.
-                It has to be greater than 1. Defaults to 10.
             device: device where the inference is running either as a dedicated class
                 or a string. If not provided is inferred.
+            tolerance:  percentage of tolerated deviation between desired and obtained property.
+                Either a single float or a dictionary of floats, where the keys are the properties.
+                Note that the tolerance is *only* used for post-hoc filtering of the generated molecules.
         """
         # device
         self.device = device_claim(device)
@@ -103,6 +101,7 @@ class ConditionalGenerator:
         self.model = InferenceRT(xlnet_model, self.tokenizer, config)
 
         # Set up inference parameters
+        self.tolerance = tolerance
         self.load_inference(resources_path)
 
     def load_model(self, resources_path: str) -> Tuple[XLNetLMHeadModel, Any]:
@@ -157,10 +156,35 @@ class ConditionalGenerator:
             ]
             self.metadata = data
 
+            # If tolerance dict is given, ensure it is well-formed
+            self.tolerance_dict = {}
+            if isinstance(self.tolerance, Dict):
+                # Check that no extra properties are given
+                for key in self.tolerance.keys():
+                    if key not in self.properties:
+                        logger.error(
+                            f"tolerance key {key} is not a valid property name, will be ignored."
+                        )
+                # Check that all properties are given
+                for key in self.properties:
+                    if key not in self.tolerance.keys():
+                        logger.error(
+                            f"tolerance key {key} is missing, will be set to 20%."
+                        )
+                    self.tolerance_dict[key] = self.tolerance.get(key, 20.0)
+
+            elif isinstance(self.tolerance, float):
+                for key in self.properties:
+                    self.tolerance_dict[key] = self.tolerance
+            else:
+                raise TypeError(
+                    f"tolerance must be either a float or a dictionary, not {type(self.tolerance)}."
+                )
+
             # Tolerance defined on the original scale
             self.tolerances = [
-                (self._maxs[i] - self._mins[i]) * self.tolerance / 100.0
-                for i in range(len(self.properties))
+                (self._maxs[i] - self._mins[i]) * self.tolerance_dict[k] / 100.0
+                for i, k in enumerate(self.properties)
             ]
         except Exception:
             raise ValueError(
@@ -695,7 +719,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
         search: str = "sample",
         temperature: float = 1.4,
         batch_size: int = 8,
-        tolerance: float = 20.0,
+        tolerance: Union[float, Dict[str, float]] = 20.0,
         sampling_wrapper: Dict[str, Any] = {},
         device: Optional[Union[torch.device, str]] = None,
     ) -> None:
@@ -721,7 +745,9 @@ class ChemicalLanguageRT(ConditionalGenerator):
             device: device where the inference s running either as a dedicated class
                 or a string. If not provided is inferred.
         """
-        super().__init__(device=device, resources_path=resources_path)
+        super().__init__(
+            device=device, resources_path=resources_path, tolerance=tolerance
+        )
 
         if sampling_wrapper == {}:
             # Validate input and determine task
@@ -852,7 +878,7 @@ class ProteinLanguageRT(ConditionalGenerator):
         search: str = "sample",
         temperature: float = 1.4,
         batch_size: int = 32,
-        tolerance: float = 20.0,
+        tolerance: Union[float, Dict[str, float]] = 20.0,
         sampling_wrapper: Dict[str, Any] = {},
         device: Optional[Union[torch.device, str]] = None,
     ) -> None:
@@ -865,7 +891,7 @@ class ProteinLanguageRT(ConditionalGenerator):
             temperature: temperature for the sampling. Defaults to 1.4.
             batch_size: number of points sampled per call. Defaults to 8.
             tolerance: the tolerance for the property of the generated molecules.
-                Given in percent. Defaults to 20.
+                Given in percent. Defaults to 20.0.
             sampling_wrapper: A high-level entry point that allows specifying a seed
                 SMILES alongside some target conditions.
                 NOTE: If this is used, the `target` needs to be a single SMILES string.
@@ -877,7 +903,9 @@ class ProteinLanguageRT(ConditionalGenerator):
             device: device where the inference s running either as a dedicated class
                 or a string. If not provided is inferred.
         """
-        super().__init__(device=device, resources_path=resources_path)
+        super().__init__(
+            device=device, resources_path=resources_path, tolerance=tolerance
+        )
 
         if sampling_wrapper == {}:
             # Validate input and determine task

@@ -31,6 +31,7 @@ import sys
 from dataclasses import dataclass, field
 from typing import IO, Iterable, Optional, Tuple, cast
 
+from ..configuration import GT4SDConfiguration
 from ..training_pipelines import (
     TRAINING_PIPELINE_ARGUMENTS_MAPPING,
     TRAINING_PIPELINE_MAPPING,
@@ -43,6 +44,12 @@ logger = logging.getLogger(__name__)
 SUPPORTED_TRAINING_PIPELINES = sorted(
     list(set(TRAINING_PIPELINE_ARGUMENTS_MAPPING) & set(TRAINING_PIPELINE_MAPPING))
 )
+
+# disable cudnn if issues with gpu training
+if GT4SDConfiguration.get_instance().gt4sd_disable_cudnn:
+    import torch
+
+    torch.backends.cudnn.enabled = False
 
 
 @dataclass
@@ -103,7 +110,7 @@ class TrainerArgumentParser(ArgumentParser):
         except Exception:
             super().print_help()
 
-    def parse_json_file(self, json_file: str) -> Tuple[DataClass, ...]:
+    def parse_json_file(self, json_file: str) -> Tuple[DataClass, ...]:  # type: ignore
         """Overriding default .json parser.
 
         It by-passes all command line arguments and simply add the training pipeline.
@@ -117,11 +124,13 @@ class TrainerArgumentParser(ArgumentParser):
         number_of_dataclass_types = len(self.dataclass_types)  # type:ignore
         self.dataclass_types = [
             dataclass_type
-            for dataclass_type in self.dataclass_types
+            for dataclass_type in self.dataclass_types  # type:ignore
             if "gt4sd.cli.trainer.TrainerArguments" not in str(dataclass_type)
         ]
         try:
-            parsed_arguments = super().parse_json_file(json_file=json_file)
+            parsed_arguments = super().parse_json_file(  # type:ignore
+                json_file=json_file, allow_extra_keys=True
+            )
         except Exception:
             logger.exception(
                 f"error parsing configuration file: {json_file}, printing error and exiting"

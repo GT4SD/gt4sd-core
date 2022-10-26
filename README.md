@@ -12,7 +12,8 @@
 [![DOI](https://zenodo.org/badge/458309249.svg)](https://zenodo.org/badge/latestdoi/458309249)
 [![2022 IEEE Open Software Services Award](https://img.shields.io/badge/Award-2022%20IEEE%20Open%20Software%20Services%20Award-yellow)](https://conferences.computer.org/services/2022/awards/oss_award.html)
 
-<img src="./docs/_static/gt4sd_logo.png" alt="logo" width="500"/>
+<img src="./docs/_static/gt4sd_graphical_abstract.png" alt="logo" width="800">
+
 
 The GT4SD (Generative Toolkit for Scientific Discovery) is an open-source platform to accelerate hypothesis generation in the scientific discovery process. It provides a library for making state-of-the-art generative AI models easier to use.
 
@@ -24,17 +25,28 @@ For full details on the library API and examples see the [docs](https://gt4sd.gi
 
 Currently `gt4sd` relies on:
 
-- python>=3.7,<3.8
+- python>=3.7,<3.9
 - pip>=19.1,<20.3
 
 We are actively working on relaxing these, so stay tuned or help us with this by [contributing](./CONTRIBUTING.md) to the project.
 
 ### conda
 
-The recommended way to install the `gt4sd` is to create a dedicated conda environment, this will ensure all requirements are satisfied:
+The recommended way to install the `gt4sd` is to create a dedicated conda environment, this will ensure all requirements are satisfied. For CPU:
 
 ```sh
+git clone https://github.com/GT4SD/gt4sd-core.git
+cd gt4sd-core/
 conda env create -f conda.yml
+conda activate gt4sd
+```
+
+**Note:** by default `gt4sd` is installed with CPU requirements on linux systems. If you have GPU available, run:
+
+```sh
+git clone https://github.com/GT4SD/gt4sd-core.git
+cd gt4sd-core/
+conda env create -f conda_gpu.yml
 conda activate gt4sd
 ```
 
@@ -66,6 +78,9 @@ Learn more in [CONTRIBUTING.md](./CONTRIBUTING.md)
 ## Getting started
 
 After install you can use `gt4sd` right away in your discovery workflows.
+
+<img src="./docs/_static/gt4sd_case_study.png" alt="logo" width="800"/>
+
 
 ### Running inference pipelines in your python code
 
@@ -210,6 +225,7 @@ The trainer currently supports the following training pipelines:
 - `moses-vae-trainer`: Moses VAE models.
 - `torchdrug-gcpn-trainer`: TorchDrug Graph Convolutional Policy Network model.
 - `torchdrug-graphaf-trainer`: TorchDrug autoregressive GraphAF model.
+- `diffusion-trainer`: Diffusers model.
 - `gflownet-trainer`: GFlowNet model.
 
 ```console
@@ -337,6 +353,7 @@ Beyond implementing various generative modeling inference and training pipelines
 - [TAPE](https://github.com/songlab-cal/tape): encoder modules compatible with the protein language models.
 - [PaccMann](https://github.com/PaccMann/): inference pipelines for all algorithms of the PaccMann family as well as training pipelines for the generative VAEs.
 - [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from [HuggingFace Models](https://huggingface.co/models)
+- [diffusers](https://github.com/huggingface/diffusers): training and inference pipelines for generative models from [Diffusers Models](https://github.com/huggingface/diffusers)
 - [GFlowNets](https://github.com/recursionpharma/gflownet): training and inference pipeline for [Generative Flow Networks](https://yoshuabengio.org/2022/03/05/generative-flow-networks/)
 
 - [MolGX](https://github.com/GT4SD//molgx/): training and inference pipelines to generate small molecules satisfying target properties. The full functions of MolGX are available [here](https://github.com/GT4SD/molgx/). 

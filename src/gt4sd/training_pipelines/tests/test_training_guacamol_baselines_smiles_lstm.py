@@ -23,21 +23,15 @@
 #
 """GuacaMol LSTM trainer unit tests."""
 
-import os
 import shutil
 import tempfile
 from typing import Any, Dict, cast
 
-import pkg_resources
+import importlib_resources
 
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
     GuacaMolLSTMTrainingPipeline,
-)
-
-TEST_DATA_DIRECTORY = pkg_resources.resource_filename(
-    "gt4sd",
-    "training_pipelines/tests/",
 )
 
 template_config = {
@@ -68,11 +62,14 @@ def test_train():
     test_pipeline = cast(GuacaMolLSTMTrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
-    file_path = os.path.join(TEST_DATA_DIRECTORY, "molecules.smiles")
-    config["training_args"]["output_dir"] = TEMPORARY_DIRECTORY
-    config["dataset_args"]["train_smiles_filepath"] = file_path
-    config["dataset_args"]["test_smiles_filepath"] = file_path
 
-    test_pipeline.train(**config)
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "training_pipelines/tests/molecules.smiles"
+    ) as file_path:
+        config["training_args"]["output_dir"] = TEMPORARY_DIRECTORY
+        config["dataset_args"]["train_smiles_filepath"] = file_path
+        config["dataset_args"]["test_smiles_filepath"] = file_path
+
+        test_pipeline.train(**config)
 
     shutil.rmtree(TEMPORARY_DIRECTORY)

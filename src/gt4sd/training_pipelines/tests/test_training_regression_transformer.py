@@ -28,7 +28,7 @@ import os
 import tempfile
 from typing import Any, Dict, Iterable, cast
 
-import pkg_resources
+import importlib_resources
 
 from gt4sd.algorithms.conditional_generation.regression_transformer import (
     RegressionTransformerMolecules,
@@ -44,7 +44,7 @@ from gt4sd.training_pipelines.core import TrainingPipelineArguments
 
 template_config = {
     "model_args": {},
-    "dataset_args": {"test_fraction": 0.5},
+    "dataset_args": {},
     "training_args": {
         "training_name": "regression-transformer-test",
         "batch_size": 4,
@@ -157,30 +157,30 @@ def test_train():
 
     config: Dict[str, Any] = template_config.copy()
     config["training_args"]["output_dir"] = TEMPORARY_DIRECTORY
-    raw_path = pkg_resources.resource_filename(
-        "gt4sd",
-        "training_pipelines/tests/regression_transformer_raw.csv",
-    )
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd")
+        / "training_pipelines/tests/regression_transformer_raw.csv"
+    ) as raw_path:
 
-    # Test the pretrained QED model
-    config["model_args"]["model_path"] = mol_path
-    config["dataset_args"]["train_data_path"] = raw_path
-    config["dataset_args"]["test_data_path"] = raw_path
-    config["dataset_args"]["augment"] = 2
-    input_config = combine_defaults_and_user_args(config)
-    test_pipeline.train(**input_config)
-
-    # Test training model from scratch
-    with tempfile.TemporaryDirectory() as temp:
-        f_name = os.path.join(temp, "tmp_xlnet_config.json")
-        # Write file
-        with open(f_name, "w") as f:
-            json.dump(xlnet_config, f, indent=4)
-
-        config["model_args"]["config_name"] = f_name
-        del config["model_args"]["model_path"]
-        config["model_args"]["tokenizer_name"] = mol_path
-        config["dataset_args"]["data_path"] = raw_path
+        # Test the pretrained QED model
+        config["model_args"]["model_path"] = mol_path
+        config["dataset_args"]["train_data_path"] = raw_path
+        config["dataset_args"]["test_data_path"] = raw_path
         config["dataset_args"]["augment"] = 2
         input_config = combine_defaults_and_user_args(config)
         test_pipeline.train(**input_config)
+
+        # Test training model from scratch
+        with tempfile.TemporaryDirectory() as temp:
+            f_name = os.path.join(temp, "tmp_xlnet_config.json")
+            # Write file
+            with open(f_name, "w") as f:
+                json.dump(xlnet_config, f, indent=4)
+
+            config["model_args"]["config_name"] = f_name
+            del config["model_args"]["model_path"]
+            config["model_args"]["tokenizer_name"] = mol_path
+            config["dataset_args"]["data_path"] = raw_path
+            config["dataset_args"]["augment"] = 2
+            input_config = combine_defaults_and_user_args(config)
+            test_pipeline.train(**input_config)

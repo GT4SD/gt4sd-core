@@ -50,6 +50,14 @@ from .controlled_sampling.advanced_manufacturing.core import (  # noqa: F401
     CatalystGenerator,
 )
 from .controlled_sampling.paccmann_gp.core import PaccMannGPGenerator  # noqa: F401
+from .generation.diffusion.core import (  # noqa: F401
+    DDIMGenerator,
+    DDPMGenerator,
+    LDMGenerator,
+    LDMTextToImageGenerator,
+    ScoreSdeGenerator,
+    StableDiffusionGenerator,
+)
 from .generation.hugging_face.core import (  # noqa: F401
     HuggingFaceCTRLGenerator,
     HuggingFaceGPT2Generator,

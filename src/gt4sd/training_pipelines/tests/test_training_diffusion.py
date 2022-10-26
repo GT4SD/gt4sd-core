@@ -21,17 +21,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Moses VAE trainer unit tests."""
+"""Diffusion trainer unit tests."""
+
 import os
 import shutil
 import tempfile
 from typing import Any, Dict, cast
 
-from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, MosesVAETrainingPipeline
-
-from ...tests.utils import exitclose_file_creator
-
-DATA_PATH = exitclose_file_creator("training_pipelines/tests/molecules.smiles")
+from gt4sd.training_pipelines import (
+    TRAINING_PIPELINE_MAPPING,
+    DiffusionForVisionTrainingPipeline,
+)
 
 
 def _create_training_output_filepaths(directory: str) -> Dict[str, str]:
@@ -44,60 +44,63 @@ def _create_training_output_filepaths(directory: str) -> Dict[str, str]:
         a dictionary containing the output files.
     """
     return {
-        "log_file": os.path.join(directory, "log.txt"),
-        "model_save": os.path.join(directory, "model.pt"),
         "config_save": os.path.join(directory, "config.pt"),
-        "vocab_save": os.path.join(directory, "vocab.pt"),
     }
 
 
 template_config = {
     "model_args": {
-        "embedding_size": 32,
-        "q_cell": "gru",
-        "q_bidir": False,
-        "q_d_h": 256,
-        "q_n_layers": 1,
-        "q_dropout": 0.5,
-        "d_cell": "gru",
-        "d_n_layers": 3,
-        "d_dropout": 0,
-        "d_d_h": 512,
-        "d_z": 128,
-        "freeze_embeddings": False,
+        "model_path": "",
+        "training_name": "ddpm",
+        "num_train_timesteps": 1000,
+        "learning_rate": 1e-4,
+        "lr_scheduler": "cosine",
+        "lr_warmup_steps": 500,
+        "adam_beta1": 0.95,
+        "adam_beta2": 0.999,
+        "adam_weight_decay": 1e-6,
+        "adam_epsilon": 1e-8,
+        "gradient_accumulation_steps": 1,
+        "in_channels": 3,
+        "out_channels": 3,
+        "layers_per_block": 2,
     },
     "training_args": {
-        "n_batch": 512,
-        "grad_clipping": 50,
-        "kl_start": 0,
-        "kl_w_start": 0,
-        "kl_w_end": 0.05,
-        "lr_start": 3 * 1e-4,
-        "lr_n_period": 1,
-        "lr_n_restarts": 1,
-        "lr_n_mult": 1,
-        "lr_end": 3 * 1e-4,
-        "n_last": 1000,
-        "n_jobs": 1,
-        "n_workers": 1,
-        "save_frequency": 1,
-        "seed": 0,
-        "device": "cpu",
-        "save_frequency": 1,
+        "local_rank": -1,
+        "output_dir": "./outputs/",
+        "save_images_epochs": 10,
+        "save_model_epochs": 10,
+        "mixed_precision": "no",
+        "logging_dir": "./logs/",
+        "cache_dir": "./cifar10/",
+        "use_auth_token": False,
+        "ema_inv_gamma": 1.0,
+        "ema_power": 0.75,
+        "ema_max_decay": 0.9999,
+        "use_ema": True,
+        "dummy_training": True,
+        "is_sampling": False,
     },
-    "dataset_args": {"train_load": DATA_PATH, "val_load": DATA_PATH},
+    "dataset_args": {
+        "dataset_name": "cifar10",
+        "dataset_config_name": None,
+        "resolution": 32,
+        "train_batch_size": 16,
+        "eval_batch_size": 16,
+        "num_epochs": 1,
+    },
 }
 
 
 def test_train():
 
-    pipeline = TRAINING_PIPELINE_MAPPING.get("moses-vae-trainer")
+    pipeline = TRAINING_PIPELINE_MAPPING.get("diffusion-trainer")
 
     assert pipeline is not None
 
     TEMPORARY_DIRECTORY = tempfile.mkdtemp()
 
-    test_pipeline = cast(MosesVAETrainingPipeline, pipeline())
+    test_pipeline = cast(DiffusionForVisionTrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
     for key, value in _create_training_output_filepaths(TEMPORARY_DIRECTORY).items():

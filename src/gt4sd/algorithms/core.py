@@ -25,6 +25,7 @@
 
 from __future__ import annotations
 
+import collections
 import logging
 import os
 import shutil
@@ -224,23 +225,30 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
         try:
             while True:
                 generated_items = self.generate()  # type:ignore
-                for item in generated_items:
-                    if item in item_set:
-                        continue
-                    else:
-                        try:
-                            valid_item = self.configuration.validate_item(item)
+                for index, item in enumerate(generated_items):
+                    try:
+                        valid_item = self.configuration.validate_item(item)
+                        # check if sample is hashable
+                        if not isinstance(item, collections.Hashable):
                             yield valid_item
-                            item_set.add(item)
-                            if len(item_set) == number_of_items:
-                                signal.alarm(0)
-                                return
-                        except InvalidItem as error:
-                            logger.debug(
-                                f"item {item} could not be validated, "
-                                f"raising {error.title}: {error.detail}"
-                            )
-                            continue
+                            item_set.add(str(index))
+                        else:
+                            # validation for samples represented as strings
+                            if item in item_set:
+                                continue
+                            else:
+                                yield valid_item
+                                item_set.add(item)  # type:ignore
+                        if len(item_set) == number_of_items:
+                            signal.alarm(0)
+                            return
+                    except InvalidItem as error:
+                        logger.debug(
+                            f"item {item} could not be validated, "
+                            f"raising {error.title}: {error.detail}"
+                        )
+                        continue
+
                 # make sure we don't keep sampling more than a given number of times,
                 # in case no new items are generated.
                 if len(item_set) == item_set_length:

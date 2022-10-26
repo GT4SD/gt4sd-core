@@ -328,8 +328,11 @@ class GaussianProcessRepresentationsSampler:
         self.dimensions = self.define_dimensions(self.representation_order)
 
     def _get_bounds(
-        self, minimum_value: float, maximum_value: float, z_dimension: int
-    ) -> List[Tuple[float, float]]:
+        self,
+        minimum_value: Union[float, np.float32],
+        maximum_value: Union[float, np.float32],
+        z_dimension: int,
+    ) -> List[Tuple[Union[float, np.float32], Union[float, np.float32]]]:
         """
         Define a list of bounds for an hypercube.
 
@@ -366,7 +369,7 @@ class GaussianProcessRepresentationsSampler:
         for representation_name in self.representations.keys() - self.bounds.keys():
             z_dimension = self.representations[representation_name].z_dimension
             self.bounds[representation_name] = self._get_bounds(
-                MINIMUM_REAL, MAXIMUM_REAL, z_dimension
+                MINIMUM_REAL, MAXIMUM_REAL, z_dimension  # type: ignore
             )
 
     def define_dimensions(self, representation_order: List[str]) -> List[Real]:
@@ -388,8 +391,8 @@ class GaussianProcessRepresentationsSampler:
             )
             latent_index += representation.z_dimension
             dimensions.extend(
-                [
-                    Real(lower_bound, upper_bound)  # type:ignore
+                [  # type:ignore
+                    Real(lower_bound, upper_bound)
                     for lower_bound, upper_bound in representation_bounds
                 ]
             )

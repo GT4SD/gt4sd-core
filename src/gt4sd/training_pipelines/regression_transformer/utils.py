@@ -340,7 +340,7 @@ class TransformersTrainingArgumentsCLI(TrainingArguments):
         """
         if self.sharded_ddp is None:
             self.sharded_ddp = ""
-        if self.fsdp is None:
+        if self.fsdp is None:  # type: ignore
             self.fsdp = ""
 
         self.disable_tqdm = string_to_bool(self.disable_tqdm)

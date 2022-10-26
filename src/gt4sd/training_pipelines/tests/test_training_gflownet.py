@@ -29,18 +29,12 @@ import tempfile
 from typing import Any, Dict, cast
 
 import numpy as np
-import pkg_resources
 import pytest
 
 from gt4sd.frameworks.gflownet.envs.graph_building_env import GraphBuildingEnv
 from gt4sd.frameworks.gflownet.envs.mol_building_env import MolBuildingEnvContext
 from gt4sd.frameworks.gflownet.tests.qm9 import QM9Dataset, QM9GapTask
 from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, GFlowNetTrainingPipeline
-
-TEST_DATA_DIRECTORY = pkg_resources.resource_filename(
-    "gt4sd",
-    "training_pipelines/tests/",
-)
 
 
 def _create_training_output_filepaths(directory: str) -> Dict[str, str]:
@@ -88,9 +82,9 @@ template_config = {
         "num_offline": 10,
     },
     "pl_trainer_args": {
-        "accelerator": "ddp",
+        "strategy": "ddp",
         "basename": "gflownet",
-        "every_n_val_epochs": 5,
+        "check_val_every_n_epoch": 5,
         "trainer_log_every_n_steps": 50,
         "auto_lr_find": True,
         "profiler": "simple",
@@ -103,10 +97,9 @@ template_config = {
         "validate_every": 1000,
         "seed": 142857,
         "device": "cpu",
-        "distributed_training_strategy": "ddp",
         "development_mode": True,
         "resume_from_checkpoint": None,
-        "save_top_k": -1,
+        "save_top_k": 1,
         "epochs": 3,
     },
     "dataset_args": {

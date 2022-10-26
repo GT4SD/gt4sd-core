@@ -27,7 +27,7 @@ import shutil
 import tempfile
 from typing import Any, Dict, cast
 
-import pkg_resources
+import importlib_resources
 
 from gt4sd.training_pipelines import (
     TRAINING_PIPELINE_MAPPING,
@@ -87,14 +87,12 @@ def test_train():
     config: Dict[str, Any] = template_config.copy()
 
     config["training_args"]["model_path"] = TEMPORARY_DIRECTORY
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "training_pipelines/tests/molecules.smi",
+    ) as file_path:
 
-    file_path = pkg_resources.resource_filename(
-        "gt4sd",
-        "training_pipelines/tests/molecules.smi",
-    )
+        config["dataset_args"]["train_smiles_filepath"] = file_path
+        config["dataset_args"]["test_smiles_filepath"] = file_path
+        test_pipeline.train(**config)
 
-    config["dataset_args"]["train_smiles_filepath"] = file_path
-    config["dataset_args"]["test_smiles_filepath"] = file_path
-    test_pipeline.train(**config)
-
-    shutil.rmtree(TEMPORARY_DIRECTORY)
+        shutil.rmtree(TEMPORARY_DIRECTORY)

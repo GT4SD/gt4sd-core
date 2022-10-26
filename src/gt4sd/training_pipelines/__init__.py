@@ -22,14 +22,19 @@
 # SOFTWARE.
 #
 """Module initialization for gt4sd traning pipelines."""
-
 import json
 import logging
 from typing import Any, Dict
 
-import pkg_resources
-
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
+from ..tests.utils import exitclose_file_creator
+from .diffusion.core import (
+    DiffusionDataArguments,
+    DiffusionForVisionTrainingPipeline,
+    DiffusionModelArguments,
+    DiffusionSavingArguments,
+    DiffusionTrainingArguments,
+)
 from .guacamol_baselines.core import GuacaMolDataArguments, GuacaMolSavingArguments
 from .guacamol_baselines.smiles_lstm.core import (
     GuacaMolLSTMModelArguments,
@@ -151,6 +156,11 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         RegressionTransformerDataArguments,
         RegressionTransformerModelArguments,
     ),
+    "diffusion-trainer": (
+        DiffusionTrainingArguments,
+        DiffusionDataArguments,
+        DiffusionModelArguments,
+    ),
     "gflownet-trainer": (
         GFlowNetPytorchLightningTrainingArguments,
         GFlowNetDataArguments,
@@ -168,6 +178,7 @@ TRAINING_PIPELINE_MAPPING = {
     "moses-organ-trainer": MosesOrganTrainingPipeline,
     "moses-vae-trainer": MosesVAETrainingPipeline,
     "regression-transformer-trainer": RegressionTransformerTrainingPipeline,
+    "diffusion-trainer": DiffusionForVisionTrainingPipeline,
     "gflownet-trainer": GFlowNetTrainingPipeline,
 }
 
@@ -181,6 +192,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "moses-organ-trainer": MosesSavingArguments,
     "moses-vae-trainer": MosesSavingArguments,
     "regression-transformer-trainer": RegressionTransformerSavingArguments,
+    "diffusion-trainer": DiffusionSavingArguments,
     "gflownet-trainer": GFlowNetSavingArguments,
 }
 
@@ -194,16 +206,14 @@ def training_pipeline_name_to_metadata(name: str) -> Dict[str, Any]:
     Returns:
         dictionary describing the parameters of the pipeline. If the pipeline is not found, no metadata (a.k.a., an empty dictionary is returned).
     """
+
     metadata: Dict[str, Any] = {"training_pipeline": name, "parameters": {}}
     if name in TRAINING_PIPELINE_NAME_METADATA_MAPPING:
         try:
-            with open(
-                pkg_resources.resource_filename(
-                    "gt4sd",
-                    f"training_pipelines/{TRAINING_PIPELINE_NAME_METADATA_MAPPING[name]}",
-                ),
-                "rt",
-            ) as fp:
+            path = exitclose_file_creator(
+                f"training_pipelines/{TRAINING_PIPELINE_NAME_METADATA_MAPPING[name]}"
+            )
+            with open(path, "rt") as fp:
                 metadata["parameters"] = json.load(fp)
         except Exception:
             logger.exception(
