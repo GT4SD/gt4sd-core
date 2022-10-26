@@ -347,7 +347,7 @@ class GeoDiffGenerator(DiffusersConfiguration):
             .union({cls.algorithm_version})
         )
 
-    def get_target_description(self) -> Dict[str, str]:
+    def get_target_description(self) -> Optional[Any]:
         """Get description of the target for generation.
 
         Returns:
