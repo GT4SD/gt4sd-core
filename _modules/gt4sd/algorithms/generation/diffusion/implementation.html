@@ -189,9 +189,9 @@
 
 <span class="sd">Parts of the implementation inspired by: https://github.com/huggingface/diffusers/blob/main/examples/train_unconditional.py.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">importlib_metadata</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -211,13 +211,11 @@
 <span class="kn">from</span> <span class="nn">packaging</span> <span class="kn">import</span> <span class="n">version</span>
 
 <span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+<span class="kn">from</span> <span class="nn">.geodiff.core</span> <span class="kn">import</span> <span class="n">GeoDiffPipeline</span>
 
 <span class="n">DIFFUSERS_VERSION_LT_0_6_0</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
     <span class="n">importlib_metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;diffusers&quot;</span><span class="p">)</span>
 <span class="p">)</span> <span class="o">&lt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;0.6.0&quot;</span><span class="p">)</span>
-
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
 <div class="viewcode-block" id="set_seed"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.implementation.html#gt4sd.algorithms.generation.diffusion.implementation.set_seed">[docs]</a><span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -239,6 +237,7 @@
     <span class="s2">&quot;latent_diffusion_conditional&quot;</span><span class="p">:</span> <span class="n">LDMTextToImagePipeline</span><span class="p">,</span>
     <span class="s2">&quot;stable_diffusion&quot;</span><span class="p">:</span> <span class="n">StableDiffusionPipeline</span><span class="p">,</span>
     <span class="s2">&quot;score_sde&quot;</span><span class="p">:</span> <span class="n">ScoreSdeVePipeline</span><span class="p">,</span>
+    <span class="s2">&quot;geodiff&quot;</span><span class="p">:</span> <span class="n">GeoDiffPipeline</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">SCHEDULER_TYPES</span> <span class="o">=</span> <span class="p">{</span>
@@ -259,7 +258,7 @@
         <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">auth_token</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;A Diffusers generation algorithm.</span>
@@ -270,7 +269,7 @@
 <span class="sd">            model_name: name of the model weights/version.</span>
 <span class="sd">            scheduler_type: type of the schedule.</span>
 <span class="sd">            auth_token: authentication token for private models.</span>
-<span class="sd">            prompt: target text to use for conditional generation.</span>
+<span class="sd">            prompt: target for conditional generation.</span>
 <span class="sd">            device: device where the inference</span>
 <span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -306,6 +305,7 @@
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model_class</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name_or_path</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Generator.sample"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.implementation.html#gt4sd.algorithms.generation.diffusion.implementation.Generator.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
@@ -321,11 +321,13 @@
             <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">number_samples</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">number_samples</span><span class="p">)</span>
+
         <span class="c1"># To support old diffusers versions (&lt;0.6.0)</span>
-        <span class="k">if</span> <span class="n">DIFFUSERS_VERSION_LT_0_6_0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">DIFFUSERS_VERSION_LT_0_6_0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;geodiff&quot;</span><span class="p">]:</span>
             <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;sample&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">images</span>
+
         <span class="k">return</span> <span class="n">item</span></div></div>
 </pre></div>
 

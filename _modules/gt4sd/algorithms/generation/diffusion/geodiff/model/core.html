@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.generation.diffusion.geodiff.model.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../../../" src="../../../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../../../_static/jquery.js"></script>
+        <script src="../../../../../../../_static/underscore.js"></script>
+        <script src="../../../../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.generation.diffusion.geodiff.model.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.generation.diffusion.geodiff.model.core</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">diffusers.configuration_utils</span> <span class="kn">import</span> <span class="n">ConfigMixin</span>
+<span class="kn">from</span> <span class="nn">diffusers.modeling_utils</span> <span class="kn">import</span> <span class="n">ModelMixin</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Data</span>
+
+<span class="kn">from</span> <span class="nn">.layers</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GINEncoder</span><span class="p">,</span>
+    <span class="n">MLPEdgeEncoder</span><span class="p">,</span>
+    <span class="n">MoleculeGNNOutput</span><span class="p">,</span>
+    <span class="n">MultiLayerPerceptron</span><span class="p">,</span>
+    <span class="n">SchNetEncoder</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">assemble_atom_pair_feature</span><span class="p">,</span>
+    <span class="n">clip_norm</span><span class="p">,</span>
+    <span class="n">extend_graph_order_radius</span><span class="p">,</span>
+    <span class="n">get_distance</span><span class="p">,</span>
+    <span class="n">graph_field_network</span><span class="p">,</span>
+    <span class="n">is_local_edge</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="MoleculeGNN"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN">[docs]</a><span class="k">class</span> <span class="nc">MoleculeGNN</span><span class="p">(</span><span class="n">ModelMixin</span><span class="p">,</span> <span class="n">ConfigMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Graph Neural Network Model for molecule conformation.</span>
+
+<span class="sd">    Code adapted from colab:</span>
+<span class="sd">        https://colab.research.google.com/drive/1pLYYWQhdLuv1q-JtEHGZybxp2RBF8gPs#scrollTo=-3-P4w5sXkRU written by Nathan Lambert.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MoleculeGNN.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="n">num_convs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="n">num_convs_local</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">mlp_act</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;relu&quot;</span><span class="p">,</span>
+        <span class="n">edge_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">edge_encoder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mlp&quot;</span><span class="p">,</span>
+        <span class="n">smooth_conv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Constructor for MoleculeGNN.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            hidden_dim: hidden dimension of the GNN.</span>
+<span class="sd">            num_convs: number of GNN layers.</span>
+<span class="sd">            num_convs_local: number of GNN layers for local edges.</span>
+<span class="sd">            cutoff: nutoff radius for the GNN.</span>
+<span class="sd">            mlp_act: activation function for the MLP.</span>
+<span class="sd">            edge_order: order of the edge features.</span>
+<span class="sd">            edge_encoder: type of edge encoder.</span>
+<span class="sd">            smooth_conv: whether to use smooth convolution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="n">cutoff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_encoder</span> <span class="o">=</span> <span class="n">edge_encoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_order</span> <span class="o">=</span> <span class="n">edge_order</span>
+
+        <span class="c1"># edge_encoder: Takes both edge type and edge length as input and outputs a vector [Note]: node embedding is done in SchNetEncoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_encoder_global</span> <span class="o">=</span> <span class="n">MLPEdgeEncoder</span><span class="p">(</span>
+            <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">mlp_act</span>
+        <span class="p">)</span>  <span class="c1"># get_edge_encoder(config)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_encoder_local</span> <span class="o">=</span> <span class="n">MLPEdgeEncoder</span><span class="p">(</span>
+            <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">mlp_act</span>
+        <span class="p">)</span>  <span class="c1"># get_edge_encoder(config)</span>
+
+        <span class="c1"># the graph neural network that extracts node-wise features.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_global</span> <span class="o">=</span> <span class="n">SchNetEncoder</span><span class="p">(</span>
+            <span class="n">hidden_channels</span><span class="o">=</span><span class="n">hidden_dim</span><span class="p">,</span>
+            <span class="n">num_filters</span><span class="o">=</span><span class="n">hidden_dim</span><span class="p">,</span>
+            <span class="n">num_interactions</span><span class="o">=</span><span class="n">num_convs</span><span class="p">,</span>
+            <span class="n">edge_channels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_encoder_global</span><span class="o">.</span><span class="n">out_channels</span><span class="p">,</span>
+            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+            <span class="n">smooth</span><span class="o">=</span><span class="n">smooth_conv</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_local</span> <span class="o">=</span> <span class="n">GINEncoder</span><span class="p">(</span>
+            <span class="n">hidden_dim</span><span class="o">=</span><span class="n">hidden_dim</span><span class="p">,</span>
+            <span class="n">num_convs</span><span class="o">=</span><span class="n">num_convs_local</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># `output_mlp` takes a mixture of two nodewise features and edge features as input and outputs</span>
+        <span class="c1"># gradients w.r.t. edge_length (out_dim = 1).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grad_global_dist_mlp</span> <span class="o">=</span> <span class="n">MultiLayerPerceptron</span><span class="p">(</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="p">[</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">activation</span><span class="o">=</span><span class="n">mlp_act</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">grad_local_dist_mlp</span> <span class="o">=</span> <span class="n">MultiLayerPerceptron</span><span class="p">(</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="p">[</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">activation</span><span class="o">=</span><span class="n">mlp_act</span>
+        <span class="p">)</span>
+
+        <span class="c1"># incorporate parameters together</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_global</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_encoder_global</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_global</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_global_dist_mlp</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_local</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_encoder_local</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_local</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_local_dist_mlp</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="MoleculeGNN._forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN._forward">[docs]</a>    <span class="k">def</span> <span class="nf">_forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">atom_type</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">pos</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">bond_index</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">bond_type</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">edge_index</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">edge_type</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">edge_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">extend_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">extend_radius</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">is_sidechain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Forward pass for edges features.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom_type:  types of atoms, (N, ).</span>
+<span class="sd">            pos:        positions of atoms, (N, 3).</span>
+<span class="sd">            bond_index: indices of bonds (not extended, not radius-graph), (2, E).</span>
+<span class="sd">            bond_type:  bond types, (E, ).</span>
+<span class="sd">            batch:      node index to graph index, (N, ).</span>
+<span class="sd">            edge_index: indices of edges (extended, radius-graph), (2, E&#39;). If None, determined by extend_graph_order_radius.</span>
+<span class="sd">            edge_type: edge types, (E&#39;, ). If None, determined by extend_graph_order_radius.</span>
+<span class="sd">            edge_length: edge lengths, (E&#39;, ). If None, determined by extend_graph_order_radius.</span>
+<span class="sd">            return_edges: whether to return edge_index, edge_type, edge_length.</span>
+<span class="sd">            extend_order: whether to extend the graph by bond order.</span>
+<span class="sd">            extend_radius: whether to extend the graph by radius.</span>
+<span class="sd">            is_sidechain: whether the atom is a sidechain atom.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple with local and global invariant edge features.</span>
+<span class="sd">                If return_edges is True, it also returns edge_index, edge_type, edge_length, local_edge_index.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">atom_type</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">edge_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">edge_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">edge_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_type</span> <span class="o">=</span> <span class="n">extend_graph_order_radius</span><span class="p">(</span>
+                <span class="n">num_nodes</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+                <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
+                <span class="n">edge_index</span><span class="o">=</span><span class="n">bond_index</span><span class="p">,</span>
+                <span class="n">edge_type</span><span class="o">=</span><span class="n">bond_type</span><span class="p">,</span>
+                <span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span>
+                <span class="n">order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_order</span><span class="p">,</span>
+                <span class="n">cutoff</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span><span class="p">,</span>
+                <span class="n">extend_order</span><span class="o">=</span><span class="n">extend_order</span><span class="p">,</span>
+                <span class="n">extend_radius</span><span class="o">=</span><span class="n">extend_radius</span><span class="p">,</span>
+                <span class="n">is_sidechain</span><span class="o">=</span><span class="n">is_sidechain</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">edge_length</span> <span class="o">=</span> <span class="n">get_distance</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (E, 1)</span>
+        <span class="n">local_edge_mask</span> <span class="o">=</span> <span class="n">is_local_edge</span><span class="p">(</span><span class="n">edge_type</span><span class="p">)</span>  <span class="c1"># (E, )</span>
+
+        <span class="c1"># with the parameterization of NCSNv2</span>
+        <span class="c1"># DDPM loss implicit handle the noise variance scale conditioning</span>
+        <span class="n">sigma_edge</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span>
+            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">edge_index</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">pos</span><span class="o">.</span><span class="n">device</span>  <span class="c1"># type: ignore</span>
+        <span class="p">)</span>  <span class="c1"># (E, 1)</span>
+
+        <span class="c1"># Encoding global</span>
+        <span class="n">edge_attr_global</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_encoder_global</span><span class="p">(</span>
+            <span class="n">edge_length</span><span class="o">=</span><span class="n">edge_length</span><span class="p">,</span> <span class="n">edge_type</span><span class="o">=</span><span class="n">edge_type</span>
+        <span class="p">)</span>  <span class="c1"># Embed edges</span>
+
+        <span class="c1"># Global</span>
+        <span class="n">node_attr_global</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_global</span><span class="p">(</span>
+            <span class="n">z</span><span class="o">=</span><span class="n">atom_type</span><span class="p">,</span>
+            <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">,</span>
+            <span class="n">edge_length</span><span class="o">=</span><span class="n">edge_length</span><span class="p">,</span>
+            <span class="n">edge_attr</span><span class="o">=</span><span class="n">edge_attr_global</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Assemble pairwise features</span>
+        <span class="n">h_pair_global</span> <span class="o">=</span> <span class="n">assemble_atom_pair_feature</span><span class="p">(</span>
+            <span class="n">node_attr</span><span class="o">=</span><span class="n">node_attr_global</span><span class="p">,</span>
+            <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">,</span>
+            <span class="n">edge_attr</span><span class="o">=</span><span class="n">edge_attr_global</span><span class="p">,</span>
+        <span class="p">)</span>  <span class="c1"># (E_global, 2H)</span>
+        <span class="c1"># Invariant features of edges (radius graph, global)</span>
+        <span class="n">edge_inv_global</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_global_dist_mlp</span><span class="p">(</span><span class="n">h_pair_global</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="mf">1.0</span> <span class="o">/</span> <span class="n">sigma_edge</span>
+        <span class="p">)</span>  <span class="c1"># (E_global, 1)</span>
+
+        <span class="c1"># Encoding local</span>
+        <span class="n">edge_attr_local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_encoder_global</span><span class="p">(</span>
+            <span class="n">edge_length</span><span class="o">=</span><span class="n">edge_length</span><span class="p">,</span> <span class="n">edge_type</span><span class="o">=</span><span class="n">edge_type</span>
+        <span class="p">)</span>  <span class="c1"># Embed edges</span>
+        <span class="c1"># edge_attr += temb_edge</span>
+
+        <span class="c1"># Local</span>
+        <span class="n">node_attr_local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_local</span><span class="p">(</span>
+            <span class="n">z</span><span class="o">=</span><span class="n">atom_type</span><span class="p">,</span>
+            <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">[:,</span> <span class="n">local_edge_mask</span><span class="p">],</span>  <span class="c1"># type: ignore</span>
+            <span class="n">edge_attr</span><span class="o">=</span><span class="n">edge_attr_local</span><span class="p">[</span><span class="n">local_edge_mask</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="c1"># Assemble pairwise features</span>
+        <span class="n">h_pair_local</span> <span class="o">=</span> <span class="n">assemble_atom_pair_feature</span><span class="p">(</span>
+            <span class="n">node_attr</span><span class="o">=</span><span class="n">node_attr_local</span><span class="p">,</span>
+            <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">[:,</span> <span class="n">local_edge_mask</span><span class="p">],</span>  <span class="c1"># type: ignore</span>
+            <span class="n">edge_attr</span><span class="o">=</span><span class="n">edge_attr_local</span><span class="p">[</span><span class="n">local_edge_mask</span><span class="p">],</span>
+        <span class="p">)</span>  <span class="c1"># (E_local, 2H)</span>
+
+        <span class="c1"># Invariant features of edges (bond graph, local)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sigma_edge</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+            <span class="n">edge_inv_local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_local_dist_mlp</span><span class="p">(</span><span class="n">h_pair_local</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="mf">1.0</span> <span class="o">/</span> <span class="n">sigma_edge</span><span class="p">[</span><span class="n">local_edge_mask</span><span class="p">]</span>
+            <span class="p">)</span>  <span class="c1"># (E_local, 1)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">edge_inv_local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_local_dist_mlp</span><span class="p">(</span><span class="n">h_pair_local</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="mf">1.0</span> <span class="o">/</span> <span class="n">sigma_edge</span>
+            <span class="p">)</span>  <span class="c1"># (E_local, 1)</span>
+
+        <span class="k">if</span> <span class="n">return_edges</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">edge_inv_global</span><span class="p">,</span>
+                <span class="n">edge_inv_local</span><span class="p">,</span>
+                <span class="n">edge_index</span><span class="p">,</span>
+                <span class="n">edge_type</span><span class="p">,</span>
+                <span class="n">edge_length</span><span class="p">,</span>
+                <span class="n">local_edge_mask</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">edge_inv_global</span><span class="p">,</span> <span class="n">edge_inv_local</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MoleculeGNN.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sample</span><span class="p">:</span> <span class="n">Data</span><span class="p">,</span>
+        <span class="n">timestep</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">return_dict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">global_start_sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">w_global</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">extend_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">extend_radius</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">clip_local</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">clip_global</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1000.0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoleculeGNNOutput</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Forward pass for the model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sample: packed torch geometric object.</span>
+<span class="sd">            timestep timesteps.</span>
+<span class="sd">            return_dict: whether or not to return a MoleculeGNNOutput instead of a plain tuple.</span>
+<span class="sd">            sigma: the noise variance scale.</span>
+<span class="sd">            global_start_sigma: the noise variance scale for global edges.</span>
+<span class="sd">            w_global: the weight for global edges.</span>
+<span class="sd">            extend_order: whether to extend the graph by bond order.</span>
+<span class="sd">            extend_radius: whether to extend the graph by radius.</span>
+<span class="sd">            clip_local: the clip value for local edges.</span>
+<span class="sd">            clip_global: the clip value for global edges.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict with samples. If return_dict is false, return positions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># unpack sample</span>
+        <span class="n">atom_type</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">atom_type</span>
+        <span class="n">bond_index</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">edge_index</span>
+        <span class="n">bond_type</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">edge_type</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">pos</span>
+
+        <span class="p">(</span>
+            <span class="n">edge_inv_global</span><span class="p">,</span>
+            <span class="n">edge_inv_local</span><span class="p">,</span>
+            <span class="n">edge_index</span><span class="p">,</span>
+            <span class="n">_</span><span class="p">,</span>
+            <span class="n">edge_length</span><span class="p">,</span>
+            <span class="n">local_edge_mask</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward</span><span class="p">(</span>
+            <span class="n">atom_type</span><span class="o">=</span><span class="n">atom_type</span><span class="p">,</span>
+            <span class="n">pos</span><span class="o">=</span><span class="n">sample</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span>
+            <span class="n">bond_index</span><span class="o">=</span><span class="n">bond_index</span><span class="p">,</span>
+            <span class="n">bond_type</span><span class="o">=</span><span class="n">bond_type</span><span class="p">,</span>
+            <span class="n">batch</span><span class="o">=</span><span class="n">sample</span><span class="o">.</span><span class="n">batch</span><span class="p">,</span>
+            <span class="n">return_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">extend_order</span><span class="o">=</span><span class="n">extend_order</span><span class="p">,</span>
+            <span class="n">extend_radius</span><span class="o">=</span><span class="n">extend_radius</span><span class="p">,</span>
+        <span class="p">)</span>  <span class="c1"># (E_global, 1), (E_local, 1)</span>
+
+        <span class="c1"># Important equation in the paper for equivariant features - eqns 5-7 of GeoDiff</span>
+        <span class="n">node_eq_local</span> <span class="o">=</span> <span class="n">graph_field_network</span><span class="p">(</span>
+            <span class="n">edge_inv_local</span><span class="p">,</span>
+            <span class="n">pos</span><span class="p">,</span>
+            <span class="n">edge_index</span><span class="p">[:,</span> <span class="n">local_edge_mask</span><span class="p">],</span>
+            <span class="n">edge_length</span><span class="p">[</span><span class="n">local_edge_mask</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">clip_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">node_eq_local</span> <span class="o">=</span> <span class="n">clip_norm</span><span class="p">(</span><span class="n">node_eq_local</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">clip_local</span><span class="p">)</span>
+
+        <span class="c1"># Global</span>
+        <span class="k">if</span> <span class="n">sigma</span> <span class="o">&lt;</span> <span class="n">global_start_sigma</span><span class="p">:</span>
+            <span class="n">edge_inv_global</span> <span class="o">=</span> <span class="n">edge_inv_global</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="mi">1</span> <span class="o">-</span> <span class="n">local_edge_mask</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">node_eq_global</span> <span class="o">=</span> <span class="n">graph_field_network</span><span class="p">(</span>
+                <span class="n">edge_inv_global</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_length</span>
+            <span class="p">)</span>
+            <span class="n">node_eq_global</span> <span class="o">=</span> <span class="n">clip_norm</span><span class="p">(</span><span class="n">node_eq_global</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">clip_global</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">node_eq_global</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Sum</span>
+        <span class="n">eps_pos</span> <span class="o">=</span> <span class="n">node_eq_local</span> <span class="o">+</span> <span class="n">node_eq_global</span> <span class="o">*</span> <span class="n">w_global</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_dict</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="n">eps_pos</span><span class="p">,)</span>
+
+        <span class="k">return</span> <span class="n">MoleculeGNNOutput</span><span class="p">(</span><span class="n">sample</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span><span class="o">-</span><span class="n">eps_pos</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>  <span class="c1"># type: ignore</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -188,7 +188,7 @@
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AlgorithmConfiguration</span><span class="p">,</span>
@@ -272,7 +272,7 @@
     <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Model domain.  Supported: &#39;image&#39;, &#39;text&#39;, &#39;audio&#39;, &#39;molecule&#39;.&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Modality.  Supported: &#39;image&#39;, &#39;text&#39;, &#39;audio&#39;, &#39;molecule&#39;.&quot;</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
@@ -290,18 +290,10 @@
         <span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+    <span class="n">prompt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prompt for text generation.&quot;</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prompt for conditional generation.&quot;</span><span class="p">),</span>
     <span class="p">)</span>
-
-<div class="viewcode-block" id="DiffusersConfiguration.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.DiffusersConfiguration.get_target_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            target description, returns None in case no target is used.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="DiffusersConfiguration.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.DiffusersConfiguration.get_conditional_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Generator</span><span class="p">(</span>
@@ -481,6 +473,46 @@
             <span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
             <span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">})</span>
         <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GeoDiffGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.GeoDiffGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">DiffusersGenerationAlgorithm</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">GeoDiffGenerator</span><span class="p">(</span><span class="n">DiffusersConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;GeoDiff Diffusion Model - Configuration for conditional 3D molecule structure generation given 2D information using a GeoDiff diffusion model.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;fusing/gfn-molecule-gen-drugs&quot;</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;geodiff&quot;</span>
+    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ddpm&quot;</span>
+    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;molecule&quot;</span>
+
+<div class="viewcode-block" id="GeoDiffGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.GeoDiffGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;more algorithm versions can be found on https://github.com/huggingface/diffusers&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">})</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GeoDiffGenerator.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.GeoDiffGenerator.get_target_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            target description, returns None in case no target is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Prompt 2d representation for the molecule.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;A dictionary containing all the information to build a molecule graph. Supported keys: [&#39;atom_type&#39;, &#39;bond_edge_index&#39;, &#39;edge_index&#39;, &#39;edge_order&#39;, &#39;edge_type&#39;, &#39;idx&#39;, &#39;is_bond&#39;, &#39;num_nodes_per_graph&#39;, &#39;num_pos_ref&#39;, &#39;nx&#39;, &#39;pos&#39;, &#39;pos_ref&#39;, &#39;rdmol&#39;, &#39;smiles&#39;]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dictionary&quot;</span><span class="p">,</span>
+        <span class="p">}</span></div></div>
 </pre></div>
 
            </div>
