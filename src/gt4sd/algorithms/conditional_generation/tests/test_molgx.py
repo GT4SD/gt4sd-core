@@ -27,11 +27,10 @@ from typing import ClassVar, Type
 
 import pytest
 
+from gt4sd.algorithms.conditional_generation.molgx import MolGX, MolGXQM9Generator
 from gt4sd.algorithms.core import AlgorithmConfiguration
 from gt4sd.algorithms.registry import ApplicationsRegistry
 from gt4sd.tests.utils import GT4SDTestSettings
-
-from gt4sd.algorithms.conditional_generation.molgx import MolGX, MolGXQM9Generator
 
 test_settings = GT4SDTestSettings.get_instance()
 
@@ -43,7 +42,7 @@ def get_classvar_type(class_var):
 
 @pytest.mark.parametrize(
     "config_class, algorithm_type, domain, algorithm_name",
-    [(MolGXQM9Generator, "generation", "materials", MolGX.__name__)],
+    [(MolGXQM9Generator, "conditional_generation", "materials", MolGX.__name__)],
 )
 def test_config_class(
     config_class: Type[AlgorithmConfiguration],
@@ -100,7 +99,7 @@ def test_generation_via_import(config, algorithm):
     [
         pytest.param(
             MolGXQM9Generator.__name__,
-            "generation",
+            "conditional_generation",
             "materials",
             MolGX.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="slow_runtime"),

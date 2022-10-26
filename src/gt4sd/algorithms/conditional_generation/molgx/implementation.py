@@ -27,29 +27,30 @@ import logging
 import os
 from typing import Any, Dict, List
 
+from molgx.molgxsdk import MolgxSdk
+
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-from molgx.molgxsdk import MolgxSdk
 
 class MolGXGenerator:
     """Interface for MolGX generator."""
 
     def __init__(
-            self,
-            resources_path: str,
-            tag_name: str,
-            homo_energy_value: float = -0.25,
-            lumo_energy_value: float = 0.08,
-            use_linear_model: bool = True,
-            number_of_candidates: int = 2,
-            maximum_number_of_candidates: int = 3,
-            maximum_number_of_solutions: int = 3,
-            maximum_number_of_nodes: int = 50000,
-            beam_size: int = 2000,
-            without_estimate: bool = True,
-            use_specific_rings: bool = True,
-            use_fragment_const: bool = False,
+        self,
+        resources_path: str,
+        tag_name: str,
+        homo_energy_value: float = -0.25,
+        lumo_energy_value: float = 0.08,
+        use_linear_model: bool = True,
+        number_of_candidates: int = 2,
+        maximum_number_of_candidates: int = 3,
+        maximum_number_of_solutions: int = 3,
+        maximum_number_of_nodes: int = 50000,
+        beam_size: int = 2000,
+        without_estimate: bool = True,
+        use_specific_rings: bool = True,
+        use_fragment_const: bool = False,
     ) -> None:
         """Instantiate a MolGX generator.
 
@@ -243,11 +244,8 @@ class MolGXGenerator:
                 sampled molecule (SMILES).
         """
         # generate molecules
-        logger.info(
-            f"running MolGX with the following parameters: {self.parameters}"
-        )
+        logger.info(f"running MolGX with the following parameters: {self.parameters}")
         print(self.parameters)
         molecules_df = self.amd.GenMols(self.molecules_data, self.parameters)
         logger.info("MolGX run completed")
         return molecules_df["SMILES"].tolist()
-

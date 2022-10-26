@@ -27,12 +27,8 @@ MolGX generation algorithm.
 """
 
 import logging
-import molgx
 from dataclasses import field
 from typing import Any, ClassVar, Dict, Iterator, Optional, TypeVar
-
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
 
 from ....domains.materials import SMILES, validate_molecules
 from ....exceptions import InvalidItem
@@ -40,33 +36,37 @@ from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
 from ...registry import ApplicationsRegistry
 from .implementation import MolGXGenerator
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
 T = type(None)
 S = TypeVar("S", bound=SMILES)
 
+
 class MolGX(GeneratorAlgorithm[S, T]):
     """MolGX Algorithm."""
-    
+
     def __init__(
-            self,
-            configuration: AlgorithmConfiguration[S, T],
-            target: Optional[T] = None,
+        self,
+        configuration: AlgorithmConfiguration[S, T],
+        target: Optional[T] = None,
     ):
         """Instantiate MolGX ready to generate items.
 
-            Args:
-                configuration: domain and application
-                    specification defining parameters, types and validations.
-                target: a target for which to generate items.
+        Args:
+            configuration: domain and application
+                specification defining parameters, types and validations.
+            target: a target for which to generate items.
 
-            Example:
-                An example for generating small molecules (SMILES) with given HOMO and LUMO energies:
+        Example:
+            An example for generating small molecules (SMILES) with given HOMO and LUMO energies:
 
-                    configuration = MolGXQM9Generator()
-                    molgx = MolGX(configuration=configuration, target=target)
-                    items = list(molgx.sample(10))
-                    print(items)
+                configuration = MolGXQM9Generator()
+                molgx = MolGX(configuration=configuration, target=target)
+                items = list(molgx.sample(10))
+                print(items)
         """
-        
+
         configuration = self.validate_configuration(configuration)
         # TODO there might also be a validation/check on the target input
         super().__init__(
@@ -75,9 +75,9 @@ class MolGX(GeneratorAlgorithm[S, T]):
         )
 
     def get_generator(
-            self,
-            configuration: AlgorithmConfiguration[S, T],
-            target: Optional[T],
+        self,
+        configuration: AlgorithmConfiguration[S, T],
+        target: Optional[T],
     ) -> Untargeted:
         """Get the function to sample batches via the ConditionalGenerator.
 
@@ -96,7 +96,7 @@ class MolGX(GeneratorAlgorithm[S, T]):
         return implementation.generate
 
     def validate_configuration(
-            self, configuration: AlgorithmConfiguration[S, T]
+        self, configuration: AlgorithmConfiguration[S, T]
     ) -> AlgorithmConfiguration[S, T]:
         # TODO raise InvalidAlgorithmConfiguration
         assert isinstance(configuration, AlgorithmConfiguration)
@@ -104,10 +104,10 @@ class MolGX(GeneratorAlgorithm[S, T]):
 
     def sample(self, number_of_items: int = 100) -> Iterator[S]:
         """Generate a number of unique and valid items.
-       
+
         Args:
-       	number_of_items: number of items to generate.
-        	Defaults to 100.
+        number_of_items: number of items to generate.
+                Defaults to 100.
 
         Yields:
                 the items.
@@ -122,13 +122,12 @@ class MolGX(GeneratorAlgorithm[S, T]):
                 )
                 logger.warning(
                     f"to enable generation of {number_of_items} molecules, increase 'maximum_number_of_solutions' (currently set to {maxiumum_number_of_molecules})"
-                    )
-                number_of_items = maxiumum_number_of_molecules
-                logger.warning(
-                    f"generating at most: {maxiumum_number_of_molecules}..."
                 )
+                number_of_items = maxiumum_number_of_molecules
+                logger.warning(f"generating at most: {maxiumum_number_of_molecules}...")
 
         return super().sample(number_of_items=number_of_items)
+
 
 @ApplicationsRegistry.register_algorithm_application(MolGX)
 class MolGXQM9Generator(AlgorithmConfiguration[SMILES, Any]):
@@ -163,9 +162,7 @@ class MolGXQM9Generator(AlgorithmConfiguration[SMILES, Any]):
     )
     maximum_number_of_nodes: int = field(
         default=50000,
-        metadata=dict(
-            description="Maximum number of nodes in the graph exploration."
-        ),
+        metadata=dict(description="Maximum number of nodes in the graph exploration."),
     )
     beam_size: int = field(
         default=2000,
@@ -177,9 +174,7 @@ class MolGXQM9Generator(AlgorithmConfiguration[SMILES, Any]):
     )
     use_specific_rings: bool = field(
         default=True,
-        metadata=dict(
-            description="Flag to indicate whether specific rings are used."
-        ),
+        metadata=dict(description="Flag to indicate whether specific rings are used."),
     )
     use_fragment_const: bool = field(
         default=False,
@@ -190,7 +185,7 @@ class MolGXQM9Generator(AlgorithmConfiguration[SMILES, Any]):
         """Get description of the target for generation.
 
         Returns:
-        	target description, returns None in case no target is used.
+                target description, returns None in case no target is used.
         """
         return None
 
@@ -221,7 +216,7 @@ class MolGXQM9Generator(AlgorithmConfiguration[SMILES, Any]):
 
     def validate_item(self, item: str) -> SMILES:
         """Check that item is a valid SMILES.
-        
+
         Args:
                 item: a generated item that is possibly not valid.
 

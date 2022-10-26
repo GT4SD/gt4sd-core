@@ -69,10 +69,12 @@ from .generation.torchdrug.core import TorchDrugGCPN, TorchDrugGraphAF  # noqa: 
 from .prediction.paccmann.core import PaccMann  # noqa: F401
 from .prediction.topics_zero_shot.core import TopicsPredictor  # noqa: F401
 
+from .conditional_generation.molgx.core import MolGXQM9Generator  # noqa: F401
+
 # extras requirements
 if EXTRAS_ENABLED:
     from .controlled_sampling.class_controlled_sampling.core import (  # noqa: F401
         PAG,
         CogMol,
     )
-    from .generation.molgx.core import MolGXQM9Generator  # noqa: F401
+
