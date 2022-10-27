@@ -368,8 +368,8 @@ class GaussianProcessRepresentationsSampler:
                 self.bounds[representation_name] = bounds  # type:ignore
         for representation_name in self.representations.keys() - self.bounds.keys():
             z_dimension = self.representations[representation_name].z_dimension
-            self.bounds[representation_name] = self._get_bounds(
-                MINIMUM_REAL, MAXIMUM_REAL, z_dimension  # type: ignore
+            self.bounds[representation_name] = self._get_bounds(  # type: ignore
+                MINIMUM_REAL, MAXIMUM_REAL, z_dimension
             )
 
     def define_dimensions(self, representation_order: List[str]) -> List[Real]:
@@ -390,11 +390,11 @@ class GaussianProcessRepresentationsSampler:
                 latent_index, latent_index + representation.z_dimension
             )
             latent_index += representation.z_dimension
-            dimensions.extend(
-                [  # type:ignore
-                    Real(lower_bound, upper_bound)
-                    for lower_bound, upper_bound in representation_bounds
-                ]
+            dimensions.extend(  # type: ignore
+                [  # type: ignore
+                    Real(lower_bound, upper_bound)  # type:ignore
+                    for lower_bound, upper_bound in representation_bounds  # type:ignore
+                ]  # type:ignore
             )
         return dimensions
 
