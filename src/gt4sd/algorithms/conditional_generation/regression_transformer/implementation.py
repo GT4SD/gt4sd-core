@@ -90,9 +90,7 @@ class ConditionalGenerator:
             raise OSError(
                 f"algorithm_version {resources_path.split('/')[-1]} does not exist."
             )
-        self.tokenizer = InferenceBertTokenizer.from_pretrained(
-            resources_path, pad_even=False
-        )
+        self.tokenizer = InferenceBertTokenizer.from_pretrained(resources_path)
         self.collator = MaskedTextCollator(self.tokenizer)
 
         # Set up model: First load the pretrained XLNet model

@@ -85,6 +85,40 @@ class RegressionTransformerTrainingArguments(
             "generation task. Defaults to True."
         },
     )
+    cg_collator: str = field(
+        default="vanilla_cg",
+        metadata={
+            "help": "The collator class. Following options are implemented: "
+            "'vanilla_cg': Collator class that does not mask the properties but anything else as a regular DataCollatorForPermutationLanguageModeling. Can optionally replace the properties with sampled values. "
+            "NOTE: This collator can deal with multiple properties. "
+            "'multientity_cg': A training collator the conditional-generation task that can handle multiple entities. "
+            "Default: vanilla_cg."
+        },
+    )
+    entity_to_mask: int = field(
+        default=-1,
+        metadata={
+            "help": "The entity that is being masked during training. 0 corresponds to first entity and so on. -1 corresponds to "
+            "a random sampling scheme where the entity-to-be-masked is determined "
+            "at runtime in the collator. NOTE: If 'mask_entity_separator' is true, "
+            "this argument will not have any effect. Defaults to -1."
+        },
+    )
+    entity_separator_token: str = field(
+        default=".",
+        metadata={
+            "help": "The token that is used to separate "
+            "entities in the input. Defaults to '.' (applicable to SMILES & SELFIES)"
+        },
+    )
+    mask_entity_separator: bool = field(
+        default=False,
+        metadata={
+            "help": "Whether or not the entity separator token can be masked. If True, *all** textual tokens can be masked and we "
+            "just default to the parent class behavior. If False, the exact behavior "
+            "depends on the entity_to_mask argument. Defaults to False."
+        },
+    )
 
 
 @dataclass
