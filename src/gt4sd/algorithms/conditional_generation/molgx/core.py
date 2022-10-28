@@ -106,11 +106,10 @@ class MolGX(GeneratorAlgorithm[S, T]):
         """Generate a number of unique and valid items.
 
         Args:
-        number_of_items: number of items to generate.
-                Defaults to 100.
+            number_of_items: number of items to generate. Defaults to 100.
 
         Yields:
-                the items.
+            the items.
         """
         if hasattr(self.configuration, "maximum_number_of_solutions"):
             maxiumum_number_of_molecules = int(
