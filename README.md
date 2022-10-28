@@ -355,6 +355,7 @@ Beyond implementing various generative modeling inference and training pipelines
 - [transformers](https://huggingface.co/transformers): training and inference pipelines for generative models from [HuggingFace Models](https://huggingface.co/models)
 - [diffusers](https://github.com/huggingface/diffusers): training and inference pipelines for generative models from [Diffusers Models](https://github.com/huggingface/diffusers)
 - [GFlowNets](https://github.com/recursionpharma/gflownet): training and inference pipeline for [Generative Flow Networks](https://yoshuabengio.org/2022/03/05/generative-flow-networks/)
+- [MolGX](https://github.com/GT4SD/molgx-core/): training and inference pipelines to generate small molecules satisfying target properties. The full implementation of MolGX, including additional functionalities, is available [here](https://github.com/GT4SD/molgx-core/).
 
 ## References
 
