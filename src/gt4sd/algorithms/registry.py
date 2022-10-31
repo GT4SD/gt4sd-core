@@ -189,6 +189,9 @@ class ApplicationsRegistry:
             PydanticConfiguration: Type[AlgorithmConfiguration] = dataclass(  # type: ignore
                 VanillaConfiguration
             )
+            PydanticConfiguration: Type[AlgorithmConfiguration] = dataclass(  # type: ignore
+                VanillaConfiguration
+            )
             # get missing entries
             missing_in__dict__ = [
                 key
