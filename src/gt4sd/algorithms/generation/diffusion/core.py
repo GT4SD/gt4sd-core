@@ -25,7 +25,7 @@
 
 import logging
 from dataclasses import field
-from typing import ClassVar, Dict, Optional, Set, TypeVar
+from typing import Any, ClassVar, Dict, Optional, Set, TypeVar, Union
 
 from ...core import (
     AlgorithmConfiguration,
@@ -109,7 +109,7 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
     modality: str = field(
         default="image",
         metadata=dict(
-            description="Model domain.  Supported: 'image', 'text', 'audio', 'molecule'."
+            description="Modality.  Supported: 'image', 'text', 'audio', 'molecule'."
         ),
     )
 
@@ -127,18 +127,10 @@ class DiffusersConfiguration(AlgorithmConfiguration[str, None]):
         ),
     )
 
-    prompt: str = field(  # type: ignore
+    prompt: Union[str, Dict[str, Any]] = field(  # type: ignore
         default=None,
-        metadata=dict(description="Prompt for text generation."),
+        metadata=dict(description="Prompt for conditional generation."),
     )
-
-    def get_target_description(self) -> Optional[Dict[str, str]]:
-        """Get description of the target for generation.
-
-        Returns:
-            target description, returns None in case no target is used.
-        """
-        return None
 
     def get_conditional_generator(self, resources_path: str, **kwargs) -> Generator:
         return Generator(
@@ -318,3 +310,43 @@ class StableDiffusionGenerator(DiffusersConfiguration):
             .list_versions()
             .union({cls.algorithm_version})
         )
+
+
+@ApplicationsRegistry.register_algorithm_application(DiffusersGenerationAlgorithm)
+class GeoDiffGenerator(DiffusersConfiguration):
+    """GeoDiff Diffusion Model - Configuration for conditional 3D molecule structure generation given 2D information using a GeoDiff diffusion model."""
+
+    algorithm_version: str = "fusing/gfn-molecule-gen-drugs"
+    model_type: str = "geodiff"
+    scheduler_type: str = "ddpm"
+    modality: str = "molecule"
+
+    @classmethod
+    def list_versions(cls) -> Set[str]:
+        """Get possible algorithm versions.
+
+        Standard S3 and cache search adding the version used in the configuration.
+
+        Returns:
+            viable values as :attr:`algorithm_version` for the environment.
+        """
+        logger.warning(
+            "more algorithm versions can be found on https://github.com/huggingface/diffusers"
+        )
+        return (
+            get_configuration_class_with_attributes(cls)
+            .list_versions()
+            .union({cls.algorithm_version})
+        )
+
+    def get_target_description(self) -> Optional[Dict[str, str]]:
+        """Get description of the target for generation.
+
+        Returns:
+            target description, returns None in case no target is used.
+        """
+        return {
+            "title": "Prompt 2d representation for the molecule.",
+            "description": "A dictionary containing all the information to build a molecule graph. Supported keys: ['atom_type', 'bond_edge_index', 'edge_index', 'edge_order', 'edge_type', 'idx', 'is_bond', 'num_nodes_per_graph', 'num_pos_ref', 'nx', 'pos', 'pos_ref', 'rdmol', 'smiles']",
+            "type": "dictionary",
+        }

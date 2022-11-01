@@ -128,7 +128,7 @@ class DiffusionForVisionTrainingPipeline(TrainingPipeline):
         )
         # ddpm noise schedule
         noise_scheduler = DDPMScheduler(
-            num_train_timesteps=params["num_train_timesteps"], tensor_format="pt"
+            num_train_timesteps=params["num_train_timesteps"]
         )
         optimizer = torch.optim.AdamW(
             model.parameters(),

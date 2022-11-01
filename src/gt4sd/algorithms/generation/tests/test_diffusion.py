@@ -23,16 +23,20 @@
 #
 """Diffusers tests."""
 
+import pickle
 from typing import ClassVar, Type
 
+import importlib_resources
 import PIL
 import pytest
+from rdkit.Chem.rdchem import Mol
 
 from gt4sd.algorithms.core import AlgorithmConfiguration
 from gt4sd.algorithms.generation.diffusion import (
     DDIMGenerator,
     DDPMGenerator,
     DiffusersGenerationAlgorithm,
+    GeoDiffGenerator,
     LDMGenerator,
     LDMTextToImageGenerator,
     ScoreSdeGenerator,
@@ -88,6 +92,12 @@ def get_classvar_type(class_var):
             "vision",
             DiffusersGenerationAlgorithm.__name__,
         ),
+        (
+            GeoDiffGenerator,
+            "generation",
+            "vision",  # TODO: change to "chemistry"
+            DiffusersGenerationAlgorithm.__name__,
+        ),
     ],
 )
 def test_config_class(
@@ -115,6 +125,7 @@ def test_config_class(
         (LDMGenerator),
         (LDMTextToImageGenerator),
         (StableDiffusionGenerator),
+        (GeoDiffGenerator),
     ],
 )
 def test_config_instance(config_class: Type[AlgorithmConfiguration]):
@@ -131,6 +142,7 @@ def test_config_instance(config_class: Type[AlgorithmConfiguration]):
         (LDMGenerator),
         (LDMTextToImageGenerator),
         (StableDiffusionGenerator),
+        (GeoDiffGenerator),
     ],
 )
 def test_available_versions(config_class: Type[AlgorithmConfiguration]):
@@ -242,3 +254,28 @@ def test_generation_via_registry(
     assert len(samples) == 1
     sample = samples[0]
     assert isinstance(sample, PIL.Image.Image)
+
+
+@pytest.mark.parametrize(
+    "config, algorithm",
+    [
+        pytest.param(
+            GeoDiffGenerator,
+            DiffusersGenerationAlgorithm,
+        ),
+    ],
+)
+def test_geodiff_conditional_generation_via_import(config, algorithm):
+
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "algorithms/generation/tests/mol_dct.pkl"
+    ) as path:
+        with open(path, "rb") as f:
+            loaded_dict = pickle.load(f)
+        prompt = loaded_dict[0]
+        configuration = config(prompt=prompt)
+        algorithm = algorithm(configuration=configuration)
+        samples = list(algorithm.sample(1))
+        assert len(samples) == 1
+        sample = samples[0]
+        assert isinstance(sample, Mol)

@@ -36,6 +36,7 @@ from .conditional_generation.guacamol.core import (  # noqa: F401
     VaeGenerator,
 )
 from .conditional_generation.key_bert.core import KeyBERTGenerator  # noqa: F401
+from .conditional_generation.molgx.core import MolGXQM9Generator  # noqa: F401
 from .conditional_generation.paccmann_rl.core import (  # noqa: F401
     PaccMannRLOmicBasedGenerator,
     PaccMannRLProteinBasedGenerator,
@@ -83,4 +84,3 @@ if EXTRAS_ENABLED:
         PAG,
         CogMol,
     )
-    from .generation.molgx.core import MolGXQM9Generator  # noqa: F401

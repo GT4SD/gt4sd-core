@@ -24,8 +24,9 @@
 """RegressionTransformer tests."""
 
 import pickle
-from typing import ClassVar, Type
+from typing import ClassVar, Dict, Type
 
+import numpy as np
 import pytest
 
 from gt4sd.algorithms.conditional_generation.regression_transformer import (
@@ -165,7 +166,7 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
                 "search": "sample",
                 "temperature": 2.0,
                 "num_samples": 5,
-                "tolerance": 20,
+                "tolerance": 5,
                 "sampling_wrapper": {
                     "property_goal": {"<stab>": 1.123},
                     "fraction_to_mask": 0.9,
@@ -182,6 +183,7 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
                 "search": "sample",
                 "num_samples": 3,
                 "temperature": 1.4,
+                "tolerance": {"<logp>": 5, "<scs>": 10},
                 "algorithm_version": "logp_and_synthesizability",
                 "sampling_wrapper": {
                     "property_goal": {"<logp>": 6.534, "<scs>": 3.835},
@@ -197,6 +199,24 @@ def test_generation_via_import(config, example_target, algorithm, params):
     regression_transformer = algorithm(
         configuration=config(**params), target=example_target
     )
+
+    # Check if tolerance was propagated
+    if "tolerance" in params.keys():
+        if isinstance(params["tolerance"], Dict):
+            np.testing.assert_almost_equal(
+                list(params["tolerance"].values()),
+                list(
+                    regression_transformer.configuration.generator.tolerance_dict.values()
+                ),
+            )
+        elif isinstance(params["tolerance"], float):
+            np.testing.assert_almost_equal(
+                list([params["tolerance"] * len(params["property_goal"].keys())]),
+                list(
+                    regression_transformer.configuration.generator.tolerance_dict.values()
+                ),
+            )
+
     items = list(regression_transformer.sample(num_samples))
     assert len(items) == num_samples
 
@@ -240,6 +260,7 @@ def test_generation_via_registry(target, algorithm_application, params):
         algorithm_application=algorithm_application,
         **params,
     )
+
     items = list(regression_transformer.sample(num_samples))
     assert len(items) == num_samples
 

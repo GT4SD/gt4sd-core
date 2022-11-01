@@ -27,10 +27,10 @@ Implementation details for huggingface diffusers generation algorithms.
 Parts of the implementation inspired by: https://github.com/huggingface/diffusers/blob/main/examples/train_unconditional.py.
 """
 
-import logging
 import os
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
+import importlib_metadata
 import numpy as np
 import torch
 from diffusers import (
@@ -45,11 +45,14 @@ from diffusers import (
     ScoreSdeVeScheduler,
     StableDiffusionPipeline,
 )
+from packaging import version
 
 from ....frameworks.torch import device_claim
+from .geodiff.core import GeoDiffPipeline
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+DIFFUSERS_VERSION_LT_0_6_0 = version.parse(
+    importlib_metadata.version("diffusers")
+) < version.parse("0.6.0")
 
 
 def set_seed(seed: int = 42) -> None:
@@ -71,6 +74,7 @@ MODEL_TYPES = {
     "latent_diffusion_conditional": LDMTextToImagePipeline,
     "stable_diffusion": StableDiffusionPipeline,
     "score_sde": ScoreSdeVePipeline,
+    "geodiff": GeoDiffPipeline,
 }
 
 SCHEDULER_TYPES = {
@@ -91,7 +95,7 @@ class Generator:
         model_name: str,
         scheduler_type: str,
         auth_token: bool = True,
-        prompt: Optional[str] = None,
+        prompt: Optional[Union[str, Dict[str, Any]]] = None,
         device: Optional[Union[torch.device, str]] = None,
     ):
         """A Diffusers generation algorithm.
@@ -102,7 +106,7 @@ class Generator:
             model_name: name of the model weights/version.
             scheduler_type: type of the schedule.
             auth_token: authentication token for private models.
-            prompt: target text to use for conditional generation.
+            prompt: target for conditional generation.
             device: device where the inference
                 is running either as a dedicated class or a string. If not provided is inferred.
         """
@@ -138,6 +142,7 @@ class Generator:
             )
         else:
             self.model = model_class.from_pretrained(model_name_or_path)
+
         self.model.to(self.device)
 
     def sample(self, number_samples: int = 1) -> List[Any]:
@@ -153,5 +158,11 @@ class Generator:
             item = self.model(batch_size=number_samples, prompt=self.prompt)
         else:
             item = self.model(batch_size=number_samples)
-        item = item["sample"]
+
+        # To support old diffusers versions (<0.6.0)
+        if DIFFUSERS_VERSION_LT_0_6_0 or self.model_type in ["geodiff"]:
+            item = item["sample"]
+        else:
+            item = item.images
+
         return item

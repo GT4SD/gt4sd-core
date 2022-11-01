@@ -15,6 +15,23 @@ To launch a finetuning of a RT pretrained on drug-like moelcules from ChEMBL, ex
 ```
 *NOTE*: This is *dummy* example, do not use "as is" :warning:
 
+*NOTE*: :warning: The above assumes that you have the `qed` model cached locally. If this is not the case, run an inference to trigger the caching mechanism:
+
+```py
+from gt4sd.algorithms.registry import ApplicationsRegistry
+algorithm = ApplicationsRegistry.get_application_instance(
+  target='CCO',
+  sampling_wrapper={'property_goal': {'<qed>': 0.12}},
+  algorithm_type='conditional_generation',
+  domain='materials',
+  algorithm_name='RegressionTransformer',
+  algorithm_application='RegressionTransformerMolecules',
+  algorithm_version='qed'
+)
+```
+Consider replacing `algorithm_version='qed'`, dependent on which model you want to finetune.
+
+
 For details on this methodology see:
 
 ```bib
