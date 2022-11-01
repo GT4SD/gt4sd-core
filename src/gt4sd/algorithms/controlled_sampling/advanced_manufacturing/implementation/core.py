@@ -390,7 +390,7 @@ class GaussianProcessRepresentationsSampler:
                 latent_index, latent_index + representation.z_dimension
             )
             latent_index += representation.z_dimension
-            dimensions.extend(
+            dimensions.extend(  # type: ignore
                 [
                     Real(lower_bound, upper_bound)  # type: ignore
                     for lower_bound, upper_bound in representation_bounds
