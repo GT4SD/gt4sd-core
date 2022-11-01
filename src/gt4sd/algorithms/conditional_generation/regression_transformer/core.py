@@ -221,6 +221,14 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
             - 'property_goal' specifies the target conditions for the generation. The
                 properties need to be specified as a dictionary. The keys need to be
                 properties supported by the algorithm version.
+            - 'substructures_to_mask': Specifies a list of substructures that should be masked.
+                Given in SMILES format. This is excluded from the stochastic masking.
+                NOTE: The model operates on SELFIES and the matching of the substructures occurs
+                in SELFIES simply on a string level.
+            - 'substructures_to_keep': Specifies a list of substructures that should definitely be kept.
+                Given in SMILES format. This is excluded from the stochastic masking.
+                NOTE: The model operates on SELFIES and the matching of the substructures occurs
+                in SELFIES simply on a string level.
             """
         ),
     )

@@ -583,6 +583,8 @@ class ConditionalGenerator:
         property_goal: Dict[str, Any] = {},
         fraction_to_mask: float = 0.2,
         tokens_to_mask: List = [],
+        substructures_to_mask: List[str] = [],
+        substructures_to_keep: List[str] = [],
     ) -> None:
         """
         Validating whether the wrapper can be used for conditional generation of samples.
@@ -600,7 +602,15 @@ class ConditionalGenerator:
             fraction_to_mask: The fraction of tokens that can be changed. Defaults to 0.2.
             tokens_to_mask: A list of atoms (or amino acids) that can be considered for masking.
                 Defaults to [] meaning that all tokens can be masked. E.g., use ['F'] to
-                only mask fluorine atoms
+                only mask fluorine atoms.
+            substructures_to_mask: Specifies a list of substructures that should be masked.
+                Given in SMILES format. This is excluded from the stochastic masking.
+                NOTE: The model operates on SELFIES and the matching of the substructures occurs
+                in SELFIES simply on a string level.
+            substructures_to_keep: Specifies a list of substructures that should definitely be kept.
+                Given in SMILES format. This is excluded from the stochastic masking.
+                NOTE: The model operates on SELFIES and the matching of the substructures occurs
+                in SELFIES simply on a string level.
         """
         self.validate_input_molecule(context, smiles=True)
 
@@ -627,6 +637,8 @@ class ConditionalGenerator:
         if not isinstance(tokens_to_mask, list):
             raise TypeError(f"The tokens_to_mask {tokens_to_mask} has to be a list.")
         self.maskable_tokens = self.get_maskable_tokens(tokens_to_mask)
+
+        self.validate_substructures(substructures_to_mask, substructures_to_keep)
 
         logger.info(
             f"Will start sampling molecules similar to {context} with goal: "
@@ -696,6 +708,65 @@ class ConditionalGenerator:
 
     def language_encoding(self, seq: str):
         raise NotImplementedError
+
+    def validate_substructures(
+        self, substructures_to_mask: List[str], substructures_to_keep: List[str]
+    ):
+        """
+        Validates the substructures that are ignored/kept for the masking when the
+        `sampling_wrapper` is used.
+
+
+        Args:
+            substructures_to_mask: List of substructures that should be masked.
+            substructures_to_keep: List of substructures that should be kept.
+
+        Raises:
+            NotImplementedError: Implemented by the child classes.
+        """
+        seed_encoded = self.language_encoding(self.seed_molecule)
+        if not isinstance(substructures_to_mask, list):
+            raise TypeError(
+                f"The substructures_to_mask {substructures_to_mask} has to be a list."
+            )
+        to_mask = []
+        for mask in substructures_to_mask:
+            if not isinstance(mask, str):
+                raise TypeError(
+                    f"The substructure_to_mask {mask} has to be a string in AAS format."
+                )
+            mask_e = self.language_encoding(mask)
+            if mask_e not in seed_encoded:
+                logger.warning(
+                    f"Substructure to keep in {mask} is not in the seed sequence, ignoring it."
+                )
+            else:
+                to_mask.append(mask_e)
+        self.substructures_to_mask = to_mask
+
+        if not isinstance(substructures_to_keep, list):
+            raise TypeError(
+                f"The substructures_to_keep {substructures_to_keep} has to be a list."
+            )
+        to_keep = []
+        for keep in substructures_to_keep:
+            if not isinstance(keep, str):
+                raise TypeError(
+                    f"The substructure_to_keep {keep} has to be a string in AAS format."
+                )
+            keep_e = self.language_encoding(keep)
+            if keep_e not in seed_encoded:
+                logger.warning(
+                    f"Substructure to keep in {keep} is not in the seed sequence, ignoring it."
+                )
+            else:
+                to_keep.append(keep_e)
+
+        self.substructures_to_keep = to_keep
+        if len(set(self.substructures_to_keep + self.substructures_to_mask)) < len(
+            self.substructures_to_keep
+        ) + len(self.self.substructures_to_mask):
+            raise ValueError("Substructures to mask and keep cannot overlap.")
 
 
 class ChemicalLanguageRT(ConditionalGenerator):
