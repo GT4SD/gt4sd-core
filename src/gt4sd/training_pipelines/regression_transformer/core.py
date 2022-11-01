@@ -98,7 +98,7 @@ class RegressionTransformerTrainingArguments(
     entity_to_mask: int = field(
         default=-1,
         metadata={
-            "help": "The entity that is being masked during training. 0 corresponds to first entity and so on. -1 corresponds to "
+            "help": "Only applies if `cg_collator='multientity_cg'`. The entity that is being masked during training. 0 corresponds to first entity and so on. -1 corresponds to "
             "a random sampling scheme where the entity-to-be-masked is determined "
             "at runtime in the collator. NOTE: If 'mask_entity_separator' is true, "
             "this argument will not have any effect. Defaults to -1."
@@ -107,15 +107,15 @@ class RegressionTransformerTrainingArguments(
     entity_separator_token: str = field(
         default=".",
         metadata={
-            "help": "The token that is used to separate "
+            "help": "Only applies if `cg_collator='multientity_cg'`.The token that is used to separate "
             "entities in the input. Defaults to '.' (applicable to SMILES & SELFIES)"
         },
     )
     mask_entity_separator: bool = field(
         default=False,
         metadata={
-            "help": "Whether or not the entity separator token can be masked. If True, *all** textual tokens can be masked and we "
-            "just default to the parent class behavior. If False, the exact behavior "
+            "help": "Only applies if `cg_collator='multientity_cg'`. Whether or not the entity separator token can be masked. If True, *all** textual tokens can be masked and we "
+            "the collator behaves like the `vanilla_cg ` even though it is a `multientity_cg`. If False, the exact behavior "
             "depends on the entity_to_mask argument. Defaults to False."
         },
     )
