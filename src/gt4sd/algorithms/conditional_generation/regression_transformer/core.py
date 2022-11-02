@@ -227,8 +227,15 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
                 in SELFIES simply on a string level.
             - 'substructures_to_keep': Specifies a list of substructures that should definitely be kept.
                 Given in SMILES format. This is excluded from the stochastic masking.
+                NOTE: This keeps tokens even if they are included in `tokens_to_mask`.
                 NOTE: The model operates on SELFIES and the matching of the substructures occurs
                 in SELFIES simply on a string level.
+            - `text_filtering`: Generated sequences are post-hoc filtered for the presence of
+                `substructures_to_keep`. This is done with RDKit substructure matches. If the sub-
+                structure cant be converted to a mol object, this argument toggles whether a substructure
+                should be ignored from post-hoc filtering (this happens per default) or whether
+                filtering should occur on a pure string level. Defaults to False.
+                NOTE: This does not affect the actual generation process.
             """
         ),
     )

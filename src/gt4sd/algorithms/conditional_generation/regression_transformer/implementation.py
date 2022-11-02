@@ -29,6 +29,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
+from rdkit import Chem
 from terminator.collators import MaskedTextCollator, PropertyCollator
 from terminator.inference import InferenceRT
 from terminator.search import SEARCH_FACTORY, Search
@@ -38,6 +39,7 @@ from transformers import AutoConfig, AutoModelWithLMHead, XLNetLMHeadModel
 
 from ....domains.materials import Sequence, validate_molecules
 from ....frameworks.torch import device_claim, map_tensor_dict
+from .utils import get_substructure_indices
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -58,6 +60,9 @@ class ConditionalGenerator:
     # ***** Additional attributes for text generation *****
     # data collator for property prediction of self-generated items.
     property_collator: PropertyCollator
+
+    # The input format for the substructures
+    subs_format: str
 
     # number of samples obtained per call.
     batch_size: int = 8
@@ -437,7 +442,7 @@ class ConditionalGenerator:
         # The property score has to be in the range understood by the model
         sequence = self.normalize_sequence(sequence)
 
-        logger.warning(f"Starting prediction for sequence {sequence}")
+        logger.info(f"Starting prediction for sequence {sequence}")
 
         # Prepare the batch
         tokens = self.tokenizer(sequence)
@@ -481,7 +486,7 @@ class ConditionalGenerator:
         # Filter out all sequences that do not satisfy property constraints within
         # tolerance range.
         logger.debug(f"Sequences {sequences}, properties: {properties}")
-        successes: Tuple = tuple(
+        property_successes: Tuple = tuple(
             filter(
                 lambda x: all(
                     [
@@ -496,6 +501,9 @@ class ConditionalGenerator:
                 zip(sequences, properties),
             )
         )  # type: ignore
+
+        # filter out sequences that do not include desired substructures
+        successes = self.filter_substructures(property_successes)  # type: ignore
         logger.info(f"Successes: {successes}")
         return successes
 
@@ -585,6 +593,7 @@ class ConditionalGenerator:
         tokens_to_mask: List = [],
         substructures_to_mask: List[str] = [],
         substructures_to_keep: List[str] = [],
+        text_filtering: bool = False,
     ) -> None:
         """
         Validating whether the wrapper can be used for conditional generation of samples.
@@ -609,8 +618,16 @@ class ConditionalGenerator:
                 in SELFIES simply on a string level.
             substructures_to_keep: Specifies a list of substructures that should definitely be kept.
                 Given in SMILES format. This is excluded from the stochastic masking.
+                NOTE: This keeps tokens even if they are included in `tokens_to_mask`.
                 NOTE: The model operates on SELFIES and the matching of the substructures occurs
                 in SELFIES simply on a string level.
+            text_filtering: Generated sequences are post-hoc filtered for the presence of
+                `substructures_to_keep`. This is done with RDKit substructure matches. If the sub-
+                structure cant be converted to a mol object, this argument toggles whether a substructure
+                should be ignored from post-hoc filtering (this happens per default) or whether
+                filtering should occur on a pure string level.
+                NOTE: This does not affect the actual generation process.
+                Defaults to False.
         """
         self.validate_input_molecule(context, smiles=True)
 
@@ -638,6 +655,10 @@ class ConditionalGenerator:
             raise TypeError(f"The tokens_to_mask {tokens_to_mask} has to be a list.")
         self.maskable_tokens = self.get_maskable_tokens(tokens_to_mask)
 
+        if not isinstance(text_filtering, bool):
+            raise TypeError(f"The text_filtering {text_filtering} has to be a bool.")
+        self.text_filtering = text_filtering
+
         self.validate_substructures(substructures_to_mask, substructures_to_keep)
 
         logger.info(
@@ -664,26 +685,36 @@ class ConditionalGenerator:
         language_seq = self.language_encoding(seq)
         tokens = self.tokenizer.text_tokenizer.tokenize(language_seq)
 
-        # Determine which tokens can be masked
-        if self.maskable_tokens == []:
-            # All tokens can be considered for masking
-            maskable_tokens = set(tokens)
-            num_to_mask = round(len(tokens) * self.fraction_to_mask)
-        else:
-            # Mask only tokens that are specified by the user
-            maskable_tokens = set(self.maskable_tokens)
-            num_to_mask = round(
-                sum([tokens.count(t) for t in maskable_tokens]) * self.fraction_to_mask
-            )
-
+        # Determine which tokens can be masked (from `tokens_to_mask`)
+        maskable_tokens = (
+            set(tokens) if self.maskable_tokens == [] else set(self.maskable_tokens)
+        )
         maskable_idxs = [i for i, t in enumerate(tokens) if t in maskable_tokens]
 
+        # Make sure that `substructures_to_keep` are not masked
+        for keep in self.substructures_to_keep:
+            keep_toks = self.tokenizer.text_tokenizer.tokenize(
+                self.language_encoding(keep)
+            )
+            to_be_kept = get_substructure_indices(tokens, keep_toks)
+            maskable_idxs = list(filter(lambda x: x not in to_be_kept, maskable_idxs))
+
+        num_to_mask = round(len(maskable_idxs) * self.fraction_to_mask)
         # Mask the tokens
         mask_idxs = np.random.choice(maskable_idxs, num_to_mask, replace=False)
         sequence_tokens = [
             t if i not in mask_idxs else self.tokenizer.mask_token
             for i, t in enumerate(tokens)
         ]
+
+        # Make sure that `substructures_to_mask` are actually masked
+        for mask in self.substructures_to_mask:
+            mask_toks = self.tokenizer.text_tokenizer.tokenize(
+                self.language_encoding(mask)
+            )
+            to_be_masked = get_substructure_indices(tokens, mask_toks)
+            for idx in to_be_masked:
+                sequence_tokens[idx] = self.tokenizer.mask_token
 
         # Extract the property tokens
         if not set(self.properties) == set(self.property_goal.keys()):
@@ -707,6 +738,9 @@ class ConditionalGenerator:
         raise NotImplementedError
 
     def language_encoding(self, seq: str):
+        raise NotImplementedError
+
+    def filter_substructures(self, property_successes: Tuple[Tuple[str, str]]):
         raise NotImplementedError
 
     def validate_substructures(
@@ -733,15 +767,14 @@ class ConditionalGenerator:
         for mask in substructures_to_mask:
             if not isinstance(mask, str):
                 raise TypeError(
-                    f"The substructure_to_mask {mask} has to be a string in AAS format."
+                    f"The substructure_to_mask {mask} has to be a string in {self.subs_format} format."
                 )
-            mask_e = self.language_encoding(mask)
-            if mask_e not in seed_encoded:
-                logger.warning(
-                    f"Substructure to keep in {mask} is not in the seed sequence, ignoring it."
+            if self.language_encoding(mask) not in seed_encoded:
+                logger.error(
+                    f"\nSubstructure to keep in {mask} not found in seed sequence, ignoring it."
                 )
             else:
-                to_mask.append(mask_e)
+                to_mask.append(mask)
         self.substructures_to_mask = to_mask
 
         if not isinstance(substructures_to_keep, list):
@@ -754,19 +787,20 @@ class ConditionalGenerator:
                 raise TypeError(
                     f"The substructure_to_keep {keep} has to be a string in AAS format."
                 )
-            keep_e = self.language_encoding(keep)
-            if keep_e not in seed_encoded:
-                logger.warning(
-                    f"Substructure to keep in {keep} is not in the seed sequence, ignoring it."
+            if self.language_encoding(keep) not in seed_encoded:
+                logger.error(
+                    f"\nSubstructure to keep in {keep} not found in seed sequence, ignoring it."
                 )
             else:
-                to_keep.append(keep_e)
+                to_keep.append(keep)
 
         self.substructures_to_keep = to_keep
         if len(set(self.substructures_to_keep + self.substructures_to_mask)) < len(
             self.substructures_to_keep
-        ) + len(self.self.substructures_to_mask):
-            raise ValueError("Substructures to mask and keep cannot overlap.")
+        ) + len(self.substructures_to_mask):
+            raise ValueError(
+                "Substructures to mask and keep contain duplicates or overlap."
+            )
 
 
 class ChemicalLanguageRT(ConditionalGenerator):
@@ -782,6 +816,8 @@ class ChemicalLanguageRT(ConditionalGenerator):
         batch_size: the batch size for the model, applicable only to generative task.
         tolerance: the tolerance for the property of the generated molecules.
     """
+
+    subs_format: str = "SMILES"
 
     def __init__(
         self,
@@ -922,8 +958,58 @@ class ChemicalLanguageRT(ConditionalGenerator):
     def language_encoding(self, seq: str) -> str:
         selfie = encoder(seq)
         if not isinstance(selfie, str):
-            raise TypeError(f"{seq} is not a valid SELFIES sequence.")
+            raise TypeError(f"{seq} (type={type(seq)}) is not a valid SMILES sequence.")
         return selfie
+
+    def filter_substructures(
+        self, property_successes: Tuple[Tuple[str, str]]
+    ) -> Tuple[Tuple[str, str]]:
+        """
+        Remove samples where user-required substructures are absent from generated samples.
+
+        Args:
+            property_successes: A tuple of samples that passed the property constraints.
+                This is a tuple of tuples, where the first element is the SMILES and the
+                second is the property prediction string.
+
+        Returns:
+            A tuple of samples that passed the property constraints and the substructure constraints.
+            Same format as input
+        """
+        if self.sampling_wrapper == {}:
+            return property_successes
+
+        successes: List[Tuple[str, str]] = []
+
+        subs_mols = []
+        for keep in self.substructures_to_keep:
+            subs_mols.append(Chem.MolFromSmiles(keep) or Chem.MolFromSmarts(keep))
+            if subs_mols[-1] is None:
+                logger.warning(
+                    f"{keep} is not a valid SMILES/SELFIES. Instead substructure filtering "
+                    f"based on sequence alone can be done and is set to: {self.text_filtering}"
+                )
+
+        # Perform filtering
+        for smi, prop in property_successes:
+            if smi is None:
+                continue
+            sane = True
+            mol = Chem.MolFromSmiles(smi)
+            for subs_mol, subs_string in zip(subs_mols, self.substructures_to_keep):
+                if subs_mol is None:
+                    if self.text_filtering and subs_string not in smi:
+                        sane = False
+                        break
+                else:
+                    if not mol.HasSubstructMatch(subs_mol):
+                        # Desired substructure not found
+                        sane = False
+                        break
+            if sane:
+                successes.append((smi, prop))
+
+        return tuple(successes)  # type: ignore
 
 
 class ProteinLanguageRT(ConditionalGenerator):
@@ -941,6 +1027,8 @@ class ProteinLanguageRT(ConditionalGenerator):
         batch_size: the batch size for the model, applicable only to generative task.
         tolerance: the tolerance for the property of the generated molecules.
     """
+
+    subs_format: str = "AAS"
 
     def __init__(
         self,
@@ -1076,3 +1164,33 @@ class ProteinLanguageRT(ConditionalGenerator):
 
     def language_encoding(self, seq: str) -> str:
         return seq
+
+    def filter_substructures(
+        self, property_successes: Tuple[Tuple[str, str]]
+    ) -> Tuple[Tuple[str, str]]:
+        """
+        Remove samples where user-required substructures are absent from generated samples.
+
+        Args:
+            property_successes: A tuple of samples that passed the property constraints.
+                This is a tuple of tuples, where the first element is the sequence and the second the
+                property prediction string.
+
+        Returns:
+            A tuple of samples that passed the property constraints and the substructure constraints.
+            Same format as input
+        """
+        if self.sampling_wrapper == {}:
+            return property_successes
+
+        successes = []
+        for seq, prop in property_successes:
+            sane = True
+            for keep in self.substructures_to_keep:
+                if keep not in seq:
+                    sane = False
+                    break
+            if sane:
+                successes.append((seq, prop))
+
+        return tuple(successes)  # type: ignore
