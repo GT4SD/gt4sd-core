@@ -176,6 +176,25 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
         pytest.param(
+            RegressionTransformerProteins,
+            "TTIKNGABCYTVPLSPEQAAKABCKKRWPDYEVQIHGNTVKVT",
+            RegressionTransformer,
+            {
+                "search": "sample",
+                "temperature": 2.0,
+                "num_samples": 5,
+                "tolerance": 80,
+                "sampling_wrapper": {
+                    "property_goal": {"<stab>": 1.123},
+                    "fraction_to_mask": 0.9,
+                    "tokens_to_mask": ["A"],
+                    "substructures_to_keep": ["KABCKKRWP"],
+                    "substructures_to_mask": ["NGABCYT"],
+                },
+            },
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
             RegressionTransformerMolecules,
             "CCOC1=NC=NC(=C1C)NCCOC(C)C",
             RegressionTransformer,
@@ -188,6 +207,25 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
                 "sampling_wrapper": {
                     "property_goal": {"<logp>": 6.534, "<scs>": 3.835},
                     "fraction_to_mask": 0.2,
+                },
+            },
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            RegressionTransformerMolecules,
+            "CC(C#C)N(C)C(=O)NC1=CC=C(Cl)C=C1",
+            RegressionTransformer,
+            {
+                "search": "sample",
+                "num_samples": 3,
+                "temperature": 1.1,
+                "tolerance": 80,
+                "algorithm_version": "qed",
+                "sampling_wrapper": {
+                    "property_goal": {"<qed>": 0.5},
+                    "fraction_to_mask": 0.2,
+                    "substructures_to_keep": ["C1=CC=C(Cl)C=C1"],
+                    "substructures_to_mask": ["C(=O)"],
                 },
             },
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
