@@ -192,6 +192,7 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
 <span class="kn">from</span> <span class="nn">terminator.collators</span> <span class="kn">import</span> <span class="n">MaskedTextCollator</span><span class="p">,</span> <span class="n">PropertyCollator</span>
 <span class="kn">from</span> <span class="nn">terminator.inference</span> <span class="kn">import</span> <span class="n">InferenceRT</span>
 <span class="kn">from</span> <span class="nn">terminator.search</span> <span class="kn">import</span> <span class="n">SEARCH_FACTORY</span><span class="p">,</span> <span class="n">Search</span>
@@ -201,6 +202,7 @@
 
 <span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">validate_molecules</span>
 <span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span><span class="p">,</span> <span class="n">map_tensor_dict</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">get_substructure_indices</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -221,6 +223,9 @@
     <span class="c1"># ***** Additional attributes for text generation *****</span>
     <span class="c1"># data collator for property prediction of self-generated items.</span>
     <span class="n">property_collator</span><span class="p">:</span> <span class="n">PropertyCollator</span>
+
+    <span class="c1"># The input format for the substructures</span>
+    <span class="n">subs_format</span><span class="p">:</span> <span class="nb">str</span>
 
     <span class="c1"># number of samples obtained per call.</span>
     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span>
@@ -600,7 +605,7 @@
         <span class="c1"># The property score has to be in the range understood by the model</span>
         <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting prediction for sequence </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting prediction for sequence </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Prepare the batch</span>
         <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
@@ -644,7 +649,7 @@
         <span class="c1"># Filter out all sequences that do not satisfy property constraints within</span>
         <span class="c1"># tolerance range.</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sequences </span><span class="si">{</span><span class="n">sequences</span><span class="si">}</span><span class="s2">, properties: </span><span class="si">{</span><span class="n">properties</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">successes</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+        <span class="n">property_successes</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
             <span class="nb">filter</span><span class="p">(</span>
                 <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">all</span><span class="p">(</span>
                     <span class="p">[</span>
@@ -659,6 +664,9 @@
                 <span class="nb">zip</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">properties</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+        <span class="c1"># filter out sequences that do not include desired substructures</span>
+        <span class="n">successes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_substructures</span><span class="p">(</span><span class="n">property_successes</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successes: </span><span class="si">{</span><span class="n">successes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">successes</span></div>
 
@@ -746,6 +754,9 @@
         <span class="n">property_goal</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
         <span class="n">fraction_to_mask</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
         <span class="n">tokens_to_mask</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">substructures_to_mask</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">substructures_to_keep</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">text_filtering</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validating whether the wrapper can be used for conditional generation of samples.</span>
@@ -763,7 +774,23 @@
 <span class="sd">            fraction_to_mask: The fraction of tokens that can be changed. Defaults to 0.2.</span>
 <span class="sd">            tokens_to_mask: A list of atoms (or amino acids) that can be considered for masking.</span>
 <span class="sd">                Defaults to [] meaning that all tokens can be masked. E.g., use [&#39;F&#39;] to</span>
-<span class="sd">                only mask fluorine atoms</span>
+<span class="sd">                only mask fluorine atoms.</span>
+<span class="sd">            substructures_to_mask: Specifies a list of substructures that should be masked.</span>
+<span class="sd">                Given in SMILES format. This is excluded from the stochastic masking.</span>
+<span class="sd">                NOTE: The model operates on SELFIES and the matching of the substructures occurs</span>
+<span class="sd">                in SELFIES simply on a string level.</span>
+<span class="sd">            substructures_to_keep: Specifies a list of substructures that should definitely be kept.</span>
+<span class="sd">                Given in SMILES format. This is excluded from the stochastic masking.</span>
+<span class="sd">                NOTE: This keeps tokens even if they are included in `tokens_to_mask`.</span>
+<span class="sd">                NOTE: The model operates on SELFIES and the matching of the substructures occurs</span>
+<span class="sd">                in SELFIES simply on a string level.</span>
+<span class="sd">            text_filtering: Generated sequences are post-hoc filtered for the presence of</span>
+<span class="sd">                `substructures_to_keep`. This is done with RDKit substructure matches. If the sub-</span>
+<span class="sd">                structure cant be converted to a mol object, this argument toggles whether a substructure</span>
+<span class="sd">                should be ignored from post-hoc filtering (this happens per default) or whether</span>
+<span class="sd">                filtering should occur on a pure string level.</span>
+<span class="sd">                NOTE: This does not affect the actual generation process.</span>
+<span class="sd">                Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">smiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -791,6 +818,12 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The tokens_to_mask </span><span class="si">{</span><span class="n">tokens_to_mask</span><span class="si">}</span><span class="s2"> has to be a list.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maskable_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maskable_tokens</span><span class="p">(</span><span class="n">tokens_to_mask</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text_filtering</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The text_filtering </span><span class="si">{</span><span class="n">text_filtering</span><span class="si">}</span><span class="s2"> has to be a bool.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_filtering</span> <span class="o">=</span> <span class="n">text_filtering</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_substructures</span><span class="p">(</span><span class="n">substructures_to_mask</span><span class="p">,</span> <span class="n">substructures_to_keep</span><span class="p">)</span>
+
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Will start sampling molecules similar to </span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="s2"> with goal: &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">property_goal</span><span class="si">}</span><span class="s2"> and masking </span><span class="si">{</span><span class="n">fraction_to_mask</span><span class="si">}</span><span class="s2"> of the tokens.&quot;</span>
@@ -815,26 +848,36 @@
         <span class="n">language_seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_encoding</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
         <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">text_tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">language_seq</span><span class="p">)</span>
 
-        <span class="c1"># Determine which tokens can be masked</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maskable_tokens</span> <span class="o">==</span> <span class="p">[]:</span>
-            <span class="c1"># All tokens can be considered for masking</span>
-            <span class="n">maskable_tokens</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
-            <span class="n">num_to_mask</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fraction_to_mask</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Mask only tokens that are specified by the user</span>
-            <span class="n">maskable_tokens</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maskable_tokens</span><span class="p">)</span>
-            <span class="n">num_to_mask</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
-                <span class="nb">sum</span><span class="p">([</span><span class="n">tokens</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">maskable_tokens</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fraction_to_mask</span>
-            <span class="p">)</span>
-
+        <span class="c1"># Determine which tokens can be masked (from `tokens_to_mask`)</span>
+        <span class="n">maskable_tokens</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maskable_tokens</span> <span class="o">==</span> <span class="p">[]</span> <span class="k">else</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maskable_tokens</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">maskable_idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">maskable_tokens</span><span class="p">]</span>
 
+        <span class="c1"># Make sure that `substructures_to_keep` are not masked</span>
+        <span class="k">for</span> <span class="n">keep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_keep</span><span class="p">:</span>
+            <span class="n">keep_toks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">text_tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">language_encoding</span><span class="p">(</span><span class="n">keep</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">to_be_kept</span> <span class="o">=</span> <span class="n">get_substructure_indices</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">keep_toks</span><span class="p">)</span>
+            <span class="n">maskable_idxs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_be_kept</span><span class="p">,</span> <span class="n">maskable_idxs</span><span class="p">))</span>
+
+        <span class="n">num_to_mask</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">maskable_idxs</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fraction_to_mask</span><span class="p">)</span>
         <span class="c1"># Mask the tokens</span>
         <span class="n">mask_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">maskable_idxs</span><span class="p">,</span> <span class="n">num_to_mask</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">sequence_tokens</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">t</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mask_idxs</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
         <span class="p">]</span>
+
+        <span class="c1"># Make sure that `substructures_to_mask` are actually masked</span>
+        <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_mask</span><span class="p">:</span>
+            <span class="n">mask_toks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">text_tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">language_encoding</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">to_be_masked</span> <span class="o">=</span> <span class="n">get_substructure_indices</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">mask_toks</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">to_be_masked</span><span class="p">:</span>
+                <span class="n">sequence_tokens</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span>
 
         <span class="c1"># Extract the property tokens</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">property_goal</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
@@ -858,7 +901,69 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="ConditionalGenerator.language_encoding"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.language_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">language_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.filter_substructures"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.filter_substructures">[docs]</a>    <span class="k">def</span> <span class="nf">filter_substructures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">property_successes</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="ConditionalGenerator.validate_substructures"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_substructures">[docs]</a>    <span class="k">def</span> <span class="nf">validate_substructures</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">substructures_to_mask</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">substructures_to_keep</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates the substructures that are ignored/kept for the masking when the</span>
+<span class="sd">        `sampling_wrapper` is used.</span>
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            substructures_to_mask: List of substructures that should be masked.</span>
+<span class="sd">            substructures_to_keep: List of substructures that should be kept.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: Implemented by the child classes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">seed_encoded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_encoding</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_molecule</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">substructures_to_mask</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The substructures_to_mask </span><span class="si">{</span><span class="n">substructures_to_mask</span><span class="si">}</span><span class="s2"> has to be a list.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">to_mask</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">substructures_to_mask</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The substructure_to_mask </span><span class="si">{</span><span class="n">mask</span><span class="si">}</span><span class="s2"> has to be a string in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subs_format</span><span class="si">}</span><span class="s2"> format.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_encoding</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seed_encoded</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Substructure to keep in </span><span class="si">{</span><span class="n">mask</span><span class="si">}</span><span class="s2"> not found in seed sequence, ignoring it.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">to_mask</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_mask</span> <span class="o">=</span> <span class="n">to_mask</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">substructures_to_keep</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The substructures_to_keep </span><span class="si">{</span><span class="n">substructures_to_keep</span><span class="si">}</span><span class="s2"> has to be a list.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">to_keep</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">keep</span> <span class="ow">in</span> <span class="n">substructures_to_keep</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keep</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The substructure_to_keep </span><span class="si">{</span><span class="n">keep</span><span class="si">}</span><span class="s2"> has to be a string in AAS format.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_encoding</span><span class="p">(</span><span class="n">keep</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seed_encoded</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Substructure to keep in </span><span class="si">{</span><span class="n">keep</span><span class="si">}</span><span class="s2"> not found in seed sequence, ignoring it.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">to_keep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keep</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_keep</span> <span class="o">=</span> <span class="n">to_keep</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_keep</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_mask</span><span class="p">))</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_keep</span>
+        <span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_mask</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Substructures to mask and keep contain duplicates or overlap.&quot;</span>
+            <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ChemicalLanguageRT"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT">[docs]</a><span class="k">class</span> <span class="nc">ChemicalLanguageRT</span><span class="p">(</span><span class="n">ConditionalGenerator</span><span class="p">):</span>
@@ -874,6 +979,8 @@
 <span class="sd">        batch_size: the batch size for the model, applicable only to generative task.</span>
 <span class="sd">        tolerance: the tolerance for the property of the generated molecules.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">subs_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;SMILES&quot;</span>
 
 <div class="viewcode-block" id="ChemicalLanguageRT.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1014,8 +1121,58 @@
 <div class="viewcode-block" id="ChemicalLanguageRT.language_encoding"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.language_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">language_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">selfie</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selfie</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">seq</span><span class="si">}</span><span class="s2"> is not a valid SELFIES sequence.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">selfie</span></div></div>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">seq</span><span class="si">}</span><span class="s2"> (type=</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span><span class="si">}</span><span class="s2">) is not a valid SMILES sequence.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">selfie</span></div>
+
+<div class="viewcode-block" id="ChemicalLanguageRT.filter_substructures"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.filter_substructures">[docs]</a>    <span class="k">def</span> <span class="nf">filter_substructures</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">property_successes</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove samples where user-required substructures are absent from generated samples.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            property_successes: A tuple of samples that passed the property constraints.</span>
+<span class="sd">                This is a tuple of tuples, where the first element is the SMILES and the</span>
+<span class="sd">                second is the property prediction string.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of samples that passed the property constraints and the substructure constraints.</span>
+<span class="sd">            Same format as input</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_wrapper</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="k">return</span> <span class="n">property_successes</span>
+
+        <span class="n">successes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">subs_mols</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">keep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_keep</span><span class="p">:</span>
+            <span class="n">subs_mols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">keep</span><span class="p">)</span> <span class="ow">or</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="n">keep</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">subs_mols</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">keep</span><span class="si">}</span><span class="s2"> is not a valid SMILES/SELFIES. Instead substructure filtering &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;based on sequence alone can be done and is set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">text_filtering</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Perform filtering</span>
+        <span class="k">for</span> <span class="n">smi</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">property_successes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">smi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">sane</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smi</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">subs_mol</span><span class="p">,</span> <span class="n">subs_string</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">subs_mols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_keep</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">subs_mol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_filtering</span> <span class="ow">and</span> <span class="n">subs_string</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">smi</span><span class="p">:</span>
+                        <span class="n">sane</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">mol</span><span class="o">.</span><span class="n">HasSubstructMatch</span><span class="p">(</span><span class="n">subs_mol</span><span class="p">):</span>
+                        <span class="c1"># Desired substructure not found</span>
+                        <span class="n">sane</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span>
+            <span class="k">if</span> <span class="n">sane</span><span class="p">:</span>
+                <span class="n">successes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">smi</span><span class="p">,</span> <span class="n">prop</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">successes</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div></div>
 
 
 <div class="viewcode-block" id="ProteinLanguageRT"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT">[docs]</a><span class="k">class</span> <span class="nc">ProteinLanguageRT</span><span class="p">(</span><span class="n">ConditionalGenerator</span><span class="p">):</span>
@@ -1033,6 +1190,8 @@
 <span class="sd">        batch_size: the batch size for the model, applicable only to generative task.</span>
 <span class="sd">        tolerance: the tolerance for the property of the generated molecules.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">subs_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;AAS&quot;</span>
 
 <div class="viewcode-block" id="ProteinLanguageRT.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1167,7 +1326,37 @@
         <span class="k">return</span> <span class="n">tokens_to_mask</span></div>
 
 <div class="viewcode-block" id="ProteinLanguageRT.language_encoding"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.language_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">language_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">seq</span></div></div>
+        <span class="k">return</span> <span class="n">seq</span></div>
+
+<div class="viewcode-block" id="ProteinLanguageRT.filter_substructures"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.filter_substructures">[docs]</a>    <span class="k">def</span> <span class="nf">filter_substructures</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">property_successes</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove samples where user-required substructures are absent from generated samples.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            property_successes: A tuple of samples that passed the property constraints.</span>
+<span class="sd">                This is a tuple of tuples, where the first element is the sequence and the second the</span>
+<span class="sd">                property prediction string.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of samples that passed the property constraints and the substructure constraints.</span>
+<span class="sd">            Same format as input</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_wrapper</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="k">return</span> <span class="n">property_successes</span>
+
+        <span class="n">successes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">seq</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">property_successes</span><span class="p">:</span>
+            <span class="n">sane</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">keep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">substructures_to_keep</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">keep</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+                    <span class="n">sane</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">sane</span><span class="p">:</span>
+                <span class="n">successes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">seq</span><span class="p">,</span> <span class="n">prop</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">successes</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div></div>
 </pre></div>
 
            </div>
