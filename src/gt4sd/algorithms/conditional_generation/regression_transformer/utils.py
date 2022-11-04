@@ -21,17 +21,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Module initialization."""
+from typing import List
 
-__version__ = "0.57.0"
-__name__ = "gt4sd"
 
-# NOTE: configure SSL to allow unverified contexts by default
-from .configuration import GT4SDConfiguration
+def get_substructure_indices(
+    full_sequence: List[str], substructure: List[str]
+) -> List[int]:
+    """
+    Args:
+        full_sequence: A list of strings, each representing a token from the full sequence
+        substructure: A list of strings, each representing a token from the substructure that
+            is contained in the full sequence.
 
-gt4sd_configuration_instance = GT4SDConfiguration.get_instance()
+    Returns:
+        A list of integers, corresponding to all the indices of the tokens in the full sequence
+        that match the substructure.
 
-if gt4sd_configuration_instance.gt4sd_create_unverified_ssl_context:
-    import ssl
-
-    ssl._create_default_https_context = ssl._create_unverified_context
+    """
+    substructure_indices: List = []
+    for i in range(len(full_sequence)):
+        if full_sequence[i] == substructure[0]:
+            if full_sequence[i : i + len(substructure)] == substructure:
+                substructure_indices.extend(range(i, i + len(substructure)))
+    return substructure_indices
