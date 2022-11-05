@@ -108,10 +108,11 @@ gt4sd_artifact_management_configuration = GT4SDArtifactManagementConfiguration(
 
 for key, val in gt4sd_artifact_management_configuration.local_cache_path.items():
     logger.info(f"using as local cache path for {key}: {val}")
+    path = os.path.join(gt4sd_configuration_instance.gt4sd_local_cache_path, val)
     try:
-        os.makedirs(val)
+        os.makedirs(path)
     except FileExistsError:
-        logger.debug(f"local cache path for {key} already exists at {val}.")
+        logger.debug(f"local cache path for {key} already exists at {path}.")
 
 
 def upload_to_s3(
