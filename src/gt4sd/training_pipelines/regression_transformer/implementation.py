@@ -126,12 +126,15 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
                     num_tokens_to_mask=None,
                     mask_token_order=None,
                 )
-                alternating_collator = TRAIN_COLLATORS["vanilla_cg"](
+                alternating_collator = TRAIN_COLLATORS[training_args["cg_collator"]](
                     tokenizer=self.tokenizer,
                     property_tokens=self.properties,
                     plm_probability=training_args["plm_probability"],
                     max_span_length=training_args["max_span_length"],
                     do_sample=False,
+                    entity_separator_token=training_args["entity_separator_token"],
+                    mask_entity_separator=training_args["mask_entity_separator"],
+                    entity_to_mask=training_args["entity_to_mask"],
                 )
 
             # Initialize our Trainer
