@@ -164,8 +164,8 @@ def test_train():
 
         # Test the pretrained QED model
         config["model_args"]["model_path"] = mol_path
-        config["dataset_args"]["train_data_path"] = raw_path
-        config["dataset_args"]["test_data_path"] = raw_path
+        config["dataset_args"]["train_data_path"] = str(raw_path)
+        config["dataset_args"]["test_data_path"] = str(raw_path)
         config["dataset_args"]["augment"] = 2
         input_config = combine_defaults_and_user_args(config)
         test_pipeline.train(**input_config)
@@ -180,7 +180,18 @@ def test_train():
             config["model_args"]["config_name"] = f_name
             del config["model_args"]["model_path"]
             config["model_args"]["tokenizer_name"] = mol_path
-            config["dataset_args"]["data_path"] = raw_path
+            config["dataset_args"]["data_path"] = str(raw_path)
             config["dataset_args"]["augment"] = 2
+            input_config = combine_defaults_and_user_args(config)
+            test_pipeline.train(**input_config)
+
+            # Test the multientity collator (finetuning QED model)
+            config["training_args"].update(
+                {
+                    "cg_collator": "multientity_cg",
+                    "entity_to_mask": 0,
+                    "entity_separator_token": ".",
+                }
+            )
             input_config = combine_defaults_and_user_args(config)
             test_pipeline.train(**input_config)
