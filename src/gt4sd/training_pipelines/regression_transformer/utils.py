@@ -173,6 +173,7 @@ def get_train_config_dict(
     return {
         "alternate_steps": training_args["alternate_steps"],
         "reset_training_loss": True,
+        "cg_collator": training_args["cg_collator"],
         "cc_loss": training_args["cc_loss"],
         "property_tokens": list(properties),
         "cg_collator_params": {
@@ -180,6 +181,9 @@ def get_train_config_dict(
             "property_tokens": list(properties),
             "plm_probability": training_args["plm_probability"],
             "max_span_length": training_args["max_span_length"],
+            "entity_separator_token": training_args["entity_separator_token"],
+            "mask_entity_separator": training_args["mask_entity_separator"],
+            "entity_to_mask": training_args["entity_to_mask"],
         },
     }
 
