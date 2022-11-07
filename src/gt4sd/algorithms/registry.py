@@ -185,7 +185,10 @@ class ApplicationsRegistry:
                     ),
                 ],  # type: ignore
             )
-
+            # NOTE: Duplicate call necessary for pydantic >=1.10.* - see https://github.com/pydantic/pydantic/issues/4695
+            PydanticConfiguration: Type[AlgorithmConfiguration] = dataclass(  # type: ignore
+                VanillaConfiguration
+            )
             PydanticConfiguration: Type[AlgorithmConfiguration] = dataclass(  # type: ignore
                 VanillaConfiguration
             )
