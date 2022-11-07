@@ -249,6 +249,40 @@
             <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether the cycle-consistency loss is computed during the conditional &quot;</span>
             <span class="s2">&quot;generation task. Defaults to True.&quot;</span>
         <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">cg_collator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;vanilla_cg&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The collator class. Following options are implemented: &quot;</span>
+            <span class="s2">&quot;&#39;vanilla_cg&#39;: Collator class that does not mask the properties but anything else as a regular DataCollatorForPermutationLanguageModeling. Can optionally replace the properties with sampled values. &quot;</span>
+            <span class="s2">&quot;NOTE: This collator can deal with multiple properties. &quot;</span>
+            <span class="s2">&quot;&#39;multientity_cg&#39;: A training collator the conditional-generation task that can handle multiple entities. &quot;</span>
+            <span class="s2">&quot;Default: vanilla_cg.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">entity_to_mask</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Only applies if `cg_collator=&#39;multientity_cg&#39;`. The entity that is being masked during training. 0 corresponds to first entity and so on. -1 corresponds to &quot;</span>
+            <span class="s2">&quot;a random sampling scheme where the entity-to-be-masked is determined &quot;</span>
+            <span class="s2">&quot;at runtime in the collator. NOTE: If &#39;mask_entity_separator&#39; is true, &quot;</span>
+            <span class="s2">&quot;this argument will not have any effect. Defaults to -1.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">entity_separator_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Only applies if `cg_collator=&#39;multientity_cg&#39;`.The token that is used to separate &quot;</span>
+            <span class="s2">&quot;entities in the input. Defaults to &#39;.&#39; (applicable to SMILES &amp; SELFIES)&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">mask_entity_separator</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Only applies if `cg_collator=&#39;multientity_cg&#39;`. Whether or not the entity separator token can be masked. If True, *all** textual tokens can be masked and we &quot;</span>
+            <span class="s2">&quot;the collator behaves like the `vanilla_cg ` even though it is a `multientity_cg`. If False, the exact behavior &quot;</span>
+            <span class="s2">&quot;depends on the entity_to_mask argument. Defaults to False.&quot;</span>
+        <span class="p">},</span>
     <span class="p">)</span></div>
 
 
