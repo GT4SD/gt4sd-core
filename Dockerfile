@@ -1,5 +1,5 @@
 # intermediate image for dependencies and user "gt4sd" setup
-FROM drugilsberg/gt4sd-base:main-20221024113933-cpu
+FROM drugilsberg/gt4sd-base:v0.58.0-cpu
 ENV PATH=/opt/conda/envs/gt4sd/bin/:${PATH}
 COPY notebooks/requirements.txt notebooks_requirements.txt
 RUN pip install --no-cache-dir notebook==5.* tensorflow-cpu>=2.1.0 gt4sd>=0.54.1 && pip install --no-cache-dir -r notebooks_requirements.txt
