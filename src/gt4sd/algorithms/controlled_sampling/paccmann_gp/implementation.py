@@ -110,8 +110,8 @@ class GPConditionalGenerator:
             os.path.join(resources_path, "selfies_language.pkl")
         )
         # initialize encoder, decoder, testVAE, and GP_generator_MW
-        self.gru_encoder = StackGRUEncoder(self.svae_params)
-        self.gru_decoder = StackGRUDecoder(self.svae_params)
+        self.gru_encoder = StackGRUEncoder(self.svae_params).to(self.device)
+        self.gru_decoder = StackGRUDecoder(self.svae_params).to(self.device)
         self.gru_vae = TeacherVAE(self.gru_encoder, self.gru_decoder)
         self.gru_vae.load_state_dict(
             torch.load(
