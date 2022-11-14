@@ -130,7 +130,9 @@ class GPConditionalGenerator:
         # setting affinity predictor parameters
         with open(os.path.join(resources_path, "mca_model_params.json")) as f:
             self.predictor_params = json.load(f)
-        self.affinity_predictor = MODEL_FACTORY["bimodal_mca"](self.predictor_params)
+        self.affinity_predictor = MODEL_FACTORY["bimodal_mca"](
+            self.predictor_params
+        ).to(self.device)
         self.affinity_predictor.load(
             os.path.join(resources_path, "mca_weights.pt"),
             map_location=self.device,
