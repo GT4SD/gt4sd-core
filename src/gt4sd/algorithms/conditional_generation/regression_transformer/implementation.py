@@ -656,7 +656,7 @@ class ConditionalGenerator:
         self.maskable_tokens = self.get_maskable_tokens(tokens_to_mask.copy())
 
         found_maskable = list(filter(lambda x: x in context, tokens_to_mask))
-        if len(found_maskable) == 0:
+        if len(found_maskable) == 0 and tokens_to_mask != []:
             raise ValueError(
                 "Malformed search query: None of the `tokens_to_mask` "
                 f"{tokens_to_mask} are in the `context`: {context}."

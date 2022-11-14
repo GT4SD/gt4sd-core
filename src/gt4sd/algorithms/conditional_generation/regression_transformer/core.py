@@ -291,10 +291,7 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
         """
         if item is None:
             raise InvalidItem(title="InvalidSequence", detail="Sequence is None")
-        (
-            items,
-            _,
-        ) = self.generator.validate_output([item])
+        items, _ = self.generator.validate_output([item])
         if items[0] is None:
             if self.generator.task == "generation":
                 title = "InvalidSMILES"
@@ -445,10 +442,7 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
         """
         if item is None:
             raise InvalidItem(title="InvalidSequence", detail="Sequence is None")
-        (
-            items,
-            _,
-        ) = self.generator.validate_output([item])
+        items, _ = self.generator.validate_output([item])
         if items[0] is None:
             if self.generator.task == "generation":
                 title = "InvalidSequence"
