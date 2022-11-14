@@ -211,12 +211,12 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
             NOTE: If this is used, the `target` needs to be a single SMILES string.
             Example: {
                 'fraction_to_mask': 0.5,
-                'atoms_to_mask': [],
+                'tokens_to_mask': [],
                 'property_goal': {'<qed>': 0.85}
             }
             - 'fraction_to_mask' specifies the ratio of tokens that can be changed by
                 the model.
-            - 'atoms_to_mask' specifies which atoms can be masked. This defaults
+            - 'tokens_to_mask' specifies which atoms can be masked. This defaults
                 to an empty list, meaning that all tokens can be masked.
             - 'property_goal' specifies the target conditions for the generation. The
                 properties need to be specified as a dictionary. The keys need to be
@@ -381,12 +381,12 @@ class RegressionTransformerProteins(AlgorithmConfiguration[Sequence, Sequence]):
             NOTE: If this is used, the `target` needs to be a single SMILES string.
             Example: {
                 'fraction_to_mask': 0.5,
-                'atoms_to_mask': [],
+                'tokens_to_mask': [],
                 'property_goal': {'<qed>': 0.85}
             }
             - 'fraction_to_mask' specifies the ratio of tokens that can be changed by
                 the model.
-            - 'atoms_to_mask' specifies which atoms can be masked. This defaults
+            - 'tokens_to_mask' specifies which atoms can be masked. This defaults
                 to an empty list, meaning that all tokens can be masked.
             - 'property_goal' specifies the target conditions for the generation. The
                 properties need to be specified as a dictionary. The keys need to be
