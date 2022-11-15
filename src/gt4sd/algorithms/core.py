@@ -57,7 +57,7 @@ from ..configuration import (
     sync_algorithm_with_s3,
     upload_to_s3,
 )
-from ..exceptions import InvalidItem, S3SyncError, SamplingError, Gt4sdTimeoutError
+from ..exceptions import Gt4sdTimeoutError, InvalidItem, S3SyncError, SamplingError
 from ..training_pipelines.core import TrainingPipelineArguments
 
 logger = logging.getLogger(__name__)
