@@ -57,7 +57,7 @@ from ..configuration import (
     sync_algorithm_with_s3,
     upload_to_s3,
 )
-from ..exceptions import InvalidItem, S3SyncError, SamplingError
+from ..exceptions import InvalidItem, S3SyncError, SamplingError, Gt4sdTimeoutError
 from ..training_pipelines.core import TrainingPipelineArguments
 
 logger = logging.getLogger(__name__)
@@ -166,7 +166,7 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
             return partial(self.generator, self.target)  # type: ignore
 
     def timeout(self, signum, frame):
-        raise TimeoutError(
+        raise Gt4sdTimeoutError(
             "Alarm signal received, probably because a signal.alarm timed out.",
         )
 
@@ -265,8 +265,8 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
                     raise_if_none_sampled(items=item_set, detail=detail)
                     return
                 item_set_length = len(item_set)
-        except TimeoutError:
-            detail = f"Samples took longer than {self.max_runtime} seconds to generate."
+        except Gt4sdTimeoutError:
+            detail = f"Samples took longer than {self.max_runtime} seconds to generate"
             logger.warning(detail + ", exiting")
             raise_if_none_sampled(items=item_set, detail=detail)
         signal.alarm(0)
