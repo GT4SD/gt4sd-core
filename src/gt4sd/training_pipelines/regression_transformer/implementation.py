@@ -139,8 +139,7 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
 
             # Initialize our Trainer
             train_config = get_train_config_dict(training_args, self.properties)
-            if not os.path.exists(params["output_dir"]):
-                os.makedirs(params["output_dir"])
+            os.makedirs(params["output_dir"], exist_ok=True)
             with open(
                 os.path.join(params["output_dir"], "training_config.json"), "w"
             ) as f:
