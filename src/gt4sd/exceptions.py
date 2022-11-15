@@ -104,7 +104,7 @@ class SamplingError(TimeoutError):
         super().__init__(detail)
 
 
-class Gt4sdTimeoutError(TimeoutError):
+class GT4SDTimeoutError(TimeoutError):
     """Error for timeouts in gt4sd."""
 
     def __init__(self, detail: str) -> None:
