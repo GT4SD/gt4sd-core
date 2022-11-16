@@ -20,15 +20,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#
-
 from .unpatch import (  # isort:skip
     fix_datasets,
     sane_datasets,
     fix_schedulers,
     sane_schedulers,
+    TORCH_HAS_OPENMP,
 )
-
+import torch
 from torchdrug.datasets import (
     BACE,
     BBBP,
@@ -94,3 +93,7 @@ DATASET_FACTORY = {
     "zinc250k": ZINC250k,
     "zinc2m": ZINC2m,
 }
+
+
+# NOTE: restore original OpenMP settings
+torch._C.has_openmp = TORCH_HAS_OPENMP
