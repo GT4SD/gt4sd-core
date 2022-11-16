@@ -206,8 +206,6 @@ def check_openmp_availabilty() -> bool:
     finally:
         shutil.rmtree(tempfolder)
 
-    print("OPENMP", is_openmp_available, tempfolder)
-
     return is_openmp_available
 
 
