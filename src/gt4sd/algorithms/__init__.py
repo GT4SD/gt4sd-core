@@ -25,7 +25,7 @@
 from ..extras import EXTRAS_ENABLED
 
 # NOTE: here we import the applications to register them
-from .conditional_generation.guacamol.core import (  # noqa: F401
+from .conditional_generation.guacamol import (  # noqa: F401
     AaeGenerator,
     GraphGAGenerator,
     GraphMCTSGenerator,
@@ -35,23 +35,21 @@ from .conditional_generation.guacamol.core import (  # noqa: F401
     SMILESLSTMPPOGenerator,
     VaeGenerator,
 )
-from .conditional_generation.key_bert.core import KeyBERTGenerator  # noqa: F401
-from .conditional_generation.molgx.core import MolGXQM9Generator  # noqa: F401
-from .conditional_generation.paccmann_rl.core import (  # noqa: F401
+from .conditional_generation.key_bert import KeyBERTGenerator  # noqa: F401
+from .conditional_generation.molgx import MolGXQM9Generator  # noqa: F401
+from .conditional_generation.paccmann_rl import (  # noqa: F401
     PaccMannRLOmicBasedGenerator,
     PaccMannRLProteinBasedGenerator,
 )
-from .conditional_generation.regression_transformer.core import (  # noqa: F401
+from .conditional_generation.regression_transformer import (  # noqa: F401
     RegressionTransformerMolecules,
     RegressionTransformerProteins,
 )
-from .conditional_generation.reinvent.core import ReinventGenerator  # noqa: F401
-from .conditional_generation.template.core import TemplateGenerator  # noqa: F401
-from .controlled_sampling.advanced_manufacturing.core import (  # noqa: F401
-    CatalystGenerator,
-)
-from .controlled_sampling.paccmann_gp.core import PaccMannGPGenerator  # noqa: F401
-from .generation.diffusion.core import (  # noqa: F401
+from .conditional_generation.reinvent import ReinventGenerator  # noqa: F401
+from .conditional_generation.template import TemplateGenerator  # noqa: F401
+from .controlled_sampling.advanced_manufacturing import CatalystGenerator  # noqa: F401
+from .controlled_sampling.paccmann_gp import PaccMannGPGenerator  # noqa: F401
+from .generation.diffusion import (  # noqa: F401
     DDIMGenerator,
     DDPMGenerator,
     LDMGenerator,
@@ -59,7 +57,7 @@ from .generation.diffusion.core import (  # noqa: F401
     ScoreSdeGenerator,
     StableDiffusionGenerator,
 )
-from .generation.hugging_face.core import (  # noqa: F401
+from .generation.hugging_face import (  # noqa: F401
     HuggingFaceCTRLGenerator,
     HuggingFaceGPT2Generator,
     HuggingFaceOpenAIGPTGenerator,
@@ -67,20 +65,13 @@ from .generation.hugging_face.core import (  # noqa: F401
     HuggingFaceXLMGenerator,
     HuggingFaceXLNetGenerator,
 )
-from .generation.moler.core import MoLeRDefaultGenerator  # noqa: F401
-from .generation.pgt.core import (  # noqa: F401
-    PGTCoherenceChecker,
-    PGTEditor,
-    PGTGenerator,
-)
-from .generation.polymer_blocks.core import PolymerBlocksGenerator  # noqa: F401
-from .generation.torchdrug.core import TorchDrugGCPN, TorchDrugGraphAF  # noqa: F401
-from .prediction.paccmann.core import PaccMann  # noqa: F401
-from .prediction.topics_zero_shot.core import TopicsPredictor  # noqa: F401
+from .generation.moler import MoLeRDefaultGenerator  # noqa: F401
+from .generation.pgt import PGTCoherenceChecker, PGTEditor, PGTGenerator  # noqa: F401
+from .generation.polymer_blocks import PolymerBlocksGenerator  # noqa: F401
+from .generation.torchdrug import TorchDrugGCPN, TorchDrugGraphAF  # noqa: F401
+from .prediction.paccmann import PaccMann  # noqa: F401
+from .prediction.topics_zero_shot import TopicsPredictor  # noqa: F401
 
 # extras requirements
 if EXTRAS_ENABLED:
-    from .controlled_sampling.class_controlled_sampling.core import (  # noqa: F401
-        PAG,
-        CogMol,
-    )
+    from .controlled_sampling.class_controlled_sampling import PAG, CogMol  # noqa: F401
