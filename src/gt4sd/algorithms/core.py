@@ -29,11 +29,11 @@ import collections
 import logging
 import os
 import shutil
-import signal
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass
 from functools import partial
+from time import time
 from typing import (
     Any,
     Callable,
@@ -141,6 +141,28 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
             If the target is None, the generator is assumed to be untargeted.
         """
 
+    def timeout(self, item_set: Set, detail: str, error: TimeoutError):
+        """Throws a timeout exception if applicable, otherwise returns
+            items gracefully.
+
+        Args:
+            item_set: Set of items generated thus far.
+            detail: context or condition for the generation. Defaults to None.
+            error: An error instance, child class of `TimeoutError` either
+                `GT4SDTimeoutError` or `SamplingError`.
+
+        Raises:
+            TimeoutError: If no items were sampled so far.
+
+        """
+        if len(item_set) == 0:
+            logger.error(detail + "Exiting now!")
+            raise error(title="No samples generated", detail=detail)  # type: ignore
+        logger.warning(
+            detail
+            + f"Returning {len(item_set)} instead of {self.number_of_items} items!"
+        )
+
     def _setup_untargeted_generator(
         self,
         configuration: AlgorithmConfiguration[S, T],
@@ -165,11 +187,6 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
         else:
             return partial(self.generator, self.target)  # type: ignore
 
-    def timeout(self, signum, frame):
-        raise GT4SDTimeoutError(
-            "Alarm signal received, probably because a signal.alarm timed out.",
-        )
-
     def sample(self, number_of_items: int = 100) -> Iterator[S]:
         """Generate a number of unique and valid items.
 
@@ -185,91 +202,72 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
                 Defaults to 100.
 
         Raises:
-            SamplingError: when requesting too many items or when no items were yielded.
-                The later happens in case of not generating samples in a number of calls
-                and when taking longer than the allowed time limit.
+            SamplingError: when requesting too many items.
+            GT4SDTimeoutError: when the algorithm takes longer than the allowed time limit.
+                Or when no items were yielded (i.e., if not generating samples for many
+                consecutive calls).
 
         Yields:
             the items.
         """
+        self.number_of_items = number_of_items
 
         if number_of_items > self.max_samples:
             detail = (
                 f"{number_of_items} is too many items to generate, "
                 f"must be under {self.max_samples+1} samples."
             )
-            logger.warning(detail)
-            raise SamplingError(title="Exceeding max_samples", detail=detail)
+            self.timeout(set(), detail=detail, error=SamplingError)  # type: ignore
 
-        def raise_if_none_sampled(items: set, detail: str):
-            """If exiting early there should be at least one generated item.
-
-            Args:
-                items: to check if it's empty.
-                detail: error message in case the exception is raised.
-
-            Raises:
-                SamplingError: using the given detail.
-            """
-            if len(items) == 0:
-                raise SamplingError(
-                    title="No samples generated",
-                    detail="No samples generated. " + detail,
-                )
-
-        item_set = set()
+        item_set: Set = set()
         stuck_counter = 0
         item_set_length = 0
-        signal.signal(signal.SIGALRM, self.timeout)
-        signal.alarm(self.max_runtime)
-        try:
-            while True:
-                generated_items = self.generate()  # type:ignore
-                for index, item in enumerate(generated_items):
-                    try:
-                        valid_item = self.configuration.validate_item(item)
-                        # check if sample is hashable
-                        if not isinstance(item, collections.Hashable):
-                            yield valid_item
-                            item_set.add(str(index))
-                        else:
-                            # validation for samples represented as strings
-                            if item in item_set:
-                                continue
-                            else:
-                                yield valid_item
-                                item_set.add(item)  # type:ignore
-                        if len(item_set) == number_of_items:
-                            signal.alarm(0)
-                            return
-                    except InvalidItem as error:
-                        logger.debug(
-                            f"item {item} could not be validated, "
-                            f"raising {error.title}: {error.detail}"
-                        )
-                        continue
+        start = time()
+        while True:
+            if time() - start > self.max_runtime:
+                detail = f"Sampling took longer than maximal runtime ({self.max_runtime} seconds). "
+                self.timeout(item_set, detail=detail, error=GT4SDTimeoutError)  # type: ignore
+                return
 
-                # make sure we don't keep sampling more than a given number of times,
-                # in case no new items are generated.
-                if len(item_set) == item_set_length:
-                    stuck_counter += 1
-                else:
-                    stuck_counter = 0
-                if (
-                    stuck_counter
-                    >= gt4sd_configuration_instance.gt4sd_max_number_of_stuck_calls
-                ):
-                    detail = f"no novel samples generated for more than {gt4sd_configuration_instance.gt4sd_max_number_of_stuck_calls} cycles"
-                    logger.warning(detail + ", exiting")
-                    signal.alarm(0)
-                    raise_if_none_sampled(items=item_set, detail=detail)
-                    return
-                item_set_length = len(item_set)
-        except GT4SDTimeoutError:
-            detail = f"Samples took longer than {self.max_runtime} seconds to generate"
-            logger.warning(detail + ", exiting")
-            raise_if_none_sampled(items=item_set, detail=detail)
-        signal.alarm(0)
+            generated_items = self.generate()  # type:ignore
+            for index, item in enumerate(generated_items):
+                try:
+                    valid_item = self.configuration.validate_item(item)
+                    # check if sample is hashable
+                    if not isinstance(item, collections.Hashable):
+                        yield valid_item
+                        item_set.add(str(index))
+                    else:
+                        # validation for samples represented as strings
+                        if item in item_set:
+                            continue
+                        else:
+                            yield valid_item
+                            item_set.add(item)  # type:ignore
+                    if len(item_set) == number_of_items:
+                        return
+                except InvalidItem as error:
+                    logger.debug(
+                        f"item {item} could not be validated, "
+                        f"raising {error.title}: {error.detail}"
+                    )
+                    continue
+
+            # make sure we don't keep sampling more than a given number of times,
+            # in case no new items are generated.
+            if len(item_set) == item_set_length:
+                stuck_counter += 1
+            else:
+                stuck_counter = 0
+            if (
+                stuck_counter
+                >= gt4sd_configuration_instance.gt4sd_max_number_of_stuck_calls
+            ):
+                prefix = "No" if len(item_set) == 0 else "No new"
+                detail = f"{prefix} samples generated for more than {gt4sd_configuration_instance.gt4sd_max_number_of_stuck_calls} cycles. "
+                self.timeout(item_set, detail=detail, error=GT4SDTimeoutError)  # type: ignore
+                return
+            item_set_length = len(item_set)
 
     def validate_configuration(
         self, configuration: AlgorithmConfiguration
@@ -340,11 +338,6 @@ class PredictorAlgorithm(ABC, Generic[S, T]):
         """
         raise NotImplementedError("Not implemented in baseclass.")
 
-    def timeout(self, signum, frame):
-        raise TimeoutError(
-            "Alarm signal received, probably because a signal.alarm timed out.",
-        )
-
     def predict(self, input: Any) -> Any:
         """Perform a prediction for an input.
         Args:
@@ -357,9 +350,6 @@ class PredictorAlgorithm(ABC, Generic[S, T]):
             the prediction.
         """
 
-        signal.signal(signal.SIGALRM, self.timeout)
-        signal.alarm(self.max_runtime)
-
         try:
             predicted = self.predictor(input)
         except TimeoutError:
@@ -369,7 +359,6 @@ class PredictorAlgorithm(ABC, Generic[S, T]):
             logger.warning(detail + " Exiting now!")
         except Exception:
             raise Exception(f"{self.__class__.__name__} failed with {input}")
-        signal.alarm(0)
         return predicted
 
     def __call__(self, input: Any) -> Any:
