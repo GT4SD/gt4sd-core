@@ -141,19 +141,18 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
             If the target is None, the generator is assumed to be untargeted.
         """
 
-    def timeout(self, item_set: Set, detail: str, error: TimeoutError):
+    def timeout(self, item_set: Set, detail: str, error: TimeoutError) -> None:
         """Throws a timeout exception if applicable, otherwise returns
             items gracefully.
 
         Args:
             item_set: Set of items generated thus far.
-            detail: context or condition for the generation. Defaults to None.
+            detail: context or condition for the generation.
             error: An error instance, child class of `TimeoutError` either
                 `GT4SDTimeoutError` or `SamplingError`.
 
         Raises:
             TimeoutError: If no items were sampled so far.
-
         """
         if len(item_set) == 0:
             logger.error(detail + "Exiting now!")
