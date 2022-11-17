@@ -51,13 +51,17 @@ class RegressionTransformerTrainingArguments(
     training_name: str = field(
         default="rt_training", metadata={"help": "Name used to identify the training."}
     )
-    epochs: int = field(default=10, metadata={"help": "Number of epochs."})
+    num_train_epochs: int = field(default=10, metadata={"help": "Number of epochs."})
     batch_size: int = field(default=16, metadata={"help": "Size of the batch."})
     log_interval: int = field(
         default=100, metadata={"help": "Number of steps between log intervals."}
     )
     gradient_interval: int = field(
         default=1, metadata={"help": "Gradient accumulation steps"}
+    )
+    eval_steps: int = field(
+        default=1000,
+        metadata={"help": "The time interval at which validation is performed."},
     )
 
     max_span_length: int = field(

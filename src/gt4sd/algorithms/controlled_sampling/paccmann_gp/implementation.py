@@ -110,8 +110,8 @@ class GPConditionalGenerator:
             os.path.join(resources_path, "selfies_language.pkl")
         )
         # initialize encoder, decoder, testVAE, and GP_generator_MW
-        self.gru_encoder = StackGRUEncoder(self.svae_params)
-        self.gru_decoder = StackGRUDecoder(self.svae_params)
+        self.gru_encoder = StackGRUEncoder(self.svae_params).to(self.device)
+        self.gru_decoder = StackGRUDecoder(self.svae_params).to(self.device)
         self.gru_vae = TeacherVAE(self.gru_encoder, self.gru_decoder)
         self.gru_vae.load_state_dict(
             torch.load(
@@ -130,7 +130,9 @@ class GPConditionalGenerator:
         # setting affinity predictor parameters
         with open(os.path.join(resources_path, "mca_model_params.json")) as f:
             self.predictor_params = json.load(f)
-        self.affinity_predictor = MODEL_FACTORY["bimodal_mca"](self.predictor_params)
+        self.affinity_predictor = MODEL_FACTORY["bimodal_mca"](
+            self.predictor_params
+        ).to(self.device)
         self.affinity_predictor.load(
             os.path.join(resources_path, "mca_weights.pt"),
             map_location=self.device,

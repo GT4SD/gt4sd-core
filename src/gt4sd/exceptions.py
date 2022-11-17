@@ -102,3 +102,19 @@ class SamplingError(TimeoutError):
         self.title = title
         self.detail = detail
         super().__init__(detail)
+
+
+class GT4SDTimeoutError(TimeoutError):
+    """Error for timeouts in gt4sd."""
+
+    def __init__(self, title: str, detail: str) -> None:
+        """Initialize SamplingError.
+
+        Args:
+            title: title of the error.
+            detail: description of the error.
+        """
+        self.type = "GT4SDTimeoutError"
+        self.title = title
+        self.detail = detail
+        super().__init__(detail)

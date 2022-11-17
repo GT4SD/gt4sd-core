@@ -653,7 +653,19 @@ class ConditionalGenerator:
 
         if not isinstance(tokens_to_mask, list):
             raise TypeError(f"The tokens_to_mask {tokens_to_mask} has to be a list.")
-        self.maskable_tokens = self.get_maskable_tokens(tokens_to_mask)
+        self.maskable_tokens = self.get_maskable_tokens(tokens_to_mask.copy())
+
+        found_maskable = list(filter(lambda x: x in context, tokens_to_mask))
+        if len(found_maskable) == 0 and tokens_to_mask != []:
+            raise ValueError(
+                "Malformed search query: None of the `tokens_to_mask` "
+                f"{tokens_to_mask} are in the `context`: {context}."
+            )
+        elif len(found_maskable) < len(tokens_to_mask):
+            logger.warning(
+                "Malformed search query: Some of the `tokens_to_mask` "
+                f"{tokens_to_mask} are not in the `context`: {context}."
+            )
 
         if not isinstance(text_filtering, bool):
             raise TypeError(f"The text_filtering {text_filtering} has to be a bool.")

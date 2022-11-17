@@ -21,7 +21,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import os
+import shutil
+import subprocess
+import tempfile
 import typing
+from subprocess import CalledProcessError
 from typing import List
 
 import importlib_metadata
@@ -43,6 +48,7 @@ from torch.optim.lr_scheduler import (  # type: ignore
     StepLR,
     _LRScheduler,
 )
+from torch.utils.cpp_extension import IS_WINDOWS
 from torch.utils.data.dataset import (
     ChainDataset,
     ConcatDataset,
@@ -163,3 +169,46 @@ def fix_schedulers(sane_schedulers: List[_LRScheduler]) -> None:
                 f"Reverting silent TorchDrug overwriting failed, {lrs} is not a subclass"
                 f" of {scheduler}."
             )
+
+
+CHECK_CODE = "int main(){return 0;}"
+
+
+def check_openmp_availabilty() -> bool:
+    """
+    Check if OpenMP is available at runtime.
+
+    Returns:
+        True if OpenMP is available, False otherwise.
+    """
+    if IS_WINDOWS:
+        compiler = os.environ.get("CXX", "cl")
+    else:
+        compiler = os.environ.get("CXX", "c++")
+
+    tempfolder = tempfile.mkdtemp()
+    with open(os.path.join(tempfolder, "main.cpp"), "w") as f:
+        f.write(CHECK_CODE)
+
+    is_openmp_available = True
+    try:
+        subprocess.check_call(
+            [
+                compiler,
+                "-fopenmp",
+                f"{tempfolder}/main.cpp",
+                "-o",
+                f"{tempfolder}/main.o",
+            ]
+        )
+    except CalledProcessError:
+        is_openmp_available = False
+    finally:
+        shutil.rmtree(tempfolder)
+
+    return is_openmp_available
+
+
+TORCH_HAS_OPENMP = torch._C.has_openmp
+# NOTE: ensuring this variable indicates OpenMP availbility in current compilerß
+torch._C.has_openmp = check_openmp_availabilty()
