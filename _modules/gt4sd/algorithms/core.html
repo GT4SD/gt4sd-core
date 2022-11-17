@@ -192,11 +192,11 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">signal</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -220,7 +220,7 @@
     <span class="n">sync_algorithm_with_s3</span><span class="p">,</span>
     <span class="n">upload_to_s3</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="kn">import</span> <span class="n">InvalidItem</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">,</span> <span class="n">SamplingError</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="kn">import</span> <span class="n">GT4SDTimeoutError</span><span class="p">,</span> <span class="n">InvalidItem</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">,</span> <span class="n">SamplingError</span>
 <span class="kn">from</span> <span class="nn">..training_pipelines.core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -304,6 +304,27 @@
 <span class="sd">            If the target is None, the generator is assumed to be untargeted.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
+<div class="viewcode-block" id="GeneratorAlgorithm.timeout"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm.timeout">[docs]</a>    <span class="k">def</span> <span class="nf">timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_set</span><span class="p">:</span> <span class="n">Set</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">TimeoutError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Throws a timeout exception if applicable, otherwise returns</span>
+<span class="sd">            items gracefully.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            item_set: Set of items generated thus far.</span>
+<span class="sd">            detail: context or condition for the generation.</span>
+<span class="sd">            error: An error instance, child class of `TimeoutError` either</span>
+<span class="sd">                `GT4SDTimeoutError` or `SamplingError`.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TimeoutError: If no items were sampled so far.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">detail</span> <span class="o">+</span> <span class="s2">&quot;Exiting now!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;No samples generated&quot;</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="n">detail</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Returning </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_items</span><span class="si">}</span><span class="s2"> items!&quot;</span>
+        <span class="p">)</span></div>
+
 <div class="viewcode-block" id="GeneratorAlgorithm._setup_untargeted_generator"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm._setup_untargeted_generator">[docs]</a>    <span class="k">def</span> <span class="nf">_setup_untargeted_generator</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
@@ -328,11 +349,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
 
-<div class="viewcode-block" id="GeneratorAlgorithm.timeout"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm.timeout">[docs]</a>    <span class="k">def</span> <span class="nf">timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signum</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
-            <span class="s2">&quot;Alarm signal received, probably because a signal.alarm timed out.&quot;</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
 <div class="viewcode-block" id="GeneratorAlgorithm.sample"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number_of_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">S</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Generate a number of unique and valid items.</span>
 
@@ -348,91 +364,72 @@
 <span class="sd">                Defaults to 100.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            SamplingError: when requesting too many items or when no items were yielded.</span>
-<span class="sd">                The later happens in case of not generating samples in a number of calls</span>
-<span class="sd">                and when taking longer than the allowed time limit.</span>
+<span class="sd">            SamplingError: when requesting too many items.</span>
+<span class="sd">            GT4SDTimeoutError: when the algorithm takes longer than the allowed time limit.</span>
+<span class="sd">                Or when no items were yielded (i.e., if not generating samples for many</span>
+<span class="sd">                consecutive calls).</span>
 
 <span class="sd">        Yields:</span>
 <span class="sd">            the items.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_items</span> <span class="o">=</span> <span class="n">number_of_items</span>
 
         <span class="k">if</span> <span class="n">number_of_items</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span><span class="p">:</span>
             <span class="n">detail</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">number_of_items</span><span class="si">}</span><span class="s2"> is too many items to generate, &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;must be under </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> samples.&quot;</span>
             <span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">detail</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">SamplingError</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Exceeding max_samples&quot;</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="nb">set</span><span class="p">(),</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">SamplingError</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
-        <span class="k">def</span> <span class="nf">raise_if_none_sampled</span><span class="p">(</span><span class="n">items</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;If exiting early there should be at least one generated item.</span>
-
-<span class="sd">            Args:</span>
-<span class="sd">                items: to check if it&#39;s empty.</span>
-<span class="sd">                detail: error message in case the exception is raised.</span>
-
-<span class="sd">            Raises:</span>
-<span class="sd">                SamplingError: using the given detail.</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">SamplingError</span><span class="p">(</span>
-                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;No samples generated&quot;</span><span class="p">,</span>
-                    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;No samples generated. &quot;</span> <span class="o">+</span> <span class="n">detail</span><span class="p">,</span>
-                <span class="p">)</span>
-
-        <span class="n">item_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">item_set</span><span class="p">:</span> <span class="n">Set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">stuck_counter</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">item_set_length</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
-        <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_runtime</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">generated_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>  <span class="c1"># type:ignore</span>
-                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">generated_items</span><span class="p">):</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">valid_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">validate_item</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-                        <span class="c1"># check if sample is hashable</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Hashable</span><span class="p">):</span>
-                            <span class="k">yield</span> <span class="n">valid_item</span>
-                            <span class="n">item_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="c1"># validation for samples represented as strings</span>
-                            <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">item_set</span><span class="p">:</span>
-                                <span class="k">continue</span>
-                            <span class="k">else</span><span class="p">:</span>
-                                <span class="k">yield</span> <span class="n">valid_item</span>
-                                <span class="n">item_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>  <span class="c1"># type:ignore</span>
-                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span> <span class="o">==</span> <span class="n">number_of_items</span><span class="p">:</span>
-                            <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-                            <span class="k">return</span>
-                    <span class="k">except</span> <span class="n">InvalidItem</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;item </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2"> could not be validated, &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;raising </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">detail</span><span class="si">}</span><span class="s2">&quot;</span>
-                        <span class="p">)</span>
-                        <span class="k">continue</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_runtime</span><span class="p">:</span>
+                <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Sampling took longer than maximal runtime (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_runtime</span><span class="si">}</span><span class="s2"> seconds). &quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">item_set</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">GT4SDTimeoutError</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+                <span class="k">return</span>
 
-                <span class="c1"># make sure we don&#39;t keep sampling more than a given number of times,</span>
-                <span class="c1"># in case no new items are generated.</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span> <span class="o">==</span> <span class="n">item_set_length</span><span class="p">:</span>
-                    <span class="n">stuck_counter</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">stuck_counter</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">if</span> <span class="p">(</span>
-                    <span class="n">stuck_counter</span>
-                    <span class="o">&gt;=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_number_of_stuck_calls</span>
-                <span class="p">):</span>
-                    <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;no novel samples generated for more than </span><span class="si">{</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_number_of_stuck_calls</span><span class="si">}</span><span class="s2"> cycles&quot;</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">detail</span> <span class="o">+</span> <span class="s2">&quot;, exiting&quot;</span><span class="p">)</span>
-                    <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-                    <span class="n">raise_if_none_sampled</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">item_set</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>
-                    <span class="k">return</span>
-                <span class="n">item_set_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
-            <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Samples took longer than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_runtime</span><span class="si">}</span><span class="s2"> seconds to generate.&quot;</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">detail</span> <span class="o">+</span> <span class="s2">&quot;, exiting&quot;</span><span class="p">)</span>
-            <span class="n">raise_if_none_sampled</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">item_set</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>
-        <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+            <span class="n">generated_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>  <span class="c1"># type:ignore</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">generated_items</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">valid_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">validate_item</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                    <span class="c1"># check if sample is hashable</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Hashable</span><span class="p">):</span>
+                        <span class="k">yield</span> <span class="n">valid_item</span>
+                        <span class="n">item_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># validation for samples represented as strings</span>
+                        <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">item_set</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">yield</span> <span class="n">valid_item</span>
+                            <span class="n">item_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>  <span class="c1"># type:ignore</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span> <span class="o">==</span> <span class="n">number_of_items</span><span class="p">:</span>
+                        <span class="k">return</span>
+                <span class="k">except</span> <span class="n">InvalidItem</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;item </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2"> could not be validated, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;raising </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">detail</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">continue</span>
+
+            <span class="c1"># make sure we don&#39;t keep sampling more than a given number of times,</span>
+            <span class="c1"># in case no new items are generated.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span> <span class="o">==</span> <span class="n">item_set_length</span><span class="p">:</span>
+                <span class="n">stuck_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stuck_counter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">stuck_counter</span>
+                <span class="o">&gt;=</span> <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_number_of_stuck_calls</span>
+            <span class="p">):</span>
+                <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;No&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;No new&quot;</span>
+                <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> samples generated for more than </span><span class="si">{</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_max_number_of_stuck_calls</span><span class="si">}</span><span class="s2"> cycles. &quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">item_set</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">GT4SDTimeoutError</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+                <span class="k">return</span>
+            <span class="n">item_set_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">item_set</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GeneratorAlgorithm.validate_configuration"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.GeneratorAlgorithm.validate_configuration">[docs]</a>    <span class="k">def</span> <span class="nf">validate_configuration</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span>
@@ -503,11 +500,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not implemented in baseclass.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PredictorAlgorithm.timeout"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.PredictorAlgorithm.timeout">[docs]</a>    <span class="k">def</span> <span class="nf">timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signum</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
-            <span class="s2">&quot;Alarm signal received, probably because a signal.alarm timed out.&quot;</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
 <div class="viewcode-block" id="PredictorAlgorithm.predict"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.PredictorAlgorithm.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Perform a prediction for an input.</span>
 <span class="sd">        Args:</span>
@@ -520,9 +512,6 @@
 <span class="sd">            the prediction.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
-        <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_runtime</span><span class="p">)</span>
-
         <span class="k">try</span><span class="p">:</span>
             <span class="n">predicted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
@@ -532,7 +521,6 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">detail</span> <span class="o">+</span> <span class="s2">&quot; Exiting now!&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> failed with </span><span class="si">{</span><span class="nb">input</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">predicted</span></div>
 
 <div class="viewcode-block" id="PredictorAlgorithm.__call__"><a class="viewcode-back" href="../../../api/gt4sd.algorithms.core.html#gt4sd.algorithms.core.PredictorAlgorithm.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>

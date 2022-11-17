@@ -322,6 +322,31 @@ If the target is None, the generator is assumed to be untargeted.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="gt4sd.algorithms.core.GeneratorAlgorithm.timeout">
+<code class="sig-name descname">timeout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item_set</span></em>, <em class="sig-param"><span class="n">detail</span></em>, <em class="sig-param"><span class="n">error</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#GeneratorAlgorithm.timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.GeneratorAlgorithm.timeout" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Throws a timeout exception if applicable, otherwise returns</dt><dd><p>items gracefully.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item_set</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>) – Set of items generated thus far.</p></li>
+<li><p><strong>detail</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – context or condition for the generation.</p></li>
+<li><p><strong>error</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">TimeoutError</span></code>) – An error instance, child class of <cite>TimeoutError</cite> either
+<cite>GT4SDTimeoutError</cite> or <cite>SamplingError</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>TimeoutError</strong> – If no items were sampled so far.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="gt4sd.algorithms.core.GeneratorAlgorithm._setup_untargeted_generator">
 <code class="sig-name descname">_setup_untargeted_generator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configuration</span></em>, <em class="sig-param"><span class="n">generator</span></em>, <em class="sig-param"><span class="n">target</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#GeneratorAlgorithm._setup_untargeted_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.GeneratorAlgorithm._setup_untargeted_generator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Targeted or untargeted generation.</p>
@@ -342,11 +367,6 @@ If the target is None, the generator is assumed to be untargeted.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="gt4sd.algorithms.core.GeneratorAlgorithm.timeout">
-<code class="sig-name descname">timeout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">signum</span></em>, <em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#GeneratorAlgorithm.timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.GeneratorAlgorithm.timeout" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt id="gt4sd.algorithms.core.GeneratorAlgorithm.sample">
 <code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">number_of_items</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#GeneratorAlgorithm.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.GeneratorAlgorithm.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a number of unique and valid items.</p>
@@ -362,9 +382,12 @@ sampling process.</p>
 Defaults to 100.</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference internal" href="gt4sd.exceptions.html#gt4sd.exceptions.SamplingError" title="gt4sd.exceptions.SamplingError"><strong>SamplingError</strong></a> – when requesting too many items or when no items were yielded.
-    The later happens in case of not generating samples in a number of calls
-    and when taking longer than the allowed time limit.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="gt4sd.exceptions.html#gt4sd.exceptions.SamplingError" title="gt4sd.exceptions.SamplingError"><strong>SamplingError</strong></a> – when requesting too many items.</p></li>
+<li><p><a class="reference internal" href="gt4sd.exceptions.html#gt4sd.exceptions.GT4SDTimeoutError" title="gt4sd.exceptions.GT4SDTimeoutError"><strong>GT4SDTimeoutError</strong></a> – when the algorithm takes longer than the allowed time limit.
+    Or when no items were yielded (i.e., if not generating samples for many
+    consecutive calls).</p></li>
+</ul>
 </dd>
 <dt class="field-odd">Yields</dt>
 <dd class="field-odd"><p>the items.</p>
@@ -407,7 +430,7 @@ Defaults to 100.</p>
 
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.core.GeneratorAlgorithm.__dict__">
-<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.core', '__annotations__': {'generator': 'Union[Untargeted, Targeted[T]]', 'target': 'Optional[T]', 'max_runtime': 'int', 'max_samples': 'int', 'generate': 'Untargeted'}, '__doc__': 'Interface for automated generation via an :class:`AlgorithmConfiguration`.', 'max_runtime': 86400, 'max_samples': 1000000, '__init__': &lt;function GeneratorAlgorithm.__init__&gt;, 'get_generator': &lt;function GeneratorAlgorithm.get_generator&gt;, '_setup_untargeted_generator': &lt;function GeneratorAlgorithm._setup_untargeted_generator&gt;, 'timeout': &lt;function GeneratorAlgorithm.timeout&gt;, 'sample': &lt;function GeneratorAlgorithm.sample&gt;, 'validate_configuration': &lt;function GeneratorAlgorithm.validate_configuration&gt;, '__orig_bases__': (&lt;class 'abc.ABC'&gt;, typing.Generic[~S, ~T]), '__dict__': &lt;attribute '__dict__' of 'GeneratorAlgorithm' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'GeneratorAlgorithm' objects&gt;, '__parameters__': (~S, ~T), '__abstractmethods__': frozenset({'get_generator'}), '_abc_impl': &lt;_abc_data object&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.core.GeneratorAlgorithm.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.core', '__annotations__': {'generator': 'Union[Untargeted, Targeted[T]]', 'target': 'Optional[T]', 'max_runtime': 'int', 'max_samples': 'int', 'generate': 'Untargeted'}, '__doc__': 'Interface for automated generation via an :class:`AlgorithmConfiguration`.', 'max_runtime': 86400, 'max_samples': 1000000, '__init__': &lt;function GeneratorAlgorithm.__init__&gt;, 'get_generator': &lt;function GeneratorAlgorithm.get_generator&gt;, 'timeout': &lt;function GeneratorAlgorithm.timeout&gt;, '_setup_untargeted_generator': &lt;function GeneratorAlgorithm._setup_untargeted_generator&gt;, 'sample': &lt;function GeneratorAlgorithm.sample&gt;, 'validate_configuration': &lt;function GeneratorAlgorithm.validate_configuration&gt;, '__orig_bases__': (&lt;class 'abc.ABC'&gt;, typing.Generic[~S, ~T]), '__dict__': &lt;attribute '__dict__' of 'GeneratorAlgorithm' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'GeneratorAlgorithm' objects&gt;, '__parameters__': (~S, ~T), '__abstractmethods__': frozenset({'get_generator'}), '_abc_impl': &lt;_abc_data object&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.core.GeneratorAlgorithm.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -506,11 +529,6 @@ at instantiation of the PredictorAlgorithm and must return a callable:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="gt4sd.algorithms.core.PredictorAlgorithm.timeout">
-<code class="sig-name descname">timeout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">signum</span></em>, <em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PredictorAlgorithm.timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.timeout" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt id="gt4sd.algorithms.core.PredictorAlgorithm.predict">
 <code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/core.html#PredictorAlgorithm.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform a prediction for an input.
@@ -552,7 +570,7 @@ at instantiation of the PredictorAlgorithm and must return a callable:</p>
 
 <dl class="py attribute">
 <dt id="gt4sd.algorithms.core.PredictorAlgorithm.__dict__">
-<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.core', '__annotations__': {'max_runtime': 'int'}, '__doc__': 'Interface for automated prediction via an :class:`AlgorithmConfiguration`.', 'max_runtime': 86400, '__init__': &lt;function PredictorAlgorithm.__init__&gt;, 'get_predictor': &lt;function PredictorAlgorithm.get_predictor&gt;, 'get_model': &lt;function PredictorAlgorithm.get_model&gt;, 'timeout': &lt;function PredictorAlgorithm.timeout&gt;, 'predict': &lt;function PredictorAlgorithm.predict&gt;, '__call__': &lt;function PredictorAlgorithm.__call__&gt;, '__orig_bases__': (&lt;class 'abc.ABC'&gt;, typing.Generic[~S, ~T]), '__dict__': &lt;attribute '__dict__' of 'PredictorAlgorithm' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'PredictorAlgorithm' objects&gt;, '__parameters__': (~S, ~T), '__abstractmethods__': frozenset({'get_model'}), '_abc_impl': &lt;_abc_data object&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'gt4sd.algorithms.core', '__annotations__': {'max_runtime': 'int'}, '__doc__': 'Interface for automated prediction via an :class:`AlgorithmConfiguration`.', 'max_runtime': 86400, '__init__': &lt;function PredictorAlgorithm.__init__&gt;, 'get_predictor': &lt;function PredictorAlgorithm.get_predictor&gt;, 'get_model': &lt;function PredictorAlgorithm.get_model&gt;, 'predict': &lt;function PredictorAlgorithm.predict&gt;, '__call__': &lt;function PredictorAlgorithm.__call__&gt;, '__orig_bases__': (&lt;class 'abc.ABC'&gt;, typing.Generic[~S, ~T]), '__dict__': &lt;attribute '__dict__' of 'PredictorAlgorithm' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'PredictorAlgorithm' objects&gt;, '__parameters__': (~S, ~T), '__abstractmethods__': frozenset({'get_model'}), '_abc_impl': &lt;_abc_data object&gt;})</em><a class="headerlink" href="#gt4sd.algorithms.core.PredictorAlgorithm.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
