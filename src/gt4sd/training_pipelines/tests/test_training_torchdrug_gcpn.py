@@ -77,9 +77,7 @@ def test_train():
     config: Dict[str, Any] = template_config.copy()
     config["training_args"]["model_path"] = TEMPORARY_DIRECTORY
     config["training_args"]["dataset_path"] = TEMPORARY_DIRECTORY
-
     test_pipeline.train(**config)
-    shutil.rmtree(TEMPORARY_DIRECTORY)
 
     # Now test with a custom dataset
     with importlib_resources.as_file(
@@ -92,19 +90,12 @@ def test_train():
         config["dataset_args"]["target_field"] = "qed"
         # This should filter out the QED again from the batches
         config["dataset_args"]["transform"] = "lambda x: {'graph': x['graph']}"
-
         test_pipeline.train(**config)
-        shutil.rmtree(TEMPORARY_DIRECTORY)
 
         # Test the property optimization
-        """
-        Disabled for now due to multiple downstream torchdrug issues, most importantly:
-        - https://github.com/DeepGraphLearning/torchdrug/issues/83
-        """
-        # config["dataset_args"]["target_field"] = 'qed'
-        # config['training_args']['task'] = 'qed'
-        # config['data_args']['node_feature'] = 'symbol'
-        # config['model_args']['criterion'] = "{'ppo': 1}"
+        config["training_args"]["task"] = "qed"
+        config["dataset_args"]["node_feature"] = "symbol"
+        config["model_args"]["criterion"] = "{'ppo': 1}"
+        test_pipeline.train(**config)
 
-        # test_pipeline.train(**config)
-        # shutil.rmtree(TEMPORARY_DIRECTORY)
+    shutil.rmtree(TEMPORARY_DIRECTORY)
