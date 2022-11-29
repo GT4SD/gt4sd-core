@@ -26,10 +26,10 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from sklearn.utils import shuffle
 import pandas as pd
 from pytoda.smiles.transforms import Augment
 from pytoda.transforms import AugmentByReversing
+from sklearn.utils import shuffle
 from terminator.selfies import encoder
 from terminator.tokenization import ExpressionBertTokenizer
 from transformers.hf_argparser import string_to_bool
@@ -79,8 +79,8 @@ def add_tokens_from_lists(
             ]
             properties = properties.union(props)
 
-    # Finish adding new tokens
-    tokenizer.add_tokens(list(all_tokens))
+    # Finish adding new tokens. `special_tokens` set to True to avoid lower-casing.
+    tokenizer.add_tokens(list(all_tokens), special_tokens=True)
     tokenizer.update_vocab(all_tokens)  # type:ignore
     logger.info(f"Added {len(tokenizer)-num_tokens} new tokens to tokenizer.")
 
