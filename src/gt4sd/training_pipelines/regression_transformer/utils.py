@@ -26,6 +26,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set, Tuple
 
+from sklearn.utils import shuffle
 import pandas as pd
 from pytoda.smiles.transforms import Augment
 from pytoda.transforms import AugmentByReversing
@@ -126,7 +127,7 @@ def prepare_datasets_from_files(
             raise TypeError(f"Please provide a csv file not {path}.")
 
         # Load data
-        df = pd.read_csv(path)
+        df = shuffle(pd.read_csv(path))
         if "text" not in df.columns:
             raise ValueError("Please provide text in the `text` column.")
 
