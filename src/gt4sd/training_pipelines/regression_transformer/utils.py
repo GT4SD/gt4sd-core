@@ -140,7 +140,7 @@ def prepare_datasets_from_files(
         properties.remove("text")
 
         # Parse data and create RT-compatible format
-        for i, row in df.iterrows():
+        for j, row in df.iterrows():
             line = "".join(
                 [
                     f"<{p}>{row[p]:.3f}{tokenizer.expression_separator}"
@@ -153,7 +153,7 @@ def prepare_datasets_from_files(
         # Perform augmentation on training data if applicable
         if i == 0 and augment is not None and augment > 1:
             for _ in range(augment):
-                for i, row in df.iterrows():
+                for j, row in df.iterrows():
                     line = "".join(
                         [
                             f"<{p}>{row[p]:.3f}{tokenizer.expression_separator}"
