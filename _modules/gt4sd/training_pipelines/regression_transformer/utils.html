@@ -194,6 +194,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">pytoda.smiles.transforms</span> <span class="kn">import</span> <span class="n">Augment</span>
 <span class="kn">from</span> <span class="nn">pytoda.transforms</span> <span class="kn">import</span> <span class="n">AugmentByReversing</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">shuffle</span>
 <span class="kn">from</span> <span class="nn">terminator.selfies</span> <span class="kn">import</span> <span class="n">encoder</span>
 <span class="kn">from</span> <span class="nn">terminator.tokenization</span> <span class="kn">import</span> <span class="n">ExpressionBertTokenizer</span>
 <span class="kn">from</span> <span class="nn">transformers.hf_argparser</span> <span class="kn">import</span> <span class="n">string_to_bool</span>
@@ -291,7 +292,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please provide a csv file not </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Load data</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">shuffle</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
         <span class="k">if</span> <span class="s2">&quot;text&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please provide text in the `text` column.&quot;</span><span class="p">)</span>
 
@@ -304,7 +305,7 @@
         <span class="n">properties</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">)</span>
 
         <span class="c1"># Parse data and create RT-compatible format</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
             <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="p">[</span>
                     <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&gt;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}{</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -317,7 +318,7 @@
         <span class="c1"># Perform augmentation on training data if applicable</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">augment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">augment</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">augment</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
                     <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                         <span class="p">[</span>
                             <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&gt;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}{</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">expression_separator</span><span class="si">}</span><span class="s2">&quot;</span>

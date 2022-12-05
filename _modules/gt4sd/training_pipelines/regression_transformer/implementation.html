@@ -190,6 +190,7 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
@@ -433,6 +434,7 @@
         <span class="n">test_data_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">line_by_line</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>
         <span class="n">augment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">save_datasets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
@@ -447,6 +449,8 @@
 <span class="sd">                at least one column of numerical properties.</span>
 <span class="sd">            line_by_line: Whether the data can be read line-by-line from disk.</span>
 <span class="sd">            augment: How many times each training sample is augmented.</span>
+<span class="sd">            save_datasets: Whether to save the datasets to disk (will be stored in</span>
+<span class="sd">                same location as `train_data_path` and `test_data_path`).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preparing/reading data...&quot;</span><span class="p">)</span>
@@ -455,20 +459,31 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">train_data_path</span><span class="p">,</span> <span class="n">test_data_path</span><span class="p">,</span> <span class="n">augment</span><span class="o">=</span><span class="n">augment</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">properties</span>
-        <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset_from_list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="p">[</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">]</span>
-        <span class="p">]</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished data setup.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">datasets</span></div>
 
-<div class="viewcode-block" id="RegressionTransformerTrainingPipeline.create_dataset_from_list"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.create_dataset_from_list">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset_from_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LineByLineTextDataset</span><span class="p">:</span>
+        <span class="n">train_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset_from_list</span><span class="p">(</span>
+            <span class="n">train_data</span><span class="p">,</span>
+            <span class="n">save_path</span><span class="o">=</span><span class="n">train_data_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.txt&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">save_datasets</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">test_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset_from_list</span><span class="p">(</span>
+            <span class="n">test_data</span><span class="p">,</span>
+            <span class="n">save_path</span><span class="o">=</span><span class="n">test_data_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.txt&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">save_datasets</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished data setup.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="RegressionTransformerTrainingPipeline.create_dataset_from_list"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.create_dataset_from_list">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset_from_list</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LineByLineTextDataset</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a LineByLineTextDataset from a List of strings.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            data: List of strings with the samples.</span>
+<span class="sd">            save_path: Path to save the dataset to. Defaults to None, meaning</span>
+<span class="sd">                the dataset will not be saved.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># Write files to temporary location and create data</span>
         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp</span><span class="p">:</span>
             <span class="n">f_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="s2">&quot;tmp_data.txt&quot;</span><span class="p">)</span>
@@ -482,6 +497,8 @@
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">LineByLineTextDataset</span><span class="p">(</span>
                 <span class="n">file_path</span><span class="o">=</span><span class="n">f_name</span><span class="p">,</span> <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">64</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="n">save_path</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">f_name</span><span class="p">,</span> <span class="n">save_path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dataset</span></div></div>
 
 
