@@ -29,6 +29,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 import pandas as pd
 from pytoda.smiles.transforms import Augment
 from pytoda.transforms import AugmentByReversing
+from sklearn.utils import shuffle
 from terminator.selfies import encoder
 from terminator.tokenization import ExpressionBertTokenizer
 from transformers.hf_argparser import string_to_bool
@@ -126,7 +127,7 @@ def prepare_datasets_from_files(
             raise TypeError(f"Please provide a csv file not {path}.")
 
         # Load data
-        df = pd.read_csv(path)
+        df = shuffle(pd.read_csv(path))
         if "text" not in df.columns:
             raise ValueError("Please provide text in the `text` column.")
 
@@ -139,7 +140,7 @@ def prepare_datasets_from_files(
         properties.remove("text")
 
         # Parse data and create RT-compatible format
-        for i, row in df.iterrows():
+        for j, row in df.iterrows():
             line = "".join(
                 [
                     f"<{p}>{row[p]:.3f}{tokenizer.expression_separator}"
@@ -152,7 +153,7 @@ def prepare_datasets_from_files(
         # Perform augmentation on training data if applicable
         if i == 0 and augment is not None and augment > 1:
             for _ in range(augment):
-                for i, row in df.iterrows():
+                for j, row in df.iterrows():
                     line = "".join(
                         [
                             f"<{p}>{row[p]:.3f}{tokenizer.expression_separator}"
