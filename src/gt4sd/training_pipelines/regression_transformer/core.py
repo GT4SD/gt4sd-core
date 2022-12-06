@@ -161,6 +161,13 @@ class RegressionTransformerDataArguments(TrainingPipelineArguments):
             "help": "Whether lines of text in the dataset are to be handled as distinct samples."
         },
     )
+    save_datasets: Optional[bool] = field(
+        default=False,
+        metadata={
+            "help": "Whether to save the datasets to disk. Datasets will be saved as `.txt` file to "
+            "the same location where `train_data_path` and `test_data_path` live. Defaults to False."
+        },
+    )
 
 
 @dataclass

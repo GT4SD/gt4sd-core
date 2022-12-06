@@ -25,6 +25,7 @@
 import json
 import logging
 import os
+import shutil
 import tempfile
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
@@ -268,6 +269,7 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
         test_data_path: str,
         line_by_line: Optional[bool],
         augment: int = 0,
+        save_datasets: bool = False,
         *args,
         **kwargs,
     ):
@@ -282,6 +284,8 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
                 at least one column of numerical properties.
             line_by_line: Whether the data can be read line-by-line from disk.
             augment: How many times each training sample is augmented.
+            save_datasets: Whether to save the datasets to disk (will be stored in
+                same location as `train_data_path` and `test_data_path`).
         """
 
         logger.info("Preparing/reading data...")
@@ -290,20 +294,31 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
             self.tokenizer, train_data_path, test_data_path, augment=augment
         )
         self.tokenizer, self.properties = tokenizer, properties
-        datasets = [
-            self.create_dataset_from_list(data) for data in [train_data, test_data]
-        ]
-        logger.info("Finished data setup.")
-        return datasets
 
-    def create_dataset_from_list(self, data: List[str]) -> LineByLineTextDataset:
+        train_dataset = self.create_dataset_from_list(
+            train_data,
+            save_path=train_data_path.replace(".csv", ".txt")
+            if save_datasets
+            else None,
+        )
+        test_dataset = self.create_dataset_from_list(
+            test_data,
+            save_path=test_data_path.replace(".csv", ".txt") if save_datasets else None,
+        )
+        logger.info("Finished data setup.")
+        return [train_dataset, test_dataset]
+
+    def create_dataset_from_list(
+        self, data: List[str], save_path: Optional[str] = None
+    ) -> LineByLineTextDataset:
         """
         Creates a LineByLineTextDataset from a List of strings.
 
         Args:
             data: List of strings with the samples.
+            save_path: Path to save the dataset to. Defaults to None, meaning
+                the dataset will not be saved.
         """
-
         # Write files to temporary location and create data
         with tempfile.TemporaryDirectory() as temp:
             f_name = os.path.join(temp, "tmp_data.txt")
@@ -317,6 +332,8 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
             dataset = LineByLineTextDataset(
                 file_path=f_name, tokenizer=self.tokenizer, block_size=2**64
             )
+            if save_path:
+                shutil.copyfile(f_name, save_path)
         return dataset
 
 
