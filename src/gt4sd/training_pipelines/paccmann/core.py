@@ -24,7 +24,7 @@
 """PaccMann training utilities."""
 
 from dataclasses import dataclass, field
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from ..core import TrainingPipeline, TrainingPipelineArguments
 
@@ -61,6 +61,12 @@ class PaccMannTrainingArguments(TrainingPipelineArguments):
         metadata={"help": "Path where the model artifacts are stored."}
     )
     training_name: str = field(metadata={"help": "Name used to identify the training."})
+    checkpoint_path: Optional[str] = field(
+        default=None,
+        metadata={
+            "help": "Path to model checkpoint for weights initialization. Leave None if you want to train a model from scratch"
+        },
+    )
     epochs: int = field(default=50, metadata={"help": "Number of epochs."})
     batch_size: int = field(default=256, metadata={"help": "Size of the batch."})
     learning_rate: float = field(
