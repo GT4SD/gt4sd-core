@@ -92,17 +92,18 @@ class ConditionalGenerator(ABC):
             search=SamplingSearch(temperature=self.temperature),
         )
 
-        # decode SELFIES
-        selfies = [
+        molecules = [
             self.smiles_language.token_indexes_to_smiles(generated_molecule.tolist())
             for generated_molecule in iter(generated_molecules)
         ]
 
         # convert SELFIES to SMILES
-        smiles = [
-            self.smiles_language.selfies_to_smiles(a_selfies) for a_selfies in selfies
-        ]
-        return smiles
+        if "selfies" in self.smiles_language.name:
+            molecules = [
+                self.smiles_language.selfies_to_smiles(a_selfies)
+                for a_selfies in molecules
+            ]
+        return molecules
 
     @staticmethod
     def validate_molecules(smiles) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
