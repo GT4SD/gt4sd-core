@@ -239,6 +239,7 @@
 
             <span class="n">model_path</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]</span>
             <span class="n">training_name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;training_name&quot;</span><span class="p">]</span>
+            <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;checkpoint_path&quot;</span><span class="p">]</span>
 
             <span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;logs/</span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model with name </span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2"> starts.&quot;</span><span class="p">)</span>
@@ -352,6 +353,11 @@
             <span class="n">gru_encoder</span> <span class="o">=</span> <span class="n">StackGRUEncoder</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
             <span class="n">gru_decoder</span> <span class="o">=</span> <span class="n">StackGRUDecoder</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
             <span class="n">gru_vae</span> <span class="o">=</span> <span class="n">TeacherVAE</span><span class="p">(</span><span class="n">gru_encoder</span><span class="p">,</span> <span class="n">gru_decoder</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">checkpoint</span><span class="p">:</span>
+                <span class="n">gru_vae</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Restored existing model from </span><span class="si">{</span><span class="n">checkpoint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Model summary:&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">gru_vae</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Param </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, shape:</span><span class="se">\t</span><span class="si">{</span><span class="n">parameter</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
