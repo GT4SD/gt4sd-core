@@ -74,6 +74,7 @@ class PaccMannVAETrainingPipeline(PaccMannTrainingPipeline):
 
             model_path = params["model_path"]
             training_name = params["training_name"]
+            checkpoint = params["checkpoint_path"]
 
             writer = SummaryWriter(f"logs/{training_name}")
             logger.info(f"Model with name {training_name} starts.")
@@ -187,6 +188,11 @@ class PaccMannVAETrainingPipeline(PaccMannTrainingPipeline):
             gru_encoder = StackGRUEncoder(params).to(device)
             gru_decoder = StackGRUDecoder(params).to(device)
             gru_vae = TeacherVAE(gru_encoder, gru_decoder).to(device)
+
+            if checkpoint:
+                gru_vae.load(checkpoint)
+                logger.info(f"Restored existing model from {checkpoint}")
+
             logger.info("Model summary:")
             for name, parameter in gru_vae.named_parameters():
                 logger.info(f"Param {name}, shape:\t{parameter.shape}")
