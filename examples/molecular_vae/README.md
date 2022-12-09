@@ -15,8 +15,9 @@ gt4sd-trainer  --training_pipeline_name paccmann-vae-trainer --epochs 250 --batc
 
 
 #### Inference
+
 This training pipeline trains a molecular VAE. The GT4SD **inference** pipeline support inference for PaccMannRL, i.e., a hybrid-VAE with an omics or a protein encoder and a molecular decoder.
-There's not (yet) a dedicated inference pipeline for a plain molecular VAE (you could train the GuacaMol VAE via GT4SD or use the controlled sampling approach in the PaccMannGP inference pipeline).
+There's not (yet) a dedicated inference pipeline for a plain molecular VAE (you could train the GuacaMol VAE via GT4SD or use `gt4sd-saving` for the controlled sampling approach from PaccMannGP inference pipeline).
 
 To use a molecular VAE trained with `gt4sd-trainer  --training_pipeline_name paccmann-vae-trainer`, do the following:
 
