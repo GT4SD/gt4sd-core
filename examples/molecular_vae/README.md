@@ -10,6 +10,7 @@ This trains a molecular VAE using encoder and decoder based on StackGRUs. For de
 conda activate gt4sd
 gt4sd-trainer  --training_pipeline_name paccmann-vae-trainer --epochs 250 --batch_size 4 --n_layers 1 --rnn_cell_size 16 --latent_dim 16 --train_smiles_filepath src/gt4sd/training_pipelines/tests/molecules.smi --test_smiles_filepath src/gt4sd/training_pipelines/tests/molecules.smi --model_path /tmp/gt4sd-paccmann-gp/ --training_name fast-example --eval_interval 15 --save_interval 15 --selfies
 ```
+
 *NOTE*: You might want to pass a SMILES/SELFIES language object via `--smiles_language_filepath`
 *NOTE*: This is *dummy* example, do not use "as is" :warning:
 
