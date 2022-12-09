@@ -255,17 +255,18 @@
             <span class="n">search</span><span class="o">=</span><span class="n">SamplingSearch</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">),</span>
         <span class="p">)</span>
 
-        <span class="c1"># decode SELFIES</span>
-        <span class="n">selfies</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">molecules</span> <span class="o">=</span> <span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">smiles_language</span><span class="o">.</span><span class="n">token_indexes_to_smiles</span><span class="p">(</span><span class="n">generated_molecule</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
             <span class="k">for</span> <span class="n">generated_molecule</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="n">generated_molecules</span><span class="p">)</span>
         <span class="p">]</span>
 
         <span class="c1"># convert SELFIES to SMILES</span>
-        <span class="n">smiles</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">smiles_language</span><span class="o">.</span><span class="n">selfies_to_smiles</span><span class="p">(</span><span class="n">a_selfies</span><span class="p">)</span> <span class="k">for</span> <span class="n">a_selfies</span> <span class="ow">in</span> <span class="n">selfies</span>
-        <span class="p">]</span>
-        <span class="k">return</span> <span class="n">smiles</span></div>
+        <span class="k">if</span> <span class="s2">&quot;selfies&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">smiles_language</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="n">molecules</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">smiles_language</span><span class="o">.</span><span class="n">selfies_to_smiles</span><span class="p">(</span><span class="n">a_selfies</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">a_selfies</span> <span class="ow">in</span> <span class="n">molecules</span>
+            <span class="p">]</span>
+        <span class="k">return</span> <span class="n">molecules</span></div>
 
 <div class="viewcode-block" id="ConditionalGenerator.validate_molecules"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.validate_molecules">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">validate_molecules</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
