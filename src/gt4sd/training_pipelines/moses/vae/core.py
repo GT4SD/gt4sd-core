@@ -26,7 +26,7 @@ import argparse
 import logging
 import os
 from dataclasses import dataclass, field
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from guacamol_baselines.moses_baselines.vae_train import main
 
@@ -119,3 +119,10 @@ class MosesVAETrainingArguments(MosesTrainingArguments):
     )
     n_jobs: int = field(default=1, metadata={"help": "Number of threads."})
     n_workers: int = field(default=1, metadata={"help": "Number of workers."})
+    warm_start: Optional[str] = field(
+        default=None,
+        metadata={
+            "help": "Optional path to a folder to warm start from. "
+            "This has to contain files `model.pt`, `vocab.pt` and `config.pt`."
+        },
+    )
