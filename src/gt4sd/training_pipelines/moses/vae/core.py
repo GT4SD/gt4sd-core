@@ -119,3 +119,10 @@ class MosesVAETrainingArguments(MosesTrainingArguments):
     )
     n_jobs: int = field(default=1, metadata={"help": "Number of threads."})
     n_workers: int = field(default=1, metadata={"help": "Number of workers."})
+    warm_start: str = field(
+        default="",
+        metadata={
+            "help": "Path to a folder to warm start from. Set empty string to not use."
+            "This has to contain files `model.pt`, `vocab.pt` and `config.pt`."
+        },
+    )

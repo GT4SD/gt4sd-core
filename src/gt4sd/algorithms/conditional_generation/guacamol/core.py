@@ -25,6 +25,8 @@ import logging
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
+from ....domains.materials import SMILES, validate_molecules
+from ....exceptions import InvalidItem
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.guacamol_baselines.core import GuacaMolSavingArguments
 from ....training_pipelines.moses.core import MosesSavingArguments
@@ -105,8 +107,33 @@ class GuacaMolGenerator(GeneratorAlgorithm[S, T]):
         return implementation.generate_batch  # type: ignore
 
 
+class GuacaMolAbstractGenerator(AlgorithmConfiguration[str, str]):
+    def validate_item(self, item: str) -> SMILES:
+        """Check that item is a valid SMILES.
+
+        Args:
+            item: a generated item that is possibly not valid.
+
+        Raises:
+            InvalidItem: in case the item can not be validated.
+
+        Returns:
+            the validated SMILES.
+        """
+        (
+            molecules,
+            _,
+        ) = validate_molecules([item])
+        if molecules[0] is None:
+            raise InvalidItem(
+                title="InvalidSMILES",
+                detail=f'rdkit.Chem.MolFromSmiles returned None for "{item}"',
+            )
+        return SMILES(item)
+
+
 @ApplicationsRegistry.register_algorithm_application(GuacaMolGenerator)
-class SMILESGAGenerator(AlgorithmConfiguration[str, str]):
+class SMILESGAGenerator(GuacaMolAbstractGenerator):
     """Configuration to generate optimizied molecules using SMILES Genetic algorithm"""
 
     algorithm_name: ClassVar[str] = GuacaMolGenerator.__name__
@@ -192,7 +219,7 @@ class SMILESGAGenerator(AlgorithmConfiguration[str, str]):
 
 
 @ApplicationsRegistry.register_algorithm_application(GuacaMolGenerator)
-class GraphGAGenerator(AlgorithmConfiguration[str, str]):
+class GraphGAGenerator(GuacaMolAbstractGenerator):
     """Configuration to generate optimizied molecules using Graph-Based Genetic algorithm"""
 
     algorithm_name: ClassVar[str] = GuacaMolGenerator.__name__
@@ -276,7 +303,7 @@ class GraphGAGenerator(AlgorithmConfiguration[str, str]):
 
 
 @ApplicationsRegistry.register_algorithm_application(GuacaMolGenerator)
-class GraphMCTSGenerator(AlgorithmConfiguration[str, str]):
+class GraphMCTSGenerator(GuacaMolAbstractGenerator):
     """Configuration to generate optimizied molecules using Graph-based Genetic Algorithm and Generative Model/Monte Carlo Tree Search for the Exploration of Chemical Space"""
 
     algorithm_name: ClassVar[str] = GuacaMolGenerator.__name__
@@ -362,7 +389,7 @@ class GraphMCTSGenerator(AlgorithmConfiguration[str, str]):
 
 
 @ApplicationsRegistry.register_algorithm_application(GuacaMolGenerator)
-class SMILESLSTMHCGenerator(AlgorithmConfiguration[str, str]):
+class SMILESLSTMHCGenerator(GuacaMolAbstractGenerator):
     """Configuration to generate optimized molecules using recurrent neural networks with hill climbing algorithm."""
 
     algorithm_name: ClassVar[str] = GuacaMolGenerator.__name__
@@ -475,7 +502,7 @@ class SMILESLSTMHCGenerator(AlgorithmConfiguration[str, str]):
 
 
 @ApplicationsRegistry.register_algorithm_application(GuacaMolGenerator)
-class SMILESLSTMPPOGenerator(AlgorithmConfiguration[str, str]):
+class SMILESLSTMPPOGenerator(GuacaMolAbstractGenerator):
     """Configuration to generate optimizied molecules using recurrent neural networks with hill climbing algorithm"""
 
     algorithm_name: ClassVar[str] = GuacaMolGenerator.__name__
@@ -628,7 +655,7 @@ class MosesGenerator(GeneratorAlgorithm[S, T]):
 
 
 @ApplicationsRegistry.register_algorithm_application(MosesGenerator)
-class AaeGenerator(AlgorithmConfiguration[str, str]):
+class AaeGenerator(GuacaMolAbstractGenerator):
     """Configuration to generate molecules using an adversarial autoencoder."""
 
     algorithm_name: ClassVar[str] = MosesGenerator.__name__
@@ -667,7 +694,7 @@ class AaeGenerator(AlgorithmConfiguration[str, str]):
 
 
 @ApplicationsRegistry.register_algorithm_application(MosesGenerator)
-class VaeGenerator(AlgorithmConfiguration[str, str]):
+class VaeGenerator(GuacaMolAbstractGenerator):
     """Configuration to generate molecules using a variational autoencoder."""
 
     algorithm_name: ClassVar[str] = MosesGenerator.__name__
@@ -729,7 +756,7 @@ class VaeGenerator(AlgorithmConfiguration[str, str]):
 
 
 @ApplicationsRegistry.register_algorithm_application(MosesGenerator)
-class OrganGenerator(AlgorithmConfiguration[str, str]):
+class OrganGenerator(GuacaMolAbstractGenerator):
     """Configuration to generate molecules using Objective-Reinforced Generative Adversarial Network"""
 
     algorithm_name: ClassVar[str] = MosesGenerator.__name__

@@ -84,6 +84,7 @@ template_config = {
         "seed": 0,
         "device": "cpu",
         "save_frequency": 1,
+        "warm_start": "",
     },
     "dataset_args": {"train_load": DATA_PATH, "val_load": DATA_PATH},
 }
