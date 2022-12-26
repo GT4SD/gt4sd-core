@@ -25,7 +25,7 @@
 import json
 import logging
 import os
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import numpy as np
 import torch
@@ -39,7 +39,7 @@ from transformers import AutoConfig, AutoModelWithLMHead, XLNetLMHeadModel
 
 from ....domains.materials import Sequence, validate_molecules
 from ....frameworks.torch import device_claim, map_tensor_dict
-from .utils import get_substructure_indices
+from .utils import filter_stubbed, get_substructure_indices
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -483,6 +483,7 @@ class ConditionalGenerator:
             )
             for seq in generations
         ]
+
         # Filter out all sequences that do not satisfy property constraints within
         # tolerance range.
         logger.debug(f"Sequences {sequences}, properties: {properties}")
@@ -991,6 +992,11 @@ class ChemicalLanguageRT(ConditionalGenerator):
         if self.sampling_wrapper == {}:
             return property_successes
 
+        # Remove samples with stub-like sequences (spuriously small)
+        property_successes = filter_stubbed(
+            property_successes, target=self.target, threshold=0.5
+        )
+
         successes: List[Tuple[str, str]] = []
 
         subs_mols = []
@@ -1021,7 +1027,8 @@ class ChemicalLanguageRT(ConditionalGenerator):
             if sane:
                 successes.append((smi, prop))
 
-        return tuple(successes)  # type: ignore
+        result = cast(Tuple[Tuple[str, str]], tuple(successes))
+        return result
 
 
 class ProteinLanguageRT(ConditionalGenerator):
