@@ -28,7 +28,7 @@ import os
 import shutil
 import tempfile
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from terminator.collators import TRAIN_COLLATORS
 from terminator.tokenization import ExpressionBertTokenizer

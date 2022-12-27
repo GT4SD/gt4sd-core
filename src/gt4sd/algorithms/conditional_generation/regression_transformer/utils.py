@@ -68,7 +68,7 @@ def filter_stubbed(
 
     seed = Chem.MolFromSmiles(target)
 
-    seed_atoms = len(list(seed.GetAtoms))
+    seed_atoms = len(list(seed.GetAtoms()))
     seed_bonds = seed.GetNumBonds()
 
     smis: List[str] = []
