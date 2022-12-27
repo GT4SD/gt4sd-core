@@ -28,7 +28,7 @@ import os
 import shutil
 import tempfile
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from terminator.collators import TRAIN_COLLATORS
 from terminator.tokenization import ExpressionBertTokenizer
@@ -139,12 +139,29 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
                 )
 
             # Initialize our Trainer
-            train_config = get_train_config_dict(training_args, self.properties)
+            train_config = get_train_config_dict(training_args, set(self.properties))
             os.makedirs(params["output_dir"], exist_ok=True)
             with open(
                 os.path.join(params["output_dir"], "training_config.json"), "w"
             ) as f:
                 json.dump(train_config, f, indent="\t")
+
+            # Create the inference.json
+            inference_dict = {
+                "property_token": self.properties,
+                "example": self.example_sample,
+                "property_ranges": {
+                    p.name: [p.minimum, p.maximum]
+                    for p in self.property_objects.values()
+                },
+                "normalize": [False] * len(self.properties),  # True not supported atm
+                "max_span_length": training_args["max_span_length"],
+                "property_mask_length": {
+                    p.name: p.mask_length for p in self.property_objects.values()
+                },
+            }
+            with open(os.path.join(params["output_dir"], "inference.json"), "w") as f:
+                json.dump(inference_dict, f, indent="\t")
 
             custom_trainer_params = get_trainer_dict(self.model_params)
             hf_train_object = get_hf_training_arg_object(training_args)
@@ -267,7 +284,6 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
         self,
         train_data_path: str,
         test_data_path: str,
-        line_by_line: Optional[bool],
         augment: int = 0,
         save_datasets: bool = False,
         *args,
@@ -282,10 +298,12 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
                 at least one column of numerical properties.
             train_data_path: Path to `.csv` file. Has to have a `text` column and
                 at least one column of numerical properties.
-            line_by_line: Whether the data can be read line-by-line from disk.
             augment: How many times each training sample is augmented.
             save_datasets: Whether to save the datasets to disk (will be stored in
                 same location as `train_data_path` and `test_data_path`).
+
+        Returns:
+            A tuple of train and test dataset.
         """
 
         logger.info("Preparing/reading data...")
@@ -293,7 +311,9 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
         tokenizer, properties, train_data, test_data = prepare_datasets_from_files(
             self.tokenizer, train_data_path, test_data_path, augment=augment
         )
-        self.tokenizer, self.properties = tokenizer, properties
+        self.tokenizer, self.property_objects = tokenizer, properties
+        self.properties = list(properties.keys())
+        self.example_sample = train_data[0]
 
         train_dataset = self.create_dataset_from_list(
             train_data,
@@ -306,7 +326,7 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
             save_path=test_data_path.replace(".csv", ".txt") if save_datasets else None,
         )
         logger.info("Finished data setup.")
-        return [train_dataset, test_dataset]
+        return train_dataset, test_dataset
 
     def create_dataset_from_list(
         self, data: List[str], save_path: Optional[str] = None
@@ -318,6 +338,8 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
             data: List of strings with the samples.
             save_path: Path to save the dataset to. Defaults to None, meaning
                 the dataset will not be saved.
+        Returns:
+            The dataset.
         """
         # Write files to temporary location and create data
         with tempfile.TemporaryDirectory() as temp:

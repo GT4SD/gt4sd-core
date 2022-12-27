@@ -154,13 +154,6 @@ class RegressionTransformerDataArguments(TrainingPipelineArguments):
             "meaning no augmentation. "
         },
     )
-
-    line_by_line: Optional[bool] = field(
-        default=True,
-        metadata={
-            "help": "Whether lines of text in the dataset are to be handled as distinct samples."
-        },
-    )
     save_datasets: Optional[bool] = field(
         default=False,
         metadata={
@@ -178,4 +171,12 @@ class RegressionTransformerSavingArguments(TrainingPipelineArguments):
 
     model_path: str = field(
         metadata={"help": "Path where the model artifacts are stored."}
+    )
+    checkpoint_name: str = field(
+        default=str(),
+        metadata={
+            "help": "Name for the checkpoint that should be copied to inference model. "
+            "Has to be a subfolder of `model_path`. Defaults to empty string meaning that "
+            "files are taken from `model_path` (i.e., after training finished)."
+        },
     )
