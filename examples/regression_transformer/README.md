@@ -32,6 +32,12 @@ algorithm = ApplicationsRegistry.get_application_instance(
 Consider replacing `algorithm_version='qed'`, dependent on which model you want to finetune.
 
 
+After completing the training, *save* the RT model in a gt4sd-compatible manner (to later run `gt4sd-inference` on it):
+
+```console
+gt4sd-saving --training_pipeline_name regression-transformer-trainer --model_path dummy_regression_transformer --train_data_path src/gt4sd/training_pipelines/tests/regression_transformer_raw.csv --test_data_path src/gt4sd/training_pipelines/tests/regression_transformer_raw.csv --eval_steps 2 --augment 10 --eval_accumulation_steps 1 --num_train_epochs 10 --training_name fast-example --target_version fast-example-v0 --algorithm_application RegressionTransformerMolecules --checkpoint_name checkpoint-final
+```
+
 For details on this methodology see:
 
 ```bib
