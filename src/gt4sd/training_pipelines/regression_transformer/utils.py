@@ -23,6 +23,7 @@
 #
 import inspect
 import logging
+from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -46,9 +47,45 @@ AUGMENT_FACTORY = {
 }
 
 
+class Property:
+    name: str
+    minimum: float = 0
+    maximum: float = 0
+    expression_separator: str = "|"
+    normalize: bool = False
+
+    def __init__(self, name: str):
+        self.name = name
+        self.mask_lengths: List = []
+
+    def update(self, line: str):
+        prop = line.split(self.name)[-1].split(self.expression_separator)[0]
+        try:
+            val = float(prop)
+        except ValueError:
+            logger.error(f"Could not convert property {prop} in {line} to float.")
+        if val < self.minimum:
+            self.minimum = val
+        elif val > self.maximum:
+            self.maximum = val
+        self.mask_lengths.append(len(prop))
+
+    @property
+    def mask_length(self) -> int:
+        """
+        How many tokens are being masked for this property.
+        """
+        counts = Counter(self.mask_lengths)
+        if len(counts) > 1:
+            logger.warning(
+                f"Not all {self.name} properties have same number of tokens: {counts}"
+            )
+        return int(counts.most_common(1)[0][0])
+
+
 def add_tokens_from_lists(
     tokenizer: ExpressionBertTokenizer, train_data: List[str], test_data: List[str]
-) -> Tuple[ExpressionBertTokenizer, Set, List[str], List[str]]:
+) -> Tuple[ExpressionBertTokenizer, Dict[str, Property], List[str], List[str]]:
     """
     Addding tokens to a tokenizer from parsed datasets hold in memory.
 
@@ -60,15 +97,15 @@ def add_tokens_from_lists(
     Returns:
        Tuple with:
             tokenizer with updated vocabulary.
-            set of property tokens.
+            dictionary of property names and full property objects.
             list of strings with training samples.
             list of strings with testing samples.
     """
     num_tokens = len(tokenizer)
-    properties: Set = set()
+    properties: Dict[str, Property] = {}
     all_tokens: Set = set()
     for data in [train_data, test_data]:
-        for i, line in enumerate(data):
+        for line in data:
             # Grow the set of all tokens in the dataset
             toks = tokenizer.tokenize(line)
             all_tokens = all_tokens.union(toks)
@@ -77,7 +114,10 @@ def add_tokens_from_lists(
                 x.split(">")[0] + ">"
                 for x in line.split(tokenizer.expression_separator)[:-1]
             ]
-            properties = properties.union(props)
+            for prop in props:
+                if prop not in properties.keys():
+                    properties[prop] = Property(prop)
+                properties[prop].update(line)
 
     # Finish adding new tokens
     tokenizer.add_tokens(list(all_tokens))
@@ -92,7 +132,7 @@ def prepare_datasets_from_files(
     train_path: str,
     test_path: str,
     augment: int = 0,
-) -> Tuple[ExpressionBertTokenizer, Set, List[str], List[str]]:
+) -> Tuple[ExpressionBertTokenizer, Dict[str, Property], List[str], List[str]]:
     """
     Converts datasets saved in provided `.csv` paths into RT-compatible datasets.
     NOTE: Also adds the new tokens from train/test data to provided tokenizer.
@@ -106,7 +146,7 @@ def prepare_datasets_from_files(
     Returns:
        Tuple with:
             tokenizer with updated vocabulary.
-            set of property tokens.
+            dict of property names and property objects.
             list of strings with training samples.
             list of strings with testing samples.
     """

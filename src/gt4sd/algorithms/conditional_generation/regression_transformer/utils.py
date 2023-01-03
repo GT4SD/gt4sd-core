@@ -21,7 +21,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import List
+from typing import List, Tuple, cast
+
+from rdkit import Chem
 
 
 def get_substructure_indices(
@@ -44,3 +46,44 @@ def get_substructure_indices(
             if full_sequence[i : i + len(substructure)] == substructure:
                 substructure_indices.extend(range(i, i + len(substructure)))
     return substructure_indices
+
+
+def filter_stubbed(
+    property_sequences: Tuple[Tuple[str, str]], target: str, threshold: float = 0.5
+) -> Tuple[Tuple[str, str]]:
+    """
+    Remove stub-like molecules that are substantially smaller than the target.
+
+    Args:
+        sequences: List of generated molecules.
+        properties: Properties of the molecules. Only used to be returned after filtering.
+        target: Seed molecule.
+        threshold: Fraction of size of generated molecule compared to seed
+            determining the threshold under which molecules are discarded.
+            Defaults to 0.5.
+
+    Returns:
+        Tuple of tuples of length 2 with filtered, generated molecule and its properties.
+    """
+
+    seed = Chem.MolFromSmiles(target)
+
+    seed_atoms = len(list(seed.GetAtoms()))
+    seed_bonds = seed.GetNumBonds()
+
+    smis: List[str] = []
+    props: List[str] = []
+    for smi, prop in property_sequences:
+        mol = Chem.MolFromSmiles(smi)
+
+        num_atoms = len(list(mol.GetAtoms()))
+        num_bonds = mol.GetNumBonds()
+
+        if num_atoms > (threshold * seed_atoms) and num_bonds > (
+            threshold * seed_bonds
+        ):
+            smis.append(smi)
+            props.append(prop)
+
+    successes = cast(Tuple[Tuple[str, str]], tuple(zip(smis, props)))
+    return successes

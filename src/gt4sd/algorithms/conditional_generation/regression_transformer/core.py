@@ -27,6 +27,7 @@ RegressionTransformer is a mutlitask regression and conditional generation model
 """
 
 import logging
+import os
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar, Union
 
@@ -35,6 +36,10 @@ from typing_extensions import Protocol, runtime_checkable
 from ....domains.materials import Molecule, Sequence
 from ....exceptions import InvalidItem
 from ....properties.core import PropertyValue
+from ....training_pipelines.core import TrainingPipelineArguments
+from ....training_pipelines.regression_transformer.core import (
+    RegressionTransformerSavingArguments,
+)
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
 from .implementation import ChemicalLanguageRT, ConditionalGenerator, ProteinLanguageRT
@@ -301,6 +306,41 @@ class RegressionTransformerMolecules(AlgorithmConfiguration[Sequence, Sequence])
                 detail = f'"{item}" is not a valid floating point number'
             raise InvalidItem(title=title, detail=detail)
         return item
+
+    @classmethod
+    def get_filepath_mappings_for_training_pipeline_arguments(
+        cls, training_pipeline_arguments: TrainingPipelineArguments
+    ) -> Dict[str, str]:
+        """Get filepath mappings for the given training pipeline arguments.
+        Args:
+            training_pipeline_arguments: training pipeline arguments.
+        Returns:
+            a mapping between artifacts' files and training pipeline's output files.
+        """
+        if isinstance(
+            training_pipeline_arguments, RegressionTransformerSavingArguments
+        ):
+            training_path = os.path.abspath(training_pipeline_arguments.model_path)
+            if training_pipeline_arguments.checkpoint_name:
+                model_path = os.path.join(
+                    training_path, training_pipeline_arguments.checkpoint_name
+                )
+            else:
+                model_path = training_path
+
+            names = ["pytorch_model.bin", "config.json", "vocab.txt"]
+            names.extend(["special_tokens_map.json", "tokenizer_config.json"])
+
+            mapper = {name: os.path.join(model_path, name) for name in names}
+
+            # Inference file is only saved once in root training folder
+            mapper["inference.json"] = os.path.join(training_path, "inference.json")
+            return mapper
+
+        else:
+            return super().get_filepath_mappings_for_training_pipeline_arguments(
+                training_pipeline_arguments
+            )
 
 
 @ApplicationsRegistry.register_algorithm_application(RegressionTransformer)
