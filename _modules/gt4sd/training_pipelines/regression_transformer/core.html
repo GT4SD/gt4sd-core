@@ -205,7 +205,7 @@
 <span class="k">class</span> <span class="nc">RegressionTransformerTrainingArguments</span><span class="p">(</span>
     <span class="n">TrainingPipelineArguments</span><span class="p">,</span> <span class="n">TransformersTrainingArgumentsCLI</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Arguments related to RegressionTransformer trainer.</span>
 <span class="sd">    NOTE: All arguments from `transformers.training_args.TrainingArguments` can be used.</span>
 <span class="sd">    Only additional ones are specified below.</span>
@@ -292,7 +292,7 @@
 
 <div class="viewcode-block" id="RegressionTransformerDataArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.core.html#gt4sd.training_pipelines.regression_transformer.core.RegressionTransformerDataArguments">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">RegressionTransformerDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Arguments related to RegressionTransformer data loading.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Arguments related to RegressionTransformer data loading.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;dataset_args&quot;</span>
 
@@ -319,13 +319,6 @@
             <span class="s2">&quot;meaning no augmentation. &quot;</span>
         <span class="p">},</span>
     <span class="p">)</span>
-
-    <span class="n">line_by_line</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether lines of text in the dataset are to be handled as distinct samples.&quot;</span>
-        <span class="p">},</span>
-    <span class="p">)</span>
     <span class="n">save_datasets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
@@ -337,12 +330,20 @@
 
 <div class="viewcode-block" id="RegressionTransformerSavingArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.core.html#gt4sd.training_pipelines.regression_transformer.core.RegressionTransformerSavingArguments">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">RegressionTransformerSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Saving arguments related to RegressionTransformer trainer.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Saving arguments related to RegressionTransformer trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_args&quot;</span>
 
     <span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path where the model artifacts are stored.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">checkpoint_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">(),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Name for the checkpoint that should be copied to inference model. &quot;</span>
+            <span class="s2">&quot;Has to be a subfolder of `model_path`. Defaults to empty string meaning that &quot;</span>
+            <span class="s2">&quot;files are taken from `model_path` (i.e., after training finished).&quot;</span>
+        <span class="p">},</span>
     <span class="p">)</span></div>
 </pre></div>
 

@@ -184,13 +184,15 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
 
 
 <div class="viewcode-block" id="get_substructure_indices"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.utils.html#gt4sd.algorithms.conditional_generation.regression_transformer.utils.get_substructure_indices">[docs]</a><span class="k">def</span> <span class="nf">get_substructure_indices</span><span class="p">(</span>
     <span class="n">full_sequence</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">substructure</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        full_sequence: A list of strings, each representing a token from the full sequence</span>
 <span class="sd">        substructure: A list of strings, each representing a token from the substructure that</span>
@@ -207,6 +209,47 @@
             <span class="k">if</span> <span class="n">full_sequence</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">substructure</span><span class="p">)]</span> <span class="o">==</span> <span class="n">substructure</span><span class="p">:</span>
                 <span class="n">substructure_indices</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">substructure</span><span class="p">)))</span>
     <span class="k">return</span> <span class="n">substructure_indices</span></div>
+
+
+<div class="viewcode-block" id="filter_stubbed"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.utils.html#gt4sd.algorithms.conditional_generation.regression_transformer.utils.filter_stubbed">[docs]</a><span class="k">def</span> <span class="nf">filter_stubbed</span><span class="p">(</span>
+    <span class="n">property_sequences</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove stub-like molecules that are substantially smaller than the target.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sequences: List of generated molecules.</span>
+<span class="sd">        properties: Properties of the molecules. Only used to be returned after filtering.</span>
+<span class="sd">        target: Seed molecule.</span>
+<span class="sd">        threshold: Fraction of size of generated molecule compared to seed</span>
+<span class="sd">            determining the threshold under which molecules are discarded.</span>
+<span class="sd">            Defaults to 0.5.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple of tuples of length 2 with filtered, generated molecule and its properties.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+    <span class="n">seed_atoms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">seed</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()))</span>
+    <span class="n">seed_bonds</span> <span class="o">=</span> <span class="n">seed</span><span class="o">.</span><span class="n">GetNumBonds</span><span class="p">()</span>
+
+    <span class="n">smis</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">props</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">smi</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">property_sequences</span><span class="p">:</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smi</span><span class="p">)</span>
+
+        <span class="n">num_atoms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()))</span>
+        <span class="n">num_bonds</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumBonds</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">num_atoms</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">threshold</span> <span class="o">*</span> <span class="n">seed_atoms</span><span class="p">)</span> <span class="ow">and</span> <span class="n">num_bonds</span> <span class="o">&gt;</span> <span class="p">(</span>
+            <span class="n">threshold</span> <span class="o">*</span> <span class="n">seed_bonds</span>
+        <span class="p">):</span>
+            <span class="n">smis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">smi</span><span class="p">)</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+
+    <span class="n">successes</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">smis</span><span class="p">,</span> <span class="n">props</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">successes</span></div>
 </pre></div>
 
            </div>

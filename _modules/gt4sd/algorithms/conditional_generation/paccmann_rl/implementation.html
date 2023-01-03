@@ -211,7 +211,7 @@
 
 
 <div class="viewcode-block" id="ConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator">[docs]</a><span class="k">class</span> <span class="nc">ConditionalGenerator</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Abstract interface for a conditional generator.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract interface for a conditional generator.&quot;&quot;&quot;</span>
 
     <span class="c1">#: device where the inference is running.</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span>
@@ -231,7 +231,7 @@
     <span class="n">encoder_latent_size</span><span class="p">:</span> <span class="nb">int</span>
 
 <div class="viewcode-block" id="ConditionalGenerator.get_smiles_from_latent"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.get_smiles_from_latent">[docs]</a>    <span class="k">def</span> <span class="nf">get_smiles_from_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latent</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Take samples from the latent space.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Take samples from the latent space.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            latent: latent vector tensor.</span>
@@ -278,7 +278,7 @@
 
 <div class="viewcode-block" id="ConditionalGenerator.generate_valid"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.generate_valid">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">generate_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">number_of_molecules</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a given number of samples (molecules) from a given condition.</span>
 
 <span class="sd">        Args:</span>
@@ -313,7 +313,7 @@
 
 
 <div class="viewcode-block" id="ProteinSequenceConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ProteinSequenceConditionalGenerator">[docs]</a><span class="k">class</span> <span class="nc">ProteinSequenceConditionalGenerator</span><span class="p">(</span><span class="n">ConditionalGenerator</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Protein conditional generator as implemented in https://doi.org/10.1088/2632-2153/abe808</span>
 <span class="sd">    (originally https://arxiv.org/abs/2005.13285).</span>
 <span class="sd">    It generates highly binding and low toxic ligands.</span>
@@ -333,7 +333,7 @@
         <span class="n">samples_per_protein</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the generator.</span>
 
 <span class="sd">        Args:</span>
@@ -394,7 +394,7 @@
         <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ProteinSequenceConditionalGenerator.get_latent"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ProteinSequenceConditionalGenerator.get_latent">[docs]</a>    <span class="k">def</span> <span class="nf">get_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a protein generate the latent representation.</span>
 
 <span class="sd">        Args:</span>
@@ -417,7 +417,7 @@
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">reparameterize</span><span class="p">(</span><span class="n">proteins_mu</span><span class="p">,</span> <span class="n">proteins_logvar</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ProteinSequenceConditionalGenerator.generate_valid"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ProteinSequenceConditionalGenerator.generate_valid">[docs]</a>    <span class="k">def</span> <span class="nf">generate_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">number_of_molecules</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a given number of samples (molecules) from a given protein.</span>
 
 <span class="sd">        Args:</span>
@@ -436,7 +436,7 @@
 
 
 <div class="viewcode-block" id="TranscriptomicConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.TranscriptomicConditionalGenerator">[docs]</a><span class="k">class</span> <span class="nc">TranscriptomicConditionalGenerator</span><span class="p">(</span><span class="n">ConditionalGenerator</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Transcriptomic conditional generator as implemented in https://doi.org/10.1016/j.isci.2021.102269</span>
 <span class="sd">    (originally https://doi.org/10.1007/978-3-030-45257-5_18, https://arxiv.org/abs/1909.05114).</span>
 <span class="sd">    It generates highly effective small molecules against transcriptomic progiles.</span>
@@ -456,7 +456,7 @@
         <span class="n">samples_per_profile</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the generator.</span>
 
 <span class="sd">        Args:</span>
@@ -512,7 +512,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TranscriptomicConditionalGenerator.get_latent"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.TranscriptomicConditionalGenerator.get_latent">[docs]</a>    <span class="k">def</span> <span class="nf">get_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a profile generate the latent representation.</span>
 
 <span class="sd">        Args:</span>
@@ -551,7 +551,7 @@
 <div class="viewcode-block" id="TranscriptomicConditionalGenerator.generate_valid"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.TranscriptomicConditionalGenerator.generate_valid">[docs]</a>    <span class="k">def</span> <span class="nf">generate_valid</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span> <span class="n">number_of_molecules</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a given number of samples (molecules) from a given transcriptomic profile.</span>
 
 <span class="sd">        Args:</span>

@@ -219,7 +219,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.conditional_generation.regression_transformer.utils.get_substructure_indices" title="gt4sd.algorithms.conditional_generation.regression_transformer.utils.get_substructure_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_substructure_indices</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gt4sd.algorithms.conditional_generation.regression_transformer.utils.filter_stubbed" title="gt4sd.algorithms.conditional_generation.regression_transformer.utils.filter_stubbed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_stubbed</span></code></a></p></td>
+<td><p>Remove stub-like molecules that are substantially smaller than the target.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gt4sd.algorithms.conditional_generation.regression_transformer.utils.get_substructure_indices" title="gt4sd.algorithms.conditional_generation.regression_transformer.utils.get_substructure_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_substructure_indices</span></code></a></p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">type full_sequence</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
@@ -249,6 +252,30 @@ is contained in the full sequence.</p></li>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A list of integers, corresponding to all the indices of the tokens in the full sequence
 that match the substructure.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gt4sd.algorithms.conditional_generation.regression_transformer.utils.filter_stubbed">
+<code class="sig-name descname">filter_stubbed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">property_sequences</span></em>, <em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">threshold</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gt4sd/algorithms/conditional_generation/regression_transformer/utils.html#filter_stubbed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gt4sd.algorithms.conditional_generation.regression_transformer.utils.filter_stubbed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove stub-like molecules that are substantially smaller than the target.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequences</strong> – List of generated molecules.</p></li>
+<li><p><strong>properties</strong> – Properties of the molecules. Only used to be returned after filtering.</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Seed molecule.</p></li>
+<li><p><strong>threshold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Fraction of size of generated molecule compared to seed
+determining the threshold under which molecules are discarded.
+Defaults to 0.5.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Tuple of tuples of length 2 with filtered, generated molecule and its properties.</p>
 </dd>
 </dl>
 </dd></dl>

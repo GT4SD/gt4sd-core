@@ -223,7 +223,7 @@
 
 
 <div class="viewcode-block" id="RegressionTransformerTrainingPipeline"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">RegressionTransformerTrainingPipeline</span><span class="p">(</span><span class="n">TrainingPipeline</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;RegressionTransformer training pipeline.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;RegressionTransformer training pipeline.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="RegressionTransformerTrainingPipeline.train"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -231,7 +231,7 @@
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Generic training function for training a Regression Transformer (RT) model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generic training function for training a Regression Transformer (RT) model.</span>
 <span class="sd">           For details see:</span>
 <span class="sd">            Born, J., &amp; Manica, M. (2022). Regression Transformer: Concurrent Conditional</span>
 <span class="sd">            Generation and Regression by Blending Numerical and Textual Tokens.</span>
@@ -304,12 +304,29 @@
                 <span class="p">)</span>
 
             <span class="c1"># Initialize our Trainer</span>
-            <span class="n">train_config</span> <span class="o">=</span> <span class="n">get_train_config_dict</span><span class="p">(</span><span class="n">training_args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span>
+            <span class="n">train_config</span> <span class="o">=</span> <span class="n">get_train_config_dict</span><span class="p">(</span><span class="n">training_args</span><span class="p">,</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">))</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">],</span> <span class="s2">&quot;training_config.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span>
             <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">train_config</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Create the inference.json</span>
+            <span class="n">inference_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;property_token&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
+                <span class="s2">&quot;example&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">example_sample</span><span class="p">,</span>
+                <span class="s2">&quot;property_ranges&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">maximum</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_objects</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;normalize&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">),</span>  <span class="c1"># True not supported atm</span>
+                <span class="s2">&quot;max_span_length&quot;</span><span class="p">:</span> <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;max_span_length&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;property_mask_length&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">mask_length</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_objects</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">],</span> <span class="s2">&quot;inference.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">inference_dict</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="n">custom_trainer_params</span> <span class="o">=</span> <span class="n">get_trainer_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_params</span><span class="p">)</span>
             <span class="n">hf_train_object</span> <span class="o">=</span> <span class="n">get_hf_training_arg_object</span><span class="p">(</span><span class="n">training_args</span><span class="p">)</span>
@@ -335,7 +352,7 @@
             <span class="p">)</span></div>
 
 <div class="viewcode-block" id="RegressionTransformerTrainingPipeline.setup_model"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.setup_model">[docs]</a>    <span class="k">def</span> <span class="nf">setup_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Error handling and training setup routine.</span>
 
 <span class="sd">        Args:</span>
@@ -432,13 +449,12 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">train_data_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">test_data_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">line_by_line</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>
         <span class="n">augment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">save_datasets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs the dataset objects.</span>
 
 
@@ -447,10 +463,12 @@
 <span class="sd">                at least one column of numerical properties.</span>
 <span class="sd">            train_data_path: Path to `.csv` file. Has to have a `text` column and</span>
 <span class="sd">                at least one column of numerical properties.</span>
-<span class="sd">            line_by_line: Whether the data can be read line-by-line from disk.</span>
 <span class="sd">            augment: How many times each training sample is augmented.</span>
 <span class="sd">            save_datasets: Whether to save the datasets to disk (will be stored in</span>
 <span class="sd">                same location as `train_data_path` and `test_data_path`).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of train and test dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preparing/reading data...&quot;</span><span class="p">)</span>
@@ -458,7 +476,9 @@
         <span class="n">tokenizer</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span> <span class="o">=</span> <span class="n">prepare_datasets_from_files</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">train_data_path</span><span class="p">,</span> <span class="n">test_data_path</span><span class="p">,</span> <span class="n">augment</span><span class="o">=</span><span class="n">augment</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">properties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">property_objects</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">properties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">properties</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">example_sample</span> <span class="o">=</span> <span class="n">train_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">train_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset_from_list</span><span class="p">(</span>
             <span class="n">train_data</span><span class="p">,</span>
@@ -471,18 +491,20 @@
             <span class="n">save_path</span><span class="o">=</span><span class="n">test_data_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.txt&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">save_datasets</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished data setup.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span></div>
 
 <div class="viewcode-block" id="RegressionTransformerTrainingPipeline.create_dataset_from_list"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerTrainingPipeline.create_dataset_from_list">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset_from_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LineByLineTextDataset</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a LineByLineTextDataset from a List of strings.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            data: List of strings with the samples.</span>
 <span class="sd">            save_path: Path to save the dataset to. Defaults to None, meaning</span>
 <span class="sd">                the dataset will not be saved.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Write files to temporary location and create data</span>
         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp</span><span class="p">:</span>
@@ -504,7 +526,7 @@
 
 <div class="viewcode-block" id="RegressionTransformerModelArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.implementation.html#gt4sd.training_pipelines.regression_transformer.implementation.RegressionTransformerModelArguments">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">RegressionTransformerModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Arguments pertaining to model instantiation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Arguments pertaining to model instantiation.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>
 

@@ -190,6 +190,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -198,6 +199,10 @@
 <span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">....exceptions</span> <span class="kn">import</span> <span class="n">InvalidItem</span>
 <span class="kn">from</span> <span class="nn">....properties.core</span> <span class="kn">import</span> <span class="n">PropertyValue</span>
+<span class="kn">from</span> <span class="nn">....training_pipelines.core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span> <span class="nn">....training_pipelines.regression_transformer.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">RegressionTransformerSavingArguments</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">GeneratorAlgorithm</span>
 <span class="kn">from</span> <span class="nn">...registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
 <span class="kn">from</span> <span class="nn">.implementation</span> <span class="kn">import</span> <span class="n">ChemicalLanguageRT</span><span class="p">,</span> <span class="n">ConditionalGenerator</span><span class="p">,</span> <span class="n">ProteinLanguageRT</span>
@@ -211,7 +216,7 @@
 
 
 <div class="viewcode-block" id="RegressionTransformer"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformer">[docs]</a><span class="k">class</span> <span class="nc">RegressionTransformer</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;RegressionTransformer Algorithm.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;RegressionTransformer Algorithm.&quot;&quot;&quot;</span>
 
     <span class="c1">#: The maximum number of samples a user can try to run in one go</span>
     <span class="n">max_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span>
@@ -221,7 +226,7 @@
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Instantiate Regression Transformer ready to generate items.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate Regression Transformer ready to generate items.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            configuration: domain and application</span>
@@ -253,7 +258,7 @@
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Targeted</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Get the function to sample with the given configuration.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the function to sample with the given configuration.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            configuration: helps to set up specific application of PaccMannRL.</span>
@@ -280,7 +285,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
         <span class="nd">@runtime_checkable</span>
         <span class="k">class</span> <span class="nc">AnyRegressionTransformerConfiguration</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;Protocol for RegressionTransformer configurations.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Protocol for RegressionTransformer configurations.&quot;&quot;&quot;</span>
 
             <span class="k">def</span> <span class="nf">get_conditional_generator</span><span class="p">(</span>
                 <span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span>
@@ -298,7 +303,7 @@
 
 <div class="viewcode-block" id="RegressionTransformerMolecules"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerMolecules">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">RegressionTransformer</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">RegressionTransformerMolecules</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">Sequence</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Configuration to generate molecules given a continuous property target and a molecular sub-structure.</span>
 
 <span class="sd">    Implementation from the paper: https://arxiv.org/abs/2202.01338.</span>
@@ -404,7 +409,7 @@
     <span class="p">)</span>
 
 <div class="viewcode-block" id="RegressionTransformerMolecules.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerMolecules.get_target_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            target description.</span>
@@ -421,7 +426,7 @@
 <div class="viewcode-block" id="RegressionTransformerMolecules.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerMolecules.get_conditional_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_conditional_generator</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChemicalLanguageRT</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: local path to model files.</span>
@@ -441,7 +446,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span></div>
 
 <div class="viewcode-block" id="RegressionTransformerMolecules.validate_item"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerMolecules.validate_item">[docs]</a>    <span class="k">def</span> <span class="nf">validate_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
-        <span class="sd">&quot;&quot;&quot;Check that item is a valid sequence.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that item is a valid sequence.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            item: a generated item that is possibly not valid.</span>
@@ -463,12 +468,47 @@
                 <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;InvalidNumerical&quot;</span>
                 <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1">&quot; is not a valid floating point number&#39;</span>
             <span class="k">raise</span> <span class="n">InvalidItem</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">item</span></div></div>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="RegressionTransformerMolecules.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerMolecules.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get filepath mappings for the given training pipeline arguments.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            a mapping between artifacts&#39; files and training pipeline&#39;s output files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">RegressionTransformerSavingArguments</span>
+        <span class="p">):</span>
+            <span class="n">training_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">checkpoint_name</span><span class="p">:</span>
+                <span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">training_path</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">checkpoint_name</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">model_path</span> <span class="o">=</span> <span class="n">training_path</span>
+
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pytorch_model.bin&quot;</span><span class="p">,</span> <span class="s2">&quot;config.json&quot;</span><span class="p">,</span> <span class="s2">&quot;vocab.txt&quot;</span><span class="p">]</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;special_tokens_map.json&quot;</span><span class="p">,</span> <span class="s2">&quot;tokenizer_config.json&quot;</span><span class="p">])</span>
+
+            <span class="n">mapper</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">}</span>
+
+            <span class="c1"># Inference file is only saved once in root training folder</span>
+            <span class="n">mapper</span><span class="p">[</span><span class="s2">&quot;inference.json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">training_path</span><span class="p">,</span> <span class="s2">&quot;inference.json&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">mapper</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+                <span class="n">training_pipeline_arguments</span>
+            <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="RegressionTransformerProteins"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerProteins">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">RegressionTransformer</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">RegressionTransformerProteins</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">Sequence</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Configuration to generate protein given a continuous property target and a partial AAs.</span>
 
 <span class="sd">    Implementation from the paper: https://arxiv.org/abs/2202.01338. It can also predict the property given a full sequence.</span>
@@ -556,7 +596,7 @@
     <span class="p">)</span>
 
 <div class="viewcode-block" id="RegressionTransformerProteins.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerProteins.get_target_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            target description.</span>
@@ -570,7 +610,7 @@
 <div class="viewcode-block" id="RegressionTransformerProteins.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerProteins.get_conditional_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_conditional_generator</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ProteinLanguageRT</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: local path to model files.</span>
@@ -592,7 +632,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span></div>
 
 <div class="viewcode-block" id="RegressionTransformerProteins.validate_item"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.core.html#gt4sd.algorithms.conditional_generation.regression_transformer.core.RegressionTransformerProteins.validate_item">[docs]</a>    <span class="k">def</span> <span class="nf">validate_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
-        <span class="sd">&quot;&quot;&quot;Check that item is a valid sequence.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that item is a valid sequence.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            item: a generated item that is possibly not valid.</span>

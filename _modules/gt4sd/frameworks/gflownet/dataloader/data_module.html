@@ -209,7 +209,7 @@
 
 
 <div class="viewcode-block" id="GFlowNetDataModule"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.data_module.html#gt4sd.frameworks.gflownet.dataloader.data_module.GFlowNetDataModule">[docs]</a><span class="k">class</span> <span class="nc">GFlowNetDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Data module from gflownet.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Data module from gflownet.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="GFlowNetDataModule.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.data_module.html#gt4sd.frameworks.gflownet.dataloader.data_module.GFlowNetDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -221,7 +221,7 @@
         <span class="n">algorithm</span><span class="p">:</span> <span class="n">TrajectoryBalance</span><span class="p">,</span>
         <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Construct GFlowNetDataModule.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct GFlowNetDataModule.</span>
 
 <span class="sd">        The module assumes a model and algorithm factory/registry.</span>
 <span class="sd">        The user should provide a dataset, environment, context for the environment, and task.</span>
@@ -261,13 +261,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mb_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hps</span><span class="p">[</span><span class="s2">&quot;global_batch_size&quot;</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="GFlowNetDataModule.prepare_data"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.data_module.html#gt4sd.frameworks.gflownet.dataloader.data_module.GFlowNetDataModule.prepare_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Prepare training and test dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare training and test dataset.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span></div>
 
 <div class="viewcode-block" id="GFlowNetDataModule.setup"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.data_module.html#gt4sd.frameworks.gflownet.dataloader.data_module.GFlowNetDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># type:ignore</span>
-        <span class="sd">&quot;&quot;&quot;Setup the data module.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup the data module.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            stage: stage considered. Defaults to None.</span>
@@ -295,11 +295,11 @@
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;number of data points used for testing: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;testing proportion: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;testing proportion: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GFlowNetDataModule.train_dataloader"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.data_module.html#gt4sd.frameworks.gflownet.dataloader.data_module.GFlowNetDataModule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Get a data loader for training.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a data loader for training.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            a training data loader.</span>
@@ -327,7 +327,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GFlowNetDataModule.val_dataloader"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.data_module.html#gt4sd.frameworks.gflownet.dataloader.data_module.GFlowNetDataModule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Get a data loader for validation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a data loader for validation.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            a validation data loader.</span>
@@ -357,7 +357,7 @@
         <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Get a data loader for testing.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a data loader for testing.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            a testing data loader.</span>
@@ -370,7 +370,7 @@
         <span class="p">)</span>
 
 <div class="viewcode-block" id="GFlowNetDataModule.predict_dataloader"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.data_module.html#gt4sd.frameworks.gflownet.dataloader.data_module.GFlowNetDataModule.predict_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">predict_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Get a data loader for prediction.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a data loader for prediction.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            a prediction data loader.</span>
