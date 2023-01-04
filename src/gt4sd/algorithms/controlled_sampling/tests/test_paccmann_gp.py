@@ -38,6 +38,7 @@ TARGET = {
     "qed": {"weight": 1.0},
     "molwt": {"target": 200},
     "sa": {"weight": 2.0},
+    "callable": {"evaluator": lambda x: 1.0},
     "affinity": {"protein": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT"},
 }
 PARAMETERS = {
