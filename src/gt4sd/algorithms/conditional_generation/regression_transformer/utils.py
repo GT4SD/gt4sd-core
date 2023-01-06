@@ -58,9 +58,8 @@ def filter_stubbed(
         sequences: List of generated molecules.
         properties: Properties of the molecules. Only used to be returned after filtering.
         target: Seed molecule.
-        threshold: Fraction of size of generated molecule compared to seed
-            determining the threshold under which molecules are discarded.
-            Defaults to 0.5.
+        threshold: Fraction of size of generated molecule compared to seed determining the
+            threshold under which molecules are discarded. Defaults to 0.5.
 
     Returns:
         Tuple of tuples of length 2 with filtered, generated molecule and its properties.
@@ -74,7 +73,10 @@ def filter_stubbed(
     smis: List[str] = []
     props: List[str] = []
     for smi, prop in property_sequences:
-        mol = Chem.MolFromSmiles(smi)
+        try:
+            mol = Chem.MolFromSmiles(smi)
+        except Exception:
+            continue
 
         num_atoms = len(list(mol.GetAtoms()))
         num_bonds = mol.GetNumBonds()
