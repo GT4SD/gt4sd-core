@@ -21,33 +21,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""CLaSS tests."""
+"""PaccMannVAE tests."""
 
 from typing import ClassVar, Type
 
 import pytest
 
-from gt4sd.algorithms.controlled_sampling.paccmann_gp import (
-    PaccMannGP,
-    PaccMannGPGenerator,
-)
 from gt4sd.algorithms.core import AlgorithmConfiguration
+from gt4sd.algorithms.generation.paccmann_vae import PaccMannVAE, PaccMannVAEGenerator
 from gt4sd.algorithms.registry import ApplicationsRegistry
-
-TARGET = {
-    "qed": {"weight": 1.0},
-    "molwt": {"target": 200},
-    "sa": {"weight": 2.0},
-    "callable": {"evaluator": lambda x: 1.0},
-    "affinity": {"protein": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT"},
-}
-PARAMETERS = {
-    "number_of_steps": 8,
-    "number_of_initial_points": 4,
-    "number_of_optimization_rounds": 1,
-    "samples_for_evaluation": 5,
-    "maximum_number_of_sampling_steps": 4,
-}
 
 
 def get_classvar_type(class_var):
@@ -59,11 +41,11 @@ def get_classvar_type(class_var):
     "config_class, algorithm_type, domain, algorithm_name",
     [
         (
-            PaccMannGPGenerator,
-            "controlled_sampling",
+            PaccMannVAEGenerator,
+            "generation",
             "materials",
-            PaccMannGP.__name__,
-        ),
+            PaccMannVAE.__name__,
+        )
     ],
 )
 def test_config_class(
@@ -84,9 +66,7 @@ def test_config_class(
 
 @pytest.mark.parametrize(
     "config_class",
-    [
-        (PaccMannGPGenerator),
-    ],
+    [(PaccMannVAEGenerator)],
 )
 def test_config_instance(config_class: Type[AlgorithmConfiguration]):
     config = config_class()  # type:ignore
@@ -95,62 +75,48 @@ def test_config_instance(config_class: Type[AlgorithmConfiguration]):
 
 @pytest.mark.parametrize(
     "config_class",
-    [
-        (PaccMannGPGenerator),
-    ],
+    [(PaccMannVAEGenerator)],
 )
 def test_available_versions(config_class: Type[AlgorithmConfiguration]):
     versions = config_class.list_versions()
+    print("HERE", versions)
     assert "v0" in versions
 
 
 @pytest.mark.parametrize(
-    "config, algorithm, algorithm_parameters",
+    "config, algorithm",
     [
-        (PaccMannGPGenerator, PaccMannGP, PARAMETERS),
+        (
+            PaccMannVAEGenerator,
+            PaccMannVAE,
+        )
     ],
 )
-def test_generation_via_import(config, algorithm, algorithm_parameters):
-    parameters = {
-        "batch_size": 1,
-    }
-    for param, value in algorithm_parameters.items():
-        parameters[param] = value
-    config = config(**parameters)
-    algorithm = algorithm(configuration=config, target=TARGET)
-    items = list(algorithm.sample(1))
-    assert len(items) == 1
+def test_generation_via_import(config, algorithm):
+    algorithm = algorithm(configuration=config())
+    items = list(algorithm.sample(5))
+    assert len(items) == 5
 
 
 @pytest.mark.parametrize(
-    "algorithm_application, algorithm_type, domain, algorithm_name, algorithm_parameters",
+    "algorithm_application, algorithm_type, domain, algorithm_name",
     [
         (
-            PaccMannGPGenerator.__name__,
-            "controlled_sampling",
+            PaccMannVAEGenerator.__name__,
+            "generation",
             "materials",
-            PaccMannGP.__name__,
-            PARAMETERS,
+            PaccMannVAE.__name__,
         ),
     ],
 )
 def test_generation_via_registry(
-    algorithm_type,
-    domain,
-    algorithm_name,
-    algorithm_application,
-    algorithm_parameters,
+    algorithm_type, domain, algorithm_name, algorithm_application
 ):
-    parameters = {
-        "target": TARGET,
-        "algorithm_type": algorithm_type,
-        "domain": domain,
-        "algorithm_name": algorithm_name,
-        "algorithm_application": algorithm_application,
-        "batch_size": 1,
-    }
-    for param, value in algorithm_parameters.items():
-        parameters[param] = value
-    algorithm = ApplicationsRegistry.get_application_instance(**parameters)
-    items = list(algorithm.sample(1))
-    assert len(items) == 1
+    algorithm = ApplicationsRegistry.get_application_instance(
+        algorithm_type=algorithm_type,
+        domain=domain,
+        algorithm_name=algorithm_name,
+        algorithm_application=algorithm_application,
+    )
+    items = list(algorithm.sample(5))
+    assert len(items) == 5

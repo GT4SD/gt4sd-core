@@ -33,6 +33,7 @@ import torch
 from paccmann_chemistry.models.vae import StackGRUDecoder, StackGRUEncoder, TeacherVAE
 from paccmann_chemistry.utils.search import SamplingSearch
 from paccmann_gp.affinity_minimization import AffinityMinimization
+from paccmann_gp.callable_minimization import CallableMinimization
 from paccmann_gp.combined_minimization import CombinedMinimization
 from paccmann_gp.gp_optimizer import GPOptimizer
 from paccmann_gp.mw_minimization import MWMinimization
@@ -53,6 +54,7 @@ MINIMIZATION_FUNCTIONS = {
     "sa": SAMinimization,
     "molwt": MWMinimization,
     "affinity": AffinityMinimization,
+    "callable": CallableMinimization,
 }
 
 
