@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.algorithms.generation.paccmann_vae.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.algorithms.generation.paccmann_vae.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.algorithms.generation.paccmann_vae.core</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;PaccMannVAE Algorithm.</span>
+
+<span class="sd">PaccMannVAE is an unconditional molecular generative model.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">SMILES</span>
+<span class="kn">from</span> <span class="nn">...conditional_generation.paccmann_rl.core</span> <span class="kn">import</span> <span class="n">PaccMannRLProteinBasedGenerator</span>
+<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">GeneratorAlgorithm</span><span class="p">,</span> <span class="n">Untargeted</span>
+<span class="kn">from</span> <span class="nn">...registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
+<span class="kn">from</span> <span class="nn">.implementation</span> <span class="kn">import</span> <span class="n">PaccMannVaeDefaultGenerator</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">SMILES</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PaccMannVAE"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.paccmann_vae.core.html#gt4sd.algorithms.generation.paccmann_vae.core.PaccMannVAE">[docs]</a><span class="k">class</span> <span class="nc">PaccMannVAE</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Molecular VAE as in the PaccMann\\ :superscript:`RL` paper.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PaccMannVAE.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.paccmann_vae.core.html#gt4sd.algorithms.generation.paccmann_vae.core.PaccMannVAE.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate PaccMannVAE ready to generate molecules.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: domain and application specification defining parameters,</span>
+<span class="sd">                types and validations.</span>
+<span class="sd">            target: unused since it is not a conditional generator.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            An example for unconditional generation of small molecules::</span>
+
+<span class="sd">                config = PaccMannVAEGenerator()</span>
+<span class="sd">                algorithm = PaccMannVAE(configuration=config)</span>
+<span class="sd">                items = list(algorithm.sample(10))</span>
+<span class="sd">                print(items)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># type:ignore</span></div>
+
+<div class="viewcode-block" id="PaccMannVAE.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.paccmann_vae.core.html#gt4sd.algorithms.generation.paccmann_vae.core.PaccMannVAE.get_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_generator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Untargeted</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the function to sample batches via PaccMannVAE.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            configuration: helps to set up specific application of PaccMannVAE.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            callable with target generating a batch of items.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">implementation</span><span class="p">:</span> <span class="n">PaccMannVaeDefaultGenerator</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">configuration</span><span class="o">.</span><span class="n">get_conditional_generator</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">implementation</span><span class="o">.</span><span class="n">generate</span></div></div>
+
+
+<div class="viewcode-block" id="PaccMannVAEGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.paccmann_vae.core.html#gt4sd.algorithms.generation.paccmann_vae.core.PaccMannVAEGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">PaccMannVAE</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">PaccMannVAEGenerator</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">SMILES</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Configuration to generate molecules with PaccMannVAE.</span>
+
+<span class="sd">    Implementation from the paper: https://doi.org/10.1016/j.isci.2021.102269</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;generation&quot;</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;materials&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;v0&quot;</span>
+
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Batch size used for the generative model sampling.&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Temperature parameter for the softmax sampling in decoding.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">generated_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum length in tokens of the generated molcules (relates to the SMILES length).&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="PaccMannVAEGenerator.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.paccmann_vae.core.html#gt4sd.algorithms.generation.paccmann_vae.core.PaccMannVAEGenerator.get_target_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            target description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="PaccMannVAEGenerator.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.paccmann_vae.core.html#gt4sd.algorithms.generation.paccmann_vae.core.PaccMannVAEGenerator.get_conditional_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PaccMannVaeDefaultGenerator</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            instance with :meth:`generate_batch&lt;gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.generate_batch&gt;` method for targeted generation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">PaccMannVaeDefaultGenerator</span><span class="p">(</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="n">generated_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">generated_length</span><span class="p">,</span>
+            <span class="n">algorithm_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PaccMannVAEGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.paccmann_vae.core.html#gt4sd.algorithms.generation.paccmann_vae.core.PaccMannVAEGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        S3 is searched as well as the local cache is searched for matching versions.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">PaccMannRLProteinBasedGenerator</span><span class="p">()</span><span class="o">.</span><span class="n">list_versions</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
