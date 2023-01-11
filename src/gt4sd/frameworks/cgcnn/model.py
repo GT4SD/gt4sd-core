@@ -23,7 +23,9 @@
 #
 """Model module."""
 
-from __future__ import print_function, division
+from __future__ import division, print_function
+
+from typing import Dict
 
 import torch
 import torch.nn as nn
@@ -34,17 +36,15 @@ class ConvLayer(nn.Module):
     Convolutional operation on graphs
     """
 
-    def __init__(self, atom_fea_len, nbr_fea_len):
+    def __init__(self, atom_fea_len: int, nbr_fea_len: int):
         """
         Initialize ConvLayer.
 
-        Parameters
-        ----------
-
-        atom_fea_len: int
-          Number of atom hidden features.
-        nbr_fea_len: int
-          Number of bond features.
+        args:
+            atom_fea_len: int
+              Number of atom hidden features.
+            nbr_fea_len: int
+              Number of bond features.
         """
         super(ConvLayer, self).__init__()
         self.atom_fea_len = atom_fea_len
@@ -58,28 +58,29 @@ class ConvLayer(nn.Module):
         self.bn2 = nn.BatchNorm1d(self.atom_fea_len)
         self.softplus2 = nn.Softplus()
 
-    def forward(self, atom_in_fea, nbr_fea, nbr_fea_idx):
+    def forward(
+        self,
+        atom_in_fea: torch.Tensor,
+        nbr_fea: torch.Tensor,
+        nbr_fea_idx: torch.LongTensor,
+    ) -> torch.Tensor:
         """
         Forward pass
 
         N: Total number of atoms in the batch
         M: Max number of neighbors
 
-        Parameters
-        ----------
+        args:
+            atom_in_fea: Variable(torch.Tensor) shape (N, atom_fea_len)
+              Atom hidden features before convolution
+            nbr_fea: Variable(torch.Tensor) shape (N, M, nbr_fea_len)
+              Bond features of each atom's M neighbors
+            nbr_fea_idx: torch.LongTensor shape (N, M)
+              Indices of M neighbors of each atom
 
-        atom_in_fea: Variable(torch.Tensor) shape (N, atom_fea_len)
-          Atom hidden features before convolution
-        nbr_fea: Variable(torch.Tensor) shape (N, M, nbr_fea_len)
-          Bond features of each atom's M neighbors
-        nbr_fea_idx: torch.LongTensor shape (N, M)
-          Indices of M neighbors of each atom
-
-        Returns
-        -------
-
-        atom_out_fea: nn.Variable shape (N, atom_fea_len)
-          Atom hidden features after convolution
+        returns:
+            atom_out_fea: nn.Variable shape (N, atom_fea_len)
+              Atom hidden features after convolution
 
         """
         # TODO will there be problems with the index zero padding?
@@ -115,32 +116,30 @@ class CrystalGraphConvNet(nn.Module):
 
     def __init__(
         self,
-        orig_atom_fea_len,
-        nbr_fea_len,
-        atom_fea_len=64,
-        n_conv=3,
-        h_fea_len=128,
-        n_h=1,
-        classification=False,
+        orig_atom_fea_len: int,
+        nbr_fea_len: int,
+        atom_fea_len: int = 64,
+        n_conv: int = 3,
+        h_fea_len: int = 128,
+        n_h: int = 1,
+        classification: bool = False,
     ):
         """
         Initialize CrystalGraphConvNet.
 
-        Parameters
-        ----------
-
-        orig_atom_fea_len: int
-          Number of atom features in the input.
-        nbr_fea_len: int
-          Number of bond features.
-        atom_fea_len: int
-          Number of hidden atom features in the convolutional layers
-        n_conv: int
-          Number of convolutional layers
-        h_fea_len: int
-          Number of hidden features after pooling
-        n_h: int
-          Number of hidden layers after pooling
+        args:
+            orig_atom_fea_len: int
+              Number of atom features in the input.
+            nbr_fea_len: int
+              Number of bond features.
+            atom_fea_len: int
+              Number of hidden atom features in the convolutional layers
+            n_conv: int
+              Number of convolutional layers
+            h_fea_len: int
+              Number of hidden features after pooling
+            n_h: int
+              Number of hidden layers after pooling
         """
         super(CrystalGraphConvNet, self).__init__()
         self.classification = classification
@@ -166,7 +165,13 @@ class CrystalGraphConvNet(nn.Module):
             self.logsoftmax = nn.LogSoftmax(dim=1)
             self.dropout = nn.Dropout()
 
-    def forward(self, atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx):
+    def forward(
+        self,
+        atom_fea: torch.Tensor,
+        nbr_fea: torch.Tensor,
+        nbr_fea_idx: torch.LongTensor,
+        crystal_atom_idx: torch.LongTensor,
+    ) -> torch.Tensor:
         """
         Forward pass
 
@@ -174,23 +179,19 @@ class CrystalGraphConvNet(nn.Module):
         M: Max number of neighbors
         N0: Total number of crystals in the batch
 
-        Parameters
-        ----------
+        args:
+            atom_fea: Variable(torch.Tensor) shape (N, orig_atom_fea_len)
+              Atom features from atom type
+            nbr_fea: Variable(torch.Tensor) shape (N, M, nbr_fea_len)
+              Bond features of each atom's M neighbors
+            nbr_fea_idx: torch.LongTensor shape (N, M)
+              Indices of M neighbors of each atom
+            crystal_atom_idx: list of torch.LongTensor of length N0
+              Mapping from the crystal idx to atom idx
 
-        atom_fea: Variable(torch.Tensor) shape (N, orig_atom_fea_len)
-          Atom features from atom type
-        nbr_fea: Variable(torch.Tensor) shape (N, M, nbr_fea_len)
-          Bond features of each atom's M neighbors
-        nbr_fea_idx: torch.LongTensor shape (N, M)
-          Indices of M neighbors of each atom
-        crystal_atom_idx: list of torch.LongTensor of length N0
-          Mapping from the crystal idx to atom idx
-
-        Returns
-        -------
-
-        prediction: nn.Variable shape (N, )
-          Atom hidden features after convolution
+        returns:
+            prediction: nn.Variable shape (N, )
+              Atom hidden features after convolution
 
         """
         atom_fea = self.embedding(atom_fea)
@@ -209,20 +210,20 @@ class CrystalGraphConvNet(nn.Module):
             out = self.logsoftmax(out)
         return out
 
-    def pooling(self, atom_fea, crystal_atom_idx):
+    def pooling(
+        self, atom_fea: torch.Tensor, crystal_atom_idx: torch.LongTensor
+    ) -> torch.Tensor:
         """
         Pooling the atom features to crystal features
 
         N: Total number of atoms in the batch
         N0: Total number of crystals in the batch
 
-        Parameters
-        ----------
-
-        atom_fea: Variable(torch.Tensor) shape (N, atom_fea_len)
-          Atom feature vectors of the batch
-        crystal_atom_idx: list of torch.LongTensor of length N0
-          Mapping from the crystal idx to atom idx
+        args:
+            atom_fea: Variable(torch.Tensor) shape (N, atom_fea_len)
+              Atom feature vectors of the batch
+            crystal_atom_idx: list of torch.LongTensor of length N0
+              Mapping from the crystal idx to atom idx
         """
         assert (
             sum([len(idx_map) for idx_map in crystal_atom_idx])
@@ -235,23 +236,23 @@ class CrystalGraphConvNet(nn.Module):
         return torch.cat(summed_fea, dim=0)
 
 
-class Normalizer(object):
+class Normalizer:
     """Normalize a Tensor and restore it later."""
 
-    def __init__(self, tensor):
+    def __init__(self, tensor: torch.Tensor):
         """tensor is taken as a sample to calculate the mean and std"""
         self.mean = torch.mean(tensor)
         self.std = torch.std(tensor)
 
-    def norm(self, tensor):
+    def norm(self, tensor: torch.Tensor) -> torch.Tensor:
         return (tensor - self.mean) / self.std
 
-    def denorm(self, normed_tensor):
+    def denorm(self, normed_tensor: torch.Tensor) -> torch.Tensor:
         return normed_tensor * self.std + self.mean
 
-    def state_dict(self):
+    def state_dict(self) -> Dict[str, torch.Tensor]:
         return {"mean": self.mean, "std": self.std}
 
-    def load_state_dict(self, state_dict):
+    def load_state_dict(self, state_dict: Dict[str, torch.Tensor]) -> None:
         self.mean = state_dict["mean"]
         self.std = state_dict["std"]
