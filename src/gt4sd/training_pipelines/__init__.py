@@ -102,6 +102,14 @@ from .torchdrug.graphaf.core import (
     TorchDrugGraphAFTrainingPipeline,
 )
 
+from .cgcnn.core import (
+    CgcnnDataArguments,
+    CgcnnModelArguments,
+    CgcnnTrainingArguments,
+    CgcnnTrainingPipeline,
+    CgcnnSavingArguments,
+)
+
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
@@ -166,6 +174,11 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         GFlowNetDataArguments,
         GFlowNetModelArguments,
     ),
+    "cgcnn":{
+        CgcnnDataArguments,
+        CgcnnModelArguments,
+        CgcnnTrainingArguments,
+    }
 }
 
 TRAINING_PIPELINE_MAPPING = {
@@ -180,6 +193,7 @@ TRAINING_PIPELINE_MAPPING = {
     "regression-transformer-trainer": RegressionTransformerTrainingPipeline,
     "diffusion-trainer": DiffusionForVisionTrainingPipeline,
     "gflownet-trainer": GFlowNetTrainingPipeline,
+    "cgcnn": CgcnnTrainingPipeline
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
@@ -194,6 +208,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "regression-transformer-trainer": RegressionTransformerSavingArguments,
     "diffusion-trainer": DiffusionSavingArguments,
     "gflownet-trainer": GFlowNetSavingArguments,
+    "cgcnn": CgcnnSavingArguments
 }
 
 

@@ -247,7 +247,7 @@ class GaussianDistance:
               len(self.filter)
         """
         return np.exp(
-            -((distances[..., np.newaxis] - self.filter) ** 2) / self.var ** 2
+            -((distances[..., np.newaxis] - self.filter) ** 2) / self.var**2
         )
 
 

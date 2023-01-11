@@ -25,7 +25,7 @@
 
 from __future__ import division, print_function
 
-from typing import Dict
+from typing import Any, Dict
 
 import torch
 import torch.nn as nn
@@ -253,6 +253,6 @@ class Normalizer:
     def state_dict(self) -> Dict[str, torch.Tensor]:
         return {"mean": self.mean, "std": self.std}
 
-    def load_state_dict(self, state_dict: Dict[str, torch.Tensor]) -> None:
+    def load_state_dict(self, state_dict: Dict[str, Any]) -> None:
         self.mean = state_dict["mean"]
         self.std = state_dict["std"]
