@@ -21,28 +21,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import argparse
 from typing import List
 
-from pydantic import Field
-
 import torch
-import argparse
-from torch.utils.data import DataLoader
+from pydantic import Field
 from torch.autograd import Variable
+from torch.utils.data import DataLoader
 
 from ...algorithms.core import (
     ConfigurablePropertyAlgorithmConfiguration,
     Predictor,
     PredictorAlgorithm,
 )
-from ..core import (
-    DomainSubmodule,
-    PropertyValue,
-    S3Parameters,
-)
-
-from ...frameworks.cgcnn.model import CrystalGraphConvNet, Normalizer
 from ...frameworks.cgcnn.data import CIFData, collate_pool
+from ...frameworks.cgcnn.model import CrystalGraphConvNet, Normalizer
+from ..core import DomainSubmodule, PropertyValue, S3Parameters
 
 
 class S3ParametersCrystals(S3Parameters):
@@ -83,8 +77,8 @@ class PoissonRationParameters(CgcnnParameters):
     algorithm_application: str = "PoissonRatio"
 
 
-class MetalClassifierParameters(CgcnnParameters):
-    algorithm_application: str = "MetalClassifier"
+class MetalSemiconductorClassifierParameters(CgcnnParameters):
+    algorithm_application: str = "MetalSemiconductorClassifier"
 
 
 class _CGCNN(PredictorAlgorithm):
@@ -142,7 +136,7 @@ class _CGCNN(PredictorAlgorithm):
             # build model
             structures, _, _ = dataset[0]
             orig_atom_fea_len = structures[0].shape[-1]
-            nbr_fea_len = structures[1].shape[-1]
+            nbr_fea_len = structures[1].shape[-1]  # type: ignore
 
             model = CrystalGraphConvNet(
                 orig_atom_fea_len,
@@ -176,27 +170,17 @@ class _CGCNN(PredictorAlgorithm):
                 test_preds += test_pred.view(-1).tolist()
                 test_cif_ids += batch_cif_ids
 
-            return model.predictions.detach().tolist()
+            return model.predictions.detach().tolist()  # type: ignore
 
         return informative_model
-
-    @classmethod
-    def get_description(cls) -> str:
-        text = """
-        This model predicts the 12 endpoints from the Tox21 challenge.
-        The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53
-        For details on the data see: https://tripod.nih.gov/tox21/challenge/.
-        """
-        return text
 
 
 class FormationEnergy(_CGCNN):
     @classmethod
     def get_description(cls) -> str:
         text = """
-        This model predicts the 12 endpoints from the Tox21 challenge.
-        The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53
-        For details on the data see: https://tripod.nih.gov/tox21/challenge/.
+        This model predicts the formation energy per atom using the CGCNN framework.
+        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.
         """
         return text
 
@@ -205,9 +189,8 @@ class AbsoluteEnergy(_CGCNN):
     @classmethod
     def get_description(cls) -> str:
         text = """
-        This model predicts the 12 endpoints from the Tox21 challenge.
-        The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53
-        For details on the data see: https://tripod.nih.gov/tox21/challenge/.
+        This model predicts the absolute energy of crystals using the CGCNN framework.
+        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.
         """
         return text
 
@@ -216,9 +199,8 @@ class BandGap(_CGCNN):
     @classmethod
     def get_description(cls) -> str:
         text = """
-        This model predicts the 12 endpoints from the Tox21 challenge.
-        The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53
-        For details on the data see: https://tripod.nih.gov/tox21/challenge/.
+        This model predicts the band gap of crystals using the CGCNN framework.
+        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.
         """
         return text
 
@@ -227,9 +209,8 @@ class FermiEnergy(_CGCNN):
     @classmethod
     def get_description(cls) -> str:
         text = """
-        This model predicts the 12 endpoints from the Tox21 challenge.
-        The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53
-        For details on the data see: https://tripod.nih.gov/tox21/challenge/.
+        This model predicts the Fermi energy of crystals using the CGCNN framework.
+        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.
         """
         return text
 
@@ -238,9 +219,8 @@ class BulkModuli(_CGCNN):
     @classmethod
     def get_description(cls) -> str:
         text = """
-        This model predicts the 12 endpoints from the Tox21 challenge.
-        The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53
-        For details on the data see: https://tripod.nih.gov/tox21/challenge/.
+        This model predicts the bulk moduli of crystals using the CGCNN framework.
+        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.
         """
         return text
 
@@ -249,9 +229,8 @@ class ShearModuli(_CGCNN):
     @classmethod
     def get_description(cls) -> str:
         text = """
-         This model predicts the 12 endpoints from the Tox21 challenge.
-         The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53
-         For details on the data see: https://tripod.nih.gov/tox21/challenge/.
+         This model predicts the shear moduli of crystals using the CGCNN framework.
+        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.
          """
         return text
 
@@ -260,19 +239,17 @@ class PoissonRatio(_CGCNN):
     @classmethod
     def get_description(cls) -> str:
         text = """
-         This model predicts the 12 endpoints from the Tox21 challenge.
-         The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53
-         For details on the data see: https://tripod.nih.gov/tox21/challenge/.
+        This model predicts the Poisson ration of crystals using the CGCNN framework.
+        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.
          """
         return text
 
 
-class MetalClassifer(_CGCNN):
+class MetalSemiconductorClassifier(_CGCNN):
     @classmethod
     def get_description(cls) -> str:
         text = """
-         This model predicts the 12 endpoints from the Tox21 challenge.
-         The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53
-         For details on the data see: https://tripod.nih.gov/tox21/challenge/.
+         This model predicts whether a given crystal is metal or semiconductor using the CGCNN framework.
+        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.
          """
         return text

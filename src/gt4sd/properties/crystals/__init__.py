@@ -26,22 +26,22 @@ from typing import Dict, Tuple, Type, Union
 from ...algorithms.core import PredictorAlgorithm
 from ..core import PropertyPredictor, PropertyPredictorParameters
 from .core import (
-    FormationEnergy,
-    FormationEnergyParameters,
     AbsoluteEnergy,
     AbsoluteEnergyParameters,
     BandGap,
     BandGapParameters,
-    FermiEnergy,
-    FermiEnergyParameters,
     BulkModuli,
     BulkModuliParameters,
-    ShearModuli,
-    ShearModuliParameters,
+    FermiEnergy,
+    FermiEnergyParameters,
+    FormationEnergy,
+    FormationEnergyParameters,
+    MetalSemiconductorClassifier,
+    MetalSemiconductorClassifierParameters,
     PoissonRatio,
     PoissonRationParameters,
-    MetalClassifer,
-    MetalClassifierParameters,
+    ShearModuli,
+    ShearModuliParameters,
 )
 
 CRYSTALS_PROPERTY_PREDICTOR_FACTORY: Dict[
@@ -59,7 +59,10 @@ CRYSTALS_PROPERTY_PREDICTOR_FACTORY: Dict[
     "bulk_moduli": (BulkModuli, BulkModuliParameters),
     "shear_moduli": (ShearModuli, ShearModuliParameters),
     "poisson_ratio": (PoissonRatio, PoissonRationParameters),
-    "metal_classifier": (MetalClassifer, MetalClassifierParameters),
+    "metal_semiconductor_classifier": (
+        MetalSemiconductorClassifier,
+        MetalSemiconductorClassifierParameters,
+    ),
 }
 
 
