@@ -32,15 +32,12 @@ import torch.nn as nn
 
 
 class ConvLayer(nn.Module):
-    """
-    Convolutional operation on graphs
-    """
+    """Convolutional operation on graphs."""
 
     def __init__(self, atom_fea_len: int, nbr_fea_len: int):
-        """
-        Initialize ConvLayer.
+        """Initialize ConvLayer.
 
-        args:
+        Args:
             atom_fea_len: int
               Number of atom hidden features.
             nbr_fea_len: int
@@ -64,23 +61,22 @@ class ConvLayer(nn.Module):
         nbr_fea: torch.Tensor,
         nbr_fea_idx: torch.LongTensor,
     ) -> torch.Tensor:
-        """
-        Forward pass
+        """Forward pass.
 
-        N: Total number of atoms in the batch
-        M: Max number of neighbors
+        N: Total number of atoms in the batch.
+        M: Max number of neighbors.
 
-        args:
+        Args:
             atom_in_fea: Variable(torch.Tensor) shape (N, atom_fea_len)
-              Atom hidden features before convolution
+              Atom hidden features before convolution.
             nbr_fea: Variable(torch.Tensor) shape (N, M, nbr_fea_len)
-              Bond features of each atom's M neighbors
+              Bond features of each atom's M neighbors.
             nbr_fea_idx: torch.LongTensor shape (N, M)
-              Indices of M neighbors of each atom
+              Indices of M neighbors of each atom.
 
-        returns:
+        Returns:
             atom_out_fea: nn.Variable shape (N, atom_fea_len)
-              Atom hidden features after convolution
+              Atom hidden features after convolution.
 
         """
         # TODO will there be problems with the index zero padding?
@@ -109,10 +105,7 @@ class ConvLayer(nn.Module):
 
 
 class CrystalGraphConvNet(nn.Module):
-    """
-    Create a crystal graph convolutional neural network for predicting total
-    material properties.
-    """
+    """Create a crystal graph convolutional neural network for predicting total material properties."""
 
     def __init__(
         self,
@@ -124,22 +117,21 @@ class CrystalGraphConvNet(nn.Module):
         n_h: int = 1,
         classification: bool = False,
     ):
-        """
-        Initialize CrystalGraphConvNet.
+        """Initialize CrystalGraphConvNet.
 
-        args:
+        Args:
             orig_atom_fea_len: int
               Number of atom features in the input.
             nbr_fea_len: int
               Number of bond features.
             atom_fea_len: int
-              Number of hidden atom features in the convolutional layers
+              Number of hidden atom features in the convolutional layers.
             n_conv: int
-              Number of convolutional layers
+              Number of convolutional layers.
             h_fea_len: int
-              Number of hidden features after pooling
+              Number of hidden features after pooling.
             n_h: int
-              Number of hidden layers after pooling
+              Number of hidden layers after pooling.
         """
         super(CrystalGraphConvNet, self).__init__()
         self.classification = classification
@@ -172,27 +164,25 @@ class CrystalGraphConvNet(nn.Module):
         nbr_fea_idx: torch.LongTensor,
         crystal_atom_idx: torch.LongTensor,
     ) -> torch.Tensor:
-        """
-        Forward pass
+        """Forward pass.
 
-        N: Total number of atoms in the batch
-        M: Max number of neighbors
-        N0: Total number of crystals in the batch
+        N: Total number of atoms in the batch.
+        M: Max number of neighbors.
+        N0: Total number of crystals in the batch.
 
-        args:
+        Args:
             atom_fea: Variable(torch.Tensor) shape (N, orig_atom_fea_len)
-              Atom features from atom type
+              Atom features from atom type.
             nbr_fea: Variable(torch.Tensor) shape (N, M, nbr_fea_len)
-              Bond features of each atom's M neighbors
+              Bond features of each atom's M neighbors.
             nbr_fea_idx: torch.LongTensor shape (N, M)
-              Indices of M neighbors of each atom
+              Indices of M neighbors of each atom.
             crystal_atom_idx: list of torch.LongTensor of length N0
-              Mapping from the crystal idx to atom idx
+              Mapping from the crystal idx to atom idx.
 
-        returns:
+        Returns:
             prediction: nn.Variable shape (N, )
-              Atom hidden features after convolution
-
+              Atom hidden features after convolution.
         """
         atom_fea = self.embedding(atom_fea)
         for conv_func in self.convs:
@@ -213,17 +203,16 @@ class CrystalGraphConvNet(nn.Module):
     def pooling(
         self, atom_fea: torch.Tensor, crystal_atom_idx: torch.LongTensor
     ) -> torch.Tensor:
-        """
-        Pooling the atom features to crystal features
+        """Pooling the atom features to crystal features.
 
-        N: Total number of atoms in the batch
-        N0: Total number of crystals in the batch
+        N: Total number of atoms in the batch.
+        N0: Total number of crystals in the batch.
 
-        args:
+        Args:
             atom_fea: Variable(torch.Tensor) shape (N, atom_fea_len)
-              Atom feature vectors of the batch
+              Atom feature vectors of the batch.
             crystal_atom_idx: list of torch.LongTensor of length N0
-              Mapping from the crystal idx to atom idx
+              Mapping from the crystal idx to atom idx.
         """
         assert (
             sum([len(idx_map) for idx_map in crystal_atom_idx])
@@ -240,19 +229,46 @@ class Normalizer:
     """Normalize a Tensor and restore it later."""
 
     def __init__(self, tensor: torch.Tensor):
-        """tensor is taken as a sample to calculate the mean and std"""
+        """tensor is taken as a sample to calculate the mean and std."""
         self.mean = torch.mean(tensor)
         self.std = torch.std(tensor)
 
     def norm(self, tensor: torch.Tensor) -> torch.Tensor:
+        """Noramlize a tensor.
+
+        Args:
+            tensor: tensor to be normalized.
+
+        Returns:
+            normalized tensor.
+        """
         return (tensor - self.mean) / self.std
 
     def denorm(self, normed_tensor: torch.Tensor) -> torch.Tensor:
+        """Denormalized tensor.
+
+        Args:
+            tensor: tensor to be denormalized:
+
+        Returns:
+            denormalized tensor.
+        """
         return normed_tensor * self.std + self.mean
 
     def state_dict(self) -> Dict[str, torch.Tensor]:
+        """ Return the state dict of normalizer.
+
+        Returns:
+            dictionary including the used mean and std values.
+        """
         return {"mean": self.mean, "std": self.std}
 
     def load_state_dict(self, state_dict: Dict[str, Any]) -> None:
+        """ Return the state dict of normalizer.
+
+       Args:
+           mean: mean value to be used for the normalization.
+           std: std value to be used for the normalization.
+        """
         self.mean = state_dict["mean"]
         self.std = state_dict["std"]

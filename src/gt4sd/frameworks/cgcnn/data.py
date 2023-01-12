@@ -60,32 +60,31 @@ def get_train_val_test_loader(
     Tuple[DataLoader[Any], DataLoader[Any], DataLoader[Any]],
     Tuple[DataLoader[Any], DataLoader[Any]],
 ]:
-    """
-    Utility function for dividing a dataset to train, val, test datasets.
+    """Utility function for dividing a dataset to train, val, test datasets.
 
     !!! The dataset needs to be shuffled before using the function !!!
 
-    args:
+    Args:
         dataset: torch.utils.data.Dataset
           The full dataset to be divided.
-        collate_fn: torch.utils.data.DataLoader
-        batch_size: int
-        train_ratio: float
-        val_ratio: float
-        test_ratio: float
-        return_test: bool
+        collate_fn: torch.utils.data.DataLoader.
+        batch_size: int.
+        train_ratio: float.
+        val_ratio: float.
+        test_ratio: float.
+        return_test: bool.
           Whether to return the test dataset loader. If False, the last test_size
           data will be hidden.
-        num_workers: int
-        pin_memory: bool
+        num_workers: int.
+        pin_memory: bool.
 
-    returns:
+    Returns:
         train_loader: torch.utils.data.DataLoader
           DataLoader that random samples the training data.
         val_loader: torch.utils.data.DataLoader
           DataLoader that random samples the validation data.
         (test_loader): torch.utils.data.DataLoader
-          DataLoader that random samples the test data, returns if
+          DataLoader that random samples the test data, Returns if
             return_test=True.
     """
     total_size = len(dataset)  # type: ignore
@@ -153,33 +152,31 @@ def get_train_val_test_loader(
 def collate_pool(
     dataset_list: List[Any],
 ) -> Tuple[Tuple[Tensor, Tensor, Tensor, List[LongTensor]], Tensor, List[Any]]:
-    """
-    Collate a list of data and return a batch for predicting crystal
-    properties.
+    """Collate a list of data and return a batch for predicting crystal properties.
 
-    args:
+    Args:
         dataset_list: list of tuples for each data point.
           (atom_fea, nbr_fea, nbr_fea_idx, target)
 
-          atom_fea: torch.Tensor shape (n_i, atom_fea_len)
-          nbr_fea: torch.Tensor shape (n_i, M, nbr_fea_len)
-          nbr_fea_idx: torch.LongTensor shape (n_i, M)
-          target: torch.Tensor shape (1, )
-          cif_id: str or int
+          atom_fea: torch.Tensor shape (n_i, atom_fea_len).
+          nbr_fea: torch.Tensor shape (n_i, M, nbr_fea_len).
+          nbr_fea_idx: torch.LongTensor shape (n_i, M).
+          target: torch.Tensor shape (1, ).
+          cif_id: str or int.
 
-    returns:
+    Returns:
         N = sum(n_i); N0 = sum(i)
         batch_atom_fea: torch.Tensor shape (N, orig_atom_fea_len)
-          Atom features from atom type
+          Atom features from atom type.
         batch_nbr_fea: torch.Tensor shape (N, M, nbr_fea_len)
-          Bond features of each atom's M neighbors
+          Bond features of each atom's M neighbors.
         batch_nbr_fea_idx: torch.LongTensor shape (N, M)
-          Indices of M neighbors of each atom
+          Indices of M neighbors of each atom.
         crystal_atom_idx: list of torch.LongTensor of length N0
-          Mapping from the crystal idx to atom idx
+          Mapping from the crystal idx to atom idx.
         target: torch.Tensor shape (N, 1)
-          Target value for prediction
-        batch_cif_ids: list
+          Target value for prediction.
+        batch_cif_ids: list.
     """
     batch_atom_fea, batch_nbr_fea, batch_nbr_fea_idx = [], [], []
     crystal_atom_idx, batch_target = [], []
@@ -210,21 +207,20 @@ def collate_pool(
 
 
 class GaussianDistance:
-    """
-    Expands the distance by Gaussian basis.
+    """Expands the distance by Gaussian basis.
 
     Unit: angstrom
     """
 
     def __init__(self, dmin: float, dmax: float, step: float, var: float = None):
         """
-        args:
+        Args:
             dmin: float
-              Minimum interatomic distance
+              Minimum interatomic distance.
             dmax: float
-              Maximum interatomic distance
+              Maximum interatomic distance.
             step: float
-              Step size for the Gaussian filter
+              Step size for the Gaussian filter.
         """
         assert dmin < dmax
         assert dmax - dmin > step
@@ -234,17 +230,16 @@ class GaussianDistance:
         self.var = var
 
     def expand(self, distances: np.ndarray) -> np.ndarray:
-        """
-        Apply Gaussian disntance filter to a numpy distance array
+        """Apply Gaussian disntance filter to a numpy distance array.
 
-        args:
+        Args:
             distance: np.array shape n-d array
-              A distance matrix of any shape
+              A distance matrix of any shape.
 
-        returns:
+        Returns:
             expanded_distance: shape (n+1)-d array
               Expanded distance matrix with the last dimension of length
-              len(self.filter)
+              len(self.filter).
         """
         return np.exp(
             -((distances[..., np.newaxis] - self.filter) ** 2) / self.var**2
@@ -252,8 +247,7 @@ class GaussianDistance:
 
 
 class AtomInitializer:
-    """
-    Base class for intializing the vector representation for atoms.
+    """Base class for intializing the vector representation for atoms.
 
     !!! Use one AtomInitializer per dataset !!!
     """
@@ -294,9 +288,9 @@ class AtomCustomJSONInitializer(AtomInitializer):
 
     def __init__(self, elem_embedding_file: str):
         """
-        args:
+        Args:
             elem_embedding_file: str
-                The path to the .json file
+                The path to the .json file.
         """
         with open(elem_embedding_file) as f:
             elem_embedding = json.load(f)
@@ -341,19 +335,19 @@ class CIFData(Dataset):
         random_seed: int = 123,
     ):
         """
-        args:
+        Args:
             root_dir: str
-                The path to the root directory of the dataset
+                The path to the root directory of the dataset.
             max_num_nbr: int
-                The maximum number of neighbors while constructing the crystal graph
+                The maximum number of neighbors while constructing the crystal graph.
             radius: float
-                The cutoff radius for searching neighbors
+                The cutoff radius for searching neighbors.
             dmin: float
-                The minimum distance for constructing GaussianDistance
+                The minimum distance for constructing GaussianDistance.
             step: float
-                The step size for constructing GaussianDistance
+                The step size for constructing GaussianDistance.
             random_seed: int
-                Random seed for shuffling the dataset
+                Random seed for shuffling the dataset.
         """
         self.root_dir = root_dir
         self.max_num_nbr, self.radius = max_num_nbr, radius
@@ -376,14 +370,14 @@ class CIFData(Dataset):
     @functools.lru_cache(maxsize=None)  # Cache loaded structures
     def __getitem__(self, idx: int) -> Tuple[Tuple[np.ndarray[Any, Any], List[List[Any]], List[List[Any]]], str, str]:  # type: ignore
         """
-        args:
-           idx: index
-        returns:
-            atom_fea: torch.Tensor shape (n_i, atom_fea_len)
-            nbr_fea: torch.Tensor shape (n_i, M, nbr_fea_len)
-            nbr_fea_idx: torch.LongTensor shape (n_i, M)
-            target: torch.Tensor shape (1, )
-            cif_id: str or int
+        Args:
+           idx: index.
+        Returns:
+            atom_fea: torch.Tensor shape (n_i, atom_fea_len).
+            nbr_fea: torch.Tensor shape (n_i, M, nbr_fea_len).
+            nbr_fea_idx: torch.LongTensor shape (n_i, M).
+            target: torch.Tensor shape (1, ).
+            cif_id: str or int.
         """
         cif_id, target = self.id_prop_data[idx]
         crystal = Structure.from_file(os.path.join(self.root_dir, cif_id + ".cif"))

@@ -252,6 +252,19 @@ def train(
     task: str,
     print_freq: int,
 ) -> None:
+    """Train step for cgcnn models.
+
+    Args:
+        train_loader: Dataloader for the training set.
+        model: CGCNN model.
+        criterion: loss function.
+        optimizer: Optimizer to be used.
+        epoch: Epoch number.
+        normalizer: Normalize.
+        disable_cuda: Disable CUDA.
+        task: Training task.
+        print_freq: Print frequency.
+    """
 
     batch_time = AverageMeter()
     data_time = AverageMeter()
@@ -372,6 +385,21 @@ def validate(
     print_freq: int,
     test: bool = False,
 ) -> float:
+    """Validation step for cgcnn models.
+
+    Args:
+        val_loader: Dataloader for the validation set.
+        model: CGCNN model.
+        criterion: loss function.
+        normalizer: Normalize.
+        disable_cuda: Disable CUDA.
+        task: Training task.
+        print_freq: Print frequency.
+        test: test or only validate using the given dataset.
+
+    Returns:
+       average auc or mae depending on the training task.
+    """
 
     batch_time = AverageMeter()
     losses = AverageMeter()
@@ -494,12 +522,14 @@ def validate(
 
 
 def mae(prediction: Tensor, target: Tensor) -> Tensor:
-    """
-    Computes the mean absolute error between prediction and target
-    Parameters
-    ----------
-    prediction: torch.Tensor (N, 1)
-    target: torch.Tensor (N, 1)
+    """Computes the mean absolute error between prediction and target.
+
+    Args:
+        prediction: torch.Tensor (N, 1)
+        target: torch.Tensor (N, 1)
+
+    Returns:
+        the computed mean absolute error.
     """
     return torch.mean(torch.abs(target - prediction))
 
@@ -507,6 +537,17 @@ def mae(prediction: Tensor, target: Tensor) -> Tensor:
 def class_eval(
     prediction: Tensor, target: Tensor
 ) -> Tuple[float, float, float, float, float]:
+    """Class evaluation.
+
+    Args:
+        prediction: Predictions.
+        target: Groundtruth.
+
+    Returns:
+        Computed accuracy, precision, recall, fscore, and auc_score.
+
+    """
+
     prediction = np.exp(prediction.numpy())
     target = target.numpy()
     pred_label = np.argmax(prediction, axis=1)
@@ -525,18 +566,28 @@ def class_eval(
 
 
 class AverageMeter:
-    """Computes and stores the average and current value"""
+    """Computes and stores the average and current value."""
 
     def __init__(self):
+        """Initialize an AverageMeter object."""
+
         self.reset()
 
     def reset(self) -> None:
+        """Reset values to 0."""
+
         self.val = 0.0
         self.avg = 0.0
         self.sum = 0.0
         self.count = 0
 
     def update(self, val: float, n: int = 1) -> None:
+        """Update values of the AverageMeter.
+
+        Args:
+            val: value to be added.
+            n: count.
+        """
         self.val = val
         self.sum += val * n
         self.count += n
@@ -546,6 +597,14 @@ class AverageMeter:
 def save_checkpoint(
     state: object, is_best: bool, filename: str = "checkpoint.pth.tar"
 ) -> None:
+    """Save CGCNN checkpoint.
+
+    Args:
+        state: checkpoint's object.
+        is_best: whether the given checkpoint has the best performance or not.
+        filename: path to the save the checkpoint.
+
+    """
     torch.save(state, filename)
     if is_best:
         shutil.copyfile(filename, "model_best.pth.tar")
@@ -557,7 +616,13 @@ class CgcnnDataArguments(TrainingPipelineArguments):
 
     __name__ = "dataset_args"
 
-    datapath: str = field(default="", metadata={"help": "Path to the dataset."})
+    datapath: str = field(
+        default="",
+        metadata={
+            "help": "Path to the dataset."
+            "The dataset should follow the directory structure as described in https://github.com/txie-93/cgcnn"
+        },
+    )
     train_size: Optional[int] = field(
         default=None, metadata={"help": "Number of training data to be loaded."}
     )
@@ -571,7 +636,7 @@ class CgcnnDataArguments(TrainingPipelineArguments):
 
 @dataclass
 class CgcnnModelArguments(TrainingPipelineArguments):
-    """Model arguments related to Diffusion trainer."""
+    """Model arguments related to CGCNN trainer."""
 
     __name__ = "model_args"
 
@@ -589,7 +654,7 @@ class CgcnnModelArguments(TrainingPipelineArguments):
 
 @dataclass
 class CgcnnTrainingArguments(TrainingPipelineArguments):
-    """Training arguments related to Diffusion trainer."""
+    """Training arguments related to CGCNN trainer."""
 
     __name__ = "training_args"
 
@@ -619,6 +684,6 @@ class CgcnnTrainingArguments(TrainingPipelineArguments):
 
 @dataclass
 class CgcnnSavingArguments(TrainingPipelineArguments):
-    """Saving arguments related to Diffusion trainer."""
+    """Saving arguments related to CGCNN trainer."""
 
     __name__ = "saving_args"
