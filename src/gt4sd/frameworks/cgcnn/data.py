@@ -368,7 +368,7 @@ class CIFData(Dataset):
         return len(self.id_prop_data)
 
     @functools.lru_cache(maxsize=None)  # Cache loaded structures
-    def __getitem__(self, idx: int) -> Tuple[Tuple[np.ndarray[Any, Any], List[List[Any]], List[List[Any]]], str, str]:  # type: ignore
+    def __getitem__(self, idx: int) -> Tuple[Any, Any, Any]:  # type: ignore
         """
         Args:
            idx: index.

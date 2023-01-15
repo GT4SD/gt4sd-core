@@ -170,7 +170,7 @@ class CgcnnTrainingPipeline(TrainingPipeline):
                 )
 
         scheduler = MultiStepLR(
-            optimizer, milestones=training_args["lr_milestone"], gamma=0.1
+            optimizer, milestones=[training_args["lr_milestone"]], gamma=0.1
         )
 
         for epoch in range(training_args["start_epoch"], training_args["epochs"]):
@@ -223,6 +223,7 @@ class CgcnnTrainingPipeline(TrainingPipeline):
                     "dataset_args": dataset_args,
                 },
                 is_best,
+                training_args["output_path"],
             )
 
         # test best model
@@ -595,19 +596,21 @@ class AverageMeter:
 
 
 def save_checkpoint(
-    state: object, is_best: bool, filename: str = "checkpoint.pth.tar"
+    state: object, is_best: bool, path: str = ".", filename: str = "checkpoint.pth.tar"
 ) -> None:
     """Save CGCNN checkpoint.
 
     Args:
         state: checkpoint's object.
         is_best: whether the given checkpoint has the best performance or not.
-        filename: path to the save the checkpoint.
+        path: path to save the checkpoint.
+        filename: checkpoint's filename.
 
     """
-    torch.save(state, filename)
+
+    torch.save(state, os.path.join(path, filename))
     if is_best:
-        shutil.copyfile(filename, "model_best.pth.tar")
+        shutil.copyfile(filename, os.path.join(path, "model_best.pth.tar"))
 
 
 @dataclass
@@ -617,7 +620,6 @@ class CgcnnDataArguments(TrainingPipelineArguments):
     __name__ = "dataset_args"
 
     datapath: str = field(
-        default="",
         metadata={
             "help": "Path to the dataset."
             "The dataset should follow the directory structure as described in https://github.com/txie-93/cgcnn"
@@ -626,7 +628,7 @@ class CgcnnDataArguments(TrainingPipelineArguments):
     train_size: Optional[int] = field(
         default=None, metadata={"help": "Number of training data to be loaded."}
     )
-    valid_size: Optional[int] = field(
+    val_size: Optional[int] = field(
         default=None, metadata={"help": "Number of validation data to be loaded."}
     )
     test_size: Optional[int] = field(
@@ -661,6 +663,10 @@ class CgcnnTrainingArguments(TrainingPipelineArguments):
     task: str = field(
         default="regression",
         metadata={"help": "Select the type of the task."},
+    )
+    output_path: str = field(
+        default=".",
+        metadata={"help": "Path to the store the checkpoints."},
     )
     disable_cuda: bool = field(default=False, metadata={"help": "Disable CUDA."})
     workers: int = field(

@@ -28,6 +28,13 @@ from typing import Any, Dict
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
 from ..tests.utils import exitclose_file_creator
+from .cgcnn.core import (
+    CgcnnDataArguments,
+    CgcnnModelArguments,
+    CgcnnSavingArguments,
+    CgcnnTrainingArguments,
+    CgcnnTrainingPipeline,
+)
 from .diffusion.core import (
     DiffusionDataArguments,
     DiffusionForVisionTrainingPipeline,
@@ -102,14 +109,6 @@ from .torchdrug.graphaf.core import (
     TorchDrugGraphAFTrainingPipeline,
 )
 
-from .cgcnn.core import (
-    CgcnnDataArguments,
-    CgcnnModelArguments,
-    CgcnnTrainingArguments,
-    CgcnnTrainingPipeline,
-    CgcnnSavingArguments,
-)
-
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
@@ -174,11 +173,11 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         GFlowNetDataArguments,
         GFlowNetModelArguments,
     ),
-    "cgcnn": {
+    "cgcnn": (
         CgcnnDataArguments,
         CgcnnModelArguments,
         CgcnnTrainingArguments,
-    },
+    ),
 }
 
 TRAINING_PIPELINE_MAPPING = {

@@ -256,7 +256,7 @@ class Normalizer:
         return normed_tensor * self.std + self.mean
 
     def state_dict(self) -> Dict[str, torch.Tensor]:
-        """ Return the state dict of normalizer.
+        """Return the state dict of normalizer.
 
         Returns:
             dictionary including the used mean and std values.
@@ -264,11 +264,11 @@ class Normalizer:
         return {"mean": self.mean, "std": self.std}
 
     def load_state_dict(self, state_dict: Dict[str, Any]) -> None:
-        """ Return the state dict of normalizer.
+        """Return the state dict of normalizer.
 
-       Args:
-           mean: mean value to be used for the normalization.
-           std: std value to be used for the normalization.
+        Args:
+            mean: mean value to be used for the normalization.
+            std: std value to be used for the normalization.
         """
         self.mean = state_dict["mean"]
         self.std = state_dict["std"]
