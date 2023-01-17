@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Cgcnn trainer unit tests."""
+"""CGCNN trainer unit tests."""
 
 import shutil
 import tempfile
@@ -29,7 +29,7 @@ from typing import Any, Dict, cast
 
 import pytest
 
-from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, CgcnnTrainingPipeline
+from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, CGCNNTrainingPipeline
 
 template_config = {
     "model_args": {
@@ -63,7 +63,7 @@ def test_train():
 
     TEMPORARY_DIRECTORY = tempfile.mkdtemp()
 
-    test_pipeline = cast(CgcnnTrainingPipeline, pipeline())
+    test_pipeline = cast(CGCNNTrainingPipeline, pipeline())
 
     config: Dict[str, Any] = template_config.copy()
     config["training_args"]["output_path"] = TEMPORARY_DIRECTORY
