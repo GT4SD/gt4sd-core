@@ -45,7 +45,7 @@ PARAMETERS = {
     "number_of_steps": 8,
     "number_of_initial_points": 4,
     "number_of_optimization_rounds": 1,
-    "samples_for_evaluation": 5,
+    "samples_for_evaluation": 10,
     "maximum_number_of_sampling_steps": 4,
 }
 
