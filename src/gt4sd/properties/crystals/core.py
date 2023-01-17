@@ -44,48 +44,48 @@ class S3ParametersCrystals(S3Parameters):
     domain: DomainSubmodule = DomainSubmodule("crystals")
 
 
-class CgcnnParameters(S3ParametersCrystals):
+class CGCNNParameters(S3ParametersCrystals):
     algorithm_name: str = "cgcnn"
     batch_size: int = Field(description="Prediction batch size", default=256)
     workers: int = Field(description="Number of data loading workers", default=0)
 
 
-class FormationEnergyParameters(CgcnnParameters):
+class FormationEnergyParameters(CGCNNParameters):
     algorithm_application: str = "FormationEnergy"
 
 
-class AbsoluteEnergyParameters(CgcnnParameters):
+class AbsoluteEnergyParameters(CGCNNParameters):
     algorithm_application: str = "AbsoluteEnergy"
 
 
-class BandGapParameters(CgcnnParameters):
+class BandGapParameters(CGCNNParameters):
     algorithm_application: str = "BandGap"
 
 
-class FermiEnergyParameters(CgcnnParameters):
+class FermiEnergyParameters(CGCNNParameters):
     algorithm_application: str = "FermiEnergy"
 
 
-class BulkModuliParameters(CgcnnParameters):
+class BulkModuliParameters(CGCNNParameters):
     algorithm_application: str = "BulkModuli"
 
 
-class ShearModuliParameters(CgcnnParameters):
+class ShearModuliParameters(CGCNNParameters):
     algorithm_application: str = "ShearModuli"
 
 
-class PoissonRatioParameters(CgcnnParameters):
+class PoissonRatioParameters(CGCNNParameters):
     algorithm_application: str = "PoissonRatio"
 
 
-class MetalSemiconductorClassifierParameters(CgcnnParameters):
+class MetalSemiconductorClassifierParameters(CGCNNParameters):
     algorithm_application: str = "MetalSemiconductorClassifier"
 
 
 class _CGCNN(PredictorAlgorithm):
     """Base class for all cgcnn-based predictive algorithms."""
 
-    def __init__(self, parameters: CgcnnParameters):
+    def __init__(self, parameters: CGCNNParameters):
 
         # Set up the configuration from the parameters
         configuration = ConfigurablePropertyAlgorithmConfiguration(

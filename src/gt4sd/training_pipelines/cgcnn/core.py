@@ -49,8 +49,8 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class CgcnnTrainingPipeline(TrainingPipeline):
-    """Cgcnn training pipelines for crystals."""
+class CGCNNTrainingPipeline(TrainingPipeline):
+    """CGCNN training pipelines for crystals."""
 
     def train(  # type: ignore
         self,
@@ -614,7 +614,7 @@ def save_checkpoint(
 
 
 @dataclass
-class CgcnnDataArguments(TrainingPipelineArguments):
+class CGCNNDataArguments(TrainingPipelineArguments):
     """Data arguments related to diffusion trainer."""
 
     __name__ = "dataset_args"
@@ -637,7 +637,7 @@ class CgcnnDataArguments(TrainingPipelineArguments):
 
 
 @dataclass
-class CgcnnModelArguments(TrainingPipelineArguments):
+class CGCNNModelArguments(TrainingPipelineArguments):
     """Model arguments related to CGCNN trainer."""
 
     __name__ = "model_args"
@@ -655,7 +655,7 @@ class CgcnnModelArguments(TrainingPipelineArguments):
 
 
 @dataclass
-class CgcnnTrainingArguments(TrainingPipelineArguments):
+class CGCNNTrainingArguments(TrainingPipelineArguments):
     """Training arguments related to CGCNN trainer."""
 
     __name__ = "training_args"
@@ -689,7 +689,7 @@ class CgcnnTrainingArguments(TrainingPipelineArguments):
 
 
 @dataclass
-class CgcnnSavingArguments(TrainingPipelineArguments):
+class CGCNNSavingArguments(TrainingPipelineArguments):
     """Saving arguments related to CGCNN trainer."""
 
     __name__ = "saving_args"

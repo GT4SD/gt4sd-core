@@ -29,11 +29,11 @@ from typing import Any, Dict
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
 from ..tests.utils import exitclose_file_creator
 from .cgcnn.core import (
-    CgcnnDataArguments,
-    CgcnnModelArguments,
-    CgcnnSavingArguments,
-    CgcnnTrainingArguments,
-    CgcnnTrainingPipeline,
+    CGCNNDataArguments,
+    CGCNNModelArguments,
+    CGCNNSavingArguments,
+    CGCNNTrainingArguments,
+    CGCNNTrainingPipeline,
 )
 from .diffusion.core import (
     DiffusionDataArguments,
@@ -174,9 +174,9 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         GFlowNetModelArguments,
     ),
     "cgcnn": (
-        CgcnnDataArguments,
-        CgcnnModelArguments,
-        CgcnnTrainingArguments,
+        CGCNNDataArguments,
+        CGCNNModelArguments,
+        CGCNNTrainingArguments,
     ),
 }
 
@@ -192,7 +192,7 @@ TRAINING_PIPELINE_MAPPING = {
     "regression-transformer-trainer": RegressionTransformerTrainingPipeline,
     "diffusion-trainer": DiffusionForVisionTrainingPipeline,
     "gflownet-trainer": GFlowNetTrainingPipeline,
-    "cgcnn": CgcnnTrainingPipeline,
+    "cgcnn": CGCNNTrainingPipeline,
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
@@ -207,7 +207,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "regression-transformer-trainer": RegressionTransformerSavingArguments,
     "diffusion-trainer": DiffusionSavingArguments,
     "gflownet-trainer": GFlowNetSavingArguments,
-    "cgcnn": CgcnnSavingArguments,
+    "cgcnn": CGCNNSavingArguments,
 }
 
 
