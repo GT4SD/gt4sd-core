@@ -22,7 +22,8 @@
 # SOFTWARE.
 #
 import argparse
-from typing import List
+import os
+from typing import Dict, List
 
 import torch
 from pydantic import Field
@@ -36,7 +37,7 @@ from ...algorithms.core import (
 )
 from ...frameworks.cgcnn.data import CIFData, collate_pool
 from ...frameworks.cgcnn.model import CrystalGraphConvNet, Normalizer
-from ..core import DomainSubmodule, PropertyValue, S3Parameters
+from ..core import DomainSubmodule, S3Parameters
 
 
 class S3ParametersCrystals(S3Parameters):
@@ -73,7 +74,7 @@ class ShearModuliParameters(CgcnnParameters):
     algorithm_application: str = "ShearModuli"
 
 
-class PoissonRationParameters(CgcnnParameters):
+class PoissonRatioParameters(CgcnnParameters):
     algorithm_application: str = "PoissonRatio"
 
 
@@ -110,20 +111,34 @@ class _CGCNN(PredictorAlgorithm):
         Returns:
             Predictor: the model.
         """
+
+        existing_models = os.listdir(resources_path)
+        existing_models = [
+            file for file in existing_models if file.endswith(".pth.tar")
+        ]
+
+        if len(existing_models) > 1:
+            raise ValueError(
+                "Only one model should be located in the specified model path."
+            )
+        elif len(existing_models) == 0:
+            raise ValueError("Model does not exist in the specified model path.")
+
+        model_path = os.path.join(resources_path, existing_models[0])
+
         model_checkpoint = torch.load(
-            resources_path, map_location=lambda storage, loc: storage
+            model_path, map_location=lambda storage, loc: storage
         )
+
         model_args = argparse.Namespace(**model_checkpoint["args"])
 
         normalizer = Normalizer(torch.zeros(3))
 
-        checkpoint = torch.load(
-            resources_path, map_location=lambda storage, loc: storage
-        )
+        checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
         normalizer.load_state_dict(checkpoint["normalizer"])
 
         # Wrapper to get toxicity-endpoint-level predictions
-        def informative_model(cif_path: str) -> List[PropertyValue]:
+        def informative_model(cif_path: str) -> Dict[str, List[float]]:
 
             dataset = CIFData(cif_path)
             test_loader = DataLoader(
@@ -145,7 +160,7 @@ class _CGCNN(PredictorAlgorithm):
                 n_conv=model_args.n_conv,
                 h_fea_len=model_args.h_fea_len,
                 n_h=model_args.n_h,
-                classification=False,
+                classification=True if model_args.task == "classification" else False,
             )
 
             model.load_state_dict(checkpoint["state_dict"])
@@ -170,7 +185,7 @@ class _CGCNN(PredictorAlgorithm):
                 test_preds += test_pred.view(-1).tolist()
                 test_cif_ids += batch_cif_ids
 
-            return model.predictions.detach().tolist()  # type: ignore
+            return {"cif_ids": test_cif_ids, "predictions": test_preds}  # type: ignore
 
         return informative_model
 

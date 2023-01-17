@@ -39,7 +39,7 @@ from .core import (
     MetalSemiconductorClassifier,
     MetalSemiconductorClassifierParameters,
     PoissonRatio,
-    PoissonRationParameters,
+    PoissonRatioParameters,
     ShearModuli,
     ShearModuliParameters,
 )
@@ -58,7 +58,7 @@ CRYSTALS_PROPERTY_PREDICTOR_FACTORY: Dict[
     "fermi_energy": (FermiEnergy, FermiEnergyParameters),
     "bulk_moduli": (BulkModuli, BulkModuliParameters),
     "shear_moduli": (ShearModuli, ShearModuliParameters),
-    "poisson_ratio": (PoissonRatio, PoissonRationParameters),
+    "poisson_ratio": (PoissonRatio, PoissonRatioParameters),
     "metal_semiconductor_classifier": (
         MetalSemiconductorClassifier,
         MetalSemiconductorClassifierParameters,
