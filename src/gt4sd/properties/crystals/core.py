@@ -181,8 +181,12 @@ class _CGCNN(PredictorAlgorithm):
                 output = model(*input_var)
 
                 # record loss
-                test_pred = normalizer.denorm(output.data.cpu())
-                test_preds += test_pred.view(-1).tolist()
+                if model_args.task=="classification":
+                    test_pred = torch.exp(output.data.cpu())
+                    test_preds += test_pred[:, 1].tolist()
+                else:
+                    test_pred = normalizer.denorm(output.data.cpu())
+                    test_preds += test_pred.view(-1).tolist()
                 test_cif_ids += batch_cif_ids
 
             return {"cif_ids": test_cif_ids, "predictions": test_preds}  # type: ignore
@@ -254,7 +258,7 @@ class PoissonRatio(_CGCNN):
     @classmethod
     def get_description(cls) -> str:
         text = """
-        This model predicts the Poisson ration of crystals using the CGCNN framework.
+        This model predicts the Poisson ratio of crystals using the CGCNN framework.
         For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.
          """
         return text
