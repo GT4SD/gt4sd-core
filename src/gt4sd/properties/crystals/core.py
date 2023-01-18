@@ -181,7 +181,7 @@ class _CGCNN(PredictorAlgorithm):
                 output = model(*input_var)
 
                 # record loss
-                if model_args.task=="classification":
+                if model_args.task == "classification":
                     test_pred = torch.exp(output.data.cpu())
                     test_preds += test_pred[:, 1].tolist()
                 else:
