@@ -61,6 +61,7 @@ If you would like to contribute to the package, we recommend the following devel
 7. Implement your changes and once you are ready run the tests:
 
     ```sh
+    # this can take quite long a it's downloading all models and running them multiple times in the tests
     python -m pytest -sv
     ```
 
@@ -78,7 +79,7 @@ If you would like to contribute to the package, we recommend the following devel
     Ensure the license headers:
 
     ```sh
-    licenseheaders -y 2022 -d src/gt4sd -o "GT4SD team" -t mit.tmpl
+    licenseheaders -y 2023 -d src/gt4sd -o "GT4SD team" -t mit.tmpl
     ```
 
 8. Once the tests and checks passes, but most importantly you are happy with the implemented feature, commit your changes.
