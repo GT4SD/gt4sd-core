@@ -1,0 +1,626 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.cgcnn.data &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.cgcnn.data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.cgcnn.data</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Data module.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core.structure</span> <span class="kn">import</span> <span class="n">Structure</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">LongTensor</span><span class="p">,</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data.dataloader</span> <span class="kn">import</span> <span class="n">default_collate</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data.sampler</span> <span class="kn">import</span> <span class="n">SubsetRandomSampler</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="get_train_val_test_loader"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.get_train_val_test_loader">[docs]</a><span class="k">def</span> <span class="nf">get_train_val_test_loader</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">collate_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_collate</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+    <span class="n">train_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">val_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">test_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">return_test</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">pin_memory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+<span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Utility function for dividing a dataset to train, val, test datasets.</span>
+
+<span class="sd">    !!! The dataset needs to be shuffled before using the function !!!</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataset: torch.utils.data.Dataset</span>
+<span class="sd">          The full dataset to be divided.</span>
+<span class="sd">        collate_fn: torch.utils.data.DataLoader.</span>
+<span class="sd">        batch_size: int.</span>
+<span class="sd">        train_ratio: float.</span>
+<span class="sd">        val_ratio: float.</span>
+<span class="sd">        test_ratio: float.</span>
+<span class="sd">        return_test: bool.</span>
+<span class="sd">          Whether to return the test dataset loader. If False, the last test_size</span>
+<span class="sd">          data will be hidden.</span>
+<span class="sd">        num_workers: int.</span>
+<span class="sd">        pin_memory: bool.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        train_loader: torch.utils.data.DataLoader</span>
+<span class="sd">          DataLoader that random samples the training data.</span>
+<span class="sd">        val_loader: torch.utils.data.DataLoader</span>
+<span class="sd">          DataLoader that random samples the validation data.</span>
+<span class="sd">        (test_loader): torch.utils.data.DataLoader</span>
+<span class="sd">          DataLoader that random samples the test data, Returns if</span>
+<span class="sd">            return_test=True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">total_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;train_size&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">train_ratio</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">val_ratio</span> <span class="o">+</span> <span class="n">test_ratio</span> <span class="o">&lt;</span> <span class="mi">1</span>
+            <span class="n">train_ratio</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">val_ratio</span> <span class="o">-</span> <span class="n">test_ratio</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;train_ratio is None, using 1 - val_ratio - &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;test_ratio = </span><span class="si">{</span><span class="n">train_ratio</span><span class="si">}</span><span class="s2"> as training data.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">train_ratio</span> <span class="o">+</span> <span class="n">val_ratio</span> <span class="o">+</span> <span class="n">test_ratio</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">total_size</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;train_size&quot;</span><span class="p">]:</span>
+        <span class="n">train_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;train_size&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">train_ratio</span> <span class="o">*</span> <span class="n">total_size</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;test_size&quot;</span><span class="p">]:</span>
+        <span class="n">test_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;test_size&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">test_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">test_ratio</span> <span class="o">*</span> <span class="n">total_size</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;val_size&quot;</span><span class="p">]:</span>
+        <span class="n">valid_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;val_size&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">valid_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val_ratio</span> <span class="o">*</span> <span class="n">total_size</span><span class="p">)</span>
+    <span class="n">train_sampler</span> <span class="o">=</span> <span class="n">SubsetRandomSampler</span><span class="p">(</span><span class="n">indices</span><span class="p">[:</span><span class="n">train_size</span><span class="p">])</span>
+    <span class="n">val_sampler</span> <span class="o">=</span> <span class="n">SubsetRandomSampler</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">valid_size</span> <span class="o">+</span> <span class="n">test_size</span><span class="p">)</span> <span class="p">:</span> <span class="o">-</span><span class="n">test_size</span><span class="p">])</span>
+
+    <span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">sampler</span><span class="o">=</span><span class="n">train_sampler</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">,</span>
+        <span class="n">pin_memory</span><span class="o">=</span><span class="n">pin_memory</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">val_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">sampler</span><span class="o">=</span><span class="n">val_sampler</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">,</span>
+        <span class="n">pin_memory</span><span class="o">=</span><span class="n">pin_memory</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_test</span><span class="p">:</span>
+
+        <span class="n">test_sampler</span> <span class="o">=</span> <span class="n">SubsetRandomSampler</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="o">-</span><span class="n">test_size</span><span class="p">:])</span>
+
+        <span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">sampler</span><span class="o">=</span><span class="n">test_sampler</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">,</span>
+            <span class="n">pin_memory</span><span class="o">=</span><span class="n">pin_memory</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">test_loader</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span></div>
+
+
+<div class="viewcode-block" id="collate_pool"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.collate_pool">[docs]</a><span class="k">def</span> <span class="nf">collate_pool</span><span class="p">(</span>
+    <span class="n">dataset_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">LongTensor</span><span class="p">]],</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collate a list of data and return a batch for predicting crystal properties.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataset_list: list of tuples for each data point.</span>
+<span class="sd">          (atom_fea, nbr_fea, nbr_fea_idx, target)</span>
+
+<span class="sd">          atom_fea: torch.Tensor shape (n_i, atom_fea_len).</span>
+<span class="sd">          nbr_fea: torch.Tensor shape (n_i, M, nbr_fea_len).</span>
+<span class="sd">          nbr_fea_idx: torch.LongTensor shape (n_i, M).</span>
+<span class="sd">          target: torch.Tensor shape (1, ).</span>
+<span class="sd">          cif_id: str or int.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        N = sum(n_i); N0 = sum(i)</span>
+<span class="sd">        batch_atom_fea: torch.Tensor shape (N, orig_atom_fea_len)</span>
+<span class="sd">          Atom features from atom type.</span>
+<span class="sd">        batch_nbr_fea: torch.Tensor shape (N, M, nbr_fea_len)</span>
+<span class="sd">          Bond features of each atom&#39;s M neighbors.</span>
+<span class="sd">        batch_nbr_fea_idx: torch.LongTensor shape (N, M)</span>
+<span class="sd">          Indices of M neighbors of each atom.</span>
+<span class="sd">        crystal_atom_idx: list of torch.LongTensor of length N0</span>
+<span class="sd">          Mapping from the crystal idx to atom idx.</span>
+<span class="sd">        target: torch.Tensor shape (N, 1)</span>
+<span class="sd">          Target value for prediction.</span>
+<span class="sd">        batch_cif_ids: list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">batch_atom_fea</span><span class="p">,</span> <span class="n">batch_nbr_fea</span><span class="p">,</span> <span class="n">batch_nbr_fea_idx</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">crystal_atom_idx</span><span class="p">,</span> <span class="n">batch_target</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">batch_cif_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">base_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">atom_fea</span><span class="p">,</span> <span class="n">nbr_fea</span><span class="p">,</span> <span class="n">nbr_fea_idx</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="n">cif_id</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+        <span class="n">dataset_list</span>
+    <span class="p">):</span>
+        <span class="n">n_i</span> <span class="o">=</span> <span class="n">atom_fea</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># number of atoms for this crystal</span>
+        <span class="n">batch_atom_fea</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom_fea</span><span class="p">)</span>
+        <span class="n">batch_nbr_fea</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nbr_fea</span><span class="p">)</span>
+        <span class="n">batch_nbr_fea_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nbr_fea_idx</span> <span class="o">+</span> <span class="n">base_idx</span><span class="p">)</span>
+        <span class="n">new_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_i</span><span class="p">)</span> <span class="o">+</span> <span class="n">base_idx</span><span class="p">)</span>
+        <span class="n">crystal_atom_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_idx</span><span class="p">)</span>
+        <span class="n">batch_target</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">batch_cif_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cif_id</span><span class="p">)</span>
+        <span class="n">base_idx</span> <span class="o">+=</span> <span class="n">n_i</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">batch_atom_fea</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">batch_nbr_fea</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">batch_nbr_fea_idx</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="n">crystal_atom_idx</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">batch_target</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">batch_cif_ids</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GaussianDistance"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.GaussianDistance">[docs]</a><span class="k">class</span> <span class="nc">GaussianDistance</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expands the distance by Gaussian basis.</span>
+
+<span class="sd">    Unit: angstrom</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GaussianDistance.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.GaussianDistance.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">var</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dmin: float</span>
+<span class="sd">              Minimum interatomic distance.</span>
+<span class="sd">            dmax: float</span>
+<span class="sd">              Maximum interatomic distance.</span>
+<span class="sd">            step: float</span>
+<span class="sd">              Step size for the Gaussian filter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">dmin</span> <span class="o">&lt;</span> <span class="n">dmax</span>
+        <span class="k">assert</span> <span class="n">dmax</span> <span class="o">-</span> <span class="n">dmin</span> <span class="o">&gt;</span> <span class="n">step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="n">dmax</span> <span class="o">+</span> <span class="n">step</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="n">step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var</span> <span class="o">=</span> <span class="n">var</span></div>
+
+<div class="viewcode-block" id="GaussianDistance.expand"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.GaussianDistance.expand">[docs]</a>    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distances</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply Gaussian disntance filter to a numpy distance array.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            distance: np.array shape n-d array</span>
+<span class="sd">              A distance matrix of any shape.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            expanded_distance: shape (n+1)-d array</span>
+<span class="sd">              Expanded distance matrix with the last dimension of length</span>
+<span class="sd">              len(self.filter).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="o">-</span><span class="p">((</span><span class="n">distances</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">var</span><span class="o">**</span><span class="mi">2</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="AtomInitializer"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomInitializer">[docs]</a><span class="k">class</span> <span class="nc">AtomInitializer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for intializing the vector representation for atoms.</span>
+
+<span class="sd">    !!! Use one AtomInitializer per dataset !!!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AtomInitializer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomInitializer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_types</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">atom_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="AtomInitializer.get_atom_fea"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomInitializer.get_atom_fea">[docs]</a>    <span class="k">def</span> <span class="nf">get_atom_fea</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_type</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">atom_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span><span class="p">[</span><span class="n">atom_type</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="AtomInitializer.load_state_dict"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomInitializer.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span> <span class="o">=</span> <span class="n">state_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_decodedict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">idx</span><span class="p">:</span> <span class="n">atom_type</span> <span class="k">for</span> <span class="n">atom_type</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="AtomInitializer.state_dict"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomInitializer.state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span></div>
+
+<div class="viewcode-block" id="AtomInitializer.decode"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomInitializer.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_decodedict&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_decodedict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">idx</span><span class="p">:</span> <span class="n">atom_type</span> <span class="k">for</span> <span class="n">atom_type</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decodedict</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="AtomCustomJSONInitializer"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomCustomJSONInitializer">[docs]</a><span class="k">class</span> <span class="nc">AtomCustomJSONInitializer</span><span class="p">(</span><span class="n">AtomInitializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialize atom feature vectors using a JSON file, which is a python</span>
+<span class="sd">    dictionary mapping from element number to a list representing the</span>
+<span class="sd">    feature vector of the element.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AtomCustomJSONInitializer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomCustomJSONInitializer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem_embedding_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            elem_embedding_file: str</span>
+<span class="sd">                The path to the .json file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">elem_embedding_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">elem_embedding</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">elem_embedding</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">elem_embedding</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">atom_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">elem_embedding</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AtomCustomJSONInitializer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atom_types</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">elem_embedding</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CIFData"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.CIFData">[docs]</a><span class="k">class</span> <span class="nc">CIFData</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The CIFData dataset is a wrapper for a dataset where the crystal structures</span>
+<span class="sd">    are stored in the form of CIF files. The dataset should have the following</span>
+<span class="sd">    directory structure:</span>
+
+<span class="sd">    root_dir</span>
+<span class="sd">    ├── id_prop.csv</span>
+<span class="sd">    ├── atom_init.json</span>
+<span class="sd">    ├── id0.cif</span>
+<span class="sd">    ├── id1.cif</span>
+<span class="sd">    ├── ...</span>
+
+<span class="sd">    id_prop.csv: a CSV file with two columns. The first column recodes a</span>
+<span class="sd">    unique ID for each crystal, and the second column recodes the value of</span>
+<span class="sd">    target property.</span>
+
+<span class="sd">    atom_init.json: a JSON file that stores the initialization vector for each</span>
+<span class="sd">    element.</span>
+
+<span class="sd">    ID.cif: a CIF file that recodes the crystal structure, where ID is the</span>
+<span class="sd">    unique ID for the crystal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CIFData.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.CIFData.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">root_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">max_num_nbr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+        <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="n">dmin</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">123</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            root_dir: str</span>
+<span class="sd">                The path to the root directory of the dataset.</span>
+<span class="sd">            max_num_nbr: int</span>
+<span class="sd">                The maximum number of neighbors while constructing the crystal graph.</span>
+<span class="sd">            radius: float</span>
+<span class="sd">                The cutoff radius for searching neighbors.</span>
+<span class="sd">            dmin: float</span>
+<span class="sd">                The minimum distance for constructing GaussianDistance.</span>
+<span class="sd">            step: float</span>
+<span class="sd">                The step size for constructing GaussianDistance.</span>
+<span class="sd">            random_seed: int</span>
+<span class="sd">                Random seed for shuffling the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">=</span> <span class="n">root_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_num_nbr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">max_num_nbr</span><span class="p">,</span> <span class="n">radius</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">root_dir</span><span class="p">),</span> <span class="s2">&quot;root_dir does not exist!&quot;</span>
+        <span class="n">id_prop_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="s2">&quot;id_prop.csv&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">id_prop_file</span><span class="p">),</span> <span class="s2">&quot;id_prop.csv does not exist!&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">id_prop_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id_prop_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">]</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_prop_data</span><span class="p">)</span>
+        <span class="n">atom_init_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="s2">&quot;atom_init.json&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">atom_init_file</span><span class="p">),</span> <span class="s2">&quot;atom_init.json does not exist!&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ari</span> <span class="o">=</span> <span class="n">AtomCustomJSONInitializer</span><span class="p">(</span><span class="n">atom_init_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span> <span class="o">=</span> <span class="n">GaussianDistance</span><span class="p">(</span><span class="n">dmin</span><span class="o">=</span><span class="n">dmin</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CIFData.__len__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.CIFData.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_prop_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CIFData.__getitem__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.CIFData.__getitem__">[docs]</a>    <span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># Cache loaded structures</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">           idx: index.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            atom_fea: torch.Tensor shape (n_i, atom_fea_len).</span>
+<span class="sd">            nbr_fea: torch.Tensor shape (n_i, M, nbr_fea_len).</span>
+<span class="sd">            nbr_fea_idx: torch.LongTensor shape (n_i, M).</span>
+<span class="sd">            target: torch.Tensor shape (1, ).</span>
+<span class="sd">            cif_id: str or int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cif_id</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_prop_data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">crystal</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">cif_id</span> <span class="o">+</span> <span class="s2">&quot;.cif&quot;</span><span class="p">))</span>
+        <span class="n">atom_fea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ari</span><span class="o">.</span><span class="n">get_atom_fea</span><span class="p">(</span><span class="n">crystal</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">specie</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">crystal</span><span class="p">))</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">atom_fea</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">atom_fea</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="n">all_nbrs</span> <span class="o">=</span> <span class="n">crystal</span><span class="o">.</span><span class="n">get_all_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">include_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">all_nbrs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sorted</span><span class="p">(</span><span class="n">nbrs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">nbrs</span> <span class="ow">in</span> <span class="n">all_nbrs</span><span class="p">]</span>
+        <span class="n">nbr_fea_idx</span><span class="p">,</span> <span class="n">nbr_fea</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">all_nbrs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nbr</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_num_nbr</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> not find enough neighbors to build graph. &quot;</span>
+                    <span class="s2">&quot;If it happens frequently, consider increase &quot;</span>
+                    <span class="s2">&quot;radius.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cif_id</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">nbr_fea_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">nbr</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_num_nbr</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">nbr</span><span class="p">))</span>
+                <span class="p">)</span>
+                <span class="n">nbr_fea</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">nbr</span><span class="p">))</span>
+                    <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_num_nbr</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">nbr</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nbr_fea_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">nbr</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_num_nbr</span><span class="p">])))</span>
+                <span class="n">nbr_fea</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">nbr</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_num_nbr</span><span class="p">])))</span>
+        <span class="n">nbr_fea_idx</span><span class="p">,</span> <span class="n">nbr_fea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nbr_fea_idx</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nbr_fea</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="n">nbr_fea</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">nbr_fea</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="n">atom_fea</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">atom_fea</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="n">nbr_fea</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">nbr_fea</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="n">nbr_fea_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="n">nbr_fea_idx</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">target</span><span class="p">)])</span>  <span class="c1"># type: ignore</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">atom_fea</span><span class="p">,</span> <span class="n">nbr_fea</span><span class="p">,</span> <span class="n">nbr_fea_idx</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="n">cif_id</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

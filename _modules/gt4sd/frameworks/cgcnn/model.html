@@ -1,0 +1,483 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.cgcnn.model &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.cgcnn.model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.cgcnn.model</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Model module.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+
+<div class="viewcode-block" id="ConvLayer"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.ConvLayer">[docs]</a><span class="k">class</span> <span class="nc">ConvLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convolutional operation on graphs.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ConvLayer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.ConvLayer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_fea_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nbr_fea_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize ConvLayer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom_fea_len: int</span>
+<span class="sd">              Number of atom hidden features.</span>
+<span class="sd">            nbr_fea_len: int</span>
+<span class="sd">              Number of bond features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConvLayer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_fea_len</span> <span class="o">=</span> <span class="n">atom_fea_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nbr_fea_len</span> <span class="o">=</span> <span class="n">nbr_fea_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc_full</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_fea_len</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbr_fea_len</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_fea_len</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigmoid</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">softplus1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Softplus</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_fea_len</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_fea_len</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">softplus2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Softplus</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConvLayer.forward"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.ConvLayer.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">atom_in_fea</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">nbr_fea</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">nbr_fea_idx</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
+
+<span class="sd">        N: Total number of atoms in the batch.</span>
+<span class="sd">        M: Max number of neighbors.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom_in_fea: Variable(torch.Tensor) shape (N, atom_fea_len)</span>
+<span class="sd">              Atom hidden features before convolution.</span>
+<span class="sd">            nbr_fea: Variable(torch.Tensor) shape (N, M, nbr_fea_len)</span>
+<span class="sd">              Bond features of each atom&#39;s M neighbors.</span>
+<span class="sd">            nbr_fea_idx: torch.LongTensor shape (N, M)</span>
+<span class="sd">              Indices of M neighbors of each atom.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            atom_out_fea: nn.Variable shape (N, atom_fea_len)</span>
+<span class="sd">              Atom hidden features after convolution.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO will there be problems with the index zero padding?</span>
+        <span class="n">N</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">nbr_fea_idx</span><span class="o">.</span><span class="n">shape</span>
+        <span class="c1"># convolution</span>
+        <span class="n">atom_nbr_fea</span> <span class="o">=</span> <span class="n">atom_in_fea</span><span class="p">[</span><span class="n">nbr_fea_idx</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">total_nbr_fea</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">atom_in_fea</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_fea_len</span><span class="p">),</span>
+                <span class="n">atom_nbr_fea</span><span class="p">,</span>
+                <span class="n">nbr_fea</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">total_gated_fea</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc_full</span><span class="p">(</span><span class="n">total_nbr_fea</span><span class="p">)</span>
+        <span class="n">total_gated_fea</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span><span class="p">(</span>
+            <span class="n">total_gated_fea</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_fea_len</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_fea_len</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">nbr_filter</span><span class="p">,</span> <span class="n">nbr_core</span> <span class="o">=</span> <span class="n">total_gated_fea</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">nbr_filter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">nbr_filter</span><span class="p">)</span>
+        <span class="n">nbr_core</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softplus1</span><span class="p">(</span><span class="n">nbr_core</span><span class="p">)</span>
+        <span class="n">nbr_sumed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nbr_filter</span> <span class="o">*</span> <span class="n">nbr_core</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">nbr_sumed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bn2</span><span class="p">(</span><span class="n">nbr_sumed</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softplus2</span><span class="p">(</span><span class="n">atom_in_fea</span> <span class="o">+</span> <span class="n">nbr_sumed</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+
+
+<div class="viewcode-block" id="CrystalGraphConvNet"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.CrystalGraphConvNet">[docs]</a><span class="k">class</span> <span class="nc">CrystalGraphConvNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a crystal graph convolutional neural network for predicting total material properties.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CrystalGraphConvNet.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.CrystalGraphConvNet.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">orig_atom_fea_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">nbr_fea_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">atom_fea_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+        <span class="n">n_conv</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">h_fea_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="n">n_h</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">classification</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize CrystalGraphConvNet.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            orig_atom_fea_len: int</span>
+<span class="sd">              Number of atom features in the input.</span>
+<span class="sd">            nbr_fea_len: int</span>
+<span class="sd">              Number of bond features.</span>
+<span class="sd">            atom_fea_len: int</span>
+<span class="sd">              Number of hidden atom features in the convolutional layers.</span>
+<span class="sd">            n_conv: int</span>
+<span class="sd">              Number of convolutional layers.</span>
+<span class="sd">            h_fea_len: int</span>
+<span class="sd">              Number of hidden features after pooling.</span>
+<span class="sd">            n_h: int</span>
+<span class="sd">              Number of hidden layers after pooling.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CrystalGraphConvNet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classification</span> <span class="o">=</span> <span class="n">classification</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">orig_atom_fea_len</span><span class="p">,</span> <span class="n">atom_fea_len</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convs</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">ConvLayer</span><span class="p">(</span><span class="n">atom_fea_len</span><span class="o">=</span><span class="n">atom_fea_len</span><span class="p">,</span> <span class="n">nbr_fea_len</span><span class="o">=</span><span class="n">nbr_fea_len</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_conv</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_to_fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">atom_fea_len</span><span class="p">,</span> <span class="n">h_fea_len</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_to_fc_softplus</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Softplus</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">n_h</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fcs</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">h_fea_len</span><span class="p">,</span> <span class="n">h_fea_len</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_h</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">softpluses</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span><span class="n">nn</span><span class="o">.</span><span class="n">Softplus</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_h</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">classification</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fc_out</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">h_fea_len</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fc_out</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">h_fea_len</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">classification</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logsoftmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CrystalGraphConvNet.forward"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.CrystalGraphConvNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">atom_fea</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">nbr_fea</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">nbr_fea_idx</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">,</span>
+        <span class="n">crystal_atom_idx</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
+
+<span class="sd">        N: Total number of atoms in the batch.</span>
+<span class="sd">        M: Max number of neighbors.</span>
+<span class="sd">        N0: Total number of crystals in the batch.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom_fea: Variable(torch.Tensor) shape (N, orig_atom_fea_len)</span>
+<span class="sd">              Atom features from atom type.</span>
+<span class="sd">            nbr_fea: Variable(torch.Tensor) shape (N, M, nbr_fea_len)</span>
+<span class="sd">              Bond features of each atom&#39;s M neighbors.</span>
+<span class="sd">            nbr_fea_idx: torch.LongTensor shape (N, M)</span>
+<span class="sd">              Indices of M neighbors of each atom.</span>
+<span class="sd">            crystal_atom_idx: list of torch.LongTensor of length N0</span>
+<span class="sd">              Mapping from the crystal idx to atom idx.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            prediction: nn.Variable shape (N, )</span>
+<span class="sd">              Atom hidden features after convolution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">atom_fea</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">atom_fea</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">conv_func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convs</span><span class="p">:</span>
+            <span class="n">atom_fea</span> <span class="o">=</span> <span class="n">conv_func</span><span class="p">(</span><span class="n">atom_fea</span><span class="p">,</span> <span class="n">nbr_fea</span><span class="p">,</span> <span class="n">nbr_fea_idx</span><span class="p">)</span>
+        <span class="n">crys_fea</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pooling</span><span class="p">(</span><span class="n">atom_fea</span><span class="p">,</span> <span class="n">crystal_atom_idx</span><span class="p">)</span>
+        <span class="n">crys_fea</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_to_fc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_to_fc_softplus</span><span class="p">(</span><span class="n">crys_fea</span><span class="p">))</span>
+        <span class="n">crys_fea</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_to_fc_softplus</span><span class="p">(</span><span class="n">crys_fea</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">classification</span><span class="p">:</span>
+            <span class="n">crys_fea</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">crys_fea</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;fcs&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;softpluses&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">fc</span><span class="p">,</span> <span class="n">softplus</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fcs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">softpluses</span><span class="p">):</span>
+                <span class="n">crys_fea</span> <span class="o">=</span> <span class="n">softplus</span><span class="p">(</span><span class="n">fc</span><span class="p">(</span><span class="n">crys_fea</span><span class="p">))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc_out</span><span class="p">(</span><span class="n">crys_fea</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">classification</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logsoftmax</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CrystalGraphConvNet.pooling"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.CrystalGraphConvNet.pooling">[docs]</a>    <span class="k">def</span> <span class="nf">pooling</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">atom_fea</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">crystal_atom_idx</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pooling the atom features to crystal features.</span>
+
+<span class="sd">        N: Total number of atoms in the batch.</span>
+<span class="sd">        N0: Total number of crystals in the batch.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom_fea: Variable(torch.Tensor) shape (N, atom_fea_len)</span>
+<span class="sd">              Atom feature vectors of the batch.</span>
+<span class="sd">            crystal_atom_idx: list of torch.LongTensor of length N0</span>
+<span class="sd">              Mapping from the crystal idx to atom idx.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx_map</span> <span class="ow">in</span> <span class="n">crystal_atom_idx</span><span class="p">])</span>
+            <span class="o">==</span> <span class="n">atom_fea</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">summed_fea</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">atom_fea</span><span class="p">[</span><span class="n">idx_map</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx_map</span> <span class="ow">in</span> <span class="n">crystal_atom_idx</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">summed_fea</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Normalizer"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.Normalizer">[docs]</a><span class="k">class</span> <span class="nc">Normalizer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize a Tensor and restore it later.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Normalizer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.Normalizer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;tensor is taken as a sample to calculate the mean and std.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">std</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Normalizer.norm"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.Normalizer.norm">[docs]</a>    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Noramlize a tensor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tensor: tensor to be normalized.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            normalized tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">tensor</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std</span></div>
+
+<div class="viewcode-block" id="Normalizer.denorm"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.Normalizer.denorm">[docs]</a>    <span class="k">def</span> <span class="nf">denorm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normed_tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Denormalized tensor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tensor: tensor to be denormalized:</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            denormalized tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">normed_tensor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">std</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span></div>
+
+<div class="viewcode-block" id="Normalizer.state_dict"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.Normalizer.state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the state dict of normalizer.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dictionary including the used mean and std values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">std</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="Normalizer.load_state_dict"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.model.html#gt4sd.frameworks.cgcnn.model.Normalizer.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the state dict of normalizer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mean: mean value to be used for the normalization.</span>
+<span class="sd">            std: std value to be used for the normalization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">std</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

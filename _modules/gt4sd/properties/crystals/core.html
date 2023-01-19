@@ -1,0 +1,485 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.properties.crystals.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../properties.html">gt4sd.properties</a> &raquo;</li>
+        
+      <li>gt4sd.properties.crystals.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.properties.crystals.core</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">Field</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="kn">from</span> <span class="nn">...algorithms.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConfigurablePropertyAlgorithmConfiguration</span><span class="p">,</span>
+    <span class="n">Predictor</span><span class="p">,</span>
+    <span class="n">PredictorAlgorithm</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">...frameworks.cgcnn.data</span> <span class="kn">import</span> <span class="n">CIFData</span><span class="p">,</span> <span class="n">collate_pool</span>
+<span class="kn">from</span> <span class="nn">...frameworks.cgcnn.model</span> <span class="kn">import</span> <span class="n">CrystalGraphConvNet</span><span class="p">,</span> <span class="n">Normalizer</span>
+<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">DomainSubmodule</span><span class="p">,</span> <span class="n">S3Parameters</span>
+
+
+<div class="viewcode-block" id="S3ParametersCrystals"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.S3ParametersCrystals">[docs]</a><span class="k">class</span> <span class="nc">S3ParametersCrystals</span><span class="p">(</span><span class="n">S3Parameters</span><span class="p">):</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">DomainSubmodule</span> <span class="o">=</span> <span class="n">DomainSubmodule</span><span class="p">(</span><span class="s2">&quot;crystals&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CGCNNParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.CGCNNParameters">[docs]</a><span class="k">class</span> <span class="nc">CGCNNParameters</span><span class="p">(</span><span class="n">S3ParametersCrystals</span><span class="p">):</span>
+    <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cgcnn&quot;</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prediction batch size&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+    <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of data loading workers&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FormationEnergyParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.FormationEnergyParameters">[docs]</a><span class="k">class</span> <span class="nc">FormationEnergyParameters</span><span class="p">(</span><span class="n">CGCNNParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;FormationEnergy&quot;</span></div>
+
+
+<div class="viewcode-block" id="AbsoluteEnergyParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.AbsoluteEnergyParameters">[docs]</a><span class="k">class</span> <span class="nc">AbsoluteEnergyParameters</span><span class="p">(</span><span class="n">CGCNNParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;AbsoluteEnergy&quot;</span></div>
+
+
+<div class="viewcode-block" id="BandGapParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.BandGapParameters">[docs]</a><span class="k">class</span> <span class="nc">BandGapParameters</span><span class="p">(</span><span class="n">CGCNNParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;BandGap&quot;</span></div>
+
+
+<div class="viewcode-block" id="FermiEnergyParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.FermiEnergyParameters">[docs]</a><span class="k">class</span> <span class="nc">FermiEnergyParameters</span><span class="p">(</span><span class="n">CGCNNParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;FermiEnergy&quot;</span></div>
+
+
+<div class="viewcode-block" id="BulkModuliParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.BulkModuliParameters">[docs]</a><span class="k">class</span> <span class="nc">BulkModuliParameters</span><span class="p">(</span><span class="n">CGCNNParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;BulkModuli&quot;</span></div>
+
+
+<div class="viewcode-block" id="ShearModuliParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.ShearModuliParameters">[docs]</a><span class="k">class</span> <span class="nc">ShearModuliParameters</span><span class="p">(</span><span class="n">CGCNNParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ShearModuli&quot;</span></div>
+
+
+<div class="viewcode-block" id="PoissonRatioParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.PoissonRatioParameters">[docs]</a><span class="k">class</span> <span class="nc">PoissonRatioParameters</span><span class="p">(</span><span class="n">CGCNNParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PoissonRatio&quot;</span></div>
+
+
+<div class="viewcode-block" id="MetalSemiconductorClassifierParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.MetalSemiconductorClassifierParameters">[docs]</a><span class="k">class</span> <span class="nc">MetalSemiconductorClassifierParameters</span><span class="p">(</span><span class="n">CGCNNParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MetalSemiconductorClassifier&quot;</span></div>
+
+
+<span class="k">class</span> <span class="nc">_CGCNN</span><span class="p">(</span><span class="n">PredictorAlgorithm</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all cgcnn-based predictive algorithms.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">CGCNNParameters</span><span class="p">):</span>
+
+        <span class="c1"># Set up the configuration from the parameters</span>
+        <span class="n">configuration</span> <span class="o">=</span> <span class="n">ConfigurablePropertyAlgorithmConfiguration</span><span class="p">(</span>
+            <span class="n">algorithm_type</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_type</span><span class="p">,</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">algorithm_name</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_name</span><span class="p">,</span>
+            <span class="n">algorithm_application</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_application</span><span class="p">,</span>
+            <span class="n">algorithm_version</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workers</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">workers</span>
+
+        <span class="c1"># The parent constructor calls `self.get_model`.</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Predictor: the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">existing_models</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span>
+        <span class="n">existing_models</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">file</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">existing_models</span> <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pth.tar&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">existing_models</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Only one model should be located in the specified model path.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">existing_models</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Model does not exist in the specified model path.&quot;</span><span class="p">)</span>
+
+        <span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="n">existing_models</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">model_checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">model_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="k">lambda</span> <span class="n">storage</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="n">storage</span>
+        <span class="p">)</span>
+
+        <span class="n">model_args</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">(</span><span class="o">**</span><span class="n">model_checkpoint</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">])</span>
+
+        <span class="n">normalizer</span> <span class="o">=</span> <span class="n">Normalizer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+        <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="k">lambda</span> <span class="n">storage</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="n">storage</span><span class="p">)</span>
+        <span class="n">normalizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">[</span><span class="s2">&quot;normalizer&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
+        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">cif_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">CIFData</span><span class="p">(</span><span class="n">cif_path</span><span class="p">)</span>
+            <span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+                <span class="n">dataset</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+                <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workers</span><span class="p">,</span>
+                <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_pool</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># build model</span>
+            <span class="n">structures</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">orig_atom_fea_len</span> <span class="o">=</span> <span class="n">structures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">nbr_fea_len</span> <span class="o">=</span> <span class="n">structures</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+
+            <span class="n">model</span> <span class="o">=</span> <span class="n">CrystalGraphConvNet</span><span class="p">(</span>
+                <span class="n">orig_atom_fea_len</span><span class="p">,</span>
+                <span class="n">nbr_fea_len</span><span class="p">,</span>
+                <span class="n">atom_fea_len</span><span class="o">=</span><span class="n">model_args</span><span class="o">.</span><span class="n">atom_fea_len</span><span class="p">,</span>
+                <span class="n">n_conv</span><span class="o">=</span><span class="n">model_args</span><span class="o">.</span><span class="n">n_conv</span><span class="p">,</span>
+                <span class="n">h_fea_len</span><span class="o">=</span><span class="n">model_args</span><span class="o">.</span><span class="n">h_fea_len</span><span class="p">,</span>
+                <span class="n">n_h</span><span class="o">=</span><span class="n">model_args</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span>
+                <span class="n">classification</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">model_args</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">])</span>
+
+            <span class="n">test_preds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">test_cif_ids</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">batch_cif_ids</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_loader</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                    <span class="n">input_var</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">Variable</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                        <span class="n">Variable</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                        <span class="nb">input</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                        <span class="nb">input</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># compute output</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">*</span><span class="n">input_var</span><span class="p">)</span>
+
+                <span class="c1"># record loss</span>
+                <span class="k">if</span> <span class="n">model_args</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
+                    <span class="n">test_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+                    <span class="n">test_preds</span> <span class="o">+=</span> <span class="n">test_pred</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">test_pred</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">denorm</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+                    <span class="n">test_preds</span> <span class="o">+=</span> <span class="n">test_pred</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">test_cif_ids</span> <span class="o">+=</span> <span class="n">batch_cif_ids</span>
+
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;cif_ids&quot;</span><span class="p">:</span> <span class="n">test_cif_ids</span><span class="p">,</span> <span class="s2">&quot;predictions&quot;</span><span class="p">:</span> <span class="n">test_preds</span><span class="p">}</span>  <span class="c1"># type: ignore</span>
+
+        <span class="k">return</span> <span class="n">informative_model</span>
+
+
+<div class="viewcode-block" id="FormationEnergy"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.FormationEnergy">[docs]</a><span class="k">class</span> <span class="nc">FormationEnergy</span><span class="p">(</span><span class="n">_CGCNN</span><span class="p">):</span>
+<div class="viewcode-block" id="FormationEnergy.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.FormationEnergy.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        This model predicts the formation energy per atom using the CGCNN framework.</span>
+<span class="s2">        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="AbsoluteEnergy"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.AbsoluteEnergy">[docs]</a><span class="k">class</span> <span class="nc">AbsoluteEnergy</span><span class="p">(</span><span class="n">_CGCNN</span><span class="p">):</span>
+<div class="viewcode-block" id="AbsoluteEnergy.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.AbsoluteEnergy.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        This model predicts the absolute energy of crystals using the CGCNN framework.</span>
+<span class="s2">        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="BandGap"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.BandGap">[docs]</a><span class="k">class</span> <span class="nc">BandGap</span><span class="p">(</span><span class="n">_CGCNN</span><span class="p">):</span>
+<div class="viewcode-block" id="BandGap.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.BandGap.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        This model predicts the band gap of crystals using the CGCNN framework.</span>
+<span class="s2">        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="FermiEnergy"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.FermiEnergy">[docs]</a><span class="k">class</span> <span class="nc">FermiEnergy</span><span class="p">(</span><span class="n">_CGCNN</span><span class="p">):</span>
+<div class="viewcode-block" id="FermiEnergy.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.FermiEnergy.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        This model predicts the Fermi energy of crystals using the CGCNN framework.</span>
+<span class="s2">        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="BulkModuli"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.BulkModuli">[docs]</a><span class="k">class</span> <span class="nc">BulkModuli</span><span class="p">(</span><span class="n">_CGCNN</span><span class="p">):</span>
+<div class="viewcode-block" id="BulkModuli.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.BulkModuli.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        This model predicts the bulk moduli of crystals using the CGCNN framework.</span>
+<span class="s2">        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="ShearModuli"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.ShearModuli">[docs]</a><span class="k">class</span> <span class="nc">ShearModuli</span><span class="p">(</span><span class="n">_CGCNN</span><span class="p">):</span>
+<div class="viewcode-block" id="ShearModuli.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.ShearModuli.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">         This model predicts the shear moduli of crystals using the CGCNN framework.</span>
+<span class="s2">        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.</span>
+<span class="s2">         &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="PoissonRatio"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.PoissonRatio">[docs]</a><span class="k">class</span> <span class="nc">PoissonRatio</span><span class="p">(</span><span class="n">_CGCNN</span><span class="p">):</span>
+<div class="viewcode-block" id="PoissonRatio.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.PoissonRatio.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        This model predicts the Poisson ratio of crystals using the CGCNN framework.</span>
+<span class="s2">        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.</span>
+<span class="s2">         &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="MetalSemiconductorClassifier"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.MetalSemiconductorClassifier">[docs]</a><span class="k">class</span> <span class="nc">MetalSemiconductorClassifier</span><span class="p">(</span><span class="n">_CGCNN</span><span class="p">):</span>
+<div class="viewcode-block" id="MetalSemiconductorClassifier.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.MetalSemiconductorClassifier.get_description">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">         This model predicts whether a given crystal is metal or semiconductor using the CGCNN framework.</span>
+<span class="s2">        For more details see: https://doi.org/10.1103/PhysRevLett.120.145301.</span>
+<span class="s2">         &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
