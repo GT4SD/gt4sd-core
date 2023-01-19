@@ -32,6 +32,7 @@ PropertyValue = Union[float, int]
 class DomainSubmodule(str, Enum):
     molecules: str = "molecules"
     properties: str = "properties"
+    crystals: str = "crystals"
 
 
 class PropertyPredictorParameters(BaseModel):
