@@ -102,9 +102,6 @@ def train_granular(configuration: Dict[str, Any]) -> None:
         log_every_n_steps=getattr(arguments, "trainer_log_every_n_steps", 50),
         callbacks=[checkpoint_callback],
         max_epochs=getattr(arguments, "epoch", 1),
-        flush_logs_every_n_steps=getattr(
-            arguments, "trainer_flush_logs_every_n_steps", 100
-        ),
     )
     trainer.fit(module, dm)
 
