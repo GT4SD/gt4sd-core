@@ -35,7 +35,7 @@ from ...algorithms.core import (
     Predictor,
     PredictorAlgorithm,
 )
-from ...frameworks.cgcnn.data import CIFData, collate_pool
+from ...frameworks.cgcnn.data import CIFData, collate_pool, AtomCustomJSONInitializer
 from ...frameworks.cgcnn.model import CrystalGraphConvNet, Normalizer
 from ..core import DomainSubmodule, S3Parameters
 
@@ -137,10 +137,14 @@ class _CGCNN(PredictorAlgorithm):
         checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
         normalizer.load_state_dict(checkpoint["normalizer"])
 
+        atom_initialization = AtomCustomJSONInitializer(
+            os.path.join(resources_path, "atom_init.json")
+        )
+
         # Wrapper to get toxicity-endpoint-level predictions
         def informative_model(cif_path: str) -> Dict[str, List[float]]:
 
-            dataset = CIFData(cif_path)
+            dataset = CIFData(cif_path, atom_initialization=atom_initialization)
             test_loader = DataLoader(
                 dataset,
                 batch_size=self.batch_size,
@@ -168,7 +172,7 @@ class _CGCNN(PredictorAlgorithm):
             test_preds = []
             test_cif_ids = []
 
-            for i, (input, target, batch_cif_ids) in enumerate(test_loader):
+            for input, _, batch_cif_ids in test_loader:
                 with torch.no_grad():
                     input_var = (
                         Variable(input[0]),

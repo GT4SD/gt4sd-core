@@ -54,7 +54,7 @@ template_config = {
 }
 
 
-@pytest.mark.skip(reason="we need to add support for dataset buckets")
+# @pytest.mark.skip(reason="we need to add support for dataset buckets")
 def test_train():
 
     pipeline = TRAINING_PIPELINE_MAPPING.get("cgcnn")

@@ -333,6 +333,7 @@ class CIFData(Dataset):
         dmin: int = 0,
         step: float = 0.2,
         random_seed: int = 123,
+        atom_initialization: AtomCustomJSONInitializer = None,
     ):
         """
         Args:
@@ -348,20 +349,44 @@ class CIFData(Dataset):
                 The step size for constructing GaussianDistance.
             random_seed: int
                 Random seed for shuffling the dataset.
+            atom_initialization: AtomInitializer
+                The atom initializer for initializing the atom feature vectors.
+                Defaults to None, in which case a `atom_init.json` should be in `root_dir`.
         """
         self.root_dir = root_dir
         self.max_num_nbr, self.radius = max_num_nbr, radius
+        print("ROOT DIR", root_dir)
         assert os.path.exists(root_dir), "root_dir does not exist!"
+
         id_prop_file = os.path.join(self.root_dir, "id_prop.csv")
-        assert os.path.exists(id_prop_file), "id_prop.csv does not exist!"
-        with open(id_prop_file) as f:
-            reader = csv.reader(f)
-            self.id_prop_data = [row for row in reader]
-        random.seed(random_seed)
+
+        self.training = os.path.exists(id_prop_file)
+        if self.training:
+            with open(id_prop_file) as f:
+                reader = csv.reader(f)
+                self.id_prop_data = [row for row in reader]
+        else:
+            # Emulate the label file
+            self.id_prop_data = [
+                (os.path.splitext(cif_id)[0], "NaN")
+                for cif_id in os.listdir(self.root_dir)
+                if cif_id.endswith(".cif")
+            ]
         random.shuffle(self.id_prop_data)
-        atom_init_file = os.path.join(self.root_dir, "atom_init.json")
-        assert os.path.exists(atom_init_file), "atom_init.json does not exist!"
-        self.ari = AtomCustomJSONInitializer(atom_init_file)
+        random.seed(random_seed)
+
+        if atom_initialization is None:
+            atom_init_file = os.path.join(self.root_dir, "atom_init.json")
+            assert os.path.exists(atom_init_file), "atom_init.json does not exist!"
+            self.ari = AtomCustomJSONInitializer(atom_init_file)
+        else:
+            if not isinstance(atom_initialization, AtomInitializer):
+                raise TypeError(
+                    "atom_initialization should be an instance of AtomInitializer, "
+                    f"not {type(atom_initialization)}"
+                )
+            self.ari = atom_initialization
+
         self.gdf = GaussianDistance(dmin=dmin, dmax=self.radius, step=step)
 
     def __len__(self):

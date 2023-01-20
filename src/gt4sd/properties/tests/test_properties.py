@@ -30,6 +30,7 @@ from gt4sd.properties.molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.molecules.core import SimilaritySeed
 from gt4sd.properties.proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.proteins.core import Charge
+from gt4sd.properties.crystals import CRYSTALS_PROPERTY_PREDICTOR_FACTORY
 
 protein = "KFLIYQMECSTMIFGL"
 molecule = "C1=CC(=CC(=C1)Br)CN"
@@ -101,6 +102,28 @@ artifact_model_data = {
         "ground_truth": [0.06142323836684227, 0.07934761792421341],
     },
 }
+
+crystal_filename: str = "./1000041.cif"
+crystal_ground_truths = {
+    "formation_energy": -2.035,
+    "absolute_energy": -3.29,
+    "band_gap": 4.58,
+    "fermi_energy": -0.69,
+    "bulk_moduli": 1.32,
+    "shear_moduli": 0.99,
+    "poisson_ratio": 0.309,
+    "metal_semiconductor_classifier": 0.00,
+}
+
+
+@pytest.mark.parametrize("property_key", crystal_ground_truths.keys())
+def test_crystals(property_key: str):
+    property_class, parameters_class = CRYSTALS_PROPERTY_PREDICTOR_FACTORY[property_key]
+    model = property_class(parameters_class(algorithm_version="v0"))  # type: ignore
+    prediction = model(input=crystal_filename)
+    assert np.isclose(
+        prediction, crystal_ground_truths[property_key], atol=1e-2  # type: ignore
+    )
 
 
 @pytest.mark.parametrize(
