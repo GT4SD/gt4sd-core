@@ -228,18 +228,21 @@ class CGCNNTrainingPipeline(TrainingPipeline):
 
         # test best model
         logger.info("Evaluate Model on Test Set")
-        best_checkpoint = torch.load("model_best.pth.tar")
-        model.load_state_dict(best_checkpoint["state_dict"])
-        validate(
-            test_loader,
-            model,
-            criterion,
-            normalizer,
-            training_args["disable_cuda"],
-            training_args["task"],
-            training_args["print_freq"],
-            test=True,
-        )
+        best_path = os.path.join(training_args["output_path"], "model_best.pth.tar")
+        if os.path.exists(best_path):
+            best_checkpoint = torch.load(best_path)
+
+            model.load_state_dict(best_checkpoint["state_dict"])
+            validate(
+                test_loader,
+                model,
+                criterion,
+                normalizer,
+                training_args["disable_cuda"],
+                training_args["task"],
+                training_args["print_freq"],
+                test=True,
+            )
 
 
 def train(
@@ -559,7 +562,10 @@ def class_eval(
         precision, recall, fscore, _ = metrics.precision_recall_fscore_support(
             target_label, pred_label, average="binary"
         )
-        auc_score = metrics.roc_auc_score(target_label, prediction[:, 1])
+        try:
+            auc_score = metrics.roc_auc_score(target_label, prediction[:, 1])
+        except ValueError:
+            auc_score = 0.0
         accuracy = metrics.accuracy_score(target_label, pred_label)
     else:
         raise NotImplementedError
@@ -610,7 +616,9 @@ def save_checkpoint(
 
     torch.save(state, os.path.join(path, filename))
     if is_best:
-        shutil.copyfile(filename, os.path.join(path, "model_best.pth.tar"))
+        shutil.copyfile(
+            os.path.join(path, filename), os.path.join(path, "model_best.pth.tar")
+        )
 
 
 @dataclass

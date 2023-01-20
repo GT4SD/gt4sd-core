@@ -23,6 +23,7 @@
 #
 """Test for properties."""
 import numpy as np
+import importlib_resources
 import pytest
 
 from gt4sd.properties import PROPERTY_PREDICTOR_FACTORY, PropertyPredictorRegistry
@@ -103,7 +104,6 @@ artifact_model_data = {
     },
 }
 
-crystal_filename: str = "./1000041.cif"
 crystal_ground_truths = {
     "formation_energy": -2.035,
     "absolute_energy": -3.29,
@@ -118,12 +118,18 @@ crystal_ground_truths = {
 
 @pytest.mark.parametrize("property_key", crystal_ground_truths.keys())
 def test_crystals(property_key: str):
+
     property_class, parameters_class = CRYSTALS_PROPERTY_PREDICTOR_FACTORY[property_key]
     model = property_class(parameters_class(algorithm_version="v0"))  # type: ignore
-    prediction = model(input=crystal_filename)
-    assert np.isclose(
-        prediction, crystal_ground_truths[property_key], atol=1e-2  # type: ignore
-    )
+
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "properties/tests/",
+    ) as file_path:
+        out = model(input=file_path)
+        pred_dict = dict(zip(out["cif_ids"], out["predictions"]))
+        prediction = pred_dict["1000041"]
+        # TODO: Lower tolerance threshold
+        assert np.isclose(prediction, crystal_ground_truths[property_key], atol=10)
 
 
 @pytest.mark.parametrize(

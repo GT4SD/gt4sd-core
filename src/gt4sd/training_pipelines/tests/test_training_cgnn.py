@@ -26,8 +26,7 @@
 import shutil
 import tempfile
 from typing import Any, Dict, cast
-
-import pytest
+import importlib_resources
 
 from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, CGCNNTrainingPipeline
 
@@ -41,16 +40,19 @@ template_config = {
     "training_args": {
         "task": "classification",
         "disable_cuda": True,
-        "epochs": 5,
+        "start_epoch": 0,
+        "epochs": 1,
         "batch_size": 256,
         "lr": 0.01,
         "momentum": 0.9,
         "weight_decay": 0.0,
         "optim": "SGD",
+        "workers": 1,
+        "resume": False,
+        "lr_milestone": 10,
+        "print_freq": 1,
     },
-    "dataset_args": {
-        "datapath": "./data/cgcnn_sample_classification",
-    },
+    "dataset_args": {"train_size": 6, "val_size": 2, "test_size": 2},
 }
 
 
@@ -68,6 +70,12 @@ def test_train():
     config: Dict[str, Any] = template_config.copy()
     config["training_args"]["output_path"] = TEMPORARY_DIRECTORY
 
-    test_pipeline.train(**config)
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "training_pipelines/tests/cgcnn-sample",
+    ) as file_path:
+        config["dataset_args"]["datapath"] = str(file_path)
+        print("FILEPATH", file_path)
+        print("CONFIG", config)
+        test_pipeline.train(**config)
 
     shutil.rmtree(TEMPORARY_DIRECTORY)
