@@ -355,7 +355,6 @@ class CIFData(Dataset):
         """
         self.root_dir = root_dir
         self.max_num_nbr, self.radius = max_num_nbr, radius
-        print("ROOT DIR", root_dir)
         assert os.path.exists(root_dir), "root_dir does not exist!"
 
         id_prop_file = os.path.join(self.root_dir, "id_prop.csv")
