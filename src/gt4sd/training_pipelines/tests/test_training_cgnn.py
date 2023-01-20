@@ -26,6 +26,7 @@
 import shutil
 import tempfile
 from typing import Any, Dict, cast
+
 import importlib_resources
 
 from gt4sd.training_pipelines import TRAINING_PIPELINE_MAPPING, CGCNNTrainingPipeline
@@ -56,7 +57,6 @@ template_config = {
 }
 
 
-# @pytest.mark.skip(reason="we need to add support for dataset buckets")
 def test_train():
 
     pipeline = TRAINING_PIPELINE_MAPPING.get("cgcnn")
@@ -74,8 +74,6 @@ def test_train():
         importlib_resources.files("gt4sd") / "training_pipelines/tests/cgcnn-sample",
     ) as file_path:
         config["dataset_args"]["datapath"] = str(file_path)
-        print("FILEPATH", file_path)
-        print("CONFIG", config)
         test_pipeline.train(**config)
 
     shutil.rmtree(TEMPORARY_DIRECTORY)

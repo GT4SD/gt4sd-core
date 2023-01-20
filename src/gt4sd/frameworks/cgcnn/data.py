@@ -367,8 +367,8 @@ class CIFData(Dataset):
                 self.id_prop_data = [row for row in reader]
         else:
             # Emulate the label file
-            self.id_prop_data = [
-                (os.path.splitext(cif_id)[0], "NaN")
+            self.id_prop_data = [  # type: ignore
+                (os.path.splitext(cif_id)[0], "NaN")  # type: ignore
                 for cif_id in os.listdir(self.root_dir)
                 if cif_id.endswith(".cif")
             ]

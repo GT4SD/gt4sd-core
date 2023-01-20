@@ -35,7 +35,7 @@ from ...algorithms.core import (
     Predictor,
     PredictorAlgorithm,
 )
-from ...frameworks.cgcnn.data import CIFData, collate_pool, AtomCustomJSONInitializer
+from ...frameworks.cgcnn.data import AtomCustomJSONInitializer, CIFData, collate_pool
 from ...frameworks.cgcnn.model import CrystalGraphConvNet, Normalizer
 from ..core import DomainSubmodule, S3Parameters
 

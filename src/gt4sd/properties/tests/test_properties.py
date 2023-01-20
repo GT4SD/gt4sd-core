@@ -22,16 +22,16 @@
 # SOFTWARE.
 #
 """Test for properties."""
-import numpy as np
 import importlib_resources
+import numpy as np
 import pytest
 
 from gt4sd.properties import PROPERTY_PREDICTOR_FACTORY, PropertyPredictorRegistry
+from gt4sd.properties.crystals import CRYSTALS_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.molecules.core import SimilaritySeed
 from gt4sd.properties.proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.proteins.core import Charge
-from gt4sd.properties.crystals import CRYSTALS_PROPERTY_PREDICTOR_FACTORY
 
 protein = "KFLIYQMECSTMIFGL"
 molecule = "C1=CC(=CC(=C1)Br)CN"
@@ -125,8 +125,8 @@ def test_crystals(property_key: str):
     with importlib_resources.as_file(
         importlib_resources.files("gt4sd") / "properties/tests/",
     ) as file_path:
-        out = model(input=file_path)
-        pred_dict = dict(zip(out["cif_ids"], out["predictions"]))
+        out = model(input=file_path)  # type: ignore
+        pred_dict = dict(zip(out["cif_ids"], out["predictions"]))  # type: ignore
         prediction = pred_dict["1000041"]
         # TODO: Lower tolerance threshold
         assert np.isclose(prediction, crystal_ground_truths[property_key], atol=10)
