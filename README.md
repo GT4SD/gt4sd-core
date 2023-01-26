@@ -79,7 +79,7 @@ Learn more in [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 After install you can use `gt4sd` right away in your discovery workflows.
 
-<img src="./docs/_static/gt4sd_case_study.png" alt="logo" width="800"/>
+<img src="./docs/_static/gt4sd_case_study.jpg" alt="logo" width="800"/>
 
 
 ### Running inference pipelines in your python code
