@@ -122,7 +122,7 @@ print(items)
 GT4SD can run inference pipelines based on the `gt4sd-inference` CLI command.
 It allows to run all inference algorithms directly from the command line.
 To see which algorithms are available and how to use the CLI for your favorite model,
-check out [examples/cli/README.md](.examples/cli/README.md).
+check out [examples/cli/README.md](./examples/cli/README.md).
 
 You can run inference pipelines simply typing:
 
