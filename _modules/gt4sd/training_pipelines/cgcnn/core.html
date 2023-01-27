@@ -393,18 +393,21 @@
 
         <span class="c1"># test best model</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Evaluate Model on Test Set&quot;</span><span class="p">)</span>
-        <span class="n">best_checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;model_best.pth.tar&quot;</span><span class="p">)</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">best_checkpoint</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">])</span>
-        <span class="n">validate</span><span class="p">(</span>
-            <span class="n">test_loader</span><span class="p">,</span>
-            <span class="n">model</span><span class="p">,</span>
-            <span class="n">criterion</span><span class="p">,</span>
-            <span class="n">normalizer</span><span class="p">,</span>
-            <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;disable_cuda&quot;</span><span class="p">],</span>
-            <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;task&quot;</span><span class="p">],</span>
-            <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;print_freq&quot;</span><span class="p">],</span>
-            <span class="n">test</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="n">best_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;output_path&quot;</span><span class="p">],</span> <span class="s2">&quot;model_best.pth.tar&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">best_path</span><span class="p">):</span>
+            <span class="n">best_checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">best_path</span><span class="p">)</span>
+
+            <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">best_checkpoint</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">])</span>
+            <span class="n">validate</span><span class="p">(</span>
+                <span class="n">test_loader</span><span class="p">,</span>
+                <span class="n">model</span><span class="p">,</span>
+                <span class="n">criterion</span><span class="p">,</span>
+                <span class="n">normalizer</span><span class="p">,</span>
+                <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;disable_cuda&quot;</span><span class="p">],</span>
+                <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;task&quot;</span><span class="p">],</span>
+                <span class="n">training_args</span><span class="p">[</span><span class="s2">&quot;print_freq&quot;</span><span class="p">],</span>
+                <span class="n">test</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="train"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.train">[docs]</a><span class="k">def</span> <span class="nf">train</span><span class="p">(</span>
@@ -724,7 +727,10 @@
         <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">fscore</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">precision_recall_fscore_support</span><span class="p">(</span>
             <span class="n">target_label</span><span class="p">,</span> <span class="n">pred_label</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s2">&quot;binary&quot;</span>
         <span class="p">)</span>
-        <span class="n">auc_score</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">target_label</span><span class="p">,</span> <span class="n">prediction</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">auc_score</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">target_label</span><span class="p">,</span> <span class="n">prediction</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">auc_score</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="n">accuracy</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">target_label</span><span class="p">,</span> <span class="n">pred_label</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
@@ -775,7 +781,9 @@
 
     <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">is_best</span><span class="p">:</span>
-        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;model_best.pth.tar&quot;</span><span class="p">))</span></div>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;model_best.pth.tar&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CGCNNDataArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.CGCNNDataArguments">[docs]</a><span class="nd">@dataclass</span>
