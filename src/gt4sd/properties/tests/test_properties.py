@@ -202,4 +202,6 @@ def test_property_predictor_registry():
     assert np.isclose(predictor(protein), protein_further_ground_truths["charge"])  # type: ignore
     assert len(PropertyPredictorRegistry.list_available()) == len(
         PROTEIN_PROPERTY_PREDICTOR_FACTORY
-    ) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY)
+    ) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY) + len(
+        CRYSTALS_PROPERTY_PREDICTOR_FACTORY
+    )
