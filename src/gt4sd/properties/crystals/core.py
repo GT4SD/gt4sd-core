@@ -126,15 +126,11 @@ class _CGCNN(PredictorAlgorithm):
 
         model_path = os.path.join(resources_path, existing_models[0])
 
-        model_checkpoint = torch.load(
-            model_path, map_location=lambda storage, loc: storage
-        )
+        checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
 
-        model_args = argparse.Namespace(**model_checkpoint["args"])
+        model_args = argparse.Namespace(**checkpoint["args"])
 
         normalizer = Normalizer(torch.zeros(3))
-
-        checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
         normalizer.load_state_dict(checkpoint["normalizer"])
 
         # Wrapper to get toxicity-endpoint-level predictions
@@ -164,6 +160,7 @@ class _CGCNN(PredictorAlgorithm):
             )
 
             model.load_state_dict(checkpoint["state_dict"])
+            model.eval()
 
             test_preds = []
             test_cif_ids = []

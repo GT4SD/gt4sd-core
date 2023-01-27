@@ -26,6 +26,7 @@ import numpy as np
 import pytest
 
 from gt4sd.properties import PROPERTY_PREDICTOR_FACTORY, PropertyPredictorRegistry
+from gt4sd.properties.crystals import CRYSTALS_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.molecules.core import SimilaritySeed
 from gt4sd.properties.proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
@@ -173,4 +174,6 @@ def test_property_predictor_registry():
     assert np.isclose(predictor(protein), protein_further_ground_truths["charge"])  # type: ignore
     assert len(PropertyPredictorRegistry.list_available()) == len(
         PROTEIN_PROPERTY_PREDICTOR_FACTORY
-    ) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY)
+    ) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY) + len(
+        CRYSTALS_PROPERTY_PREDICTOR_FACTORY
+    )
