@@ -105,14 +105,14 @@ artifact_model_data = {
 }
 
 crystal_ground_truths = {
-    "formation_energy": -2.035,
-    "absolute_energy": -3.29,
-    "band_gap": 4.58,
-    "fermi_energy": -0.69,
-    "bulk_moduli": 1.32,
-    "shear_moduli": 0.99,
-    "poisson_ratio": 0.309,
-    "metal_semiconductor_classifier": 0.00,
+    "formation_energy": -2.1132538318634033,
+    "absolute_energy": -3.3883044719696045,
+    "band_gap": 4.774056434631348,
+    "fermi_energy": -0.6838343143463135,
+    "bulk_moduli": 1.3808047771453857,
+    "shear_moduli": 0.9817742705345154,
+    "poisson_ratio": 0.3124755620956421,
+    "metal_semiconductor_classifier": 4.423607151693432e-06,
 }
 
 
@@ -128,8 +128,7 @@ def test_crystals(property_key: str):
         out = model(input=file_path)  # type: ignore
         pred_dict = dict(zip(out["cif_ids"], out["predictions"]))  # type: ignore
         prediction = pred_dict["1000041"]
-        # TODO: Lower tolerance threshold
-        assert np.isclose(prediction, crystal_ground_truths[property_key], atol=10)
+        assert np.isclose(prediction, crystal_ground_truths[property_key], atol=1e-2)
 
 
 @pytest.mark.parametrize(
