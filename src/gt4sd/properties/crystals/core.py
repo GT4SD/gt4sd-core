@@ -25,6 +25,7 @@ import argparse
 import os
 from typing import Dict, List
 
+import pandas as pd
 import torch
 from pydantic import Field
 from torch.autograd import Variable
@@ -37,6 +38,8 @@ from ...algorithms.core import (
 )
 from ...frameworks.cgcnn.data import AtomCustomJSONInitializer, CIFData, collate_pool
 from ...frameworks.cgcnn.model import CrystalGraphConvNet, Normalizer
+from ...frameworks.crystals_rfc.FeatureEngine import Features
+from ...frameworks.crystals_rfc.rfclassifier import RFC
 from ..core import DomainSubmodule, S3Parameters
 
 
@@ -48,6 +51,11 @@ class CGCNNParameters(S3ParametersCrystals):
     algorithm_name: str = "cgcnn"
     batch_size: int = Field(description="Prediction batch size", default=256)
     workers: int = Field(description="Number of data loading workers", default=0)
+
+
+class MetalNonMetalClassifierParameters(S3ParametersCrystals):
+    algorithm_name: str = "RFC"
+    algorithm_application: str = "MetalNonMetalClassifier"
 
 
 class FormationEnergyParameters(CGCNNParameters):
@@ -137,7 +145,7 @@ class _CGCNN(PredictorAlgorithm):
             os.path.join(resources_path, "atom_init.json")
         )
 
-        # Wrapper to get toxicity-endpoint-level predictions
+        # Wrapper to get the predictions
         def informative_model(cif_path: str) -> Dict[str, List[float]]:
 
             dataset = CIFData(cif_path, atom_initialization=atom_initialization)
@@ -191,6 +199,59 @@ class _CGCNN(PredictorAlgorithm):
                 test_cif_ids += batch_cif_ids
 
             return {"cif_ids": test_cif_ids, "predictions": test_preds}  # type: ignore
+
+        return informative_model
+
+
+class MetalNonMetalClassifier(PredictorAlgorithm):
+    """Metal/non-metal classifier class."""
+
+    def __init__(self, parameters: MetalNonMetalClassifierParameters):
+
+        # Set up the configuration from the parameters
+        configuration = ConfigurablePropertyAlgorithmConfiguration(
+            algorithm_type=parameters.algorithm_type,
+            domain=parameters.domain,
+            algorithm_name=parameters.algorithm_name,
+            algorithm_application=parameters.algorithm_application,
+            algorithm_version=parameters.algorithm_version,
+        )
+
+        # The parent constructor calls `self.get_model`.
+        super().__init__(configuration=configuration)
+
+    def get_model(self, resources_path: str) -> Predictor:
+        """Instantiate the actual model.
+
+        Args:
+            resources_path: local path to model files.
+
+        Returns:
+            Predictor: the model.
+        """
+
+        rfc = RFC()
+
+        # provide the path to saved model in load_model
+        loaded_model, maxm = rfc.load_model(resources_path)
+
+        # Wrapper to get the predictions
+        def informative_model(formula_file: str) -> Dict[str, List[str]]:
+            # getting the feature
+            feature_eng = Features(formula_file=formula_file)
+            features = feature_eng.get_features()
+
+            # getting the targets and symmetries
+            df = pd.DataFrame(features)
+            pred_x = df.iloc[:, 1:].values
+
+            # getting the chemical formulas
+            df_mat = pd.read_csv(formula_file, header=None)
+            formulas = df_mat.iloc[:, 0].to_list()
+
+            predictions = rfc.predict(model=loaded_model, maxm=maxm, pred_x=pred_x)
+
+            return {"formulas": formulas, "predictions": predictions}
 
         return informative_model
 

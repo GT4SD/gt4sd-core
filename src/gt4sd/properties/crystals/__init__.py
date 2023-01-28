@@ -36,6 +36,8 @@ from .core import (
     FermiEnergyParameters,
     FormationEnergy,
     FormationEnergyParameters,
+    MetalNonMetalClassifier,
+    MetalNonMetalClassifierParameters,
     MetalSemiconductorClassifier,
     MetalSemiconductorClassifierParameters,
     PoissonRatio,
@@ -62,6 +64,10 @@ CRYSTALS_PROPERTY_PREDICTOR_FACTORY: Dict[
     "metal_semiconductor_classifier": (
         MetalSemiconductorClassifier,
         MetalSemiconductorClassifierParameters,
+    ),
+    "meta_nonmetal_classifier": (
+        MetalNonMetalClassifier,
+        MetalNonMetalClassifierParameters,
     ),
 }
 
