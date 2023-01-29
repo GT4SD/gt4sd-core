@@ -130,6 +130,29 @@ def test_crystals(property_key: str):
         prediction = pred_dict["1000041"]
         assert np.isclose(prediction, crystal_ground_truths[property_key], atol=1e-2)
 
+def test_rfc():
+    property_class, parameters_class = CRYSTALS_PROPERTY_PREDICTOR_FACTORY["meta_nonmetal_classifier"]
+    model = property_class(parameters_class(algorithm_version="v0"))  # type: ignore
+
+    with importlib_resources.as_file(
+            importlib_resources.files("gt4sd") / "properties/tests/crf_data.csv",
+    ) as file_path:
+
+        out = model(input=file_path)  # type: ignore
+
+        assert len(out["formulas"])==len(out["predictions"])
+        pred_dict = dict(zip(out["formulas"], out["predictions"]))  # type: ignore
+
+        assert pred_dict["AgHgHW6"]=="metal"
+        assert pred_dict["AlGaH6Os"]=="non-metal"
+        assert pred_dict["BaAlTlH6"]=="non-metal"
+        assert pred_dict["BaCaH6Ir"]=="non-metal"
+        assert pred_dict["BaCaH6Rh"]=="non-metal"
+        assert pred_dict["BaCaHfSi6"]=="metal"
+        assert pred_dict["BaCrH6Ru"]=="non-metal"
+        assert pred_dict["BaMgZnH6"]=="non-metal"
+        assert pred_dict["BaMnVH6"]=="non-metal"
+
 
 @pytest.mark.parametrize(
     "property_key", [(property_key) for property_key in ground_truths.keys()]
