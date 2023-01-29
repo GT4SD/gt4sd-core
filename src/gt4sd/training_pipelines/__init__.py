@@ -35,6 +35,13 @@ from .cgcnn.core import (
     CGCNNTrainingArguments,
     CGCNNTrainingPipeline,
 )
+from .crystals_crf.core import (
+    CrystalsRFCDataArguments,
+    CrystalsRFCModelArguments,
+    CrystalsRFCSavingArguments,
+    CrystalsRFCTrainingArguments,
+    CrystalsRFCTrainingPipeline,
+)
 from .diffusion.core import (
     DiffusionDataArguments,
     DiffusionForVisionTrainingPipeline,
@@ -178,6 +185,11 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         CGCNNModelArguments,
         CGCNNTrainingArguments,
     ),
+    "crystals-rfc": (
+        CrystalsRFCDataArguments,
+        CrystalsRFCModelArguments,
+        CrystalsRFCTrainingArguments,
+    ),
 }
 
 TRAINING_PIPELINE_MAPPING = {
@@ -193,6 +205,7 @@ TRAINING_PIPELINE_MAPPING = {
     "diffusion-trainer": DiffusionForVisionTrainingPipeline,
     "gflownet-trainer": GFlowNetTrainingPipeline,
     "cgcnn": CGCNNTrainingPipeline,
+    "crystals-rfc": CrystalsRFCTrainingPipeline,
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
@@ -208,6 +221,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "diffusion-trainer": DiffusionSavingArguments,
     "gflownet-trainer": GFlowNetSavingArguments,
     "cgcnn": CGCNNSavingArguments,
+    "crystals-rfc": CrystalsRFCSavingArguments,
 }
 
 

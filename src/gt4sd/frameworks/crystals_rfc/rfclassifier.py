@@ -126,9 +126,9 @@ class RFC:
             data_X, data_y, test_size=test_size, random_state=42
         )
 
-        return (train_x, test_x, train_y, test_y)
+        return train_x, test_x, train_y, test_y
 
-    def normalize_data(self, train_x, test_x, train_y, test_y):
+    def normalize_data(self, train_x:Any, test_x:Any, train_y:Any, test_y:Any) -> Tuple[Any, Any, Any, Any]:
         """Normalize dataset.
 
         Args:
@@ -147,9 +147,9 @@ class RFC:
         train_x /= maxm
         test_x /= maxm
 
-        return (train_x, test_x, train_y, test_y, maxm)
+        return train_x, test_x, train_y, test_y, maxm
 
-    def train(self, x, y) -> RandomForestClassifier:
+    def train(self, x: Any, y: Any) -> RandomForestClassifier:
         """Train a RandomForest model.
 
         Args:
@@ -175,16 +175,6 @@ class RFC:
         logger.info("Mean Accuracy: %0.5f (+/- %0.5f)" % (scores.mean(), scores.std()))
 
         return model
-
-    def print_clf_report(self, test_y, y_rbf_test) -> None:
-        """Print classification report.
-
-        Args:
-            test_y: testing set's groundtruth.
-            y_rbf_test: predictions.
-        """
-        logger.info("The Classification Report")
-        logger.info(classification_report(test_y, y_rbf_test))
 
     def save(self, path: str, model: RandomForestClassifier, maxm) -> None:
         """Save model.
