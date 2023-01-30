@@ -36,6 +36,8 @@ from .core import (
     FermiEnergyParameters,
     FormationEnergy,
     FormationEnergyParameters,
+    MetalNonMetalClassifier,
+    MetalNonMetalClassifierParameters,
     MetalSemiconductorClassifier,
     MetalSemiconductorClassifierParameters,
     PoissonRatio,
@@ -51,7 +53,7 @@ CRYSTALS_PROPERTY_PREDICTOR_FACTORY: Dict[
         Type[PropertyPredictorParameters],
     ],
 ] = {
-    # inherent properties
+    #  ml predicted properties
     "formation_energy": (FormationEnergy, FormationEnergyParameters),
     "absolute_energy": (AbsoluteEnergy, AbsoluteEnergyParameters),
     "band_gap": (BandGap, BandGapParameters),
@@ -62,6 +64,10 @@ CRYSTALS_PROPERTY_PREDICTOR_FACTORY: Dict[
     "metal_semiconductor_classifier": (
         MetalSemiconductorClassifier,
         MetalSemiconductorClassifierParameters,
+    ),
+    "metal_nonmetal_classifier": (
+        MetalNonMetalClassifier,
+        MetalNonMetalClassifierParameters,
     ),
 }
 

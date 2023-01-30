@@ -623,7 +623,7 @@ def save_checkpoint(
 
 @dataclass
 class CGCNNDataArguments(TrainingPipelineArguments):
-    """Data arguments related to diffusion trainer."""
+    """Data arguments related to CGCNN trainer."""
 
     __name__ = "dataset_args"
 
