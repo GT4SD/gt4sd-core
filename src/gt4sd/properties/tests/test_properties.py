@@ -141,7 +141,7 @@ def test_rfc():
         importlib_resources.files("gt4sd") / "properties/tests/crf_data.csv",
     ) as file_path:
 
-        out = model(input=file_path) # type: ignore
+        out = model(input=file_path)  # type: ignore
 
         pred_dict = dict(zip(out["formulas"], out["predictions"]))  # type: ignore
 
