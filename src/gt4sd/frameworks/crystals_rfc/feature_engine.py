@@ -13,7 +13,7 @@ import re
 from typing import Dict, List
 
 import pandas as pd
-import pkg_resources
+import pkg_resources  # type: ignore
 from pymatgen.core.composition import Composition
 
 
@@ -27,7 +27,7 @@ class Features:
             formula_file: file of formulas
         """
         self.formula_file = formula_file
-        self.atomic_data_file = pkg_resources.resource_filename(
+        self.atomic_data_file = pkg_resources.resource_filename(  # type: ignore
             "gt4sd", os.path.join("frameworks", "crystals_rfc", "atomic_data.csv")
         )
 
@@ -151,7 +151,16 @@ class Features:
             List of encoded systems.
         """
         df_mat = pd.read_csv(self.formula_file, header=None)
-        sym_list = [x[2] for x in df_mat.values.tolist()]
+
+        if len(df_mat.columns) == 3:
+            sym_list = [x[2] for x in df_mat.values.tolist()]
+        elif len(df_mat.columns) == 2:
+            sym_list = [x[1] for x in df_mat.values.tolist()]
+        else:
+            raise ValueError(
+                "The provided csv file should contain two or three columns."
+            )
+
         encoded_sym = []
         for sym in sym_list:
             if sym == "monoclinic":

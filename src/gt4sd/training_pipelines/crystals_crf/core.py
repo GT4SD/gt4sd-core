@@ -59,12 +59,13 @@ class CrystalsRFCTrainingPipeline(TrainingPipeline):
         train_x, test_x, train_y, test_y = rfc.split_data(
             df, test_size=dataset_args["test_size"]
         )
-        train_x, test_x, train_y, test_y, maxm = rfc.normalize_data(
+        train_x, test_x, train_y, test_y = rfc.normalize_data(
             train_x, test_x, train_y, test_y
         )
-        model = rfc.train(train_x, train_y)
 
-        rfc.save(training_args["output_path"], model, maxm)
+        rfc.train(train_x, train_y)
+
+        rfc.save(training_args["output_path"])
 
 
 @dataclass

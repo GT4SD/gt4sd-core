@@ -26,7 +26,7 @@
 import logging
 import os
 import pickle
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -66,7 +66,7 @@ class RFC:
             bootstrap=False,
         )
 
-        self.maxm: Optional[np.ndarray] = None
+        self.maxm: np.ndarray
 
     def load_data(self, file_name: str) -> pd.DataFrame:
         """Load dataset.
@@ -80,7 +80,6 @@ class RFC:
         feature_eng = Features(formula_file=file_name)
         features = feature_eng.get_features()
         df = pd.DataFrame(features)
-        # df = df.drop([9])
         df = df.dropna()
 
         imp = SimpleImputer(missing_values=np.nan, strategy="mean")
@@ -141,7 +140,7 @@ class RFC:
         test_x: np.ndarray,
         train_y: np.ndarray,
         test_y: np.ndarray,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Normalize dataset.
 
         Args:
@@ -154,13 +153,13 @@ class RFC:
             Training and testing sets.
         """
         xx = abs(train_x)
-        maxm = xx.max(axis=0)
-        maxm[maxm == 0.0] = 1
+        self.maxm = xx.max(axis=0)
+        self.maxm[self.maxm == 0.0] = 1
 
-        train_x /= maxm
-        test_x /= maxm
+        train_x /= self.maxm
+        test_x /= self.maxm
 
-        return train_x, test_x, train_y, test_y, maxm
+        return train_x, test_x, train_y, test_y
 
     def train(self, x: np.ndarray, y: np.ndarray) -> RandomForestClassifier:
         """Train a RandomForest model.
@@ -183,7 +182,7 @@ class RFC:
 
         return model
 
-    def save(self, path: str, model: RandomForestClassifier) -> None:
+    def save(self, path: str) -> None:
         """Save model.
 
         Args:
