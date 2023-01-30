@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.frameworks.crystals_rfc.feature_engine &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>gt4sd.frameworks.crystals_rfc.feature_engine</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.frameworks.crystals_rfc.feature_engine</h1><div class="highlight"><pre>
+<span></span><span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Feature engine for crystals.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core.composition</span> <span class="kn">import</span> <span class="n">Composition</span>
+
+
+<div class="viewcode-block" id="Features"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.crystals_rfc.feature_engine.html#gt4sd.frameworks.crystals_rfc.feature_engine.Features">[docs]</a><span class="k">class</span> <span class="nc">Features</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Feature generator for crystals.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Features.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.crystals_rfc.feature_engine.html#gt4sd.frameworks.crystals_rfc.feature_engine.Features.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formula_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize Feature engine.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            formula_file: file of formulas</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formula_file</span> <span class="o">=</span> <span class="n">formula_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomic_data_file</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+            <span class="s2">&quot;gt4sd&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;frameworks&quot;</span><span class="p">,</span> <span class="s2">&quot;crystals_rfc&quot;</span><span class="p">,</span> <span class="s2">&quot;atomic_data.csv&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Features.make_features"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.crystals_rfc.feature_engine.html#gt4sd.frameworks.crystals_rfc.feature_engine.Features.make_features">[docs]</a>    <span class="k">def</span> <span class="nf">make_features</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">atomic_descriptors</span><span class="p">,</span>
+        <span class="n">formula_list</span><span class="p">,</span>
+        <span class="n">targets</span><span class="p">,</span>
+        <span class="n">encoded_sym</span><span class="p">,</span>
+        <span class="n">add_avg</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">add_aad</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">add_md</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">add_cv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize Feature engine.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atomic_descriptors: atomic descriptors.</span>
+<span class="sd">            formula_list: file of formulas.</span>
+<span class="sd">            targets: targets.</span>
+<span class="sd">            encoded_sym: encoded_sym.</span>
+<span class="sd">            add_avg: include Weighted Average.</span>
+<span class="sd">            add_aad: include Average Absolute Deviation.</span>
+<span class="sd">            add_md: include maximum difference.</span>
+<span class="sd">            add_cv: include element ratio vector.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of all features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">all_feature_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">indx0</span><span class="p">,</span> <span class="n">formula</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">formula_list</span><span class="p">):</span>
+
+            <span class="n">feature_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">atom_symbols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">atomic_descriptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="n">comp</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span>
+            <span class="n">formula</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">formula</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([A-Z][a-z]?)([0-9]?\.?[0-9]*)&quot;</span><span class="p">,</span> <span class="n">formula</span><span class="p">)</span>
+            <span class="n">comp_vector</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom_symbols</span><span class="p">))]</span>
+
+            <span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">targets</span><span class="p">[</span><span class="n">indx0</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">encoded_sym</span><span class="p">[</span><span class="n">indx0</span><span class="p">]:</span>
+                <span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+            <span class="c1"># Calculating the total number of atoms in the chemical formula</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">elem</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="n">num</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">total</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+
+            <span class="c1"># Calculating Weighted Average</span>
+            <span class="n">avg</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">des</span> <span class="ow">in</span> <span class="n">atomic_descriptors</span><span class="p">:</span>
+                <span class="n">des_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">elem</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                        <span class="n">num</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+                    <span class="n">avg</span> <span class="o">+=</span> <span class="n">des</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span> <span class="o">*</span> <span class="n">num</span>
+                    <span class="n">des_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">des</span><span class="p">[</span><span class="n">elem</span><span class="p">],</span> <span class="n">num</span><span class="p">))</span>
+                <span class="n">avg</span> <span class="o">=</span> <span class="n">avg</span> <span class="o">/</span> <span class="n">total</span>
+                <span class="k">if</span> <span class="n">add_avg</span><span class="p">:</span>
+                    <span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg</span><span class="p">)</span>
+
+                <span class="c1"># Calculating Average Absolute Deviation</span>
+                <span class="k">if</span> <span class="n">add_aad</span><span class="p">:</span>
+                    <span class="n">avg_ad</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">des_list</span><span class="p">:</span>
+                        <span class="n">ad</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">avg</span><span class="p">)</span> <span class="o">*</span> <span class="n">num</span>
+                        <span class="n">avg_ad</span> <span class="o">+=</span> <span class="n">ad</span>
+                    <span class="n">avg_ad</span> <span class="o">=</span> <span class="n">avg_ad</span> <span class="o">/</span> <span class="n">total</span>
+
+                    <span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_ad</span><span class="p">)</span>
+
+                <span class="c1"># Calculating maximum difference</span>
+                <span class="k">if</span> <span class="n">add_md</span><span class="p">:</span>
+                    <span class="n">dif_list</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">y1</span><span class="p">,</span> <span class="n">num1</span> <span class="ow">in</span> <span class="n">des_list</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">y2</span><span class="p">,</span> <span class="n">num2</span> <span class="ow">in</span> <span class="n">des_list</span><span class="p">:</span>
+                            <span class="n">dif</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span>
+                            <span class="n">dif_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dif</span><span class="p">)</span>
+                    <span class="n">max_dif</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dif_list</span><span class="p">)</span>
+
+                    <span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_dif</span><span class="p">)</span>
+
+            <span class="c1"># Creting Element Ratio Vector</span>
+            <span class="k">for</span> <span class="n">elem</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="n">num</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">atom_symbols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+                <span class="n">comp_vector</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num</span><span class="p">)</span> <span class="o">/</span> <span class="n">total</span>  <span class="c1"># type: ignore</span>
+
+            <span class="c1"># Uncomment if the element ratio vector is required</span>
+            <span class="k">if</span> <span class="n">add_cv</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">ratio</span> <span class="ow">in</span> <span class="n">comp_vector</span><span class="p">:</span>
+                    <span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ratio</span><span class="p">)</span>
+
+            <span class="n">all_feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature_list</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">all_feature_list</span></div>
+
+<div class="viewcode-block" id="Features.get_formula_list"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.crystals_rfc.feature_engine.html#gt4sd.frameworks.crystals_rfc.feature_engine.Features.get_formula_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_formula_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get formula list.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of formulas.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_mat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formula_file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">formula_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df_mat</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+
+        <span class="k">return</span> <span class="n">formula_list</span></div>
+
+<div class="viewcode-block" id="Features.get_encoded_sym"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.crystals_rfc.feature_engine.html#gt4sd.frameworks.crystals_rfc.feature_engine.Features.get_encoded_sym">[docs]</a>    <span class="k">def</span> <span class="nf">get_encoded_sym</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get encoded systems.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of encoded systems.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_mat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formula_file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_mat</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">sym_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df_mat</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_mat</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">sym_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df_mat</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The provided csv file should contain two or three columns.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">encoded_sym</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sym</span> <span class="ow">in</span> <span class="n">sym_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sym</span> <span class="o">==</span> <span class="s2">&quot;monoclinic&quot;</span><span class="p">:</span>
+                <span class="n">digits</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">sym</span> <span class="o">==</span> <span class="s2">&quot;triclinic&quot;</span><span class="p">:</span>
+                <span class="n">digits</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">sym</span> <span class="o">==</span> <span class="s2">&quot;orthorhombic&quot;</span><span class="p">:</span>
+                <span class="n">digits</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">sym</span> <span class="o">==</span> <span class="s2">&quot;trigonal&quot;</span><span class="p">:</span>
+                <span class="n">digits</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">sym</span> <span class="o">==</span> <span class="s2">&quot;hexagonal&quot;</span><span class="p">:</span>
+                <span class="n">digits</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">sym</span> <span class="o">==</span> <span class="s2">&quot;cubic&quot;</span><span class="p">:</span>
+                <span class="n">digits</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">sym</span> <span class="o">==</span> <span class="s2">&quot;tetragonal&quot;</span><span class="p">:</span>
+                <span class="n">digits</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">encoded_sym</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">encoded_sym</span></div>
+
+<div class="viewcode-block" id="Features.get_targets"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.crystals_rfc.feature_engine.html#gt4sd.frameworks.crystals_rfc.feature_engine.Features.get_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get targets.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of targets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_mat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formula_file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_mat</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df_mat</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_mat</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">df_mat</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The provided csv file should contain two or three columns.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">targets</span></div>
+
+<div class="viewcode-block" id="Features.get_atomic_descriptors"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.crystals_rfc.feature_engine.html#gt4sd.frameworks.crystals_rfc.feature_engine.Features.get_atomic_descriptors">[docs]</a>    <span class="k">def</span> <span class="nf">get_atomic_descriptors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get atomic descriptors.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">               List of atomic descriptors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_des</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atomic_data_file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">atomic_descriptors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df_des</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_des</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df_des</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+            <span class="n">des_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">tmp</span><span class="p">))</span>
+
+            <span class="n">atomic_descriptors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">des_dict</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">atomic_descriptors</span></div>
+
+<div class="viewcode-block" id="Features.get_features"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.crystals_rfc.feature_engine.html#gt4sd.frameworks.crystals_rfc.feature_engine.Features.get_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get features.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of all features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">formula_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_formula_list</span><span class="p">()</span>
+        <span class="n">encoded_sym</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_encoded_sym</span><span class="p">()</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_targets</span><span class="p">()</span>
+        <span class="n">atomic_descriptors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_atomic_descriptors</span><span class="p">()</span>
+
+        <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_features</span><span class="p">(</span>
+            <span class="n">atomic_descriptors</span><span class="o">=</span><span class="n">atomic_descriptors</span><span class="p">,</span>
+            <span class="n">encoded_sym</span><span class="o">=</span><span class="n">encoded_sym</span><span class="p">,</span>
+            <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
+            <span class="n">formula_list</span><span class="o">=</span><span class="n">formula_list</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">features</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

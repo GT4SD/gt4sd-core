@@ -190,6 +190,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">Field</span>
 <span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Variable</span>
@@ -202,6 +203,8 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">...frameworks.cgcnn.data</span> <span class="kn">import</span> <span class="n">AtomCustomJSONInitializer</span><span class="p">,</span> <span class="n">CIFData</span><span class="p">,</span> <span class="n">collate_pool</span>
 <span class="kn">from</span> <span class="nn">...frameworks.cgcnn.model</span> <span class="kn">import</span> <span class="n">CrystalGraphConvNet</span><span class="p">,</span> <span class="n">Normalizer</span>
+<span class="kn">from</span> <span class="nn">...frameworks.crystals_rfc.feature_engine</span> <span class="kn">import</span> <span class="n">Features</span>
+<span class="kn">from</span> <span class="nn">...frameworks.crystals_rfc.rf_classifier</span> <span class="kn">import</span> <span class="n">RFC</span>
 <span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">DomainSubmodule</span><span class="p">,</span> <span class="n">S3Parameters</span>
 
 
@@ -213,6 +216,11 @@
     <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cgcnn&quot;</span>
     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prediction batch size&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
     <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of data loading workers&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MetalNonMetalClassifierParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.MetalNonMetalClassifierParameters">[docs]</a><span class="k">class</span> <span class="nc">MetalNonMetalClassifierParameters</span><span class="p">(</span><span class="n">S3ParametersCrystals</span><span class="p">):</span>
+    <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;RFC&quot;</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MetalNonMetalClassifier&quot;</span></div>
 
 
 <div class="viewcode-block" id="FormationEnergyParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.FormationEnergyParameters">[docs]</a><span class="k">class</span> <span class="nc">FormationEnergyParameters</span><span class="p">(</span><span class="n">CGCNNParameters</span><span class="p">):</span>
@@ -302,7 +310,7 @@
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;atom_init.json&quot;</span><span class="p">)</span>
         <span class="p">)</span>
 
-        <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
+        <span class="c1"># Wrapper to get the predictions</span>
         <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">cif_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
 
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">CIFData</span><span class="p">(</span><span class="n">cif_path</span><span class="p">,</span> <span class="n">atom_initialization</span><span class="o">=</span><span class="n">atom_initialization</span><span class="p">)</span>
@@ -358,6 +366,58 @@
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;cif_ids&quot;</span><span class="p">:</span> <span class="n">test_cif_ids</span><span class="p">,</span> <span class="s2">&quot;predictions&quot;</span><span class="p">:</span> <span class="n">test_preds</span><span class="p">}</span>  <span class="c1"># type: ignore</span>
 
         <span class="k">return</span> <span class="n">informative_model</span>
+
+
+<div class="viewcode-block" id="MetalNonMetalClassifier"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.MetalNonMetalClassifier">[docs]</a><span class="k">class</span> <span class="nc">MetalNonMetalClassifier</span><span class="p">(</span><span class="n">PredictorAlgorithm</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Metal/non-metal classifier class.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MetalNonMetalClassifier.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.MetalNonMetalClassifier.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">MetalNonMetalClassifierParameters</span><span class="p">):</span>
+
+        <span class="c1"># Set up the configuration from the parameters</span>
+        <span class="n">configuration</span> <span class="o">=</span> <span class="n">ConfigurablePropertyAlgorithmConfiguration</span><span class="p">(</span>
+            <span class="n">algorithm_type</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_type</span><span class="p">,</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">algorithm_name</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_name</span><span class="p">,</span>
+            <span class="n">algorithm_application</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_application</span><span class="p">,</span>
+            <span class="n">algorithm_version</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># The parent constructor calls `self.get_model`.</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MetalNonMetalClassifier.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.MetalNonMetalClassifier.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Predictor: the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">rfc</span> <span class="o">=</span> <span class="n">RFC</span><span class="p">()</span>
+
+        <span class="n">rfc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span>
+
+        <span class="c1"># Wrapper to get the predictions</span>
+        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">formula_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+            <span class="c1"># getting the feature</span>
+            <span class="n">feature_eng</span> <span class="o">=</span> <span class="n">Features</span><span class="p">(</span><span class="n">formula_file</span><span class="o">=</span><span class="n">formula_file</span><span class="p">)</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">feature_eng</span><span class="o">.</span><span class="n">get_features</span><span class="p">()</span>
+
+            <span class="c1"># getting the targets and symmetries</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+            <span class="n">pred_x</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span>
+
+            <span class="c1"># getting the chemical formulas</span>
+            <span class="n">df_mat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">formula_file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">formulas</span> <span class="o">=</span> <span class="n">df_mat</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+
+            <span class="n">predictions</span> <span class="o">=</span> <span class="n">rfc</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">pred_x</span><span class="o">=</span><span class="n">pred_x</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;formulas&quot;</span><span class="p">:</span> <span class="n">formulas</span><span class="p">,</span> <span class="s2">&quot;predictions&quot;</span><span class="p">:</span> <span class="n">predictions</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">informative_model</span></div></div>
 
 
 <div class="viewcode-block" id="FormationEnergy"><a class="viewcode-back" href="../../../../api/gt4sd.properties.crystals.core.html#gt4sd.properties.crystals.core.FormationEnergy">[docs]</a><span class="k">class</span> <span class="nc">FormationEnergy</span><span class="p">(</span><span class="n">_CGCNN</span><span class="p">):</span>
