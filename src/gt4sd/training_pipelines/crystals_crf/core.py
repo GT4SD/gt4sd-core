@@ -27,7 +27,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
 
-from ...frameworks.crystals_rfc.rfclassifier import RFC
+from ...frameworks.crystals_rfc.rf_classifier import RFC
 from ..core import TrainingPipeline, TrainingPipelineArguments
 
 logger = logging.getLogger(__name__)

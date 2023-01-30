@@ -39,7 +39,7 @@ from ...algorithms.core import (
 from ...frameworks.cgcnn.data import AtomCustomJSONInitializer, CIFData, collate_pool
 from ...frameworks.cgcnn.model import CrystalGraphConvNet, Normalizer
 from ...frameworks.crystals_rfc.feature_engine import Features
-from ...frameworks.crystals_rfc.rfclassifier import RFC
+from ...frameworks.crystals_rfc.rf_classifier import RFC
 from ..core import DomainSubmodule, S3Parameters
 
 
