@@ -97,13 +97,13 @@ class Features:
 
                 # Calculating Average Absolute Deviation
                 if add_aad:
-                    avgAD = 0.0
+                    avg_ad = 0.0
                     for y, num in des_list:
                         ad = abs(y - avg) * num
-                        avgAD += ad
-                    avgAD = avgAD / total
+                        avg_ad += ad
+                    avg_ad = avg_ad / total
 
-                    feature_list.append(avgAD)
+                    feature_list.append(avg_ad)
 
                 # Calculating maximum difference
                 if add_md:
