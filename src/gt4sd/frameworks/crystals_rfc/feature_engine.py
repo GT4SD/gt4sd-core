@@ -10,7 +10,7 @@
 
 import os
 import re
-from typing import Any, Dict, List
+from typing import Dict, List
 
 import pandas as pd
 import pkg_resources
@@ -37,11 +37,11 @@ class Features:
         formula_list,
         targets,
         encoded_sym,
-        addAVG: bool = True,
-        addAAD: bool = True,
-        addMD: bool = False,
-        addCV: bool = False,
-    ) -> List[List[Any]]:
+        add_avg: bool = True,
+        add_aad: bool = True,
+        add_md: bool = False,
+        add_cv: bool = False,
+    ) -> List[List[float]]:
         """Initialize Feature engine.
 
         Args:
@@ -49,10 +49,10 @@ class Features:
             formula_list: file of formulas.
             targets: targets.
             encoded_sym: encoded_sym.
-            addAVG: include Weighted Average.
-            addAAD: include Average Absolute Deviation.
-            addMD: include maximum difference.
-            addCV: include element ratio vector.
+            add_avg: include Weighted Average.
+            add_aad: include Average Absolute Deviation.
+            add_md: include maximum difference.
+            add_cv: include element ratio vector.
 
         Returns:
             List of all features.
@@ -92,11 +92,11 @@ class Features:
                     avg += des[elem] * num
                     des_list.append((des[elem], num))
                 avg = avg / total
-                if addAVG:
+                if add_avg:
                     feature_list.append(avg)
 
                 # Calculating Average Absolute Deviation
-                if addAAD:
+                if add_aad:
                     avgAD = 0.0
                     for y, num in des_list:
                         ad = abs(y - avg) * num
@@ -106,7 +106,7 @@ class Features:
                     feature_list.append(avgAD)
 
                 # Calculating maximum difference
-                if addMD:
+                if add_md:
                     dif_list = []
                     for y1, num1 in des_list:
                         for y2, num2 in des_list:
@@ -125,7 +125,7 @@ class Features:
                 comp_vector[index] = int(num) / total  # type: ignore
 
             # Uncomment if the element ratio vector is required
-            if addCV:
+            if add_cv:
                 for ratio in comp_vector:
                     feature_list.append(ratio)
 
@@ -179,11 +179,19 @@ class Features:
             List of targets.
         """
         df_mat = pd.read_csv(self.formula_file, header=None)
-        targets = [x[1] for x in df_mat.values.tolist()]
+
+        if len(df_mat.columns) == 3:
+            targets = [x[1] for x in df_mat.values.tolist()]
+        elif len(df_mat.columns) == 2:
+            targets = [0 for _ in df_mat.values.tolist()]
+        else:
+            raise ValueError(
+                "The provided csv file should contain two or three columns."
+            )
 
         return targets
 
-    def get_atomic_descriptors(self) -> List[Dict[Any, Any]]:
+    def get_atomic_descriptors(self) -> List[Dict[str, float]]:
         """Get atomic descriptors.
 
         Returns:
@@ -202,7 +210,7 @@ class Features:
 
         return atomic_descriptors
 
-    def get_features(self) -> List[List[Any]]:
+    def get_features(self) -> List[List[float]]:
         """Get features.
 
         Returns:

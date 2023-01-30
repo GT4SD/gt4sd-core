@@ -26,22 +26,18 @@
 import logging
 import os
 import pickle
-from typing import Any, List, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import classification_report
 from sklearn.model_selection import cross_val_score, train_test_split
 
-from .FeatureEngine import Features
+from .feature_engine import Features
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
-
-seed = 7
-np.random.seed(seed)
 
 
 class RFC:
@@ -60,6 +56,17 @@ class RFC:
         """
 
         self.crystal_sys = crystal_sys
+
+        self.model = RandomForestClassifier(
+            n_estimators=500,
+            min_samples_split=10,
+            min_samples_leaf=3,
+            max_features="auto",
+            max_depth=70,
+            bootstrap=False,
+        )
+
+        self.maxm: Optional[np.ndarray] = None
 
     def load_data(self, file_name: str) -> pd.DataFrame:
         """Load dataset.
@@ -110,7 +117,7 @@ class RFC:
 
     def split_data(
         self, df: pd.DataFrame, test_size: float = 0.2
-    ) -> Tuple[Any, Any, Any, Any]:
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Load dataset.
 
         Args:
@@ -128,7 +135,13 @@ class RFC:
 
         return train_x, test_x, train_y, test_y
 
-    def normalize_data(self, train_x:Any, test_x:Any, train_y:Any, test_y:Any) -> Tuple[Any, Any, Any, Any]:
+    def normalize_data(
+        self,
+        train_x: np.ndarray,
+        test_x: np.ndarray,
+        train_y: np.ndarray,
+        test_y: np.ndarray,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Normalize dataset.
 
         Args:
@@ -149,7 +162,7 @@ class RFC:
 
         return train_x, test_x, train_y, test_y, maxm
 
-    def train(self, x: Any, y: Any) -> RandomForestClassifier:
+    def train(self, x: np.ndarray, y: np.ndarray) -> RandomForestClassifier:
         """Train a RandomForest model.
 
         Args:
@@ -160,74 +173,60 @@ class RFC:
             Trained model.
         """
 
-        clf = RandomForestClassifier(
-            n_estimators=500,
-            min_samples_split=10,
-            min_samples_leaf=3,
-            max_features="auto",
-            max_depth=70,
-            bootstrap=False,
-        )
+        if self.maxm is None:
+            raise ValueError("Dataset should be normalized before the training.")
 
-        scores = cross_val_score(clf, x, y, cv=10, scoring="accuracy")
-        model = clf.fit(x, y)
+        scores = cross_val_score(self.model, x, y, cv=10, scoring="accuracy")
+        model = self.model.fit(x, y)
 
         logger.info("Mean Accuracy: %0.5f (+/- %0.5f)" % (scores.mean(), scores.std()))
 
         return model
 
-    def save(self, path: str, model: RandomForestClassifier, maxm) -> None:
+    def save(self, path: str, model: RandomForestClassifier) -> None:
         """Save model.
 
         Args:
             path: path to store the model.
-            model: a trained model.
-            maxm: normalized parameters of the trained model.
         """
 
         if not os.path.exists(path):
             os.makedirs(path)
 
         # save the model to disk
-        pickle.dump(model, open(os.path.join(path, "model.sav"), "wb"))
+        pickle.dump(self.model, open(os.path.join(path, "model.sav"), "wb"))
         # save the normalizing parameters
-        df_maxm = pd.DataFrame(maxm)
+        df_maxm = pd.DataFrame(self.maxm)
         df_maxm.to_csv(os.path.join(path, "maxm.csv"), index=False, header=None)
 
-    def load_model(self, path: str) -> Tuple[Any, Any]:
+    def load_model(self, path: str) -> None:
         """Save model.
 
         Args:
             path: path where the file is located.
-
-        Returns:
-            The pretrained model and its normalized parameters.
         """
         # load the model from disk
-        loaded_model = pickle.load(open(os.path.join(path, "model.sav"), "rb"))
+        self.model = pickle.load(open(os.path.join(path, "model.sav"), "rb"))
 
         # load normalizing parameters
         df_maxm_load = pd.read_csv(os.path.join(path, "maxm.csv"), header=None)
-        maxm = np.array([x[0] for x in df_maxm_load.values.tolist()])
+        self.maxm = np.array([x[0] for x in df_maxm_load.values.tolist()])
 
-        return loaded_model, maxm
-
-    def predict(
-        self, model: RandomForestClassifier, maxm: Any, pred_x: Any
-    ) -> List[str]:
+    def predict(self, pred_x: np.ndarray) -> List[str]:
         """Predict.
 
         Args:
-            model: a trained model.
-            maxm: the normalized parameters of the model.
             pred_x: input.
 
         Returns:
             Predictions
         """
 
-        pred_x /= maxm
-        y_rbf_pred = model.predict(pred_x)
+        if self.maxm is None:
+            raise ValueError("Model is not initialized.")
+
+        pred_x /= self.maxm
+        y_rbf_pred = self.model.predict(pred_x)
         y_rbf_pred = list(y_rbf_pred)
 
         y_pred_label = ["metal" if x == 0 else "non-metal" for x in y_rbf_pred]

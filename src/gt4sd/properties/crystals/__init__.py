@@ -65,7 +65,7 @@ CRYSTALS_PROPERTY_PREDICTOR_FACTORY: Dict[
         MetalSemiconductorClassifier,
         MetalSemiconductorClassifierParameters,
     ),
-    "meta_nonmetal_classifier": (
+    "metal_nonmetal_classifier": (
         MetalNonMetalClassifier,
         MetalNonMetalClassifierParameters,
     ),

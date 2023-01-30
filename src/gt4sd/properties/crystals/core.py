@@ -38,7 +38,7 @@ from ...algorithms.core import (
 )
 from ...frameworks.cgcnn.data import AtomCustomJSONInitializer, CIFData, collate_pool
 from ...frameworks.cgcnn.model import CrystalGraphConvNet, Normalizer
-from ...frameworks.crystals_rfc.FeatureEngine import Features
+from ...frameworks.crystals_rfc.feature_engine import Features
 from ...frameworks.crystals_rfc.rfclassifier import RFC
 from ..core import DomainSubmodule, S3Parameters
 
@@ -232,8 +232,7 @@ class MetalNonMetalClassifier(PredictorAlgorithm):
 
         rfc = RFC()
 
-        # provide the path to saved model in load_model
-        loaded_model, maxm = rfc.load_model(resources_path)
+        rfc.load_model(resources_path)
 
         # Wrapper to get the predictions
         def informative_model(formula_file: str) -> Dict[str, List[str]]:
@@ -249,7 +248,7 @@ class MetalNonMetalClassifier(PredictorAlgorithm):
             df_mat = pd.read_csv(formula_file, header=None)
             formulas = df_mat.iloc[:, 0].to_list()
 
-            predictions = rfc.predict(model=loaded_model, maxm=maxm, pred_x=pred_x)
+            predictions = rfc.predict(pred_x=pred_x)
 
             return {"formulas": formulas, "predictions": predictions}
 
