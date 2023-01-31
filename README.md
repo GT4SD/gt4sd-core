@@ -15,13 +15,14 @@
 <img src="./docs/_static/gt4sd_graphical_abstract.png" alt="logo" width="800">
 
 
-The GT4SD (Generative Toolkit for Scientific Discovery) is an open-source platform to accelerate hypothesis generation in the scientific discovery process. It provides a library for making state-of-the-art generative AI models easier to use.
+The **GT4SD** (Generative Toolkit for Scientific Discovery) is an open-source platform to accelerate hypothesis generation in the scientific discovery process. It provides a library for making state-of-the-art generative AI models easier to use.
 
 For full details on the library API and examples see the [docs](https://gt4sd.github.io/gt4sd-core/).
+Almost all pretrained models are also available via `gradio`-powered [web apps](https://huggingface.co/GT4SD) on HuggingFace spaces.
 
 ## Installation
 
-### requirements
+### Requirements
 
 Currently `gt4sd` relies on:
 
@@ -30,7 +31,7 @@ Currently `gt4sd` relies on:
 
 We are actively working on relaxing these, so stay tuned or help us with this by [contributing](./CONTRIBUTING.md) to the project.
 
-### conda
+### Conda
 
 The recommended way to install the `gt4sd` is to create a dedicated conda environment, this will ensure all requirements are satisfied. For CPU:
 
