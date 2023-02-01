@@ -18,7 +18,7 @@
 The **GT4SD** (Generative Toolkit for Scientific Discovery) is an open-source platform to accelerate hypothesis generation in the scientific discovery process. It provides a library for making state-of-the-art generative AI models easier to use.
 
 For full details on the library API and examples see the [docs](https://gt4sd.github.io/gt4sd-core/).
-Almost all pretrained models are also available via `gradio`-powered [web apps](https://huggingface.co/GT4SD) on HuggingFace spaces.
+Almost all pretrained models are also available via `gradio`-powered [web apps](https://huggingface.co/GT4SD) on Hugging Face Spaces.
 
 ## Installation
 
