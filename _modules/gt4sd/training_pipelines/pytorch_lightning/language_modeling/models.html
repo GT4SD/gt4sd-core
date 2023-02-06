@@ -200,11 +200,8 @@
     <span class="n">AutoModel</span><span class="p">,</span>
     <span class="n">AutoModelForCausalLM</span><span class="p">,</span>
     <span class="n">AutoModelForMaskedLM</span><span class="p">,</span>
+    <span class="n">AutoModelForSeq2SeqLM</span><span class="p">,</span>
     <span class="n">AutoTokenizer</span><span class="p">,</span>
-    <span class="n">BartConfig</span><span class="p">,</span>
-    <span class="n">BartForConditionalGeneration</span><span class="p">,</span>
-    <span class="n">T5Config</span><span class="p">,</span>
-    <span class="n">T5ForConditionalGeneration</span><span class="p">,</span>
     <span class="n">XLNetLMHeadModel</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -358,37 +355,17 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a model for conditional generation.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;t5&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">]:</span>  <span class="c1"># type:ignore</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">T5ForConditionalGeneration</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">],</span>  <span class="c1"># type:ignore</span>
-                    <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">elif</span> <span class="s2">&quot;bart&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">]:</span>  <span class="c1"># type:ignore</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">BartForConditionalGeneration</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">],</span>  <span class="c1"># type:ignore</span>
-                    <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s1">&#39;model_name_or_path&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> is not supported for conditional generation training.&quot;</span>
-                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForSeq2SeqLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_name_or_path&quot;</span><span class="p">],</span>  <span class="c1"># type:ignore</span>
+                <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;t5&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">]:</span>
-                <span class="n">config</span> <span class="o">=</span> <span class="n">T5Config</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
-                <span class="p">)</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">T5ForConditionalGeneration</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="s2">&quot;bart&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">]:</span>
-                <span class="n">config</span> <span class="o">=</span> <span class="n">BartConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
-                <span class="p">)</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;model_config_name&quot;</span><span class="p">],</span> <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
+            <span class="p">)</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">BartForConditionalGeneration</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">[</span><span class="s1">&#39;model_name_or_path&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> is not supported for conditional generation training.&quot;</span>
-                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForSeq2SeqLM</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training from scratch&quot;</span><span class="p">)</span>
 
