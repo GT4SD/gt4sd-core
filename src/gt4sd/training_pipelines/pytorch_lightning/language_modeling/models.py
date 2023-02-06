@@ -35,11 +35,8 @@ from transformers import (
     AutoModel,
     AutoModelForCausalLM,
     AutoModelForMaskedLM,
+    AutoModelForSeq2SeqLM,
     AutoTokenizer,
-    BartConfig,
-    BartForConditionalGeneration,
-    T5Config,
-    T5ForConditionalGeneration,
     XLNetLMHeadModel,
 )
 
@@ -193,37 +190,17 @@ class CGMModule(LMModule):
         """Initialize a model for conditional generation."""
 
         if self.model_args["model_name_or_path"] is not None:
-            if "t5" in self.model_args["model_name_or_path"]:  # type:ignore
-                self.model = T5ForConditionalGeneration.from_pretrained(
-                    self.model_args["model_name_or_path"],  # type:ignore
-                    cache_dir=self.cache_dir,
-                )
-            elif "bart" in self.model_args["model_name_or_path"]:  # type:ignore
-                self.model = BartForConditionalGeneration.from_pretrained(
-                    self.model_args["model_name_or_path"],  # type:ignore
-                    cache_dir=self.cache_dir,
-                )
-            else:
-                raise ValueError(
-                    f"{self.model_args['model_name_or_path']} is not supported for conditional generation training."
-                )
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(
+                self.model_args["model_name_or_path"],  # type:ignore
+                cache_dir=self.cache_dir,
+            )
         else:
-            if "t5" in self.model_args["model_config_name"]:
-                config = T5Config.from_pretrained(
-                    self.model_args["model_config_name"], cache_dir=self.cache_dir
-                )
 
-                self.model = T5ForConditionalGeneration.from_config(config)
-            elif "bart" in self.model_args["model_config_name"]:
-                config = BartConfig.from_pretrained(
-                    self.model_args["model_config_name"], cache_dir=self.cache_dir
-                )
+            config = AutoConfig.from_pretrained(
+                self.model_args["model_config_name"], cache_dir=self.cache_dir
+            )
 
-                self.model = BartForConditionalGeneration.from_config(config)
-            else:
-                raise ValueError(
-                    f"{self.model_args['model_name_or_path']} is not supported for conditional generation training."
-                )
+            self.model = AutoModelForSeq2SeqLM.from_config(config)
 
             logger.info("Training from scratch")
 
