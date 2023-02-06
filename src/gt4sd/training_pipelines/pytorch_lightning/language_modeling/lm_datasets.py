@@ -35,9 +35,11 @@ import pytorch_lightning as pl
 from datasets import DatasetDict
 from torch.utils.data import ConcatDataset, DataLoader, Dataset
 from transformers import (
+    AutoModelForSeq2SeqLM,
     AutoTokenizer,
     DataCollatorForLanguageModeling,
     DataCollatorForPermutationLanguageModeling,
+    DataCollatorForSeq2Seq,
     default_data_collator,
 )
 from transformers.tokenization_utils_base import BatchEncoding
@@ -265,16 +267,27 @@ class CGMDataModule(DataModule):
     """Pytorch-lightning-style data module for conditional generation dataset."""
 
     def __init__(
-        self, dataset_args: Dict[str, Union[float, str, int]], tokenizer: AutoTokenizer
+        self,
+        dataset_args: Dict[str, Union[float, str, int]],
+        model: AutoModelForSeq2SeqLM,
+        tokenizer: AutoTokenizer,
     ) -> None:
         """
         Initialize the data module.
 
         Args:
             dataset_args: dictionary containing the metadata for the lightning data module creation.
+            model: model to be used in the module.
             tokenizer: tokenizer to be used in the module.
         """
         super().__init__(dataset_args, tokenizer)
+
+        self.data_collator = DataCollatorForSeq2Seq(
+            tokenizer,
+            model=model,
+            label_pad_token_id=-100,
+            pad_to_multiple_of=None,
+        )
 
         self.load()
 
@@ -293,7 +306,7 @@ class CGMDataModule(DataModule):
         padding = self.dataset_args.get("padding", "max_length")
         max_length = self.dataset_args.get("max_length", 512)
 
-        source = self.tokenizer(  # type: ignore
+        data_inputs = self.tokenizer(  # type: ignore
             examples["source"],
             truncation=truncation,
             padding=padding,
@@ -307,14 +320,15 @@ class CGMDataModule(DataModule):
             max_length=max_length,
         )
 
-        return BatchEncoding(
-            data={
-                "input_ids": source["input_ids"],
-                "attention_mask": source["attention_mask"],
-                "labels": targets["input_ids"],
-                "decoder_attention_mask": targets["attention_mask"],
-            }
-        )
+        if padding == "max_length":
+            targets["inputs_ids"] = [
+                -100 if x == self.tokenizer.pad_token_id else x
+                for x in targets["input_ids"]
+            ]
+
+        data_inputs["labels"] = targets["input_ids"]
+
+        return BatchEncoding(data=data_inputs)
 
 
 class CLMDataModule(DataModule):
