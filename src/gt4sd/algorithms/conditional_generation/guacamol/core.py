@@ -25,7 +25,7 @@ import logging
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
-from ....domains.materials import SMILES, validate_molecules
+from ....domains.materials import InputType, SMILES, validate_molecules
 from ....exceptions import InvalidItem
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.guacamol_baselines.core import GuacaMolSavingArguments
@@ -123,7 +123,7 @@ class GuacaMolAbstractGenerator(AlgorithmConfiguration[str, str]):
         (
             molecules,
             _,
-        ) = validate_molecules([item])
+        ) = validate_molecules([item], InputType.smiles)
         if molecules[0] is None:
             raise InvalidItem(
                 title="InvalidSMILES",

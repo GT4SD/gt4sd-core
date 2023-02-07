@@ -230,6 +230,23 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
             },
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
+        pytest.param(
+            RegressionTransformerMolecules,
+            "<[A];CC1=CC=C(CO[R])C=C1;[A].R -> [B].R><[B];O=C(O[C@H](C([R])=O)C)[C@@H](O[Q])C;[B].Q -> [B].R>",
+            RegressionTransformer,
+            {
+                "search": "sample",
+                "num_samples": 3,
+                "temperature": 0.9,
+                "tolerance": 100,
+                "algorithm_version": "block_copolymer",
+                "sampling_wrapper": {
+                    "property_goal": {'<Dispersity>': 1.080, '<MnGPC>': 3513},
+                    "fraction_to_mask": 0.1,
+                },
+            },
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
     ],
 )
 def test_generation_via_import(config, example_target, algorithm, params):

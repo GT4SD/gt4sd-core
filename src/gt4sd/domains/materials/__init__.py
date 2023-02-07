@@ -24,7 +24,7 @@
 """Types, classes, validation, etc. for the material domain."""
 
 from typing import List, NewType, Tuple, Union
-
+from enum import Enum
 import numpy as np
 import pandas as pd
 from rdkit import Chem
@@ -33,6 +33,8 @@ from rdkit.Chem import Mol
 # TODO: setting to str directly requires no wrapping, so wrong strings could be passed
 Protein = str  # NewType('Protein', str)
 SMILES = str  # NewType('SMILES', str)
+SELFIES = str  # NewType('SELFIES', str)
+COPOLYMER = str  # NewType('COPOLYMER', str)
 SmallMolecule = Union[SMILES, Mol]
 MacroMolecule = Union[Protein, Mol]
 Omics = Union[np.ndarray, pd.Series]
@@ -41,7 +43,13 @@ Molecule = Union[SmallMolecule, MacroMolecule]
 Sequence = str
 
 
-def validate_molecules(
+class InputType(str, Enum):
+    selfies = "SELFIES"
+    smiles = "SMILES"
+    copolymer = "COPOLYMER"
+
+
+def validate_smiles(
     smiles_list: List[SMILES],
 ) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
     """Validate molecules.
@@ -63,6 +71,62 @@ def validate_molecules(
         if molecule is not None and molecule != ""
     ]
     return molecules, valid_ids
+
+
+def validate_selfies(
+    selfies_list: List[SELFIES],
+) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
+    """Validate molecules.
+
+    Args:
+        selfies_list: list of SELFIES representing molecules.
+
+    Returns:
+        a tuple containing RDKit molecules and valid indexes.
+    """
+    # valid ids
+    valid_ids = [0]
+    if -1 in selfies_list:
+        # selfies is not valid if it contains -1 so return no valid ids
+        valid_ids = []
+    return selfies_list, valid_ids
+
+
+def validate_copolymer(
+    copolymers_list: List[COPOLYMER],
+) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
+    """Validate molecules.
+
+    Args:
+        copolymers_list: list of COPOLYMER representing molecules.
+
+    Returns:
+        a tuple containing RDKit molecules and valid indexes.
+    """
+    # TODO implement actual validation
+    return copolymers_list, [0]
+
+
+INPUT_VALIDATOR_FACTORY = {
+    InputType.selfies: validate_selfies,
+    InputType.smiles: validate_smiles,
+    InputType.copolymer: validate_copolymer,
+}
+
+
+def validate_molecules(
+    pattern_list: List[str], input_type: str,
+) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
+    """Validate molecules.
+
+    Args:
+        pattern_list: list of patterns representing molecules.
+        input_type: type of patter (SELFIES, SMILES OR COPOLYMER).
+
+    Returns:
+        a tuple containing RDKit molecules and valid indexes.
+    """
+    return INPUT_VALIDATOR_FACTORY[input_type](pattern_list)
 
 
 Bounds = Tuple[int, int]  # NewType('Bounds', Tuple[int, int])

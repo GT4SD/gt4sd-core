@@ -30,7 +30,7 @@ import logging
 from dataclasses import field
 from typing import Any, ClassVar, Dict, Iterator, Optional, TypeVar
 
-from ....domains.materials import SMILES, validate_molecules
+from ....domains.materials import InputType, SMILES, validate_molecules
 from ....exceptions import InvalidItem
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
 from ...registry import ApplicationsRegistry
@@ -228,7 +228,7 @@ class MolGXQM9Generator(AlgorithmConfiguration[SMILES, Any]):
         (
             molecules,
             _,
-        ) = validate_molecules([item])
+        ) = validate_molecules([item], InputType.smiles)
         if molecules[0] is None:
             raise InvalidItem(
                 title="InvalidSMILES",
