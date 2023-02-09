@@ -24,7 +24,7 @@
 """Types, classes, validation, etc. for the material domain."""
 
 from enum import Enum
-from typing import List, NewType, Tuple, Union
+from typing import Any, List, NewType, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -76,7 +76,7 @@ def validate_smiles(
 
 def validate_selfies(
     selfies_list: List[SELFIES],
-) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
+) -> Tuple[List[SELFIES], List[int]]:
     """Validate molecules.
 
     Args:
@@ -86,7 +86,7 @@ def validate_selfies(
         a tuple containing RDKit molecules and valid indexes.
     """
     # selfies is not valid if it contains -1 so return no valid ids
-    valid_ids = [s for s in selfies_list if s != -1]
+    valid_ids = [i for i, s in enumerate(selfies_list) if s != -1]
     selfies = [s for i, s in enumerate(selfies_list) if i in valid_ids]
     return selfies, valid_ids
 
@@ -123,7 +123,7 @@ INPUT_VALIDATOR_FACTORY = {
 def validate_molecules(
     pattern_list: List[str],
     input_type: str,
-) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
+) -> Tuple[List[Any], List[int]]:
     """Validate molecules.
 
     Args:
@@ -133,7 +133,7 @@ def validate_molecules(
     Returns:
         a tuple containing RDKit molecules and valid indexes.
     """
-    return INPUT_VALIDATOR_FACTORY[input_type](pattern_list)
+    return INPUT_VALIDATOR_FACTORY[input_type](pattern_list)  # type: ignore
 
 
 Bounds = Tuple[int, int]  # NewType('Bounds', Tuple[int, int])
