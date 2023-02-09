@@ -28,7 +28,7 @@ import os
 from dataclasses import field
 from typing import ClassVar, Dict, Optional, TypeVar
 
-from ....domains.materials import InputType, SMILES, validate_molecules
+from ....domains.materials import SMILES, InputType, validate_molecules
 from ....exceptions import InvalidItem
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.paccmann.core import PaccMannSavingArguments

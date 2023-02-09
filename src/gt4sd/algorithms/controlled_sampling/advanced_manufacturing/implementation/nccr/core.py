@@ -254,5 +254,7 @@ class CatalystGenerator(Generator):
             )
             if len(sample["smiles"])
         ]
-        _, valid_indexes = validate_molecules(pattern_list=smiles_list, input_type=InputType.smiles)
+        _, valid_indexes = validate_molecules(
+            pattern_list=smiles_list, input_type=InputType.smiles
+        )
         return [smiles_list[index] for index in valid_indexes]

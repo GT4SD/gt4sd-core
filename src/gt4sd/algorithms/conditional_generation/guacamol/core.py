@@ -25,7 +25,7 @@ import logging
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
-from ....domains.materials import InputType, SMILES, validate_molecules
+from ....domains.materials import SMILES, InputType, validate_molecules
 from ....exceptions import InvalidItem
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.guacamol_baselines.core import GuacaMolSavingArguments

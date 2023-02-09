@@ -33,7 +33,7 @@ from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
 from typing_extensions import Protocol, runtime_checkable
 
-from ....domains.materials import InputType, SMILES, validate_molecules
+from ....domains.materials import SMILES, InputType, validate_molecules
 from ....exceptions import InvalidItem
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.paccmann.core import PaccMannSavingArguments
