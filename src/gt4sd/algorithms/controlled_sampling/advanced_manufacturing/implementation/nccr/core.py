@@ -30,7 +30,7 @@ from typing import List, Union, cast
 
 import torch
 
-from ......domains.materials import validate_molecules
+from ......domains.materials import MoleculeFormat, validate_molecules
 from ......frameworks.granular.ml.models import (
     GranularEncoderDecoderModel,
     MlpPredictor,
@@ -254,5 +254,7 @@ class CatalystGenerator(Generator):
             )
             if len(sample["smiles"])
         ]
-        _, valid_indexes = validate_molecules(smiles_list=smiles_list)
+        _, valid_indexes = validate_molecules(
+            pattern_list=smiles_list, input_type=MoleculeFormat.smiles
+        )
         return [smiles_list[index] for index in valid_indexes]
