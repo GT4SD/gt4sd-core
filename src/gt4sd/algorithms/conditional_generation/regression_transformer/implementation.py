@@ -927,7 +927,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
         if input_type == InputType.selfies:
             # Fractional molecules based on non-masked parts of the SELFIES sequence
             smis = list(map(decoder, sequence.split(self.tokenizer.mask_token)))
-            _, idxs = validate_molecules(smis, input_type)
+            _, idxs = validate_molecules(smis, input_type)  # type: ignore
         elif input_type == InputType.smiles or input_type == InputType.copolymer:
             _, idxs = validate_molecules([sequence], input_type)
             if len(idxs) != 1:
