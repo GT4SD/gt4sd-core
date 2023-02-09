@@ -23,8 +23,9 @@
 #
 """Types, classes, validation, etc. for the material domain."""
 
-from typing import List, NewType, Tuple, Union
 from enum import Enum
+from typing import List, NewType, Tuple, Union
+
 import numpy as np
 import pandas as pd
 from rdkit import Chem
@@ -84,12 +85,10 @@ def validate_selfies(
     Returns:
         a tuple containing RDKit molecules and valid indexes.
     """
-    # valid ids
-    valid_ids = [0]
-    if -1 in selfies_list:
-        # selfies is not valid if it contains -1 so return no valid ids
-        valid_ids = []
-    return selfies_list, valid_ids
+    # selfies is not valid if it contains -1 so return no valid ids
+    valid_ids = [s for s in selfies_list if s != -1]
+    selfies = [s for i, s in enumerate(selfies_list) if i in valid_ids]
+    return selfies, valid_ids
 
 
 def validate_copolymer(
@@ -104,7 +103,14 @@ def validate_copolymer(
         a tuple containing RDKit molecules and valid indexes.
     """
     # TODO implement actual validation
-    return copolymers_list, [0]
+
+    # Remove duplicates
+    copolymers, idxs = [], []
+    for i, copolymer in enumerate(copolymers_list):
+        if copolymer not in copolymers:
+            copolymers.append(copolymer)
+            idxs.append(i)
+    return copolymers, idxs
 
 
 INPUT_VALIDATOR_FACTORY = {
@@ -115,7 +121,8 @@ INPUT_VALIDATOR_FACTORY = {
 
 
 def validate_molecules(
-    pattern_list: List[str], input_type: str,
+    pattern_list: List[str],
+    input_type: str,
 ) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
     """Validate molecules.
 
@@ -132,8 +139,5 @@ def validate_molecules(
 Bounds = Tuple[int, int]  # NewType('Bounds', Tuple[int, int])
 
 PhotoacidityCondition = NewType("PhotoacidityCondition", Bounds)
-# photoacidity_condition = PhotoacidityCondition(
-#     (0, 1)
-# )  # PhotoacidityCondition(Bounds((0, 1))) if Bound was a new type
 
 ConditionPAG = Union[PhotoacidityCondition]
