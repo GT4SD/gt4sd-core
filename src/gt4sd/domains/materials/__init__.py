@@ -35,7 +35,7 @@ from rdkit.Chem import Mol
 Protein = str  # NewType('Protein', str)
 SMILES = str  # NewType('SMILES', str)
 SELFIES = str  # NewType('SELFIES', str)
-COPOLYMER = str  # NewType('COPOLYMER', str)
+Copolymer = str  # NewType('Copolymer', str)
 SmallMolecule = Union[SMILES, Mol]
 MacroMolecule = Union[Protein, Mol]
 Omics = Union[np.ndarray, pd.Series]
@@ -44,10 +44,10 @@ Molecule = Union[SmallMolecule, MacroMolecule]
 Sequence = str
 
 
-class InputType(str, Enum):
+class MoleculeFormat(str, Enum):
     selfies = "SELFIES"
     smiles = "SMILES"
-    copolymer = "COPOLYMER"
+    copolymer = "Copolymer"
 
 
 def validate_smiles(
@@ -94,7 +94,7 @@ def validate_selfies(
 def validate_copolymer(
     copolymers_list: List[COPOLYMER],
 ) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
-    """Validate molecules.
+    """Validate copolymers.
 
     Args:
         copolymers_list: list of COPOLYMER representing molecules.
@@ -113,10 +113,10 @@ def validate_copolymer(
     return copolymers, idxs
 
 
-INPUT_VALIDATOR_FACTORY = {
-    InputType.selfies: validate_selfies,
-    InputType.smiles: validate_smiles,
-    InputType.copolymer: validate_copolymer,
+MOLECULE_FORMAT_VALIDATOR_FACTORY = {
+    MoleculeFormat.selfies: validate_selfies,
+    MoleculeFormat.smiles: validate_smiles,
+    MoleculeFormat.copolymer: validate_copolymer,
 }
 
 
