@@ -34,7 +34,7 @@ from terminator.collators import MaskedTextCollator, PropertyCollator
 from terminator.inference import InferenceRT
 from terminator.search import SEARCH_FACTORY, Search
 from terminator.selfies import decoder, encoder
-from terminator.tokenization import InferenceBertTokenizer
+from terminator.tokenization import InferenceBertTokenizer, PolymerGraphTokenizer
 from transformers import AutoConfig, AutoModelWithLMHead, XLNetLMHeadModel
 
 from ....domains.materials import InputType, Sequence, validate_molecules
@@ -89,7 +89,6 @@ class ConditionalGenerator:
         """
         # device
         self.device = device_claim(device)
-        self.algorithm_version = resources_path.split('/')[-1]
         # Set up the data preparation pipeline
         if not os.path.exists(os.path.join(resources_path, "inference.json")):
             raise OSError(
@@ -278,10 +277,17 @@ class ConditionalGenerator:
             raise ValueError(
                 f"Do not mask number and text sequence at the same time like in {x}."
             )
-        self.validate_input_molecule(text_sequence)
+        if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
+            self.validate_input_molecule(text_sequence, InputType.copolymer)
+        else:
+            # We can assume this to be a SELFIES
+            self.validate_input_molecule(text_sequence)
+
         self.validate_input_numerical(number_sequence)
 
-    def validate_input_molecule(self, sequence: str, input_type: str = False) -> None:
+    def validate_input_molecule(
+        self, sequence: str, input_type: str = "SELFIES"
+    ) -> None:
         """
         Verifies that the non-numerical part of the input is a proper sequence.
 
@@ -599,7 +605,7 @@ class ConditionalGenerator:
         Validating whether the wrapper can be used for conditional generation of samples.
 
         Args:
-            context: A string that is used as a seed. Has to be a SELFIES
+            context: A string that is used as a seed. Has to be a SMILES or a block-copoylmer
                 (RegressionTransformerMolecules) or AAS (RegressionTransformerProteins).
             property_goal: Specifies the property conditions for the targeted generation.
                The keys are the properties and have to be aligned with the
@@ -629,7 +635,7 @@ class ConditionalGenerator:
                 NOTE: This does not affect the actual generation process.
                 Defaults to False.
         """
-        if self.algorithm_version == "block_copolymer":
+        if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
             self.validate_input_molecule(context, InputType.copolymer)
         else:
             self.validate_input_molecule(context, InputType.smiles)
@@ -907,7 +913,9 @@ class ChemicalLanguageRT(ConditionalGenerator):
 
         self.small_mol = True
 
-    def validate_input_molecule(self, sequence: str, input_type: str = InputType.selfies) -> None:
+    def validate_input_molecule(
+        self, sequence: str, input_type: str = InputType.selfies
+    ) -> None:
         """
         Verifies that the non-numerical part of the input sequence is a molecule.
 
@@ -920,12 +928,14 @@ class ChemicalLanguageRT(ConditionalGenerator):
             # Fractional molecules based on non-masked parts of the SELFIES sequence
             smis = list(map(decoder, sequence.split(self.tokenizer.mask_token)))
             _, idxs = validate_molecules(smis, input_type)
-        else:
+        elif input_type == InputType.smiles or input_type == InputType.copolymer:
             _, idxs = validate_molecules([sequence], input_type)
-        if len(idxs) != 1:
-            raise ValueError(
-                f"The context {sequence} is not a valid {input_type} string."
-            )
+            if len(idxs) != 1:
+                raise ValueError(
+                    f"The context {sequence} is not a valid {input_type} string."
+                )
+        else:
+            raise ValueError(f"Unknown data type {input_type}.")
 
     def validate_output(self, sequences: List[Any]) -> Tuple[List[Any], List[int]]:
         """
@@ -946,6 +956,13 @@ class ChemicalLanguageRT(ConditionalGenerator):
             return self.validate_numerical(sequences)
         else:
             # Convert SELFIES to SMILES
+            if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
+                # Copolymer models require specific validation
+                return validate_molecules(
+                    pattern_list=list(zip(*sequences))[0],
+                    input_type=InputType.copolymer,
+                )
+
             smiles_list = list(
                 filter(
                     lambda x: x != self.target and x is not None,
@@ -971,7 +988,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
         return [encoder(a) for a in tokens_to_mask]  # type: ignore
 
     def language_encoding(self, seq: str) -> str:
-        if self.algorithm_version == "block_copolymer":
+        if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
             return seq
         selfie = encoder(seq)
         if not isinstance(selfie, str):
@@ -993,7 +1010,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
             A tuple of samples that passed the property constraints and the substructure constraints.
             Same format as input
         """
-        if self.algorithm_version == "block_copolymer":
+        if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
             return property_successes
         if self.sampling_wrapper == {}:
             return property_successes
