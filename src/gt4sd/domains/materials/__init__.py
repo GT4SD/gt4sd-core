@@ -92,12 +92,12 @@ def validate_selfies(
 
 
 def validate_copolymer(
-    copolymers_list: List[COPOLYMER],
-) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
+    copolymers_list: List[Copolymer],
+) -> Tuple[List[Copolymer], List[int]]:
     """Validate copolymers.
 
     Args:
-        copolymers_list: list of COPOLYMER representing molecules.
+        copolymers_list: list of Copolymer representing molecules.
 
     Returns:
         a tuple containing RDKit molecules and valid indexes.
@@ -128,12 +128,12 @@ def validate_molecules(
 
     Args:
         pattern_list: list of patterns representing molecules.
-        input_type: type of patter (SELFIES, SMILES OR COPOLYMER).
+        input_type: type of patter (SELFIES, SMILES OR Copolymer).
 
     Returns:
         a tuple containing RDKit molecules and valid indexes.
     """
-    return INPUT_VALIDATOR_FACTORY[input_type](pattern_list)  # type: ignore
+    return MOLECULE_FORMAT_VALIDATOR_FACTORY[input_type](pattern_list)  # type: ignore
 
 
 Bounds = Tuple[int, int]  # NewType('Bounds', Tuple[int, int])

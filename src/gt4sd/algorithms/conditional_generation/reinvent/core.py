@@ -25,7 +25,7 @@ import logging
 from dataclasses import field
 from typing import Any, Callable, ClassVar, Dict, Iterable, Optional, TypeVar
 
-from ....domains.materials import SMILES, InputType, validate_molecules
+from ....domains.materials import SMILES, MoleculeFormat, validate_molecules
 from ....exceptions import InvalidItem
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm
 from ...registry import ApplicationsRegistry
@@ -165,7 +165,7 @@ class ReinventGenerator(AlgorithmConfiguration[str, str]):
             the validated SMILES.
         """
         molecules, _ = validate_molecules(
-            pattern_list=[item], input_type=InputType.smiles
+            pattern_list=[item], input_type=MoleculeFormat.smiles
         )
 
         if molecules[0] is None:

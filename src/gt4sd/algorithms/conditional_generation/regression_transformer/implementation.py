@@ -37,7 +37,7 @@ from terminator.selfies import decoder, encoder
 from terminator.tokenization import InferenceBertTokenizer, PolymerGraphTokenizer
 from transformers import AutoConfig, AutoModelWithLMHead, XLNetLMHeadModel
 
-from ....domains.materials import InputType, Sequence, validate_molecules
+from ....domains.materials import MoleculeFormat, Sequence, validate_molecules
 from ....frameworks.torch import device_claim, map_tensor_dict
 from .utils import filter_stubbed, get_substructure_indices
 
@@ -278,7 +278,7 @@ class ConditionalGenerator:
                 f"Do not mask number and text sequence at the same time like in {x}."
             )
         if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
-            self.validate_input_molecule(text_sequence, InputType.copolymer)
+            self.validate_input_molecule(text_sequence, MoleculeFormat.copolymer)
         else:
             # We can assume this to be a SELFIES
             self.validate_input_molecule(text_sequence)
@@ -636,9 +636,9 @@ class ConditionalGenerator:
                 Defaults to False.
         """
         if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
-            self.validate_input_molecule(context, InputType.copolymer)
+            self.validate_input_molecule(context, MoleculeFormat.copolymer)
         else:
-            self.validate_input_molecule(context, InputType.smiles)
+            self.validate_input_molecule(context, MoleculeFormat.smiles)
 
         self.seed_molecule = context
 
@@ -914,7 +914,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
         self.small_mol = True
 
     def validate_input_molecule(
-        self, sequence: str, input_type: str = InputType.selfies
+        self, sequence: str, input_type: str = MoleculeFormat.selfies
     ) -> None:
         """
         Verifies that the non-numerical part of the input sequence is a molecule.
@@ -924,11 +924,14 @@ class ChemicalLanguageRT(ConditionalGenerator):
             input_type: whether the input is validated to be a SELFIES (default), SMILES or COPOLYMER.
         """
 
-        if input_type == InputType.selfies:
+        if input_type == MoleculeFormat.selfies:
             # Fractional molecules based on non-masked parts of the SELFIES sequence
             smis = list(map(decoder, sequence.split(self.tokenizer.mask_token)))
             _, idxs = validate_molecules(smis, input_type)  # type: ignore
-        elif input_type == InputType.smiles or input_type == InputType.copolymer:
+        elif (
+            input_type == MoleculeFormat.smiles
+            or input_type == MoleculeFormat.copolymer
+        ):
             _, idxs = validate_molecules([sequence], input_type)
             if len(idxs) != 1:
                 raise ValueError(
@@ -960,7 +963,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
                 # Copolymer models require specific validation
                 return validate_molecules(
                     pattern_list=list(zip(*sequences))[0],
-                    input_type=InputType.copolymer,
+                    input_type=MoleculeFormat.copolymer,
                 )
 
             smiles_list = list(
@@ -971,7 +974,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
             )
             if smiles_list == []:
                 return ([None], [-1])
-            return validate_molecules(pattern_list=smiles_list, input_type=InputType.smiles)  # type: ignore
+            return validate_molecules(pattern_list=smiles_list, input_type=MoleculeFormat.smiles)  # type: ignore
 
     def get_maskable_tokens(self, tokens_to_mask: List[str]) -> List[str]:
         """
