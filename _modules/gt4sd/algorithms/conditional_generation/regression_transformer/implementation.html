@@ -164,7 +164,7 @@
 <span></span><span class="c1">#</span>
 <span class="c1"># MIT License</span>
 <span class="c1">#</span>
-<span class="c1"># Copyright (c) 2022 GT4SD team</span>
+<span class="c1"># Copyright (c) 2023 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
 <span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
@@ -197,10 +197,10 @@
 <span class="kn">from</span> <span class="nn">terminator.inference</span> <span class="kn">import</span> <span class="n">InferenceRT</span>
 <span class="kn">from</span> <span class="nn">terminator.search</span> <span class="kn">import</span> <span class="n">SEARCH_FACTORY</span><span class="p">,</span> <span class="n">Search</span>
 <span class="kn">from</span> <span class="nn">terminator.selfies</span> <span class="kn">import</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">encoder</span>
-<span class="kn">from</span> <span class="nn">terminator.tokenization</span> <span class="kn">import</span> <span class="n">InferenceBertTokenizer</span>
+<span class="kn">from</span> <span class="nn">terminator.tokenization</span> <span class="kn">import</span> <span class="n">InferenceBertTokenizer</span><span class="p">,</span> <span class="n">PolymerGraphTokenizer</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoConfig</span><span class="p">,</span> <span class="n">AutoModelWithLMHead</span><span class="p">,</span> <span class="n">XLNetLMHeadModel</span>
 
-<span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">validate_molecules</span>
+<span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">MoleculeFormat</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">validate_molecules</span>
 <span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span><span class="p">,</span> <span class="n">map_tensor_dict</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">filter_stubbed</span><span class="p">,</span> <span class="n">get_substructure_indices</span>
 
@@ -252,7 +252,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-
         <span class="c1"># Set up the data preparation pipeline</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;inference.json&quot;</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
@@ -441,11 +440,17 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Do not mask number and text sequence at the same time like in </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">text_tokenizer</span><span class="p">,</span> <span class="n">PolymerGraphTokenizer</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">text_sequence</span><span class="p">,</span> <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">copolymer</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># We can assume this to be a SELFIES</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">text_sequence</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">text_sequence</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_numerical</span><span class="p">(</span><span class="n">number_sequence</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ConditionalGenerator.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ConditionalGenerator.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ConditionalGenerator.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;SELFIES&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Verifies that the non-numerical part of the input is a proper sequence.</span>
 
@@ -763,7 +768,7 @@
 <span class="sd">        Validating whether the wrapper can be used for conditional generation of samples.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            context: A string that is used as a seed. Has to be a SELFIES</span>
+<span class="sd">            context: A string that is used as a seed. Has to be a SMILES or a block-copoylmer</span>
 <span class="sd">                (RegressionTransformerMolecules) or AAS (RegressionTransformerProteins).</span>
 <span class="sd">            property_goal: Specifies the property conditions for the targeted generation.</span>
 <span class="sd">               The keys are the properties and have to be aligned with the</span>
@@ -793,7 +798,10 @@
 <span class="sd">                NOTE: This does not affect the actual generation process.</span>
 <span class="sd">                Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">smiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">text_tokenizer</span><span class="p">,</span> <span class="n">PolymerGraphTokenizer</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">copolymer</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_input_molecule</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">smiles</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">seed_molecule</span> <span class="o">=</span> <span class="n">context</span>
 
@@ -1068,25 +1076,32 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">small_mol</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="ChemicalLanguageRT.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ChemicalLanguageRT.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">selfies</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Verifies that the non-numerical part of the input sequence is a molecule.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            sequence: input sequence to be validated.</span>
-<span class="sd">            smiles: whether the input is validated to be a SELFIES (default) or SMILES.</span>
+<span class="sd">            input_type: whether the input is validated to be a SELFIES (default), SMILES or COPOLYMER.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">smiles</span><span class="p">:</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">idxs</span> <span class="o">=</span> <span class="n">validate_molecules</span><span class="p">([</span><span class="n">sequence</span><span class="p">])</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The context </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2"> is not a valid SMILES string.&quot;</span>
-                <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">input_type</span> <span class="o">==</span> <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">selfies</span><span class="p">:</span>
             <span class="c1"># Fractional molecules based on non-masked parts of the SELFIES sequence</span>
             <span class="n">smis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="n">sequence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">mask_token</span><span class="p">)))</span>
-            <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">smis</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid sequence: </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="n">_</span><span class="p">,</span> <span class="n">idxs</span> <span class="o">=</span> <span class="n">validate_molecules</span><span class="p">(</span><span class="n">smis</span><span class="p">,</span> <span class="n">input_type</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="n">input_type</span> <span class="o">==</span> <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">smiles</span>
+            <span class="ow">or</span> <span class="n">input_type</span> <span class="o">==</span> <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">copolymer</span>
+        <span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">idxs</span> <span class="o">=</span> <span class="n">validate_molecules</span><span class="p">([</span><span class="n">sequence</span><span class="p">],</span> <span class="n">input_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The context </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2"> is not a valid </span><span class="si">{</span><span class="n">input_type</span><span class="si">}</span><span class="s2"> string.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown data type </span><span class="si">{</span><span class="n">input_type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ChemicalLanguageRT.validate_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.validate_output">[docs]</a>    <span class="k">def</span> <span class="nf">validate_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1107,6 +1122,13 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_numerical</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Convert SELFIES to SMILES</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">text_tokenizer</span><span class="p">,</span> <span class="n">PolymerGraphTokenizer</span><span class="p">):</span>
+                <span class="c1"># Copolymer models require specific validation</span>
+                <span class="k">return</span> <span class="n">validate_molecules</span><span class="p">(</span>
+                    <span class="n">pattern_list</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">sequences</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">input_type</span><span class="o">=</span><span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">copolymer</span><span class="p">,</span>
+                <span class="p">)</span>
+
             <span class="n">smiles_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
                 <span class="nb">filter</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">and</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
@@ -1115,7 +1137,7 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">smiles_list</span> <span class="o">==</span> <span class="p">[]:</span>
                 <span class="k">return</span> <span class="p">([</span><span class="kc">None</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">return</span> <span class="n">validate_molecules</span><span class="p">(</span><span class="n">smiles_list</span><span class="o">=</span><span class="n">smiles_list</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+            <span class="k">return</span> <span class="n">validate_molecules</span><span class="p">(</span><span class="n">pattern_list</span><span class="o">=</span><span class="n">smiles_list</span><span class="p">,</span> <span class="n">input_type</span><span class="o">=</span><span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">smiles</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
 
 <div class="viewcode-block" id="ChemicalLanguageRT.get_maskable_tokens"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.get_maskable_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">get_maskable_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens_to_mask</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1132,6 +1154,8 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">encoder</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">tokens_to_mask</span><span class="p">]</span>  <span class="c1"># type: ignore</span></div>
 
 <div class="viewcode-block" id="ChemicalLanguageRT.language_encoding"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ChemicalLanguageRT.language_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">language_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">text_tokenizer</span><span class="p">,</span> <span class="n">PolymerGraphTokenizer</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">seq</span>
         <span class="n">selfie</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selfie</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">seq</span><span class="si">}</span><span class="s2"> (type=</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span><span class="si">}</span><span class="s2">) is not a valid SMILES sequence.&quot;</span><span class="p">)</span>
@@ -1152,6 +1176,8 @@
 <span class="sd">            A tuple of samples that passed the property constraints and the substructure constraints.</span>
 <span class="sd">            Same format as input</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">text_tokenizer</span><span class="p">,</span> <span class="n">PolymerGraphTokenizer</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">property_successes</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_wrapper</span> <span class="o">==</span> <span class="p">{}:</span>
             <span class="k">return</span> <span class="n">property_successes</span>
 
@@ -1282,13 +1308,13 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">small_mol</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="ProteinLanguageRT.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ProteinLanguageRT.validate_input_molecule"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.regression_transformer.implementation.html#gt4sd.algorithms.conditional_generation.regression_transformer.implementation.ProteinLanguageRT.validate_input_molecule">[docs]</a>    <span class="k">def</span> <span class="nf">validate_input_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Verifies that the non-numerical part of the input sequence is a valid AAS.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            sequence: input sequence to be validated.</span>
-<span class="sd">            smiles: boolean argument that is ignored but needed for sibling class.</span>
+<span class="sd">            input_type: str argument that is ignored but needed for sibling class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">sequence</span> <span class="o">!=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>

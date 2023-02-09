@@ -201,7 +201,7 @@
 <span class="kn">from</span> <span class="nn">paccmann_omics.encoders</span> <span class="kn">import</span> <span class="n">ENCODER_FACTORY</span>
 <span class="kn">from</span> <span class="nn">pytoda.smiles.smiles_language</span> <span class="kn">import</span> <span class="n">SMILESLanguage</span>
 
-<span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">validate_molecules</span>
+<span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">MoleculeFormat</span><span class="p">,</span> <span class="n">validate_molecules</span>
 <span class="kn">from</span> <span class="nn">....domains.materials.protein_encoding</span> <span class="kn">import</span> <span class="n">PrimarySequenceEncoder</span>
 <span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
 <span class="kn">from</span> <span class="nn">....frameworks.torch.vae</span> <span class="kn">import</span> <span class="n">reparameterize</span>
@@ -270,7 +270,7 @@
 
 <div class="viewcode-block" id="ConditionalGenerator.validate_molecules"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.validate_molecules">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">validate_molecules</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-        <span class="k">return</span> <span class="n">validate_molecules</span><span class="p">(</span><span class="n">smiles_list</span><span class="o">=</span><span class="n">smiles</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">validate_molecules</span><span class="p">(</span><span class="n">pattern_list</span><span class="o">=</span><span class="n">smiles</span><span class="p">,</span> <span class="n">input_type</span><span class="o">=</span><span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">smiles</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConditionalGenerator.get_latent"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.get_latent">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>

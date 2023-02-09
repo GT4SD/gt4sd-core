@@ -186,7 +186,8 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Types, classes, validation, etc. for the material domain.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -196,6 +197,8 @@
 <span class="c1"># TODO: setting to str directly requires no wrapping, so wrong strings could be passed</span>
 <span class="n">Protein</span> <span class="o">=</span> <span class="nb">str</span>  <span class="c1"># NewType(&#39;Protein&#39;, str)</span>
 <span class="n">SMILES</span> <span class="o">=</span> <span class="nb">str</span>  <span class="c1"># NewType(&#39;SMILES&#39;, str)</span>
+<span class="n">SELFIES</span> <span class="o">=</span> <span class="nb">str</span>  <span class="c1"># NewType(&#39;SELFIES&#39;, str)</span>
+<span class="n">Copolymer</span> <span class="o">=</span> <span class="nb">str</span>  <span class="c1"># NewType(&#39;Copolymer&#39;, str)</span>
 <span class="n">SmallMolecule</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">SMILES</span><span class="p">,</span> <span class="n">Mol</span><span class="p">]</span>
 <span class="n">MacroMolecule</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Protein</span><span class="p">,</span> <span class="n">Mol</span><span class="p">]</span>
 <span class="n">Omics</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]</span>
@@ -204,7 +207,13 @@
 <span class="n">Sequence</span> <span class="o">=</span> <span class="nb">str</span>
 
 
-<div class="viewcode-block" id="validate_molecules"><a class="viewcode-back" href="../../../api/gt4sd.domains.materials.html#gt4sd.domains.materials.validate_molecules">[docs]</a><span class="k">def</span> <span class="nf">validate_molecules</span><span class="p">(</span>
+<div class="viewcode-block" id="MoleculeFormat"><a class="viewcode-back" href="../../../api/gt4sd.domains.materials.html#gt4sd.domains.materials.MoleculeFormat">[docs]</a><span class="k">class</span> <span class="nc">MoleculeFormat</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">selfies</span> <span class="o">=</span> <span class="s2">&quot;SELFIES&quot;</span>
+    <span class="n">smiles</span> <span class="o">=</span> <span class="s2">&quot;SMILES&quot;</span>
+    <span class="n">copolymer</span> <span class="o">=</span> <span class="s2">&quot;Copolymer&quot;</span></div>
+
+
+<div class="viewcode-block" id="validate_smiles"><a class="viewcode-back" href="../../../api/gt4sd.domains.materials.html#gt4sd.domains.materials.validate_smiles">[docs]</a><span class="k">def</span> <span class="nf">validate_smiles</span><span class="p">(</span>
     <span class="n">smiles_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SMILES</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate molecules.</span>
@@ -228,12 +237,71 @@
     <span class="k">return</span> <span class="n">molecules</span><span class="p">,</span> <span class="n">valid_ids</span></div>
 
 
+<div class="viewcode-block" id="validate_selfies"><a class="viewcode-back" href="../../../api/gt4sd.domains.materials.html#gt4sd.domains.materials.validate_selfies">[docs]</a><span class="k">def</span> <span class="nf">validate_selfies</span><span class="p">(</span>
+    <span class="n">selfies_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SELFIES</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">SELFIES</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate molecules.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        selfies_list: list of SELFIES representing molecules.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a tuple containing RDKit molecules and valid indexes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># selfies is not valid if it contains -1 so return no valid ids</span>
+    <span class="n">valid_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">selfies_list</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">selfies</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">selfies_list</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">valid_ids</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">selfies</span><span class="p">,</span> <span class="n">valid_ids</span></div>
+
+
+<div class="viewcode-block" id="validate_copolymer"><a class="viewcode-back" href="../../../api/gt4sd.domains.materials.html#gt4sd.domains.materials.validate_copolymer">[docs]</a><span class="k">def</span> <span class="nf">validate_copolymer</span><span class="p">(</span>
+    <span class="n">copolymers_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Copolymer</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Copolymer</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate copolymers.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        copolymers_list: list of Copolymer representing molecules.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a tuple containing RDKit molecules and valid indexes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO implement actual validation</span>
+
+    <span class="c1"># Remove duplicates</span>
+    <span class="n">copolymers</span><span class="p">,</span> <span class="n">idxs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">copolymer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">copolymers_list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">copolymer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">copolymers</span><span class="p">:</span>
+            <span class="n">copolymers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copolymer</span><span class="p">)</span>
+            <span class="n">idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">copolymers</span><span class="p">,</span> <span class="n">idxs</span></div>
+
+
+<span class="n">MOLECULE_FORMAT_VALIDATOR_FACTORY</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">selfies</span><span class="p">:</span> <span class="n">validate_selfies</span><span class="p">,</span>
+    <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">smiles</span><span class="p">:</span> <span class="n">validate_smiles</span><span class="p">,</span>
+    <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">copolymer</span><span class="p">:</span> <span class="n">validate_copolymer</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="validate_molecules"><a class="viewcode-back" href="../../../api/gt4sd.domains.materials.html#gt4sd.domains.materials.validate_molecules">[docs]</a><span class="k">def</span> <span class="nf">validate_molecules</span><span class="p">(</span>
+    <span class="n">pattern_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">input_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate molecules.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pattern_list: list of patterns representing molecules.</span>
+<span class="sd">        input_type: type of patter (SELFIES, SMILES OR Copolymer).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a tuple containing RDKit molecules and valid indexes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">MOLECULE_FORMAT_VALIDATOR_FACTORY</span><span class="p">[</span><span class="n">input_type</span><span class="p">](</span><span class="n">pattern_list</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+
+
 <span class="n">Bounds</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>  <span class="c1"># NewType(&#39;Bounds&#39;, Tuple[int, int])</span>
 
 <span class="n">PhotoacidityCondition</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">&quot;PhotoacidityCondition&quot;</span><span class="p">,</span> <span class="n">Bounds</span><span class="p">)</span>
-<span class="c1"># photoacidity_condition = PhotoacidityCondition(</span>
-<span class="c1">#     (0, 1)</span>
-<span class="c1"># )  # PhotoacidityCondition(Bounds((0, 1))) if Bound was a new type</span>
 
 <span class="n">ConditionPAG</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">PhotoacidityCondition</span><span class="p">]</span>
 </pre></div>
