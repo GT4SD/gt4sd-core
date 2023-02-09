@@ -162,7 +162,7 @@ def test_train():
         / "training_pipelines/tests/regression_transformer_raw.csv"
     ) as raw_path:
 
-        # Test the pretrained QED model
+        # Test finetuning the QED model
         config["model_args"]["model_path"] = mol_path
         config["dataset_args"]["train_data_path"] = str(raw_path)
         config["dataset_args"]["test_data_path"] = str(raw_path)
@@ -195,3 +195,20 @@ def test_train():
             )
             input_config = combine_defaults_and_user_args(config)
             test_pipeline.train(**input_config)
+
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd")
+        / "training_pipelines/tests/regression_transformer_copolymer_raw.csv"
+    ) as raw_path:
+
+        # Test finetuning the polymer model
+        polymer_model = RegressionTransformerMolecules(
+            algorithm_version="block_copolymer"
+        )
+        polymer_path = polymer_model.ensure_artifacts_for_version("block_copolymer")
+
+        config["model_args"]["model_path"] = polymer_path
+        config["dataset_args"]["train_data_path"] = str(raw_path)
+        config["dataset_args"]["test_data_path"] = str(raw_path)
+        input_config = combine_defaults_and_user_args(config)
+        test_pipeline.train(**input_config)

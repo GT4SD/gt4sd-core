@@ -241,9 +241,32 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
                 "tolerance": 100,
                 "algorithm_version": "block_copolymer",
                 "sampling_wrapper": {
-                    "property_goal": {'<Dispersity>': 1.080, '<MnGPC>': 3513},
+                    "property_goal": {"<Dispersity>": 1.080, "<MnGPC>": 3513},
                     "fraction_to_mask": 0.1,
                 },
+            },
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            RegressionTransformerMolecules,
+            "<Dispersity>1.080|<MnGPC>3513.00000|<[A];CC1=CC[MASK][MASK](CO[R])C=C1;[A].R -> [B].R><[B];O=C(O[C@H](C([R])=O)C)[C@@H](O[Q])C;[B].Q -> [B].R>",
+            RegressionTransformer,
+            {
+                "algorithm_version": "block_copolymer",
+                "search": "greedy",
+                "num_samples": 2,
+                "tolerance": 100,
+            },
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            RegressionTransformerMolecules,
+            "<Dispersity>[MASK][MASK][MASK][MASK][MASK]|<MnGPC>[MASK][MASK][MASK][MASK][MASK][MASK][MASK][MASK][MASK][MASK]|<[A];CC1=CC=C(CO[R])C=C1;[A].R -> [B].R><[B];O=C(O[C@H](C([R])=O)C)[C@@H](O[Q])C;[B].Q -> [B].R>",
+            RegressionTransformer,
+            {
+                "algorithm_version": "block_copolymer",
+                "search": "greedy",
+                "num_samples": 1,
             },
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
