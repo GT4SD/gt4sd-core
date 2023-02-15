@@ -63,7 +63,7 @@ pip install gt4sd
 pip install -r vcs_requirements.txt
 ```
 
-A few VCS dependencies require Git LFS to be installed (make sure it's available on your system).
+A few VCS dependencies require Git LFS (make sure it's available on your system).
 
 ### Development setup & installation
 
