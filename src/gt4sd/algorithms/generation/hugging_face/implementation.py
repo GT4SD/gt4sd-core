@@ -34,6 +34,8 @@ from typing import List, Optional, Union
 import numpy as np
 import torch
 from transformers import (
+    AutoModelForSeq2SeqLM,
+    AutoTokenizer,
     BasicTokenizer,
     CTRLLMHeadModel,
     CTRLTokenizer,
@@ -137,6 +139,7 @@ MODEL_TYPES = {
     "xlnet": (XLNetLMHeadModel, XLNetTokenizer, prepare_prefix_input),
     "transfo-xl": (TransfoXLLMHeadModel, TransfoXLTokenizer, prepare_prefix_input),
     "xlm": (XLMWithLMHeadModel, XLMTokenizer, None),
+    "t5": (AutoModelForSeq2SeqLM, AutoTokenizer, None),
 }
 
 
@@ -151,6 +154,8 @@ class Generator:
         prompt: str,
         length: int,
         stop_token: str,
+        num_beams: int,
+        do_sample: bool,
         temperature: float,
         repetition_penalty: float,
         k: int,
@@ -184,6 +189,8 @@ class Generator:
         self.prompt = prompt
         self.length = length
         self.stop_token = None if stop_token == "" else stop_token
+        self.num_beams = num_beams
+        self.do_sample = do_sample
         self.temperature = temperature
         self.repetition_penalty = repetition_penalty
         self.k = k
@@ -213,10 +220,14 @@ class Generator:
         )
         self.model = model_class.from_pretrained(model_name_or_path)
         self.model.to(self.device)
+
         # adjusting length
-        self.length = adjust_length_to_model(
-            self.length, self.model.config.max_position_embeddings
-        )
+        if self.model_type == "t5":
+            self.length = adjust_length_to_model(self.length, 512)
+        else:
+            self.length = adjust_length_to_model(
+                self.length, self.model.config.max_position_embeddings
+            )
 
     def sample(self) -> List[str]:
         """Sample text snippets.
@@ -258,11 +269,12 @@ class Generator:
         output_sequences = self.model.generate(
             input_ids=input_ids,
             max_length=self.length + len(encoded_prompt[0]),
+            num_beams=self.num_beams,
+            do_sample=self.do_sample,
             temperature=self.temperature,
             top_k=self.k,
             top_p=self.p,
             repetition_penalty=self.repetition_penalty,
-            do_sample=True,
             num_return_sequences=self.number_of_sequences,
         )
 
