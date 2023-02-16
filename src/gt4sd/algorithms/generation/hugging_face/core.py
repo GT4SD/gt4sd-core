@@ -349,11 +349,11 @@ class HuggingFaceTransfoXLGenerator(HuggingFaceConfiguration):
 
 
 @ApplicationsRegistry.register_algorithm_application(HuggingFaceGenerationAlgorithm)
-class HuggingFaceT5Generator(HuggingFaceConfiguration):
-    """Configuration to generate text using T5."""
+class HuggingFaceSeq2SeqGenerator(HuggingFaceConfiguration):
+    """Configuration to generate text using Seq2Seq LMs."""
 
     algorithm_version: str = "t5-small"
-    model_type: str = "t5"
+    model_type: str = "auto-seq2seq-lm"
 
     @classmethod
     def list_versions(cls) -> Set[str]:

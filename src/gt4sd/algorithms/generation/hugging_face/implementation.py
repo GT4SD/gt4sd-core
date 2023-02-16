@@ -139,7 +139,7 @@ MODEL_TYPES = {
     "xlnet": (XLNetLMHeadModel, XLNetTokenizer, prepare_prefix_input),
     "transfo-xl": (TransfoXLLMHeadModel, TransfoXLTokenizer, prepare_prefix_input),
     "xlm": (XLMWithLMHeadModel, XLMTokenizer, None),
-    "t5": (AutoModelForSeq2SeqLM, AutoTokenizer, None),
+    "auto-seq2seq-lm": (AutoModelForSeq2SeqLM, AutoTokenizer, None),
 }
 
 
@@ -201,6 +201,7 @@ class Generator:
 
     def load_model(self) -> None:
         """Load a pretrained HuggingFace generation model."""
+
         try:
             model_class, tokenizer_class, preprocessing_function = MODEL_TYPES[
                 self.model_type
@@ -222,7 +223,7 @@ class Generator:
         self.model.to(self.device)
 
         # adjusting length
-        if self.model_type == "t5":
+        if self.model_type == "auto-seq2seq-lm":
             self.length = adjust_length_to_model(self.length, 512)
         else:
             self.length = adjust_length_to_model(

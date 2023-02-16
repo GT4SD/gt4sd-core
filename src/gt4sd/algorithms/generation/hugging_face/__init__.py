@@ -28,7 +28,7 @@ from .core import (
     HuggingFaceGenerationAlgorithm,
     HuggingFaceGPT2Generator,
     HuggingFaceOpenAIGPTGenerator,
-    HuggingFaceT5Generator,
+    HuggingFaceSeq2SeqGenerator,
     HuggingFaceTransfoXLGenerator,
     HuggingFaceXLMGenerator,
     HuggingFaceXLNetGenerator,
@@ -42,5 +42,5 @@ __all__ = [
     "HuggingFaceOpenAIGPTGenerator",
     "HuggingFaceXLNetGenerator",
     "HuggingFaceTransfoXLGenerator",
-    "HuggingFaceT5Generator",
+    "HuggingFaceSeq2SeqGenerator",
 ]
