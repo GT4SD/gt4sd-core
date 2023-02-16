@@ -224,7 +224,9 @@ class Generator:
 
         # adjusting length
         if self.model_type == "auto-seq2seq-lm":
-            self.length = adjust_length_to_model(self.length, 512)
+            self.length = adjust_length_to_model(
+                self.length, self.tokenizer.model_max_length
+            )
         else:
             self.length = adjust_length_to_model(
                 self.length, self.model.config.max_position_embeddings

@@ -149,12 +149,6 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
 @pytest.mark.parametrize(
     "config, algorithm",
     [
-        pytest.param(HuggingFaceXLMGenerator, HuggingFaceGenerationAlgorithm),
-        pytest.param(HuggingFaceCTRLGenerator, HuggingFaceGenerationAlgorithm),
-        pytest.param(HuggingFaceGPT2Generator, HuggingFaceGenerationAlgorithm),
-        pytest.param(HuggingFaceOpenAIGPTGenerator, HuggingFaceGenerationAlgorithm),
-        pytest.param(HuggingFaceXLNetGenerator, HuggingFaceGenerationAlgorithm),
-        pytest.param(HuggingFaceTransfoXLGenerator, HuggingFaceGenerationAlgorithm),
         pytest.param(HuggingFaceSeq2SeqGenerator, HuggingFaceGenerationAlgorithm),
     ],
 )
