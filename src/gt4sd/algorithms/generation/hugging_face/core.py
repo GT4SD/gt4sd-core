@@ -127,7 +127,7 @@ class HuggingFaceConfiguration(AlgorithmConfiguration[str, None]):
         default=1, metadata=dict(description="Number of beams for beam search.")
     )
     do_sample: bool = field(
-        default=False,
+        default=True,
         metadata=dict(
             description="Whether or not to use sampling; use greedy decoding otherwise."
         ),
@@ -161,7 +161,7 @@ class HuggingFaceConfiguration(AlgorithmConfiguration[str, None]):
         ),
     )
     number_of_sequences: int = field(
-        default=1,
+        default=8,
         metadata=dict(description="Number of text sequences to generate."),
     )
 
