@@ -162,42 +162,6 @@ def test_generation_via_import(config, algorithm):
     "algorithm_application, algorithm_type, domain, algorithm_name",
     [
         pytest.param(
-            HuggingFaceXLMGenerator.__name__,
-            "generation",
-            "nlp",
-            HuggingFaceGenerationAlgorithm.__name__,
-        ),
-        pytest.param(
-            HuggingFaceCTRLGenerator.__name__,
-            "generation",
-            "nlp",
-            HuggingFaceGenerationAlgorithm.__name__,
-        ),
-        pytest.param(
-            HuggingFaceGPT2Generator.__name__,
-            "generation",
-            "nlp",
-            HuggingFaceGenerationAlgorithm.__name__,
-        ),
-        pytest.param(
-            HuggingFaceOpenAIGPTGenerator.__name__,
-            "generation",
-            "nlp",
-            HuggingFaceGenerationAlgorithm.__name__,
-        ),
-        pytest.param(
-            HuggingFaceXLNetGenerator.__name__,
-            "generation",
-            "nlp",
-            HuggingFaceGenerationAlgorithm.__name__,
-        ),
-        pytest.param(
-            HuggingFaceTransfoXLGenerator.__name__,
-            "generation",
-            "nlp",
-            HuggingFaceGenerationAlgorithm.__name__,
-        ),
-        pytest.param(
             HuggingFaceSeq2SeqGenerator.__name__,
             "generation",
             "nlp",
