@@ -149,6 +149,36 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
 @pytest.mark.parametrize(
     "config, algorithm",
     [
+        pytest.param(
+            HuggingFaceXLMGenerator,
+            HuggingFaceGenerationAlgorithm,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceCTRLGenerator,
+            HuggingFaceGenerationAlgorithm,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceGPT2Generator,
+            HuggingFaceGenerationAlgorithm,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceOpenAIGPTGenerator,
+            HuggingFaceGenerationAlgorithm,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceXLNetGenerator,
+            HuggingFaceGenerationAlgorithm,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceTransfoXLGenerator,
+            HuggingFaceGenerationAlgorithm,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
         pytest.param(HuggingFaceSeq2SeqGenerator, HuggingFaceGenerationAlgorithm),
     ],
 )
@@ -161,6 +191,48 @@ def test_generation_via_import(config, algorithm):
 @pytest.mark.parametrize(
     "algorithm_application, algorithm_type, domain, algorithm_name",
     [
+        pytest.param(
+            HuggingFaceXLMGenerator.__name__,
+            "generation",
+            "nlp",
+            HuggingFaceGenerationAlgorithm.__name__,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceCTRLGenerator.__name__,
+            "generation",
+            "nlp",
+            HuggingFaceGenerationAlgorithm.__name__,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceGPT2Generator.__name__,
+            "generation",
+            "nlp",
+            HuggingFaceGenerationAlgorithm.__name__,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceOpenAIGPTGenerator.__name__,
+            "generation",
+            "nlp",
+            HuggingFaceGenerationAlgorithm.__name__,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceXLNetGenerator.__name__,
+            "generation",
+            "nlp",
+            HuggingFaceGenerationAlgorithm.__name__,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceTransfoXLGenerator.__name__,
+            "generation",
+            "nlp",
+            HuggingFaceGenerationAlgorithm.__name__,
+            marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
         pytest.param(
             HuggingFaceSeq2SeqGenerator.__name__,
             "generation",
