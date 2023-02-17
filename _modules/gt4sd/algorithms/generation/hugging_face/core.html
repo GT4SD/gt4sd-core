@@ -286,6 +286,15 @@
     <span class="n">stop_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Stop token for text generation.&quot;</span><span class="p">)</span>
     <span class="p">)</span>
+    <span class="n">num_beams</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of beams for beam search.&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">do_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether or not to use sampling; use greedy decoding otherwise.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
@@ -335,6 +344,8 @@
             <span class="n">prompt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span>
             <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span>
             <span class="n">stop_token</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stop_token</span><span class="p">,</span>
+            <span class="n">num_beams</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_beams</span><span class="p">,</span>
+            <span class="n">do_sample</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">do_sample</span><span class="p">,</span>
             <span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
             <span class="n">repetition_penalty</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">repetition_penalty</span><span class="p">,</span>
             <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
@@ -482,6 +493,32 @@
     <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;transfo-xl&quot;</span>
 
 <div class="viewcode-block" id="HuggingFaceTransfoXLGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceTransfoXLGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+
+<span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;more algorithm versions can be found on https://huggingface.co/models&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">list_versions</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="bp">cls</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">})</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HuggingFaceSeq2SeqGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceSeq2SeqGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">HuggingFaceGenerationAlgorithm</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">HuggingFaceSeq2SeqGenerator</span><span class="p">(</span><span class="n">HuggingFaceConfiguration</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration to generate text using Seq2Seq LMs.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;t5-small&quot;</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto-seq2seq-lm&quot;</span>
+
+<div class="viewcode-block" id="HuggingFaceSeq2SeqGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.core.html#gt4sd.algorithms.generation.hugging_face.core.HuggingFaceSeq2SeqGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
 
