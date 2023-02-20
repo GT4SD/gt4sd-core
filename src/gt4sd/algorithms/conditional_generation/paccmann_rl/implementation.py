@@ -38,7 +38,7 @@ from paccmann_chemistry.utils.search import SamplingSearch
 from paccmann_omics.encoders import ENCODER_FACTORY
 from pytoda.smiles.smiles_language import SMILESLanguage
 
-from ....domains.materials import validate_molecules
+from ....domains.materials import MoleculeFormat, validate_molecules
 from ....domains.materials.protein_encoding import PrimarySequenceEncoder
 from ....frameworks.torch import device_claim
 from ....frameworks.torch.vae import reparameterize
@@ -107,7 +107,7 @@ class ConditionalGenerator(ABC):
 
     @staticmethod
     def validate_molecules(smiles) -> Tuple[List[Chem.rdchem.Mol], List[int]]:
-        return validate_molecules(smiles_list=smiles)
+        return validate_molecules(pattern_list=smiles, input_type=MoleculeFormat.smiles)
 
     @abstractmethod
     def get_latent(self, condition: Any) -> torch.Tensor:

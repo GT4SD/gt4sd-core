@@ -28,6 +28,20 @@ from typing import Any, Dict
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
 from ..tests.utils import exitclose_file_creator
+from .cgcnn.core import (
+    CGCNNDataArguments,
+    CGCNNModelArguments,
+    CGCNNSavingArguments,
+    CGCNNTrainingArguments,
+    CGCNNTrainingPipeline,
+)
+from .crystals_crf.core import (
+    CrystalsRFCDataArguments,
+    CrystalsRFCModelArguments,
+    CrystalsRFCSavingArguments,
+    CrystalsRFCTrainingArguments,
+    CrystalsRFCTrainingPipeline,
+)
 from .diffusion.core import (
     DiffusionDataArguments,
     DiffusionForVisionTrainingPipeline,
@@ -166,6 +180,16 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         GFlowNetDataArguments,
         GFlowNetModelArguments,
     ),
+    "cgcnn": (
+        CGCNNDataArguments,
+        CGCNNModelArguments,
+        CGCNNTrainingArguments,
+    ),
+    "crystals-rfc": (
+        CrystalsRFCDataArguments,
+        CrystalsRFCModelArguments,
+        CrystalsRFCTrainingArguments,
+    ),
 }
 
 TRAINING_PIPELINE_MAPPING = {
@@ -180,6 +204,8 @@ TRAINING_PIPELINE_MAPPING = {
     "regression-transformer-trainer": RegressionTransformerTrainingPipeline,
     "diffusion-trainer": DiffusionForVisionTrainingPipeline,
     "gflownet-trainer": GFlowNetTrainingPipeline,
+    "cgcnn": CGCNNTrainingPipeline,
+    "crystals-rfc": CrystalsRFCTrainingPipeline,
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
@@ -194,6 +220,8 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "regression-transformer-trainer": RegressionTransformerSavingArguments,
     "diffusion-trainer": DiffusionSavingArguments,
     "gflownet-trainer": GFlowNetSavingArguments,
+    "cgcnn": CGCNNSavingArguments,
+    "crystals-rfc": CrystalsRFCSavingArguments,
 }
 
 

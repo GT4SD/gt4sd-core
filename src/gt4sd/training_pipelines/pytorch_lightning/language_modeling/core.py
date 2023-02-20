@@ -179,7 +179,9 @@ class LanguageModelingTrainingPipeline(PyTorchLightningTrainingPipeline):
         """
 
         model_module = CGMModule(model_args)
-        data_module = CGMDataModule(dataset_args, tokenizer=model_module.tokenizer)
+        data_module = CGMDataModule(
+            dataset_args, model=model_module.model, tokenizer=model_module.tokenizer
+        )
 
         return data_module, model_module
 

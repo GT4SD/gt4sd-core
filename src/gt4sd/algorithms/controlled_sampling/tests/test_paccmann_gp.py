@@ -38,13 +38,14 @@ TARGET = {
     "qed": {"weight": 1.0},
     "molwt": {"target": 200},
     "sa": {"weight": 2.0},
+    "callable": {"evaluator": lambda x: 1.0},
     "affinity": {"protein": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT"},
 }
 PARAMETERS = {
     "number_of_steps": 8,
     "number_of_initial_points": 4,
     "number_of_optimization_rounds": 1,
-    "samples_for_evaluation": 2,
+    "samples_for_evaluation": 10,
     "maximum_number_of_sampling_steps": 4,
 }
 

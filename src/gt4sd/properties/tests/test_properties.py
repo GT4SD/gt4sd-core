@@ -22,10 +22,12 @@
 # SOFTWARE.
 #
 """Test for properties."""
+import importlib_resources
 import numpy as np
 import pytest
 
 from gt4sd.properties import PROPERTY_PREDICTOR_FACTORY, PropertyPredictorRegistry
+from gt4sd.properties.crystals import CRYSTALS_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
 from gt4sd.properties.molecules.core import SimilaritySeed
 from gt4sd.properties.proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
@@ -102,6 +104,57 @@ artifact_model_data = {
     },
 }
 
+crystal_ground_truths = {
+    "formation_energy": -2.1132538318634033,
+    "absolute_energy": -3.3883044719696045,
+    "band_gap": 4.774056434631348,
+    "fermi_energy": -0.6838343143463135,
+    "bulk_moduli": 1.3808047771453857,
+    "shear_moduli": 0.9817742705345154,
+    "poisson_ratio": 0.3124755620956421,
+    "metal_semiconductor_classifier": 4.423607151693432e-06,
+}
+
+
+@pytest.mark.parametrize("property_key", crystal_ground_truths.keys())
+def test_crystals(property_key: str):
+
+    property_class, parameters_class = CRYSTALS_PROPERTY_PREDICTOR_FACTORY[property_key]
+    model = property_class(parameters_class(algorithm_version="v0"))  # type: ignore
+
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "properties/tests/",
+    ) as file_path:
+        out = model(input=file_path)  # type: ignore
+        pred_dict = dict(zip(out["cif_ids"], out["predictions"]))  # type: ignore
+        prediction = pred_dict["1000041"]
+        assert np.isclose(prediction, crystal_ground_truths[property_key], atol=1e-2)
+
+
+def test_rfc():
+    property_class, parameters_class = CRYSTALS_PROPERTY_PREDICTOR_FACTORY[
+        "metal_nonmetal_classifier"
+    ]
+    model = property_class(parameters_class(algorithm_version="v0"))  # type: ignore
+
+    with importlib_resources.as_file(
+        importlib_resources.files("gt4sd") / "properties/tests/crf_data.csv",
+    ) as file_path:
+
+        out = model(input=file_path)  # type: ignore
+
+        pred_dict = dict(zip(out["formulas"], out["predictions"]))  # type: ignore
+
+        assert pred_dict["AgHgHW6"] == "metal"
+        assert pred_dict["AlGaH6Os"] == "non-metal"
+        assert pred_dict["BaAlTlH6"] == "non-metal"
+        assert pred_dict["BaCaH6Ir"] == "non-metal"
+        assert pred_dict["BaCaH6Rh"] == "non-metal"
+        assert pred_dict["BaCaHfSi6"] == "metal"
+        assert pred_dict["BaCrH6Ru"] == "non-metal"
+        assert pred_dict["BaMgZnH6"] == "non-metal"
+        assert pred_dict["BaMnVH6"] == "non-metal"
+
 
 @pytest.mark.parametrize(
     "property_key", [(property_key) for property_key in ground_truths.keys()]
@@ -173,4 +226,6 @@ def test_property_predictor_registry():
     assert np.isclose(predictor(protein), protein_further_ground_truths["charge"])  # type: ignore
     assert len(PropertyPredictorRegistry.list_available()) == len(
         PROTEIN_PROPERTY_PREDICTOR_FACTORY
-    ) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY)
+    ) + len(MOLECULE_PROPERTY_PREDICTOR_FACTORY) + len(
+        CRYSTALS_PROPERTY_PREDICTOR_FACTORY
+    )

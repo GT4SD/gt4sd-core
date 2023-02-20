@@ -25,6 +25,7 @@
 from typing import Any, Dict, List
 
 from .core import PropertyPredictor
+from .crystals import CRYSTALS_PROPERTY_PREDICTOR_FACTORY
 from .molecules import MOLECULE_PROPERTY_PREDICTOR_FACTORY
 from .proteins import PROTEIN_PROPERTY_PREDICTOR_FACTORY
 from .scorer import (
@@ -34,6 +35,7 @@ from .scorer import (
 )
 
 PROPERTY_PREDICTOR_FACTORY: Dict[str, Any] = {
+    **CRYSTALS_PROPERTY_PREDICTOR_FACTORY,
     **MOLECULE_PROPERTY_PREDICTOR_FACTORY,
     **PROTEIN_PROPERTY_PREDICTOR_FACTORY,
 }

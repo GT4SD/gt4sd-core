@@ -28,7 +28,7 @@ import os
 from dataclasses import field
 from typing import ClassVar, Dict, Optional, TypeVar
 
-from ....domains.materials import SMILES, validate_molecules
+from ....domains.materials import SMILES, MoleculeFormat, validate_molecules
 from ....exceptions import InvalidItem
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.paccmann.core import PaccMannSavingArguments
@@ -139,7 +139,7 @@ class PolymerBlocksGenerator(AlgorithmConfiguration[SMILES, None]):
         (
             molecules,
             _,
-        ) = validate_molecules([item])
+        ) = validate_molecules([item], MoleculeFormat.smiles)
         if molecules[0] is None:
             raise InvalidItem(
                 title="InvalidSMILES",
