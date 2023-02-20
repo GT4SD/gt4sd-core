@@ -68,8 +68,7 @@ a young Grigori Rasputin is asked by his father and a group of men to perform ma
 Rasputin has a vision and denounces one of the men as a horse thief. Although his
 father initially slaps him for making such an accusation, Rasputin watches as the
 man is chased outside and beaten. Twenty years later, Rasputin sees a vision of
-the Virgin Mary, prompting him to become a priest. Rasputin quickly becomes famous,
-with people, even a bishop, begging for his blessing. <eod> </s> <eos>"""
+the Virgin Mary, prompting him to become a priest. <eod> </s> <eos>"""
 
 
 def set_seed(seed: int = 42) -> None:
@@ -292,17 +291,14 @@ class Generator:
             text = self.tokenizer.decode(
                 generated_sequence, clean_up_tokenization_spaces=True
             )
+
             text = text[: text.find(self.stop_token) if self.stop_token else None]
-            total_sequence = (
-                self.prompt
-                + text[
-                    len(
-                        self.tokenizer.decode(
-                            encoded_prompt[0], clean_up_tokenization_spaces=True
-                        )
-                    ) :
-                ]
-            )
+
+            if self.prompt not in text:
+                total_sequence = self.prefix + self.prompt + text
+            else:
+                total_sequence = text
+
             generated_sequences.append(total_sequence)
 
         return generated_sequences
