@@ -231,8 +231,7 @@
 <span class="s2">Rasputin has a vision and denounces one of the men as a horse thief. Although his</span>
 <span class="s2">father initially slaps him for making such an accusation, Rasputin watches as the</span>
 <span class="s2">man is chased outside and beaten. Twenty years later, Rasputin sees a vision of</span>
-<span class="s2">the Virgin Mary, prompting him to become a priest. Rasputin quickly becomes famous,</span>
-<span class="s2">with people, even a bishop, begging for his blessing. &lt;eod&gt; &lt;/s&gt; &lt;eos&gt;&quot;&quot;&quot;</span>
+<span class="s2">the Virgin Mary, prompting him to become a priest. &lt;eod&gt; &lt;/s&gt; &lt;eos&gt;&quot;&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="set_seed"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.set_seed">[docs]</a><span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -455,17 +454,14 @@
             <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
                 <span class="n">generated_sequence</span><span class="p">,</span> <span class="n">clean_up_tokenization_spaces</span><span class="o">=</span><span class="kc">True</span>
             <span class="p">)</span>
+
             <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span> <span class="n">text</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stop_token</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_token</span> <span class="k">else</span> <span class="kc">None</span><span class="p">]</span>
-            <span class="n">total_sequence</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span>
-                <span class="o">+</span> <span class="n">text</span><span class="p">[</span>
-                    <span class="nb">len</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
-                            <span class="n">encoded_prompt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">clean_up_tokenization_spaces</span><span class="o">=</span><span class="kc">True</span>
-                        <span class="p">)</span>
-                    <span class="p">)</span> <span class="p">:</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+                <span class="n">total_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">+</span> <span class="n">text</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">total_sequence</span> <span class="o">=</span> <span class="n">text</span>
+
             <span class="n">generated_sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_sequence</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">generated_sequences</span></div></div>
