@@ -905,7 +905,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
                 tokenizer=self.tokenizer,
                 property_tokens=self.properties,
                 num_tokens_to_mask=[-1] * len(self.properties),
-                ignore_errors=False,
+                ignore_errors=True,
             )
 
         else:
