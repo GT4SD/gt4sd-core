@@ -23,7 +23,17 @@
 #
 from enum import Enum
 from typing import List
+import json
+import torch
+import pandas as pd
+import numpy as np
+import torch.nn.functional as F
 
+from tokenizer.tokenizer import MolTranBertTokenizer
+from molformer.finetune.finetune_pubchem_light_classification_multitask import PropertyPredictionDataset
+from molformer.finetune.finetune_pubchem_light_classification_multitask import LightningModule as ClassificationLightningModule
+from molformer.finetune.finetune_pubchem_light_classification_multitask import LightningModule as RegressionLightningModule
+from molformer.finetune.finetune_pubchem_light_classification_multitask import MultitaskEmbeddingDataset, PropertyPredictionDataModule, MultitaskModel
 from paccmann_generator.drug_evaluators import SIDER
 from paccmann_generator.drug_evaluators import ClinTox as _ClinTox
 from paccmann_generator.drug_evaluators import OrganDB as _OrganTox
@@ -164,6 +174,205 @@ class DockingParameters(PropertyPredictorParameters):
 class S3ParametersMolecules(S3Parameters):
     domain: DomainSubmodule = DomainSubmodule("molecules")
 
+
+class MolformerParameters(S3ParametersMolecules):
+    algorithm_name: str = "cgcnn"
+    batch_size: int = Field(description="Prediction batch size", default=128)
+    workers: int = Field(description="Number of data loading workers", default=8)
+
+class MolformerClassificationParameters(MolformerParameters):
+    algorithm_name: str = "classification"
+
+class MolformerRegressionParameters(MolformerParameters):
+    algorithm_name: str = "regression"
+
+
+class _Molformer(PredictorAlgorithm):
+    """Base class for all Molformer predictive algorithms."""
+
+    def __init__(self, parameters: MolformerParameters):
+
+        # Set up the configuration from the parameters
+        configuration = ConfigurablePropertyAlgorithmConfiguration(
+            algorithm_type=parameters.algorithm_type,
+            domain=parameters.domain,
+            algorithm_name=parameters.algorithm_name,
+            algorithm_application=parameters.algorithm_application,
+            algorithm_version=parameters.algorithm_version,
+        )
+
+        self.batch_size = parameters.batch_size
+        self.workers = parameters.workers
+
+        # The parent constructor calls `self.get_model`.
+        super().__init__(configuration=configuration)
+
+    def get_resources_path_and_config(self, resources_path: str)
+
+        tokenizer_path = resources_path + ".txt"  # "bert_vocab.txt"
+        model_path = resources_path + ".ckpt"
+        config_path = resources_path + ".json"
+
+        with open(config_path, "r") as f:
+            config = json.load(f)
+
+        return config, tokenizer_path, model_path
+
+class MolformerClassification(_Molformer):
+    """Class for all Molformer classification algorithms."""
+
+    def get_model(self, resources_path: str) -> Predictor:
+        """Instantiate the actual model.
+
+        Args:
+            resources_path: local path to model files.
+
+        Returns:
+            Predictor: the model.
+        """
+
+        config, tokenizer_path, model_path = self.get_resources_path_and_config(resources_path)
+
+        tokenizer = MolTranBertTokenizer(tokenizer_path)
+
+        model = ClassificationLightningModule(config, tokenizer).load_from_checkpoint(
+            model_path,
+            strict=False,
+            config=config,
+            tokenizer=tokenizer,
+            vocab=len(tokenizer.vocab),
+        )
+
+        model.eval()
+
+        # Wrapper to get the predictions
+        def informative_model(samples: str) -> Dict[str, List[float]]:
+
+            if isinstance(samples, str):
+                samples = [samples]
+
+            df = pd.DataFrane.from_dict({"smiles": samples})
+
+            dataset = PropertyPredictionDataset(df)
+            datamodule = PropertyPredictionDataModule(margs, tokenizer)
+            datamodule.test_ds = dataset
+
+            preds = []
+            for batch in datamodule.test_dataloader():
+                with torch.no_grad():
+                    batch_output = model.validation_step(batch, _, 0)
+
+                preds_cpu = F.softmax(batch_output["pred"], dim=1).cpu().numpy()
+                preds_cpu = preds_cpu[:, 1]
+                y_pred = np.where(preds_cpu >= 0.5, 1, 0)
+                preds += y_pred.list()
+
+            return preds
+
+        return informative_model
+
+class MolformerMultitaskClassification(_Molformer):
+    """Class for all Molformer multitask classification algorithms."""
+
+    def get_model(self, resources_path: str) -> Predictor:
+        """Instantiate the actual model.
+
+        Args:
+            resources_path: local path to model files.
+
+        Returns:
+            Predictor: the model.
+        """
+
+        config, tokenizer_path, model_path = self.get_resources_path_and_config(resources_path)
+
+        tokenizer = MolTranBertTokenizer(tokenizer_path)
+
+        model = MultitaskModel(config, tokenizer).load_from_checkpoint(
+            model_path,
+            strict=False,
+            config=config,
+            tokenizer=tokenizer,
+            vocab=len(tokenizer.vocab),
+        )
+
+        model.eval()
+
+        # Wrapper to get the predictions
+        def informative_model(samples: str) -> Dict[str, List[float]]:
+
+            if isinstance(samples,str):
+                samples = [samples]
+
+            df = pd.DataFrane.from_dict({"smiles":samples})
+
+            dataset = MultitaskEmbeddingDataset(df)
+            datamodule = PropertyPredictionDataModule(margs, tokenizer)
+            datamodule.test_ds = dataset
+
+            preds = []
+            for batch in datamodule.test_dataloader():
+
+                with torch.no_grad():
+                    batch_output = model.validation_step(batch, _, 0)
+
+                batch_preds_idx = torch.argmax(batch_output["pred"],dim=1)
+                batch_preds = [config["tasks"][i] for i in batch_preds_idx]
+                preds += batch_preds
+
+            return preds
+
+        return informative_model
+
+class MolformerRegression(_Molformer):
+    """Class for all Molformer regression algorithms."""
+
+    def get_model(self, resources_path: str) -> Predictor:
+        """Instantiate the actual model.
+
+        Args:
+            resources_path: local path to model files.
+
+        Returns:
+            Predictor: the model.
+        """
+
+        config, tokenizer_path, model_path = self.get_resources_path_and_config(resources_path)
+
+        tokenizer = MolTranBertTokenizer(tokenizer_path)
+
+        model = RegressionLightningModule(config, tokenizer).load_from_checkpoint(
+            model_path,
+            strict=False,
+            config=config,
+            tokenizer=tokenizer,
+            vocab=len(tokenizer.vocab),
+        )
+
+        model.eval()
+
+        # Wrapper to get the predictions
+        def informative_model(samples: str) -> Dict[str, List[float]]:
+
+            if isinstance(samples, str):
+                samples = [samples]
+
+            df = pd.DataFrane.from_dict({"smiles": samples})
+
+            dataset = PropertyPredictionDataset(df)
+            datamodule = PropertyPredictionDataModule(margs, tokenizer)
+            datamodule.test_ds = dataset
+
+            preds = []
+            for batch in datamodule.test_dataloader():
+                with torch.no_grad():
+                    batch_output = model.validation_step(batch, _, 0)
+
+                preds += batch_output["pred"].list()
+
+            return preds
+
+        return informative_model
 
 class MCAParameters(S3ParametersMolecules):
     algorithm_name: str = "MCA"
