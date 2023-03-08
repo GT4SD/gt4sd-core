@@ -109,7 +109,7 @@ class MoLeRGenerator:
                 latents = np.stack(model.encode(self.seed_smiles))
 
             # Add noise to latent codes
-            latents = latents + self.sigma * np.random.randn(latents.shape).astype(
+            latents = latents + self.sigma * np.random.randn(*latents.shape).astype(
                 np.float32
             )
             scaffolds = list(islice(cycle(self.scaffolds), self.num_samples))
