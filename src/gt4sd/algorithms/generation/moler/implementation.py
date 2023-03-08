@@ -27,6 +27,7 @@ import logging
 from itertools import cycle, islice
 from typing import List
 
+import numpy as np
 from rdkit import Chem
 from molecule_generation import VaeWrapper
 
@@ -102,7 +103,7 @@ class MoLeRGenerator:
             if self.seed_smiles == [""]:
                 latents = model.sample_latents(self.num_samples)
             else:
-                latents = model.encode(self.seed_smiles)
+                latents = np.stack(model.encode(self.seed_smiles))
             scaffolds = list(islice(cycle(self.scaffolds), self.num_samples))
             samples = model.decode(
                 latents=latents,

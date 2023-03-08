@@ -91,7 +91,11 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
         (
             MoLeRDefaultGenerator,
             MoLeR,
-            {"seed": 0, "seed_smiles": "c1ccccc1.CNC=O", "num_workers": 1},
+            {
+                "seed": 0,
+                "seed_smiles": "c1ccccc1.CNC=O.CN1C=NC2=C1C(=O)N(C(=O)N2C)C.[O-]C(=O)[O-].CCOCN",
+                "num_workers": 1,
+            },
         ),
         # Test hard-conditioning on scaffolds
         (
@@ -109,7 +113,7 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
             MoLeR,
             {
                 "seed": 0,
-                "seed_smiles": "c1ccccc1.CNC=O",
+                "seed_smiles": "c1ccccc1.CNC=O.CN1C=NC2=C1C(=O)N(C(=O)N2C)C.[O-]C(=O)[O-].CCOCN",
                 "scaffolds": "CN.CCC",
                 "num_workers": 1,
             },
@@ -120,7 +124,7 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
             MoLeR,
             {
                 "seed": 0,
-                "seed_smiles": "c1ccccc1.CNC=O",
+                "seed_smiles": "c1ccccc1.CNC=O.CN1C=NC2=C1C(=O)N(C(=O)N2C)C.[O-]C(=O)[O-].CCOCN",
                 "scaffolds": "CN.CCC.CNO",
                 "num_workers": 1,
             },
