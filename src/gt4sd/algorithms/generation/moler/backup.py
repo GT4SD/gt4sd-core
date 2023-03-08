@@ -45,7 +45,7 @@ class MoLeRGenerator:
         beam_size: int,
         seed: int,
         num_workers: int,
-        seed_smiles: str,
+        seed_smiles: str = "",
     ) -> None:
         """Instantiate a MoLeR generator.
 
@@ -56,8 +56,9 @@ class MoLeRGenerator:
             beam_size: beam size to use during decoding.
             seed: seed used for random number generation.
             num_workers: number of workers used for generation.
-            seed_smiles: dot-separated SMILES used to initialize the decoder. If empty,
-                random codes are sampled from the latent space.
+            seed_smiles: A list of SMILES used for initializing the decoder. If empty, random
+                samples from the latent space are obtained. If given, should ideally be the
+                same length as scaffolds (in that case, samples will be paired).
 
         Raises:
             RuntimeError: in the case extras are disabled.
@@ -78,6 +79,8 @@ class MoLeRGenerator:
             for scaffold in scaffolds.split(".")
             if Chem.MolFromSmiles(scaffold) is not None
         ]
+        print("INPU", seed_smiles, scaffolds)
+        print("INITI", self.seed_smiles, self.scaffolds)
         # Repeat scaffolds if needed
         if self.scaffolds != [""] and len(self.scaffolds) < self.num_samples:
             self.scaffolds = list(islice(cycle(self.scaffolds), self.num_samples))
@@ -91,6 +94,8 @@ class MoLeRGenerator:
         Returns:
             sampled molecule (SMILES).
         """
+        # process scaffolds
+
         # generate molecules
         logger.info("running MoLeR...")
         with VaeWrapper(
@@ -99,16 +104,31 @@ class MoLeRGenerator:
             seed=self._seed,
             num_workers=self.num_workers,
         ) as model:
-            if self.seed_smiles == [""]:
-                latents = model.sample_latents(self.num_samples)
-            else:
-                latents = model.encode(self.seed_smiles)
-            scaffolds = list(islice(cycle(self.scaffolds), self.num_samples))
+
+            latents = model.sample_latents(self.num_samples)
+            scaffolds = list(islice(cycle(["CC", "CCN"]), self.num_samples))
             samples = model.decode(
                 latents=latents,
                 scaffolds=scaffolds if len(scaffolds) == self.num_samples else None,
             )
-        # offset seed to guarantee uniqueness
+        #     print(self.seed_smiles)
+        #     print(self.scaffolds)
+        #     samples = list("CCCCCCCCC")
+        #     # if self.seed_smiles ==[""]:
+        #     latents = model.sample_latents(self.num_samples)
+        #     print(latents.shape)
+        #     print(self.num_samples, self.scaffolds)
+        #     # # else:
+        #     # # latents = model.encode(self.seed_smiles)
+        #     samples = model.decode(
+        #         latents=latents,
+        #         scaffolds=None
+        #         # self.scaffolds
+        #         # if len(self.scaffolds) == self.num_samples
+        #         # else None,
+        #     )
+        #     print("GENERATEED", samples)
+        # # offset seed to guarantee uniqueness
         self._seed += 1
         logger.info("MoLeR run completed")
         return samples

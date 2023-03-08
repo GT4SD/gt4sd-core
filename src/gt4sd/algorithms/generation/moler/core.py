@@ -134,6 +134,12 @@ class MoLeRDefaultGenerator(AlgorithmConfiguration[SMILES, Any]):
         default=6,
         metadata=dict(description="Number of workers used for generation."),
     )
+    seed_smiles: str = field(
+        default="",
+        metadata=dict(
+            description="Dot-separated SMILES used to initialize the encoder. If empty, random codes are used."
+        ),
+    )
 
     def get_target_description(self) -> Optional[Dict[str, str]]:
         """Get description of the target for generation.
@@ -159,6 +165,7 @@ class MoLeRDefaultGenerator(AlgorithmConfiguration[SMILES, Any]):
             beam_size=self.beam_size,
             seed=self.seed,
             num_workers=self.num_workers,
+            seed_smiles=self.seed_smiles,
         )
 
     def validate_item(self, item: str) -> SMILES:
