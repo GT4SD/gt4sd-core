@@ -140,6 +140,12 @@ class MoLeRDefaultGenerator(AlgorithmConfiguration[SMILES, Any]):
             description="Dot-separated SMILES used to initialize the encoder. If empty, random codes are used."
         ),
     )
+    sigma: float = field(
+        default=0.0,
+        metadata=dict(
+            description="Variance of Gaussian noise being added to latent code."
+        ),
+    )
 
     def get_target_description(self) -> Optional[Dict[str, str]]:
         """Get description of the target for generation.
@@ -166,6 +172,7 @@ class MoLeRDefaultGenerator(AlgorithmConfiguration[SMILES, Any]):
             seed=self.seed,
             num_workers=self.num_workers,
             seed_smiles=self.seed_smiles,
+            sigma=self.sigma,
         )
 
     def validate_item(self, item: str) -> SMILES:

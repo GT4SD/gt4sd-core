@@ -47,6 +47,7 @@ class MoLeRGenerator:
         seed: int,
         num_workers: int,
         seed_smiles: str,
+        sigma: float,
     ) -> None:
         """Instantiate a MoLeR generator.
 
@@ -59,6 +60,7 @@ class MoLeRGenerator:
             num_workers: number of workers used for generation.
             seed_smiles: dot-separated SMILES used to initialize the decoder. If empty,
                 random codes are sampled from the latent space.
+            sigma: variance of gaussian noise being added to the latent code.
 
         Raises:
             RuntimeError: in the case extras are disabled.
@@ -69,6 +71,7 @@ class MoLeRGenerator:
         self.beam_size = beam_size
         self.num_workers = num_workers
         self._seed = seed
+        self.sigma = sigma
 
         # Process context
         self.seed_smiles = [
@@ -104,6 +107,11 @@ class MoLeRGenerator:
                 latents = model.sample_latents(self.num_samples)
             else:
                 latents = np.stack(model.encode(self.seed_smiles))
+
+            # Add noise to latent codes
+            latents = latents + self.sigma * np.random.randn(latents.shape).astype(
+                np.float32
+            )
             scaffolds = list(islice(cycle(self.scaffolds), self.num_samples))
             samples = model.decode(
                 latents=latents,
