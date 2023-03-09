@@ -23,7 +23,7 @@
 #
 import os
 from enum import Enum
-from typing import List, Union
+from typing import List, Optional, Union
 
 import importlib_resources
 import numpy as np
@@ -69,6 +69,7 @@ from ...algorithms.core import (
     PredictorAlgorithm,
 )
 from ...domains.materials import SmallMolecule
+from ...frameworks.torch import device_claim
 from ..core import (
     ApiTokenParameters,
     CallablePropertyPredictor,
@@ -199,6 +200,9 @@ class MolformerParameters(S3ParametersMolecules):
     algorithm_name: str = "molformer"
     batch_size: int = Field(description="Prediction batch size", default=128)
     workers: int = Field(description="Number of data loading workers", default=8)
+    device: Optional[str] = Field(
+        description="Device to be used for inference", default=None
+    )
 
 
 class MolformerClassificationParameters(MolformerParameters):
@@ -293,6 +297,8 @@ class _Molformer(PredictorAlgorithm):
             importlib_resources.files("gt4sd_molformer") / "finetune/bert_vocab.txt"
         )
 
+        self.device = device_claim(parameters.device)
+
         # The parent constructor calls `self.get_model`.
         super().__init__(configuration=configuration)
 
@@ -334,6 +340,7 @@ class MolformerClassification(_Molformer):
             vocab=len(tokenizer.vocab),
         )
 
+        model.to(self.device)
         model.eval()
 
         # Wrapper to get the predictions
@@ -389,6 +396,7 @@ class MolformerMultitaskClassification(_Molformer):
             vocab=len(tokenizer.vocab),
         )
 
+        model.to(self.device)
         model.eval()
 
         # Wrapper to get the predictions
@@ -447,6 +455,7 @@ class MolformerRegression(_Molformer):
             vocab=len(tokenizer.vocab),
         )
 
+        model.to(self.device)
         model.eval()
 
         # Wrapper to get the predictions
