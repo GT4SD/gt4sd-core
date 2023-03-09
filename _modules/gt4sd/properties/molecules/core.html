@@ -186,9 +186,39 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">import</span> <span class="nn">importlib_resources</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LightningModule</span> <span class="k">as</span> <span class="n">RegressionLightningModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PropertyPredictionDataModule</span> <span class="k">as</span> <span class="n">RegressionDataModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PropertyPredictionDataset</span> <span class="k">as</span> <span class="n">RegressionDataset</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LightningModule</span> <span class="k">as</span> <span class="n">ClassificationLightningModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PropertyPredictionDataModule</span> <span class="k">as</span> <span class="n">ClassificationDataModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PropertyPredictionDataset</span> <span class="k">as</span> <span class="n">ClassificationDataset</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification_multitask</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MultitaskEmbeddingDataset</span><span class="p">,</span>
+    <span class="n">MultitaskModel</span><span class="p">,</span>
+    <span class="n">PropertyPredictionDataModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.ft_tokenizer.ft_tokenizer</span> <span class="kn">import</span> <span class="n">MolTranBertTokenizer</span>
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">SIDER</span>
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">ClinTox</span> <span class="k">as</span> <span class="n">_ClinTox</span>
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">OrganDB</span> <span class="k">as</span> <span class="n">_OrganTox</span>
@@ -204,6 +234,7 @@
     <span class="n">PredictorAlgorithm</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">...domains.materials</span> <span class="kn">import</span> <span class="n">SmallMolecule</span>
+<span class="kn">from</span> <span class="nn">...frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
 <span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ApiTokenParameters</span><span class="p">,</span>
     <span class="n">CallablePropertyPredictor</span><span class="p">,</span>
@@ -330,6 +361,27 @@
     <span class="n">domain</span><span class="p">:</span> <span class="n">DomainSubmodule</span> <span class="o">=</span> <span class="n">DomainSubmodule</span><span class="p">(</span><span class="s2">&quot;molecules&quot;</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="MolformerParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerParameters">[docs]</a><span class="k">class</span> <span class="nc">MolformerParameters</span><span class="p">(</span><span class="n">S3ParametersMolecules</span><span class="p">):</span>
+    <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;molformer&quot;</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prediction batch size&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of data loading workers&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Device to be used for inference&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MolformerClassificationParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerClassificationParameters">[docs]</a><span class="k">class</span> <span class="nc">MolformerClassificationParameters</span><span class="p">(</span><span class="n">MolformerParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;classification&quot;</span></div>
+
+
+<div class="viewcode-block" id="MolformerMultitaskClassificationParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerMultitaskClassificationParameters">[docs]</a><span class="k">class</span> <span class="nc">MolformerMultitaskClassificationParameters</span><span class="p">(</span><span class="n">MolformerParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;multitask_classification&quot;</span></div>
+
+
+<div class="viewcode-block" id="MolformerRegressionParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerRegressionParameters">[docs]</a><span class="k">class</span> <span class="nc">MolformerRegressionParameters</span><span class="p">(</span><span class="n">MolformerParameters</span><span class="p">):</span>
+    <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;regression&quot;</span></div>
+
+
 <div class="viewcode-block" id="MCAParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MCAParameters">[docs]</a><span class="k">class</span> <span class="nc">MCAParameters</span><span class="p">(</span><span class="n">S3ParametersMolecules</span><span class="p">):</span>
     <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MCA&quot;</span></div>
 
@@ -387,6 +439,212 @@
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;type of toxicity for which predictions are made.&quot;</span><span class="p">,</span>
         <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chronic&quot;</span><span class="p">,</span> <span class="s2">&quot;subchronic&quot;</span><span class="p">,</span> <span class="s2">&quot;multigenerational&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">],</span>
     <span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">_Molformer</span><span class="p">(</span><span class="n">PredictorAlgorithm</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all Molformer predictive algorithms.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">MolformerParameters</span><span class="p">):</span>
+
+        <span class="c1"># Set up the configuration from the parameters</span>
+        <span class="n">configuration</span> <span class="o">=</span> <span class="n">ConfigurablePropertyAlgorithmConfiguration</span><span class="p">(</span>
+            <span class="n">algorithm_type</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_type</span><span class="p">,</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">algorithm_name</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_name</span><span class="p">,</span>
+            <span class="n">algorithm_application</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_application</span><span class="p">,</span>
+            <span class="n">algorithm_version</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">algorithm_version</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workers</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">workers</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_path</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">importlib_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;gt4sd_molformer&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;finetune/bert_vocab.txt&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># The parent constructor calls `self.get_model`.</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_resources_path_and_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+        <span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;model.ckpt&quot;</span><span class="p">)</span>
+        <span class="n">config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;hparams.yaml&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="n">model_path</span>
+
+
+<div class="viewcode-block" id="MolformerClassification"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerClassification">[docs]</a><span class="k">class</span> <span class="nc">MolformerClassification</span><span class="p">(</span><span class="n">_Molformer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for all Molformer classification algorithms.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MolformerClassification.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerClassification.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Predictor: the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">config</span><span class="p">,</span> <span class="n">model_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_resources_path_and_config</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span>
+
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;num_workers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">MolTranBertTokenizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_path</span><span class="p">)</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ClassificationLightningModule</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span>
+            <span class="n">model_path</span><span class="p">,</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+            <span class="n">vocab</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">vocab</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="c1"># Wrapper to get the predictions</span>
+        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">samples</span><span class="p">]</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="n">samples</span><span class="p">})</span>
+
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">ClassificationDataset</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="n">datamodule</span> <span class="o">=</span> <span class="n">ClassificationDataModule</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+            <span class="n">datamodule</span><span class="o">.</span><span class="n">test_ds</span> <span class="o">=</span> <span class="n">dataset</span>
+
+            <span class="n">preds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">test_dataloader</span><span class="p">():</span>
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                    <span class="n">batch_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">testing_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+                <span class="n">preds_cpu</span> <span class="o">=</span> <span class="n">batch_output</span><span class="p">[</span><span class="s2">&quot;pred&quot;</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">preds_cpu</span> <span class="o">&gt;=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">preds</span> <span class="o">+=</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">preds</span>
+
+        <span class="k">return</span> <span class="n">informative_model</span></div></div>
+
+
+<div class="viewcode-block" id="MolformerMultitaskClassification"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerMultitaskClassification">[docs]</a><span class="k">class</span> <span class="nc">MolformerMultitaskClassification</span><span class="p">(</span><span class="n">_Molformer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for all Molformer multitask classification algorithms.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MolformerMultitaskClassification.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerMultitaskClassification.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Predictor: the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">config</span><span class="p">,</span> <span class="n">model_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_resources_path_and_config</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span>
+
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;num_workers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">MolTranBertTokenizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_path</span><span class="p">)</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">MultitaskModel</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span>
+            <span class="n">model_path</span><span class="p">,</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+            <span class="n">vocab</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">vocab</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="c1"># Wrapper to get the predictions</span>
+        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">samples</span><span class="p">]</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="n">samples</span><span class="p">})</span>
+
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">MultitaskEmbeddingDataset</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="n">datamodule</span> <span class="o">=</span> <span class="n">PropertyPredictionDataModule</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+            <span class="n">datamodule</span><span class="o">.</span><span class="n">test_ds</span> <span class="o">=</span> <span class="n">dataset</span>
+
+            <span class="n">preds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">test_dataloader</span><span class="p">():</span>
+
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                    <span class="n">batch_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">testing_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="n">batch_output</span><span class="p">[</span><span class="s2">&quot;pred&quot;</span><span class="p">])</span>
+
+                <span class="n">batch_preds_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">batch_output</span><span class="p">[</span><span class="s2">&quot;pred&quot;</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">batch_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;measure_names&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">batch_preds_idx</span><span class="p">]</span>
+                <span class="n">preds</span> <span class="o">+=</span> <span class="n">batch_preds</span>
+
+            <span class="k">return</span> <span class="n">preds</span>
+
+        <span class="k">return</span> <span class="n">informative_model</span></div></div>
+
+
+<div class="viewcode-block" id="MolformerRegression"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerRegression">[docs]</a><span class="k">class</span> <span class="nc">MolformerRegression</span><span class="p">(</span><span class="n">_Molformer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for all Molformer regression algorithms.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MolformerRegression.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerRegression.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources_path: local path to model files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Predictor: the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">config</span><span class="p">,</span> <span class="n">model_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_resources_path_and_config</span><span class="p">(</span><span class="n">resources_path</span><span class="p">)</span>
+
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;num_workers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">MolTranBertTokenizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_path</span><span class="p">)</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">RegressionLightningModule</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span>
+            <span class="n">model_path</span><span class="p">,</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+            <span class="n">vocab</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">vocab</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="c1"># Wrapper to get the predictions</span>
+        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">samples</span><span class="p">]</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="n">samples</span><span class="p">})</span>
+
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">RegressionDataset</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aug&quot;</span><span class="p">])</span>
+            <span class="n">datamodule</span> <span class="o">=</span> <span class="n">RegressionDataModule</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+            <span class="n">datamodule</span><span class="o">.</span><span class="n">test_ds</span> <span class="o">=</span> <span class="n">dataset</span>
+
+            <span class="n">preds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">test_dataloader</span><span class="p">():</span>
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                    <span class="n">batch_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">testing_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+                <span class="n">preds</span> <span class="o">+=</span> <span class="n">batch_output</span><span class="p">[</span><span class="s2">&quot;pred&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">preds</span>
+
+        <span class="k">return</span> <span class="n">informative_model</span></div></div>
 
 
 <span class="c1"># NOTE: property prediction classes</span>
