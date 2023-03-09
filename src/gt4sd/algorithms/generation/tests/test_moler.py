@@ -83,16 +83,56 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
 
 
 @pytest.mark.parametrize(
-    "config, algorithm",
+    "config, algorithm, params",
     [
+        # Test unconditional generation
+        (MoLeRDefaultGenerator, MoLeR, {"seed": 42, "num_workers": 1}),
+        # Test soft-conditioning on latent codes
         (
             MoLeRDefaultGenerator,
             MoLeR,
-        )
+            {
+                "seed": 0,
+                "seed_smiles": "c1ccccc1.CNC=O.CN1C=NC2=C1C(=O)N(C(=O)N2C)C.[O-]C(=O)[O-].CCOCN",
+                "num_workers": 1,
+            },
+        ),
+        # Test hard-conditioning on scaffolds
+        (
+            MoLeRDefaultGenerator,
+            MoLeR,
+            {
+                "seed": 0,
+                "scaffolds": "CN.O=C1C2=CC=C(C3=CC=CC=C3)C=C=C2OC2=CC=CC=C12",
+                "num_workers": 1,
+            },
+        ),
+        # Test both together
+        (
+            MoLeRDefaultGenerator,
+            MoLeR,
+            {
+                "seed": 0,
+                "seed_smiles": "c1ccccc1.CNC=O.CN1C=NC2=C1C(=O)N(C(=O)N2C)C.[O-]C(=O)[O-].CCOCN",
+                "scaffolds": "CN.CCC",
+                "num_workers": 1,
+            },
+        ),
+        # Test both together with unequal sizes
+        (
+            MoLeRDefaultGenerator,
+            MoLeR,
+            {
+                "seed": 0,
+                "seed_smiles": "c1ccccc1.CNC=O.CN1C=NC2=C1C(=O)N(C(=O)N2C)C.[O-]C(=O)[O-].CCOCN",
+                "scaffolds": "CN.CCC.CNO",
+                "num_workers": 1,
+            },
+        ),
     ],
 )
-def test_generation_via_import(config, algorithm):
-    algorithm = algorithm(configuration=config())
+def test_generation_via_import(config, algorithm, params):
+    algorithm = algorithm(configuration=config(**params))
     items = list(algorithm.sample(5))
     assert len(items) == 5
 

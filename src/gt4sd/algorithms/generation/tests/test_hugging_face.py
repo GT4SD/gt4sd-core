@@ -33,6 +33,7 @@ from gt4sd.algorithms.generation.hugging_face import (
     HuggingFaceGenerationAlgorithm,
     HuggingFaceGPT2Generator,
     HuggingFaceOpenAIGPTGenerator,
+    HuggingFaceSeq2SeqGenerator,
     HuggingFaceTransfoXLGenerator,
     HuggingFaceXLMGenerator,
     HuggingFaceXLNetGenerator,
@@ -87,6 +88,12 @@ def get_classvar_type(class_var):
             "nlp",
             HuggingFaceGenerationAlgorithm.__name__,
         ),
+        (
+            HuggingFaceSeq2SeqGenerator,
+            "generation",
+            "nlp",
+            HuggingFaceGenerationAlgorithm.__name__,
+        ),
     ],
 )
 def test_config_class(
@@ -114,6 +121,7 @@ def test_config_class(
         (HuggingFaceOpenAIGPTGenerator),
         (HuggingFaceXLNetGenerator),
         (HuggingFaceTransfoXLGenerator),
+        (HuggingFaceSeq2SeqGenerator),
     ],
 )
 def test_config_instance(config_class: Type[AlgorithmConfiguration]):
@@ -130,6 +138,7 @@ def test_config_instance(config_class: Type[AlgorithmConfiguration]):
         (HuggingFaceOpenAIGPTGenerator),
         (HuggingFaceXLNetGenerator),
         (HuggingFaceTransfoXLGenerator),
+        (HuggingFaceSeq2SeqGenerator),
     ],
 )
 def test_available_versions(config_class: Type[AlgorithmConfiguration]):
@@ -170,6 +179,7 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
             HuggingFaceGenerationAlgorithm,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
         ),
+        pytest.param(HuggingFaceSeq2SeqGenerator, HuggingFaceGenerationAlgorithm),
     ],
 )
 def test_generation_via_import(config, algorithm):
@@ -222,6 +232,12 @@ def test_generation_via_import(config, algorithm):
             "nlp",
             HuggingFaceGenerationAlgorithm.__name__,
             marks=pytest.mark.skipif(test_settings.gt4sd_ci, reason="high_memory"),
+        ),
+        pytest.param(
+            HuggingFaceSeq2SeqGenerator.__name__,
+            "generation",
+            "nlp",
+            HuggingFaceGenerationAlgorithm.__name__,
         ),
     ],
 )

@@ -73,6 +73,8 @@ def filter_stubbed(
     smis: List[str] = []
     props: List[str] = []
     for smi, prop in property_sequences:
+        if smi == "":
+            continue
         try:
             mol = Chem.MolFromSmiles(smi)
         except Exception:

@@ -123,6 +123,15 @@ class HuggingFaceConfiguration(AlgorithmConfiguration[str, None]):
     stop_token: str = field(
         default="", metadata=dict(description="Stop token for text generation.")
     )
+    num_beams: int = field(
+        default=1, metadata=dict(description="Number of beams for beam search.")
+    )
+    do_sample: bool = field(
+        default=True,
+        metadata=dict(
+            description="Whether or not to use sampling; use greedy decoding otherwise."
+        ),
+    )
     temperature: float = field(
         default=1.0,
         metadata=dict(
@@ -172,6 +181,8 @@ class HuggingFaceConfiguration(AlgorithmConfiguration[str, None]):
             prompt=self.prompt,
             length=self.length,
             stop_token=self.stop_token,
+            num_beams=self.num_beams,
+            do_sample=self.do_sample,
             temperature=self.temperature,
             repetition_penalty=self.repetition_penalty,
             k=self.k,
@@ -317,6 +328,32 @@ class HuggingFaceTransfoXLGenerator(HuggingFaceConfiguration):
 
     algorithm_version: str = "transfo-xl-wt103"
     model_type: str = "transfo-xl"
+
+    @classmethod
+    def list_versions(cls) -> Set[str]:
+        """Get possible algorithm versions.
+
+        Standard S3 and cache search adding the version used in the configuration.
+
+        Returns:
+            viable values as :attr:`algorithm_version` for the environment.
+        """
+        logger.warning(
+            "more algorithm versions can be found on https://huggingface.co/models"
+        )
+        return (
+            get_configuration_class_with_attributes(cls)
+            .list_versions()
+            .union({cls.algorithm_version})
+        )
+
+
+@ApplicationsRegistry.register_algorithm_application(HuggingFaceGenerationAlgorithm)
+class HuggingFaceSeq2SeqGenerator(HuggingFaceConfiguration):
+    """Configuration to generate text using Seq2Seq LMs."""
+
+    algorithm_version: str = "t5-small"
+    model_type: str = "auto-seq2seq-lm"
 
     @classmethod
     def list_versions(cls) -> Set[str]:

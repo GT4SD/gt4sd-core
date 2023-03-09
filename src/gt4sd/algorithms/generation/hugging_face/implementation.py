@@ -34,6 +34,8 @@ from typing import List, Optional, Union
 import numpy as np
 import torch
 from transformers import (
+    AutoModelForSeq2SeqLM,
+    AutoTokenizer,
     BasicTokenizer,
     CTRLLMHeadModel,
     CTRLTokenizer,
@@ -66,8 +68,7 @@ a young Grigori Rasputin is asked by his father and a group of men to perform ma
 Rasputin has a vision and denounces one of the men as a horse thief. Although his
 father initially slaps him for making such an accusation, Rasputin watches as the
 man is chased outside and beaten. Twenty years later, Rasputin sees a vision of
-the Virgin Mary, prompting him to become a priest. Rasputin quickly becomes famous,
-with people, even a bishop, begging for his blessing. <eod> </s> <eos>"""
+the Virgin Mary, prompting him to become a priest. <eod> </s> <eos>"""
 
 
 def set_seed(seed: int = 42) -> None:
@@ -137,6 +138,7 @@ MODEL_TYPES = {
     "xlnet": (XLNetLMHeadModel, XLNetTokenizer, prepare_prefix_input),
     "transfo-xl": (TransfoXLLMHeadModel, TransfoXLTokenizer, prepare_prefix_input),
     "xlm": (XLMWithLMHeadModel, XLMTokenizer, None),
+    "auto-seq2seq-lm": (AutoModelForSeq2SeqLM, AutoTokenizer, None),
 }
 
 
@@ -151,6 +153,8 @@ class Generator:
         prompt: str,
         length: int,
         stop_token: str,
+        num_beams: int,
+        do_sample: bool,
         temperature: float,
         repetition_penalty: float,
         k: int,
@@ -184,6 +188,8 @@ class Generator:
         self.prompt = prompt
         self.length = length
         self.stop_token = None if stop_token == "" else stop_token
+        self.num_beams = num_beams
+        self.do_sample = do_sample
         self.temperature = temperature
         self.repetition_penalty = repetition_penalty
         self.k = k
@@ -194,6 +200,7 @@ class Generator:
 
     def load_model(self) -> None:
         """Load a pretrained HuggingFace generation model."""
+
         try:
             model_class, tokenizer_class, preprocessing_function = MODEL_TYPES[
                 self.model_type
@@ -213,10 +220,16 @@ class Generator:
         )
         self.model = model_class.from_pretrained(model_name_or_path)
         self.model.to(self.device)
+
         # adjusting length
-        self.length = adjust_length_to_model(
-            self.length, self.model.config.max_position_embeddings
-        )
+        if self.model_type == "auto-seq2seq-lm":
+            self.length = adjust_length_to_model(
+                self.length, self.tokenizer.model_max_length
+            )
+        else:
+            self.length = adjust_length_to_model(
+                self.length, self.model.config.max_position_embeddings
+            )
 
     def sample(self) -> List[str]:
         """Sample text snippets.
@@ -258,11 +271,12 @@ class Generator:
         output_sequences = self.model.generate(
             input_ids=input_ids,
             max_length=self.length + len(encoded_prompt[0]),
+            num_beams=self.num_beams,
+            do_sample=self.do_sample,
             temperature=self.temperature,
             top_k=self.k,
             top_p=self.p,
             repetition_penalty=self.repetition_penalty,
-            do_sample=True,
             num_return_sequences=self.number_of_sequences,
         )
 
@@ -277,17 +291,14 @@ class Generator:
             text = self.tokenizer.decode(
                 generated_sequence, clean_up_tokenization_spaces=True
             )
+
             text = text[: text.find(self.stop_token) if self.stop_token else None]
-            total_sequence = (
-                self.prompt
-                + text[
-                    len(
-                        self.tokenizer.decode(
-                            encoded_prompt[0], clean_up_tokenization_spaces=True
-                        )
-                    ) :
-                ]
-            )
+
+            if self.prompt not in text:
+                total_sequence = self.prefix + self.prompt + text
+            else:
+                total_sequence = text
+
             generated_sequences.append(total_sequence)
 
         return generated_sequences
