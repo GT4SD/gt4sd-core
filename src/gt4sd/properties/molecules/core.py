@@ -23,7 +23,7 @@
 #
 import os
 from enum import Enum
-from typing import Dict, List, Union
+from typing import List, Union
 
 import importlib_resources
 import numpy as np
@@ -337,7 +337,7 @@ class MolformerClassification(_Molformer):
         model.eval()
 
         # Wrapper to get the predictions
-        def informative_model(samples: Union[str,List[str]]) -> List[float]:
+        def informative_model(samples: Union[str, List[str]]) -> List[float]:
 
             if isinstance(samples, str):
                 samples = [samples]
@@ -392,7 +392,7 @@ class MolformerMultitaskClassification(_Molformer):
         model.eval()
 
         # Wrapper to get the predictions
-        def informative_model(samples: Union[str,List[str]]) -> List[str]:
+        def informative_model(samples: Union[str, List[str]]) -> List[str]:
 
             if isinstance(samples, str):
                 samples = [samples]
@@ -450,7 +450,7 @@ class MolformerRegression(_Molformer):
         model.eval()
 
         # Wrapper to get the predictions
-        def informative_model(samples: Union[str,List[str]]) -> List[float]:
+        def informative_model(samples: Union[str, List[str]]) -> List[float]:
 
             if isinstance(samples, str):
                 samples = [samples]
