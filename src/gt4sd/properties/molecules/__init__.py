@@ -44,6 +44,12 @@ from .core import (
     MolecularWeight,
     MoleculeOne,
     MoleculeOneParameters,
+    MolformerClassification,
+    MolformerClassificationParameters,
+    MolformerMultitaskClassification,
+    MolformerMultitaskClassificationParameters,
+    MolformerRegression,
+    MolformerRegressionParameters,
     NumberAromaticRings,
     NumberAtoms,
     NumberHAcceptors,
@@ -107,6 +113,15 @@ MOLECULE_PROPERTY_PREDICTOR_FACTORY: Dict[
     "sider": (Sider, SiderParameters),
     "organtox": (OrganTox, OrganToxParameters),
     "clintox": (ClinTox, ClinToxParameters),
+    "molformer_classification": (
+        MolformerClassification,
+        MolformerClassificationParameters,
+    ),
+    "molformer_multitask_classification": (
+        MolformerMultitaskClassification,
+        MolformerMultitaskClassificationParameters,
+    ),
+    "molformer_regression": (MolformerRegression, MolformerRegressionParameters),
     # # properties from models requiring authentification
     "askcos": (Askcos, AskcosParameters),
     "molecule_one": (MoleculeOne, MoleculeOneParameters),
