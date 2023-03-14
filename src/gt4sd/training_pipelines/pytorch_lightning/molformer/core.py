@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2022 GT4SD team
+# Copyright (c) 2023 GT4SD team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,8 @@
 """Molformer training utilities."""
 
 import logging
-from dataclasses import Dict, Union, dataclass, field, Optional, List, Tuple
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Tuple, Union
 
 import importlib_resources
 from gt4sd_molformer.finetune.finetune_pubchem_light import (
@@ -89,10 +90,13 @@ class MolformerTrainingPipeline(TrainingPipeline):
             the data and model modules.
         """
 
-        if model_args["type"] not in self.training_types:
+        if model_args["type"] not in self.modules_getter:
             raise ValueError(f"Training type {model_args['type']} is not supported.")
 
-        data_module, model_module = self.modules_getter[model_args["type"]](
+        model_args["mode"] = model_args["pooling_mode"]  # align with gt4sd-molformer
+        del model_args["pooling_mode"]
+
+        data_module, model_module = self.modules_getter[model_args["type"]]( #type: ignore
             model_args, dataset_args
         )
 
@@ -215,27 +219,41 @@ class MolformerDataArguments(TrainingPipelineArguments):
 
     __name__ = "dataset_args"
 
-    datapath: str = field(
-        metadata={
-            "help": "Path to the dataset."
-            "The dataset should follow the directory structure as described in https://github.com/txie-93/Molformer"
-        },
-    )
+    # everywhere
     n_batch: int = field(default=512, metadata={"help": "Batch size."})
-    train_size: Optional[int] = field(
-        default=None, metadata={"help": "Number of training data to be loaded."}
-    )
-    val_size: Optional[int] = field(
-        default=None, metadata={"help": "Number of validation data to be loaded."}
-    )
-    test_size: Optional[int] = field(
-        default=None, metadata={"help": "Number of testing data to be loaded."}
-    )
+
+    # pretraining
+
+    data_path: str = field(default="", metadata={"help": "path to pubchem file."})
+
     max_len: int = field(default=100, metadata={"help": "Max of length of SMILES."})
     train_load: Optional[str] = field(
         default=None, metadata={"help": "Where to load the model."}
     )
     n_workers: Optional[int] = field(default=1, metadata={"help": "Number of workers."})
+
+    # finetuning
+
+    dataset_name: str = field(
+        default="sol",
+        metadata={
+            "help": "Finetuning - Name of the dataset to be found in the data root directory."
+        },
+    )
+    measure_name: str = field(
+        default="measure",
+        metadata={"help": "Finetuning - Measure name to be used as groundtruth."}
+    )
+    data_root: str = field(
+        default="my_data_root",
+        metadata={"help": "Finetuning - Data root for the dataset."}
+    )
+    train_dataset_length: Optional[int] = field(
+        default=None, metadata={"help": "Finetuning - Length of training dataset."}
+    )
+    eval_dataset_length: Optional[int] = field(
+        default=None, metadata={"help": "Finetuning - Length of evaluation dataset."}
+    )
 
 
 @dataclass
@@ -244,133 +262,44 @@ class MolformerModelArguments(TrainingPipelineArguments):
 
     __name__ = "model_args"
 
-    type: str = field(
+    type: str = field( default="classification",
         metadata={
             "help": "The training type, for example pretraining or classification."
         },
     )
 
     n_head: int = field(default=8, metadata={"help": "GPT number of heads."})
-    n_laye: int = field(default=12, metadata={"help": "GPT number of layers."})
+    n_layer: int = field(default=12, metadata={"help": "GPT number of layers."})
     q_dropout: float = field(default=0.5, metadata={"help": "Encoder layers dropout."})
     d_dropout: float = field(default=0.1, metadata={"help": "Decoder layers dropout."})
     n_embd: int = field(default=768, metadata={"help": "Latent vector dimensionality."})
     fc_h: int = field(
         default=512, metadata={"help": "Fully connected hidden dimensionality."}
     )
-    unlike_alpha: float = field(
-        default=1.0, metadata={"help": "unlikelihood loss alpha weight."}
-    )
     dropout: float = field(
         default=0.1, metadata={"help": "Dropout used in finetuning."}
     )
     dims: List[int] = field(default_factory=lambda: [])
-    num_classes: Optional[int] = field(default=None)
+    num_classes: Optional[int] = field(
+        default=None, metadata={"help": "Finetuning - Number of classes"}
+    )
 
-    vocab_load: Optional[str] = field(
-        default=None, metadata={"help": "Where to load the vocab."}
-    )
-    n_samples: Optional[int] = field(
-        default=None, metadata={"help": "Number of samples to sample."}
-    )
-    dataset_name: str = field(default="sol")
-    measure_name: str = field(default="measure")
-    data_root: str = field(
-        default="/dccstor/medscan7/smallmolecule/runs/ba-predictor/small-data/affinity"
-    )
-    train_dataset_length: Optional[int] = field(default=None)
-    eval_dataset_length: Optional[int] = field(default=None)
-    desc_skip_connection: Optional[bool] = field(default=False)
-
-    finetune_path: str = field(
-        default="", metadata={"help": "path to  trainer file to continue training."}
-    )
     restart_path: str = field(
         default="", metadata={"help": "path to  trainer file to continue training."}
     )
-    from_scratch: bool = field(
-        default=False, metadata={"help": "train on qm9 from scratch."}
-    )
-    unlikelihood: bool = field(
-        default=False, metadata={"help": "use unlikelihood loss with gpt pretrain."}
-    )
+
     lr_start: float = field(default=3 * 1e-4, metadata={"help": "Initial lr value."})
-    lr_end: float = field(
-        default=3 * 1e-4, metadata={"help": "Maximum lr weight value."}
-    )
+
     lr_multiplier: int = field(default=1, metadata={"help": "lr weight multiplier."})
-    n_last: int = field(
-        default=1000, metadata={"help": "Number of iters to smooth loss calc."}
-    )
+
     seed: int = field(default=12345, metadata={"help": "Seed."})
-    gen_save: Optional[str] = field(
-        default=None, metadata={"help": "Where to save the gen molecules."}
-    )
-    val_load: Optional[str] = field(
-        default=None, metadata={"help": "Where to load the model."}
-    )
-    beam_size: int = field(default=0, metadata={"help": "Number of beams to generate."})
-    num_seq_returned: int = field(
-        default=0,
-        metadata={"help": "number of beams to be returned (must be <= beam_size."},
-    )
+
     min_len: int = field(
         default=1, metadata={"help": "minimum length to be generated."}
     )
-    nucleus_thresh: float = field(
-        default=0.9, metadata={"help": "nucleus sampling threshold."}
-    )
-    data_path: str = field(default="", metadata={"help": "path to pubchem file."})
-    pretext_size: int = field(
-        default=0, metadata={"help": "number of k-mers to pretext."}
-    )
-    model_save_dir: str = field(
-        default="./models_dump/",
-        metadata={"help": "Where to save the models/log/config/vocab."},
-    )
-    model_save: str = field(
-        default="model.pt", metadata={"help": "Where to save the model."}
-    )
-    log_file: Optional[str] = field(
-        default=None, metadata={"help": "Where to save the log."}
-    )
-    tb_loc: Optional[str] = field(
-        default=None, metadata={"help": "Where to save the tensorflow location."}
-    )
-    config_save: Optional[str] = field(
-        default=None, metadata={"help": "Where to save the config."}
-    )
-    vocab_save: Optional[str] = field(
-        default=None, metadata={"help": "Where to save the vocab."}
-    )
-    debug: bool = field(
-        default=False, metadata={"help": "do not erase cache at end of program."}
-    )
-    fast_dev_run: bool = field(
-        default=False,
-        metadata={
-            "help": "This flag runs a “unit test” by running n if set to n (int) else 1 if set to True training and validation batch(es)."
-        },
-    )
-    freeze_model: bool = field(
-        default=False,
-        metadata={"help": "freeze weights of bert model during fine tuning."},
-    )
-    resume: bool = field(default=False, metadata={"help": "Resume from a saved model."})
-    rotate: bool = field(
-        default=False, metadata={"help": "use rotational relative embedding."}
-    )
-    model_load: Optional[str] = field(
-        default=None, metadata={"help": "Where to load the model."}
-    )
-    root_dir: str = field(default=".", metadata={"help": "location of root dir."})
-    config_load: Optional[str] = field(
-        default=None, metadata={"help": "Where to load the config."}
-    )
 
-    model_arch: Optional[str] = field(
-        default=None, metadata={"help": "used to teack model arch in params."}
-    )
+    root_dir: str = field(default=".", metadata={"help": "location of root dir."})
+
     num_feats: int = field(
         default=32, metadata={"help": "number of random features for FAVOR+."}
     )
