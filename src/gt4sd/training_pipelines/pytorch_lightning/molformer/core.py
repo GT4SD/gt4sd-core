@@ -51,13 +51,14 @@ from gt4sd_molformer.training.train_pubchem_light import (
 from gt4sd_molformer.training.train_pubchem_light import MoleculeModule
 from pytorch_lightning import LightningDataModule, LightningModule
 
-from ..core import TrainingPipeline, TrainingPipelineArguments
+from ...core import TrainingPipelineArguments
+from ..core import PyTorchLightningTrainingPipeline
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class MolformerTrainingPipeline(TrainingPipeline):
+class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
     """Molformer training pipelines for crystals."""
 
     def __init__(
@@ -219,10 +220,7 @@ class MolformerDataArguments(TrainingPipelineArguments):
 
     __name__ = "dataset_args"
 
-    # everywhere
     n_batch: int = field(default=512, metadata={"help": "Batch size."})
-
-    # pretraining
 
     data_path: str = field(default="", metadata={"help": "path to pubchem file."})
 
@@ -231,8 +229,6 @@ class MolformerDataArguments(TrainingPipelineArguments):
         default=None, metadata={"help": "Where to load the model."}
     )
     n_workers: Optional[int] = field(default=1, metadata={"help": "Number of workers."})
-
-    # finetuning
 
     dataset_name: str = field(
         default="sol",
