@@ -25,6 +25,7 @@
 
 import logging
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
 import importlib_resources
@@ -96,9 +97,15 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
             raise ValueError(f"Training type {model_args['type']} is not supported.")
 
         # alignments with gt4sd-molformer
+        model_args["run_id"] = datetime.now().strftime("%m%d%Y%H%M")
+        dataset_args["n_embd"] = model_args["n_embd"]
+        model_args["dataset_names"] = "valid test".split()  # type: ignore
+        model_args["dataset_name"] = dataset_args["dataset_name"]
         model_args["measure_name"] = dataset_args["measure_name"]
         model_args["mode"] = model_args["pooling_mode"]
         del model_args["pooling_mode"]
+
+        seed.seed_everything(model_args["seed"]) # type: ignore
 
         data_module, model_module = self.modules_getter[model_args["type"]](  # type: ignore
             model_args, dataset_args
@@ -160,7 +167,18 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
         tokenizer = MolTranBertTokenizer(bert_vocab_path)
         data_module = ClassificationDataModule(dataset_args, tokenizer)
 
-        model_module = ClassificationLightningModule(model_args, tokenizer)
+        if model_args["pretrained_path"] is not None:
+            model_module = ClassificationLightningModule(
+                model_args, tokenizer
+            ).load_from_checkpoint(
+                model_args["pretrained_path"],
+                strict=False,
+                config=model_args,
+                tokenizer=tokenizer,
+                vocab=len(tokenizer.vocab),
+            )
+        else:
+            model_module = ClassificationLightningModule(model_args, tokenizer)
 
         return data_module, model_module
 
@@ -179,6 +197,11 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
             the data and model modules.
         """
 
+        model_args["num_tasks"] = len(dataset_args["measure_names"]) # type: ignore
+
+        if model_args["num_tasks"] == 0:
+            raise ValueError("Missing class names.")
+
         bert_vocab_path = (
             importlib_resources.files("gt4sd_molformer") / "finetune/bert_vocab.txt"
         )
@@ -186,7 +209,17 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
         tokenizer = MolTranBertTokenizer(bert_vocab_path)
 
         data_module = PropertyPredictionDataModule(dataset_args, tokenizer)
-        model_module = MultitaskModel(model_args, tokenizer)
+
+        if model_args["pretrained_path"] is not None:
+            model_module = MultitaskModel(model_args, tokenizer).load_from_checkpoint(
+                model_args["pretrained_path"],
+                strict=False,
+                config=model_args,
+                tokenizer=tokenizer,
+                vocab=len(tokenizer.vocab),
+            )
+        else:
+            model_module = MultitaskModel(model_args, tokenizer)
 
         return data_module, model_module
 
@@ -211,12 +244,12 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
 
         tokenizer = MolTranBertTokenizer(bert_vocab_path)
 
-        seed.seed_everything(model_args.seed)
+        if model_args["pretrained_path"] is not None:
 
-        if model_args.pretrained_path is not None:
-
-            model_module = RegressionLightningModule(model_args, tokenizer).load_from_checkpoint(
-                model_args.pretrained_path,
+            model_module = RegressionLightningModule(
+                model_args, tokenizer
+            ).load_from_checkpoint(
+                model_args["pretrained_path"],
                 strict=False,
                 config=model_args,
                 tokenizer=tokenizer,
@@ -237,7 +270,7 @@ class MolformerDataArguments(TrainingPipelineArguments):
 
     __name__ = "dataset_args"
 
-    n_batch: int = field(default=512, metadata={"help": "Batch size."})
+    batch_size: int = field(default=512, metadata={"help": "Batch size."})
 
     data_path: str = field(default="", metadata={"help": "path to pubchem file."})
 
@@ -245,8 +278,9 @@ class MolformerDataArguments(TrainingPipelineArguments):
     train_load: Optional[str] = field(
         default=None, metadata={"help": "Where to load the model."}
     )
-    n_workers: Optional[int] = field(default=1, metadata={"help": "Number of workers."})
-
+    num_workers: Optional[int] = field(
+        default=1, metadata={"help": "Number of workers."}
+    )
     dataset_name: str = field(
         default="sol",
         metadata={
@@ -267,8 +301,11 @@ class MolformerDataArguments(TrainingPipelineArguments):
     eval_dataset_length: Optional[int] = field(
         default=None, metadata={"help": "Finetuning - Length of evaluation dataset."}
     )
-
     aug: bool = field(default=False, metadata={"help": "aug."})
+    measure_names: List[str] = field(
+        default_factory=lambda: [],
+        metadata={"help": "Class names for multitask classification."},
+    )
 
 
 @dataclass
@@ -308,7 +345,7 @@ class MolformerModelArguments(TrainingPipelineArguments):
 
     lr_multiplier: int = field(default=1, metadata={"help": "lr weight multiplier."})
 
-    seed: int = field(default=12345, metadata={"help": "Seed."})
+    seed: Union[float, str, int] = field(default=12345, metadata={"help": "Seed."})
 
     min_len: int = field(
         default=1, metadata={"help": "minimum length to be generated."}
@@ -325,6 +362,10 @@ class MolformerModelArguments(TrainingPipelineArguments):
     fold: int = field(default=0, metadata={"help": "number of folds for fine tuning."})
     pretrained_path: Optional[str] = field(
         default=None, metadata={"help": "Path to the base pretrained model."}
+    )
+    results_dir: str = field(
+        default=".",
+        metadata={"help": "Path to save evaluation results during training."},
     )
 
 
@@ -382,8 +423,8 @@ class MolformerTrainingArguments(TrainingPipelineArguments):
     basename: Optional[str] = field(
         default="lightning_logs", metadata={"help": "Experiment name."}
     )
-    val_check_interval: int = field(
-        default=50000, metadata={"help": " How often to check the validation set."}
+    val_check_interval: Union[int, float] = field(
+        default=1.0, metadata={"help": " How often to check the validation set."}
     )
     gradient_clip_val: float = field(
         default=50, metadata={"help": "Gradient clipping value."}
