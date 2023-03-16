@@ -27,7 +27,6 @@ import logging
 from itertools import cycle, islice
 from typing import List
 
-import numpy as np
 from rdkit import Chem
 from molecule_generation import VaeWrapper
 
@@ -46,8 +45,6 @@ class MoLeRGenerator:
         beam_size: int,
         seed: int,
         num_workers: int,
-        seed_smiles: str,
-        sigma: float,
     ) -> None:
         """Instantiate a MoLeR generator.
 
@@ -58,36 +55,17 @@ class MoLeRGenerator:
             beam_size: beam size to use during decoding.
             seed: seed used for random number generation.
             num_workers: number of workers used for generation.
-            seed_smiles: dot-separated SMILES used to initialize the decoder. If empty,
-                random codes are sampled from the latent space.
-            sigma: variance of gaussian noise being added to the latent code.
 
         Raises:
             RuntimeError: in the case extras are disabled.
         """
         # loading artifacts
         self.resources_path = resources_path
+        self.scaffolds = scaffolds
         self.num_samples = num_samples
         self.beam_size = beam_size
         self.num_workers = num_workers
         self._seed = seed
-        self.sigma = sigma
-
-        # Process context
-        self.seed_smiles = [
-            smi for smi in seed_smiles.split(".") if Chem.MolFromSmiles(smi) is not None
-        ]
-        self.scaffolds = [
-            scaffold
-            for scaffold in scaffolds.split(".")
-            if Chem.MolFromSmiles(scaffold) is not None
-        ]
-        # Repeat scaffolds if needed
-        if self.scaffolds != [""] and len(self.scaffolds) < self.num_samples:
-            self.scaffolds = list(islice(cycle(self.scaffolds), self.num_samples))
-        # Repeat seed smiles if needed
-        if self.seed_smiles != [""] and len(self.seed_smiles) < self.num_samples:
-            self.seed_smiles = list(islice(cycle(self.seed_smiles), self.num_samples))
 
     def generate(self) -> List[str]:
         """Sample molecules using MoLeR.
@@ -95,6 +73,12 @@ class MoLeRGenerator:
         Returns:
             sampled molecule (SMILES).
         """
+        # process scaffolds
+        valid_scaffolds = [
+            scaffold
+            for scaffold in self.scaffolds.split(".")
+            if Chem.MolFromSmiles(scaffold) is not None
+        ]
         # generate molecules
         logger.info("running MoLeR...")
         with VaeWrapper(
@@ -103,16 +87,8 @@ class MoLeRGenerator:
             seed=self._seed,
             num_workers=self.num_workers,
         ) as model:
-            if self.seed_smiles == [""]:
-                latents = model.sample_latents(self.num_samples)
-            else:
-                latents = np.stack(model.encode(self.seed_smiles))
-
-            # Add noise to latent codes
-            latents = latents + self.sigma * np.random.randn(*latents.shape).astype(
-                np.float32
-            )
-            scaffolds = list(islice(cycle(self.scaffolds), self.num_samples))
+            latents = model.sample_latents(self.num_samples)
+            scaffolds = list(islice(cycle(valid_scaffolds), self.num_samples))
             samples = model.decode(
                 latents=latents,
                 scaffolds=scaffolds if len(scaffolds) == self.num_samples else None,
