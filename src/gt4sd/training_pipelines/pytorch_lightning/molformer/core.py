@@ -105,7 +105,7 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
         model_args["mode"] = model_args["pooling_mode"]
         del model_args["pooling_mode"]
 
-        seed.seed_everything(model_args["seed"]) # type: ignore
+        seed.seed_everything(model_args["seed"])  # type: ignore
 
         data_module, model_module = self.modules_getter[model_args["type"]](  # type: ignore
             model_args, dataset_args
@@ -197,7 +197,7 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
             the data and model modules.
         """
 
-        model_args["num_tasks"] = len(dataset_args["measure_names"]) # type: ignore
+        model_args["num_tasks"] = len(dataset_args["measure_names"])  # type: ignore
 
         if model_args["num_tasks"] == 0:
             raise ValueError("Missing class names.")
