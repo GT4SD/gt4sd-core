@@ -253,6 +253,8 @@ class MolformerDataArguments(TrainingPipelineArguments):
         default=None, metadata={"help": "Finetuning - Length of evaluation dataset."}
     )
 
+    aug: bool = field(default=False, metadata={"help": "aug."})
+
 
 @dataclass
 class MolformerModelArguments(TrainingPipelineArguments):
@@ -306,8 +308,6 @@ class MolformerModelArguments(TrainingPipelineArguments):
         default="cls", metadata={"help": "type of pooling to use."}
     )
     fold: int = field(default=0, metadata={"help": "number of folds for fine tuning."})
-
-    aug: bool = field(default=False, metadata={"help": "aug."})
 
 
 @dataclass
