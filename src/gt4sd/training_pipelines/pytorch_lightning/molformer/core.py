@@ -118,6 +118,7 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
             the data and model modules.
         """
 
+        model_args["measure_name"] = dataset_args["measure_name"]
         train_config = {
             "batch_size": model_args["n_batch"],
             "num_workers": model_args["n_workers"],
