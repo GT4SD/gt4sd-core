@@ -94,7 +94,9 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
         if model_args["type"] not in self.modules_getter:
             raise ValueError(f"Training type {model_args['type']} is not supported.")
 
-        model_args["mode"] = model_args["pooling_mode"]  # align with gt4sd-molformer
+        # alignments with gt4sd-molformer
+        model_args["measure_name"] = dataset_args["measure_name"]
+        model_args["mode"] = model_args["pooling_mode"]
         del model_args["pooling_mode"]
 
         data_module, model_module = self.modules_getter[model_args["type"]](  # type: ignore
@@ -118,7 +120,6 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
             the data and model modules.
         """
 
-        model_args["measure_name"] = dataset_args["measure_name"]
         train_config = {
             "batch_size": model_args["n_batch"],
             "num_workers": model_args["n_workers"],
