@@ -50,6 +50,7 @@ from gt4sd_molformer.training.train_pubchem_light import (
 )
 from gt4sd_molformer.training.train_pubchem_light import MoleculeModule
 from pytorch_lightning import LightningDataModule, LightningModule
+from pytorch_lightning.utilities import seed
 
 from ...core import TrainingPipelineArguments
 from ..core import PyTorchLightningTrainingPipeline
@@ -209,9 +210,23 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
         )
 
         tokenizer = MolTranBertTokenizer(bert_vocab_path)
-        data_module = RegressionDataModule(dataset_args, tokenizer)
 
-        model_module = RegressionLightningModule(model_args, tokenizer)
+        seed.seed_everything(model_args.seed)
+
+        if model_args.pretrained_path is not None:
+
+            model_module = RegressionLightningModule(model_args, tokenizer).load_from_checkpoint(
+                model_args.pretrained_path,
+                strict=False,
+                config=model_args,
+                tokenizer=tokenizer,
+                vocab=len(tokenizer.vocab),
+            )
+
+        else:
+            model_module = RegressionLightningModule(model_args, tokenizer)
+
+        data_module = RegressionDataModule(dataset_args, tokenizer)
 
         return data_module, model_module
 
@@ -308,6 +323,9 @@ class MolformerModelArguments(TrainingPipelineArguments):
         default="cls", metadata={"help": "type of pooling to use."}
     )
     fold: int = field(default=0, metadata={"help": "number of folds for fine tuning."})
+    pretrained_path: Optional[str] = field(
+        default=None, metadata={"help": "Path to the base pretrained model."}
+    )
 
 
 @dataclass
