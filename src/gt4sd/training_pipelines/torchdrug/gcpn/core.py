@@ -31,7 +31,6 @@ from typing import Any, Dict, Optional
 
 import torch
 from torch import optim
-
 from torchdrug.core import Engine
 from torchdrug.models import RGCN
 from torchdrug.tasks import GCPNGeneration

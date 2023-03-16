@@ -119,5 +119,4 @@ class MoLeRGenerator:
             )
         # offset seed to guarantee uniqueness
         self._seed += 1
-        logger.info("MoLeR run completed")
         return samples
