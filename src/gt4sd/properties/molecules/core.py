@@ -358,6 +358,7 @@ class MolformerClassification(_Molformer):
             preds = []
             for batch in datamodule.test_dataloader():
                 with torch.no_grad():
+                    batch = [x.to(self.device) for x in batch]
                     batch_output = model.testing_step(batch, 0, 0)
 
                 preds_cpu = batch_output["pred"][:, 1]
@@ -415,9 +416,8 @@ class MolformerMultitaskClassification(_Molformer):
             for batch in datamodule.test_dataloader():
 
                 with torch.no_grad():
+                    batch = [x.to(self.device) for x in batch]
                     batch_output = model.testing_step(batch, 0, 0)
-
-                print(batch_output["pred"])
 
                 batch_preds_idx = torch.argmax(batch_output["pred"], dim=1)
                 batch_preds = [config["measure_names"][i] for i in batch_preds_idx]
@@ -473,6 +473,7 @@ class MolformerRegression(_Molformer):
             preds = []
             for batch in datamodule.test_dataloader():
                 with torch.no_grad():
+                    batch = [x.to(self.device) for x in batch]
                     batch_output = model.testing_step(batch, 0, 0)
 
                 preds += batch_output["pred"].view(-1).tolist()
