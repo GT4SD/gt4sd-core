@@ -96,7 +96,7 @@ class MolformerTrainingPipeline(TrainingPipeline):
         model_args["mode"] = model_args["pooling_mode"]  # align with gt4sd-molformer
         del model_args["pooling_mode"]
 
-        data_module, model_module = self.modules_getter[model_args["type"]]( #type: ignore
+        data_module, model_module = self.modules_getter[model_args["type"]](  # type: ignore
             model_args, dataset_args
         )
 
@@ -242,11 +242,11 @@ class MolformerDataArguments(TrainingPipelineArguments):
     )
     measure_name: str = field(
         default="measure",
-        metadata={"help": "Finetuning - Measure name to be used as groundtruth."}
+        metadata={"help": "Finetuning - Measure name to be used as groundtruth."},
     )
     data_root: str = field(
         default="my_data_root",
-        metadata={"help": "Finetuning - Data root for the dataset."}
+        metadata={"help": "Finetuning - Data root for the dataset."},
     )
     train_dataset_length: Optional[int] = field(
         default=None, metadata={"help": "Finetuning - Length of training dataset."}
@@ -262,7 +262,8 @@ class MolformerModelArguments(TrainingPipelineArguments):
 
     __name__ = "model_args"
 
-    type: str = field( default="classification",
+    type: str = field(
+        default="classification",
         metadata={
             "help": "The training type, for example pretraining or classification."
         },

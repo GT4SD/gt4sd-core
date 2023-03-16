@@ -93,6 +93,13 @@ from .pytorch_lightning.language_modeling.core import (
     LanguageModelingSavingArguments,
     LanguageModelingTrainingPipeline,
 )
+from .pytorch_lightning.molformer.core import (
+    MolformerDataArguments,
+    MolformerModelArguments,
+    MolformerSavingArguments,
+    MolformerTrainingArguments,
+    MolformerTrainingPipeline,
+)
 from .regression_transformer.core import (
     RegressionTransformerDataArguments,
     RegressionTransformerSavingArguments,
@@ -190,6 +197,11 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         CrystalsRFCModelArguments,
         CrystalsRFCTrainingArguments,
     ),
+    "molformer": (
+        MolformerDataArguments,
+        MolformerModelArguments,
+        MolformerTrainingArguments,
+    ),
 }
 
 TRAINING_PIPELINE_MAPPING = {
@@ -206,6 +218,7 @@ TRAINING_PIPELINE_MAPPING = {
     "gflownet-trainer": GFlowNetTrainingPipeline,
     "cgcnn": CGCNNTrainingPipeline,
     "crystals-rfc": CrystalsRFCTrainingPipeline,
+    "molformer": MolformerTrainingPipeline,
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
@@ -222,6 +235,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "gflownet-trainer": GFlowNetSavingArguments,
     "cgcnn": CGCNNSavingArguments,
     "crystals-rfc": CrystalsRFCSavingArguments,
+    "molformer": MolformerSavingArguments,
 }
 
 
