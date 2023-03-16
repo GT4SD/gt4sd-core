@@ -307,6 +307,8 @@ class MolformerModelArguments(TrainingPipelineArguments):
     )
     fold: int = field(default=0, metadata={"help": "number of folds for fine tuning."})
 
+    aug: bool = field(default=False, metadata={"help": "aug."})
+
 
 @dataclass
 class MolformerTrainingArguments(TrainingPipelineArguments):
