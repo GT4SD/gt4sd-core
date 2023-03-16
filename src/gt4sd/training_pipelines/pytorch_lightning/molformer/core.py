@@ -345,7 +345,7 @@ class MolformerModelArguments(TrainingPipelineArguments):
 
     lr_multiplier: int = field(default=1, metadata={"help": "lr weight multiplier."})
 
-    seed: Union[float, str, int] = field(default=12345, metadata={"help": "Seed."})
+    seed: int = field(default=12345, metadata={"help": "Seed."})
 
     min_len: int = field(
         default=1, metadata={"help": "minimum length to be generated."}
@@ -423,7 +423,7 @@ class MolformerTrainingArguments(TrainingPipelineArguments):
     basename: Optional[str] = field(
         default="lightning_logs", metadata={"help": "Experiment name."}
     )
-    val_check_interval: Union[int, float] = field(
+    val_check_interval: float = field(
         default=1.0, metadata={"help": " How often to check the validation set."}
     )
     gradient_clip_val: float = field(
