@@ -310,7 +310,7 @@ class MolformerModelArguments(TrainingPipelineArguments):
 class MolformerTrainingArguments(TrainingPipelineArguments):
     """Training arguments related to Molformer trainer."""
 
-    __name__ = "training_args"
+    __name__ = "pl_trainer_args"
 
     accumulate_grad_batches: int = field(
         default=1,
