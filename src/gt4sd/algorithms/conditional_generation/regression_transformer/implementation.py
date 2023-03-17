@@ -816,6 +816,9 @@ class ConditionalGenerator:
                 to_keep.append(keep)
 
         self.substructures_to_keep = to_keep
+        # Contains even the ones whose strings cant be found in seed string
+        self.all_substructures_to_keep = substructures_to_keep
+
         if len(set(self.substructures_to_keep + self.substructures_to_mask)) < len(
             self.substructures_to_keep
         ) + len(self.substructures_to_mask):
@@ -1024,15 +1027,31 @@ class ChemicalLanguageRT(ConditionalGenerator):
         )
 
         successes: List[Tuple[str, str]] = []
-
-        subs_mols = []
-        for keep in self.substructures_to_keep:
-            subs_mols.append(Chem.MolFromSmiles(keep) or Chem.MolFromSmarts(keep))
-            if subs_mols[-1] is None:
+        subs_mols: List = []
+        for keep in self.all_substructures_to_keep:
+            subs_mol = Chem.MolFromSmiles(keep) or Chem.MolFromSmarts(keep)
+            if subs_mol is None:
                 logger.warning(
                     f"{keep} is not a valid SMILES/SELFIES. Instead substructure filtering "
                     f"based on sequence alone can be done and is set to: {self.text_filtering}"
                 )
+            if keep not in self.substructures_to_keep and not Chem.MolFromSmiles(
+                self.target
+            ).HasSubstructMatch(subs_mol):
+                logger.info(
+                    f"{keep} could not be identified in SMILES/SELFIES on text level AND no "
+                    "substructure match occurred, hence it will be ignored"
+                )
+                subs_mols.append(None)
+            elif keep not in self.substructures_to_keep:
+                logger.info(
+                    f"{keep} could not be identified in SMILES/SELFIES on *string*-level but since the"
+                    "RDKit match was successful, it will still be used for post-hoc filtering."
+                )
+                subs_mols.append(subs_mol)
+            else:
+                # "Normal" substructure
+                subs_mols.append(subs_mol)
 
         # Perform filtering
         for smi, prop in property_successes:
@@ -1040,9 +1059,13 @@ class ChemicalLanguageRT(ConditionalGenerator):
                 continue
             sane = True
             mol = Chem.MolFromSmiles(smi)
-            for subs_mol, subs_string in zip(subs_mols, self.substructures_to_keep):
+            for subs_mol, subs_string in zip(subs_mols, self.all_substructures_to_keep):
                 if subs_mol is None:
-                    if self.text_filtering and subs_string not in smi:
+                    if (
+                        self.text_filtering
+                        and subs_string not in smi
+                        and subs_string in self.substructures_to_keep
+                    ):
                         sane = False
                         break
                 else:
