@@ -272,7 +272,7 @@ class MolformerDataArguments(TrainingPipelineArguments):
 
     batch_size: int = field(default=512, metadata={"help": "Batch size."})
 
-    data_path: str = field(default="", metadata={"help": "path to pubchem file."})
+    data_path: str = field(default="", metadata={"help": "Pretraining - path to pubchem file."})
 
     max_len: int = field(default=100, metadata={"help": "Max of length of SMILES."})
     train_load: Optional[str] = field(
