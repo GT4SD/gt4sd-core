@@ -128,14 +128,16 @@ class MolformerTrainingPipeline(PyTorchLightningTrainingPipeline):
             the data and model modules.
         """
 
+        model_args["max_len"] = dataset_args["max_len"]
+
         train_config = {
-            "batch_size": model_args["n_batch"],
-            "num_workers": model_args["n_workers"],
+            "batch_size": dataset_args["batch_size"],
+            "num_workers": dataset_args["num_workers"],
             "pin_memory": True,
         }
 
         data_module = MoleculeModule(
-            dataset_args["max_len"], dataset_args["datapath"], train_config
+            dataset_args["max_len"], dataset_args["data_path"], train_config
         )
         data_module.setup()
 
@@ -272,7 +274,9 @@ class MolformerDataArguments(TrainingPipelineArguments):
 
     batch_size: int = field(default=512, metadata={"help": "Batch size."})
 
-    data_path: str = field(default="", metadata={"help": "Pretraining - path to pubchem file."})
+    data_path: str = field(
+        default="", metadata={"help": "Pretraining - path to pubchem file."}
+    )
 
     max_len: int = field(default=100, metadata={"help": "Max of length of SMILES."})
     train_load: Optional[str] = field(
@@ -367,6 +371,7 @@ class MolformerModelArguments(TrainingPipelineArguments):
         default=".",
         metadata={"help": "Path to save evaluation results during training."},
     )
+    debug: bool = field(default=False, metadata={"help": "Debug training"})
 
 
 @dataclass
