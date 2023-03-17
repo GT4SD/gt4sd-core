@@ -1,0 +1,658 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gt4sd.training_pipelines.pytorch_lightning.molformer.core &mdash; gt4sd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> gt4sd
+          
+
+          
+            
+            <img src="../../../../../_static/gt4sd_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_inference_usage_md.html">Examples on how to use the GT4SD algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_algorithm_addition_md.html">Examples on how to add an algorithm to GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_server_upload_md.html">Examples on how to upload models on a self-hosted minio service using GT4SD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/gt4sd_gfn_usage_md.html">Example on how to use GFlowNet for a generic task using GT4SD</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/gt4sd.html">API of the gt4sd package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">gt4sd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../training_pipelines.html">gt4sd.training_pipelines</a> &raquo;</li>
+        
+      <li>gt4sd.training_pipelines.pytorch_lightning.molformer.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gt4sd.training_pipelines.pytorch_lightning.molformer.core</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2023 GT4SD team</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Molformer training utilities.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">importlib_resources</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LightningModule</span> <span class="k">as</span> <span class="n">RegressionLightningModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PropertyPredictionDataModule</span> <span class="k">as</span> <span class="n">RegressionDataModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LightningModule</span> <span class="k">as</span> <span class="n">ClassificationLightningModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PropertyPredictionDataModule</span> <span class="k">as</span> <span class="n">ClassificationDataModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification_multitask</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MultitaskModel</span><span class="p">,</span>
+    <span class="n">PropertyPredictionDataModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.ft_tokenizer.ft_tokenizer</span> <span class="kn">import</span> <span class="n">MolTranBertTokenizer</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.training.train_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LightningModule</span> <span class="k">as</span> <span class="n">PretrainingModule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gt4sd_molformer.training.train_pubchem_light</span> <span class="kn">import</span> <span class="n">MoleculeModule</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning.utilities</span> <span class="kn">import</span> <span class="n">seed</span>
+
+<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">PyTorchLightningTrainingPipeline</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="MolformerTrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">MolformerTrainingPipeline</span><span class="p">(</span><span class="n">PyTorchLightningTrainingPipeline</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Molformer training pipelines for crystals.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MolformerTrainingPipeline.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules_getter</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;pretraining&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pretraining_modules</span><span class="p">,</span>
+            <span class="s2">&quot;classification&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_classification_modules</span><span class="p">,</span>
+            <span class="s2">&quot;multitask_classification&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_multitask_classification_modules</span><span class="p">,</span>
+            <span class="s2">&quot;regression&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_regression_modules</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="MolformerTrainingPipeline.get_data_and_model_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_data_and_model_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_model_modules</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+        <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get data and model modules for training.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_args: model arguments passed to the configuration.</span>
+<span class="sd">            dataset_args: dataset arguments passed to the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the data and model modules.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules_getter</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training type </span><span class="si">{</span><span class="n">model_args</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> is not supported.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># alignments with gt4sd-molformer</span>
+        <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;run_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%m</span><span class="si">%d</span><span class="s2">%Y%H%M&quot;</span><span class="p">)</span>
+        <span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;n_embd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;n_embd&quot;</span><span class="p">]</span>
+        <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;dataset_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;valid test&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+        <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;dataset_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;dataset_name&quot;</span><span class="p">]</span>
+        <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;measure_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;measure_name&quot;</span><span class="p">]</span>
+        <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;pooling_mode&quot;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;pooling_mode&quot;</span><span class="p">]</span>
+
+        <span class="n">seed</span><span class="o">.</span><span class="n">seed_everything</span><span class="p">(</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
+
+        <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules_getter</span><span class="p">[</span><span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]](</span>  <span class="c1"># type: ignore</span>
+            <span class="n">model_args</span><span class="p">,</span> <span class="n">dataset_args</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span></div>
+
+<div class="viewcode-block" id="MolformerTrainingPipeline.get_pretraining_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_pretraining_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_pretraining_modules</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+        <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get data and model modules for pretraing.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_args: model arguments passed to the configuration.</span>
+<span class="sd">            dataset_args: dataset arguments passed to the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the data and model modules.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;max_len&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;max_len&quot;</span><span class="p">]</span>
+
+        <span class="n">train_config</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;num_workers&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;pin_memory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">data_module</span> <span class="o">=</span> <span class="n">MoleculeModule</span><span class="p">(</span>
+            <span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;max_len&quot;</span><span class="p">],</span> <span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;data_path&quot;</span><span class="p">],</span> <span class="n">train_config</span>
+        <span class="p">)</span>
+        <span class="n">data_module</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+        <span class="n">model_module</span> <span class="o">=</span> <span class="n">PretrainingModule</span><span class="p">(</span><span class="n">model_args</span><span class="p">,</span> <span class="n">data_module</span><span class="o">.</span><span class="n">get_vocab</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span></div>
+
+<div class="viewcode-block" id="MolformerTrainingPipeline.get_classification_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_classification_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_classification_modules</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+        <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get data and model modules for pretraing.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_args: model arguments passed to the configuration.</span>
+<span class="sd">            dataset_args: dataset arguments passed to the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the data and model modules.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># return data_module, model_module</span>
+
+        <span class="n">bert_vocab_path</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">importlib_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;gt4sd_molformer&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;finetune/bert_vocab.txt&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">MolTranBertTokenizer</span><span class="p">(</span><span class="n">bert_vocab_path</span><span class="p">)</span>
+        <span class="n">data_module</span> <span class="o">=</span> <span class="n">ClassificationDataModule</span><span class="p">(</span><span class="n">dataset_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;pretrained_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">model_module</span> <span class="o">=</span> <span class="n">ClassificationLightningModule</span><span class="p">(</span>
+                <span class="n">model_args</span><span class="p">,</span> <span class="n">tokenizer</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span>
+                <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;pretrained_path&quot;</span><span class="p">],</span>
+                <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">config</span><span class="o">=</span><span class="n">model_args</span><span class="p">,</span>
+                <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+                <span class="n">vocab</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">vocab</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model_module</span> <span class="o">=</span> <span class="n">ClassificationLightningModule</span><span class="p">(</span><span class="n">model_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span></div>
+
+<div class="viewcode-block" id="MolformerTrainingPipeline.get_multitask_classification_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_multitask_classification_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_multitask_classification_modules</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+        <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get data and model modules for pretraing.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_args: model arguments passed to the configuration.</span>
+<span class="sd">            dataset_args: dataset arguments passed to the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the data and model modules.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;num_tasks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_args</span><span class="p">[</span><span class="s2">&quot;measure_names&quot;</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
+
+        <span class="k">if</span> <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;num_tasks&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing class names.&quot;</span><span class="p">)</span>
+
+        <span class="n">bert_vocab_path</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">importlib_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;gt4sd_molformer&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;finetune/bert_vocab.txt&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">MolTranBertTokenizer</span><span class="p">(</span><span class="n">bert_vocab_path</span><span class="p">)</span>
+
+        <span class="n">data_module</span> <span class="o">=</span> <span class="n">PropertyPredictionDataModule</span><span class="p">(</span><span class="n">dataset_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;pretrained_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">model_module</span> <span class="o">=</span> <span class="n">MultitaskModel</span><span class="p">(</span><span class="n">model_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span>
+                <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;pretrained_path&quot;</span><span class="p">],</span>
+                <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">config</span><span class="o">=</span><span class="n">model_args</span><span class="p">,</span>
+                <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+                <span class="n">vocab</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">vocab</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model_module</span> <span class="o">=</span> <span class="n">MultitaskModel</span><span class="p">(</span><span class="n">model_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span></div>
+
+<div class="viewcode-block" id="MolformerTrainingPipeline.get_regression_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_regression_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_regression_modules</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+        <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get data and model modules for pretraing.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_args: model arguments passed to the configuration.</span>
+<span class="sd">            dataset_args: dataset arguments passed to the configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the data and model modules.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">bert_vocab_path</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">importlib_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;gt4sd_molformer&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;finetune/bert_vocab.txt&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">MolTranBertTokenizer</span><span class="p">(</span><span class="n">bert_vocab_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;pretrained_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="n">model_module</span> <span class="o">=</span> <span class="n">RegressionLightningModule</span><span class="p">(</span>
+                <span class="n">model_args</span><span class="p">,</span> <span class="n">tokenizer</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span>
+                <span class="n">model_args</span><span class="p">[</span><span class="s2">&quot;pretrained_path&quot;</span><span class="p">],</span>
+                <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">config</span><span class="o">=</span><span class="n">model_args</span><span class="p">,</span>
+                <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+                <span class="n">vocab</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">vocab</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model_module</span> <span class="o">=</span> <span class="n">RegressionLightningModule</span><span class="p">(</span><span class="n">model_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="n">data_module</span> <span class="o">=</span> <span class="n">RegressionDataModule</span><span class="p">(</span><span class="n">dataset_args</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span></div></div>
+
+
+<div class="viewcode-block" id="MolformerDataArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerDataArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">MolformerDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Data arguments related to Molformer trainer.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;dataset_args&quot;</span>
+
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch size.&quot;</span><span class="p">})</span>
+
+    <span class="n">data_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Pretraining - path to the data file.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Max of length of SMILES.&quot;</span><span class="p">})</span>
+    <span class="n">train_load</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Where to load the model.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of workers.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;sol&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Finetuning - Name of the dataset to be found in the data root directory.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">measure_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;measure&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Finetuning - Measure name to be used as groundtruth.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">data_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;my_data_root&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Finetuning - Data root for the dataset.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">train_dataset_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Finetuning - Length of training dataset.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">eval_dataset_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Finetuning - Length of evaluation dataset.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">aug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;aug.&quot;</span><span class="p">})</span>
+    <span class="n">measure_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Class names for multitask classification.&quot;</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MolformerModelArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerModelArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">MolformerModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Model arguments related to Molformer trainer.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>
+
+    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;classification&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The training type, for example pretraining or classification.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">n_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;GPT number of heads.&quot;</span><span class="p">})</span>
+    <span class="n">n_layer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;GPT number of layers.&quot;</span><span class="p">})</span>
+    <span class="n">q_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Encoder layers dropout.&quot;</span><span class="p">})</span>
+    <span class="n">d_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Decoder layers dropout.&quot;</span><span class="p">})</span>
+    <span class="n">n_embd</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Latent vector dimensionality.&quot;</span><span class="p">})</span>
+    <span class="n">fc_h</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Fully connected hidden dimensionality.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Dropout used in finetuning.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[])</span>
+    <span class="n">num_classes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Finetuning - Number of classes&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">restart_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;path to  trainer file to continue training.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">lr_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3</span> <span class="o">*</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Initial lr value.&quot;</span><span class="p">})</span>
+
+    <span class="n">lr_multiplier</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;lr weight multiplier.&quot;</span><span class="p">})</span>
+
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">12345</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Seed.&quot;</span><span class="p">})</span>
+
+    <span class="n">min_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;minimum length to be generated.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">root_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;location of root dir.&quot;</span><span class="p">})</span>
+
+    <span class="n">num_feats</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;number of random features for FAVOR+.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">pooling_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;cls&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;type of pooling to use.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">fold</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;number of folds for fine tuning.&quot;</span><span class="p">})</span>
+    <span class="n">pretrained_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path to the base pretrained model.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">results_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path to save evaluation results during training.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Debug training&quot;</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="MolformerTrainingArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">MolformerTrainingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Training arguments related to Molformer trainer.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;pl_trainer_args&quot;</span>
+
+    <span class="n">accumulate_grad_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Accumulates grads every k batches or as set up in the dict.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ddp&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The accelerator backend to use (previously known as distributed_backend).&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">gpus</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;number of gpus to use.&quot;</span><span class="p">})</span>
+    <span class="n">max_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;max number of epochs.&quot;</span><span class="p">})</span>
+    <span class="n">monitor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Quantity to monitor in order to store a checkpoint.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">save_top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The best k models according to the quantity monitored will be saved.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Quantity to monitor in order to store a checkpoint.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">every_n_train_steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of training steps between checkpoints.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">every_n_epochs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of epochs between checkpoints.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">save_last</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;When True, always saves the model at the end of the epoch to a file last.ckpt&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">save_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;logs&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Save directory for logs and output.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">basename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;lightning_logs&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Experiment name.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">val_check_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot; How often to check the validation set.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">gradient_clip_val</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Gradient clipping value.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">resume_from_checkpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path/URL of the checkpoint from which training is resumed.&quot;</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MolformerSavingArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerSavingArguments">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">MolformerSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Saving arguments related to Molformer trainer.&quot;&quot;&quot;</span>
+
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_args&quot;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright GT4SD team 2022.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
