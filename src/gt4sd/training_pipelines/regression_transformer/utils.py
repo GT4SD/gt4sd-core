@@ -56,6 +56,8 @@ class Property:
 
     def __init__(self, name: str):
         self.name = name
+        if not name.strip("<>").isalnum():
+            raise ValueError(f"Properties have to be alphanumerics, not {name}.")
         self.mask_lengths: List = []
 
     def update(self, line: str):

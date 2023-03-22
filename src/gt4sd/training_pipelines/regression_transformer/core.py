@@ -83,10 +83,10 @@ class RegressionTransformerTrainingArguments(
         },
     )
     cc_loss: bool = field(
-        default=True,
+        default=False,
         metadata={
             "help": "Whether the cycle-consistency loss is computed during the conditional "
-            "generation task. Defaults to True."
+            "generation task. Defaults to False."
         },
     )
     cg_collator: str = field(
