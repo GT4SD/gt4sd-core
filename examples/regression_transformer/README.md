@@ -11,7 +11,7 @@ conda activate gt4sd
 ## Training a model
 We generally recommend to finetune an existing RT model.
 ### Finetuning 
-To launch a finetuning of a RT pretrained on drug-like moelcules from ChEMBL, execute the following from the GT4SD root:
+To launch a finetuning of a RT pretrained on drug-like molecules from ChEMBL, execute the following from the GT4SD root:
 
 ```console
  gt4sd-trainer --training_pipeline_name regression-transformer-trainer --model_path ~/.gt4sd/algorithms/conditional_generation/RegressionTransformer/RegressionTransformerMolecules/qed --do_train --output_dir my_regression_transformer --train_data_path src/gt4sd/training_pipelines/tests/regression_transformer_raw.csv --test_data_path src/gt4sd/training_pipelines/tests/regression_transformer_raw.csv --overwrite_output_dir --eval_steps 200 --augment 10 --eval_accumulation_steps 1 --num_train_epochs 100 
