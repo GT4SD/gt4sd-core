@@ -34,7 +34,11 @@ from terminator.collators import MaskedTextCollator, PropertyCollator
 from terminator.inference import InferenceRT
 from terminator.search import SEARCH_FACTORY, Search
 from terminator.selfies import decoder, encoder
-from terminator.tokenization import InferenceBertTokenizer, PolymerGraphTokenizer
+from terminator.tokenization import (
+    InferenceBertTokenizer,
+    PolymerGraphTokenizer,
+    SelfiesTokenizer,
+)
 from transformers import AutoConfig, AutoModelWithLMHead, XLNetLMHeadModel
 
 from ....domains.materials import MoleculeFormat, Sequence, validate_molecules
@@ -279,9 +283,10 @@ class ConditionalGenerator:
             )
         if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
             self.validate_input_molecule(text_sequence, MoleculeFormat.copolymer)
+        elif isinstance(self.tokenizer.text_tokenizer, SelfiesTokenizer):
+            self.validate_input_molecule(text_sequence, MoleculeFormat.selfies)
         else:
-            # We can assume this to be a SELFIES
-            self.validate_input_molecule(text_sequence)
+            self.validate_input_molecule(text_sequence, MoleculeFormat.smiles)
 
         self.validate_input_numerical(number_sequence)
 
@@ -994,12 +999,15 @@ class ChemicalLanguageRT(ConditionalGenerator):
         return [encoder(a) for a in tokens_to_mask]  # type: ignore
 
     def language_encoding(self, seq: str) -> str:
-        if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
+        if isinstance(self.tokenizer.text_tokenizer, SelfiesTokenizer):
+            selfie = encoder(seq)
+            if not isinstance(selfie, str):
+                raise TypeError(
+                    f"{seq} (type={type(seq)}) is not a SMILES sequence that can be converted to SELFIES."
+                )
+            return selfie
+        else:
             return seq
-        selfie = encoder(seq)
-        if not isinstance(selfie, str):
-            raise TypeError(f"{seq} (type={type(seq)}) is not a valid SMILES sequence.")
-        return selfie
 
     def filter_substructures(
         self, property_successes: Tuple[Tuple[str, str]]
