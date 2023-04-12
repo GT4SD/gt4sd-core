@@ -77,17 +77,16 @@ def filter_stubbed(
             continue
         try:
             mol = Chem.MolFromSmiles(smi)
+            num_atoms = len(list(mol.GetAtoms()))
+            num_bonds = mol.GetNumBonds()
+
+            if num_atoms > (threshold * seed_atoms) and num_bonds > (
+                threshold * seed_bonds
+            ):
+                smis.append(smi)
+                props.append(prop)
         except Exception:
             continue
-
-        num_atoms = len(list(mol.GetAtoms()))
-        num_bonds = mol.GetNumBonds()
-
-        if num_atoms > (threshold * seed_atoms) and num_bonds > (
-            threshold * seed_bonds
-        ):
-            smis.append(smi)
-            props.append(prop)
 
     successes = cast(Tuple[Tuple[str, str]], tuple(zip(smis, props)))
     return successes
