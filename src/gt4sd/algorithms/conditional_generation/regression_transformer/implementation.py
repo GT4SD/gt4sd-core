@@ -470,7 +470,12 @@ class ConditionalGenerator:
         ]
 
         # Second part: Predict the properties of the just generated sequence
-        _input = self.property_collator.mask_tokens(generations)
+        try:
+            _input = self.property_collator.mask_tokens(generations)
+        except UnboundLocalError:
+            # NOTE: in case there are errors with the collator we can't have successes
+            return ()
+
         prediction_input = {
             "input_ids": _input[0],
             "perm_mask": _input[1],
