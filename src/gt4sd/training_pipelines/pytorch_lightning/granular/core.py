@@ -36,8 +36,11 @@ from ....frameworks.granular.dataloader.data_module import GranularDataModule
 from ....frameworks.granular.dataloader.dataset import build_dataset_and_architecture
 from ....frameworks.granular.ml.models import AUTOENCODER_ARCHITECTURES
 from ....frameworks.granular.ml.module import GranularModule
+from ....trainer.hf_pl.core import (
+    PytorchLightningTrainingArguments,
+    PyTorchLightningTrainingPipeline,
+)
 from ...core import TrainingPipelineArguments
-from ..core import PytorchLightningTrainingArguments, PyTorchLightningTrainingPipeline
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece

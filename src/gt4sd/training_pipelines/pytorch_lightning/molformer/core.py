@@ -53,8 +53,8 @@ from gt4sd_molformer.training.train_pubchem_light import MoleculeModule
 from pytorch_lightning import LightningDataModule, LightningModule
 from pytorch_lightning.utilities import seed
 
+from ....trainer.hf_pl.core import PyTorchLightningTrainingPipeline
 from ...core import TrainingPipelineArguments
-from ..core import PyTorchLightningTrainingPipeline
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

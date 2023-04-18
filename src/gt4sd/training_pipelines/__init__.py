@@ -28,6 +28,13 @@ from typing import Any, Dict
 
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
 from ..tests.utils import exitclose_file_creator
+from ..trainer.hf_pl.core import (
+    LanguageModelingDataArguments,
+    LanguageModelingModelArguments,
+    LanguageModelingSavingArguments,
+    LanguageModelingTrainingPipeline,
+    PytorchLightningTrainingArguments,
+)
 from .cgcnn.core import (
     CGCNNDataArguments,
     CGCNNModelArguments,
@@ -72,7 +79,6 @@ from .paccmann.core import (
     PaccMannTrainingArguments,
 )
 from .paccmann.vae.core import PaccMannVAEModelArguments, PaccMannVAETrainingPipeline
-from .pytorch_lightning.core import PytorchLightningTrainingArguments
 from .pytorch_lightning.gflownet.core import (
     GFlowNetDataArguments,
     GFlowNetModelArguments,
@@ -86,12 +92,6 @@ from .pytorch_lightning.granular.core import (
     GranularPytorchLightningTrainingArguments,
     GranularSavingArguments,
     GranularTrainingPipeline,
-)
-from .pytorch_lightning.language_modeling.core import (
-    LanguageModelingDataArguments,
-    LanguageModelingModelArguments,
-    LanguageModelingSavingArguments,
-    LanguageModelingTrainingPipeline,
 )
 from .pytorch_lightning.molformer.core import (
     MolformerDataArguments,

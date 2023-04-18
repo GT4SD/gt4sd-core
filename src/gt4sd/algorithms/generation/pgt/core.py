@@ -31,7 +31,7 @@ from typing import Any, ClassVar, Dict, Optional, TypeVar
 
 from typing_extensions import Protocol, runtime_checkable
 
-from ....cli.pl_to_hf_converter import convert_pl_to_hf
+from ....trainer.hf_pl.cli_pl_to_hf_converter import convert_pl_to_hf
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.pytorch_lightning.language_modeling.core import (
     LanguageModelingSavingArguments,

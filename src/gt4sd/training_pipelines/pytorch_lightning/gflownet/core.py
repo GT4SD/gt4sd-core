@@ -43,8 +43,11 @@ from ....frameworks.gflownet.envs.graph_building_env import (
 from ....frameworks.gflownet.loss import ALGORITHM_FACTORY
 from ....frameworks.gflownet.ml.models import MODEL_FACTORY
 from ....frameworks.gflownet.ml.module import GFlowNetModule
+from ....trainer.hf_pl.core import (
+    PytorchLightningTrainingArguments,
+    PyTorchLightningTrainingPipeline,
+)
 from ...core import TrainingPipelineArguments
-from ..core import PytorchLightningTrainingArguments, PyTorchLightningTrainingPipeline
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
 _sentencepiece
