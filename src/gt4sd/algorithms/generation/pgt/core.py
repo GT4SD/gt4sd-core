@@ -33,7 +33,7 @@ from typing_extensions import Protocol, runtime_checkable
 
 from ....trainer.hf_pl.cli_pl_to_hf_converter import convert_pl_to_hf
 from ....training_pipelines.core import TrainingPipelineArguments
-from ....training_pipelines.pytorch_lightning.language_modeling.core import (
+from ....trainer.hf_pl.core import (
     LanguageModelingSavingArguments,
 )
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
