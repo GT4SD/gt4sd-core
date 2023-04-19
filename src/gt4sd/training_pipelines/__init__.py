@@ -31,6 +31,8 @@ from gt4sd_trainer.hf_pl.core import (
     LanguageModelingModelArguments,
     LanguageModelingSavingArguments,
     LanguageModelingTrainingPipeline,
+)
+from gt4sd_trainer.hf_pl.pytorch_lightning_trainer import (
     PytorchLightningTrainingArguments,
 )
 
