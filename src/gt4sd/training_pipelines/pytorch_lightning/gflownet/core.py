@@ -28,6 +28,10 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Tuple, Union
 
 import sentencepiece as _sentencepiece
+from gt4sd_trainer.hf_pl.core import (
+    PytorchLightningTrainingArguments,
+    PyTorchLightningTrainingPipeline,
+)
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer
 from pytorch_lightning.loggers import TensorBoardLogger
 
@@ -43,10 +47,6 @@ from ....frameworks.gflownet.envs.graph_building_env import (
 from ....frameworks.gflownet.loss import ALGORITHM_FACTORY
 from ....frameworks.gflownet.ml.models import MODEL_FACTORY
 from ....frameworks.gflownet.ml.module import GFlowNetModule
-from ....trainer.hf_pl.core import (
-    PytorchLightningTrainingArguments,
-    PyTorchLightningTrainingPipeline,
-)
 from ...core import TrainingPipelineArguments
 
 # sentencepiece has to be loaded before lightning to avoid segfaults

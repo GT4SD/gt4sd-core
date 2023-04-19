@@ -29,10 +29,10 @@ import shutil
 from dataclasses import field
 from typing import Any, ClassVar, Dict, Optional, TypeVar
 
+from gt4sd_trainer.hf_pl.cli_pl_to_hf_converter import convert_pl_to_hf
+from gt4sd_trainer.hf_pl.core import LanguageModelingSavingArguments
 from typing_extensions import Protocol, runtime_checkable
 
-from ....trainer.hf_pl.cli_pl_to_hf_converter import convert_pl_to_hf
-from ....trainer.hf_pl.core import LanguageModelingSavingArguments
 from ....training_pipelines.core import TrainingPipelineArguments
 from ...core import AlgorithmConfiguration, GeneratorAlgorithm, Untargeted
 from ...registry import ApplicationsRegistry

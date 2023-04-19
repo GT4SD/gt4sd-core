@@ -26,15 +26,16 @@ import json
 import logging
 from typing import Any, Dict
 
-from ..cli.load_arguments_from_dataclass import extract_fields_from_class
-from ..tests.utils import exitclose_file_creator
-from ..trainer.hf_pl.core import (
+from gt4sd_trainer.hf_pl.core import (
     LanguageModelingDataArguments,
     LanguageModelingModelArguments,
     LanguageModelingSavingArguments,
     LanguageModelingTrainingPipeline,
     PytorchLightningTrainingArguments,
 )
+
+from ..cli.load_arguments_from_dataclass import extract_fields_from_class
+from ..tests.utils import exitclose_file_creator
 from .cgcnn.core import (
     CGCNNDataArguments,
     CGCNNModelArguments,

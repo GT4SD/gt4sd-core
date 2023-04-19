@@ -30,16 +30,16 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Tuple
 
 import sentencepiece as _sentencepiece
+from gt4sd_trainer.hf_pl.core import (
+    PytorchLightningTrainingArguments,
+    PyTorchLightningTrainingPipeline,
+)
 from pytorch_lightning import LightningDataModule, LightningModule
 
 from ....frameworks.granular.dataloader.data_module import GranularDataModule
 from ....frameworks.granular.dataloader.dataset import build_dataset_and_architecture
 from ....frameworks.granular.ml.models import AUTOENCODER_ARCHITECTURES
 from ....frameworks.granular.ml.module import GranularModule
-from ....trainer.hf_pl.core import (
-    PytorchLightningTrainingArguments,
-    PyTorchLightningTrainingPipeline,
-)
 from ...core import TrainingPipelineArguments
 
 # sentencepiece has to be loaded before lightning to avoid segfaults
