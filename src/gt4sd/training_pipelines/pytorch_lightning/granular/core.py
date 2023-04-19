@@ -30,7 +30,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Tuple
 
 import sentencepiece as _sentencepiece
-from gt4sd_trainer.hf_pl.core import (
+from gt4sd_trainer.hf_pl.pytorch_lightning_trainer import (
     PytorchLightningTrainingArguments,
     PyTorchLightningTrainingPipeline,
 )

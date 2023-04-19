@@ -50,7 +50,9 @@ from gt4sd_molformer.training.train_pubchem_light import (
     LightningModule as PretrainingModule,
 )
 from gt4sd_molformer.training.train_pubchem_light import MoleculeModule
-from gt4sd_trainer.hf_pl.core import PyTorchLightningTrainingPipeline
+from gt4sd_trainer.hf_pl.pytorch_lightning_trainer import (
+    PyTorchLightningTrainingPipeline,
+)
 from pytorch_lightning import LightningDataModule, LightningModule
 from pytorch_lightning.utilities import seed
 
