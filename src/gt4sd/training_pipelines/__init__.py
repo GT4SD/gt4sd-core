@@ -26,6 +26,16 @@ import json
 import logging
 from typing import Any, Dict
 
+from gt4sd_trainer.hf_pl.core import (
+    LanguageModelingDataArguments,
+    LanguageModelingModelArguments,
+    LanguageModelingSavingArguments,
+    LanguageModelingTrainingPipeline,
+)
+from gt4sd_trainer.hf_pl.pytorch_lightning_trainer import (
+    PytorchLightningTrainingArguments,
+)
+
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
 from ..tests.utils import exitclose_file_creator
 from .cgcnn.core import (
@@ -72,7 +82,6 @@ from .paccmann.core import (
     PaccMannTrainingArguments,
 )
 from .paccmann.vae.core import PaccMannVAEModelArguments, PaccMannVAETrainingPipeline
-from .pytorch_lightning.core import PytorchLightningTrainingArguments
 from .pytorch_lightning.gflownet.core import (
     GFlowNetDataArguments,
     GFlowNetModelArguments,
@@ -86,12 +95,6 @@ from .pytorch_lightning.granular.core import (
     GranularPytorchLightningTrainingArguments,
     GranularSavingArguments,
     GranularTrainingPipeline,
-)
-from .pytorch_lightning.language_modeling.core import (
-    LanguageModelingDataArguments,
-    LanguageModelingModelArguments,
-    LanguageModelingSavingArguments,
-    LanguageModelingTrainingPipeline,
 )
 from .pytorch_lightning.molformer.core import (
     MolformerDataArguments,
