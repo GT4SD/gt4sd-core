@@ -162,6 +162,14 @@ class ConditionalGenerator:
                 data.get("property_ranges", {}).get(p, [0, 1])[1]
                 for p in self.properties
             ]
+            # In case custom normalization/denormalization is required
+            self.normalization_fns = [
+                data.get("normalization_fns", {}).get(p, None) for p in self.properties
+            ]
+            self.denormalization_fns = [
+                data.get("denormalization_fns", {}).get(p, None)
+                for p in self.properties
+            ]
             self.metadata = data
 
             # If tolerance dict is given, ensure it is well-formed
@@ -211,14 +219,25 @@ class ConditionalGenerator:
         Returns:
             float: Value in regular scale.
         """
-
         # If the property was not normalized, return the value
         if not self.do_normalize[idx]:
             return x
 
-        return round(
-            x * (self._maxs[idx] - self._mins[idx]) + self._mins[idx], precision
-        )
+        # The default normalization reverts a linear transformation to [0,1] scale
+        if self.denormalization_fns[idx] is None:
+            return round(
+                x * (self._maxs[idx] - self._mins[idx]) + self._mins[idx], precision
+            )
+
+        # This allows to revert arbitrarily complex preprocessing functions
+        fn = self.denormalization_fns[idx]
+        try:
+            denormed = eval(fn)(x)
+            return round(denormed, precision)
+        except SyntaxError:
+            raise SyntaxError(
+                f"Custom denormalization function {fn} seems improperly formatted"
+            )
 
     def normalize(self, x: str, idx: int, precision: int = 3) -> float:
         """
@@ -237,13 +256,32 @@ class ConditionalGenerator:
             raise TypeError(f"{x} is not a float and cant safely be casted.")
 
         x_float = float(x)
+        if x_float < self._mins[idx] or x_float > self._maxs[idx]:
+            raise ValueError(
+                f"Property value {x_float} for {self.properties[idx]} is outside of "
+                f"model's range [{self._mins[idx]}, {self._maxs[idx]}]."
+            )
         # If this property does not require normalization, return it
         if not self.do_normalize[idx]:
             return x_float
-        normed = round(
-            (x_float - self._mins[idx]) / (self._maxs[idx] - self._mins[idx]), precision
-        )
-        return normed
+
+        # This performs a standard linear normalization to [0,1]
+        if self.normalization_fns[idx] is None:
+            normed = round(
+                (x_float - self._mins[idx]) / (self._maxs[idx] - self._mins[idx]),
+                precision,
+            )
+            return normed
+
+        # Allows to apply arbitrary preprocessing functions
+        fn = self.normalization_fns[idx]
+        try:
+            normed = eval(fn)(x_float)
+            return round(normed, precision)
+        except SyntaxError:
+            raise SyntaxError(
+                f"Custom normalization function {fn} seems improperly formatted"
+            )
 
     def validate_input(self, x: str) -> None:
         """
