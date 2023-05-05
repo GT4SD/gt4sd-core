@@ -28,9 +28,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
-import importlib_resources
 import sentencepiece as _sentencepiece
 import tensorflow as _tensorflow
+import importlib_resources
 from gt4sd_molformer.finetune.finetune_pubchem_light import (
     LightningModule as RegressionLightningModule,
 )

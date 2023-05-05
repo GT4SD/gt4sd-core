@@ -27,7 +27,6 @@ from typing import Any, Dict, Optional
 
 import sentencepiece as _sentencepiece
 import tensorflow as _tensorflow
-
 import numpy as np
 from pytorch_lightning import Trainer
 

@@ -23,10 +23,10 @@
 #
 from argparse import Namespace
 
-import numpy as np
-import pytest
 import sentencepiece as _sentencepiece
 import tensorflow as _tensorflow
+import numpy as np
+import pytest
 import pytorch_lightning as pl
 
 from gt4sd.frameworks.gflownet.dataloader.data_module import GFlowNetDataModule
