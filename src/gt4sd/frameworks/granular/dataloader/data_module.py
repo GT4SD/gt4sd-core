@@ -27,6 +27,7 @@ import logging
 from typing import Callable, List, Optional, cast
 
 import sentencepiece as _sentencepiece
+import torch as _torch
 import tensorflow as _tensorflow
 import pandas as pd
 import pytorch_lightning as pl
@@ -39,6 +40,7 @@ from .sampler import StratifiedSampler
 # imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
 _tensorflow
+_torch
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
