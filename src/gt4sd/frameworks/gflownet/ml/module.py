@@ -30,6 +30,7 @@ import os
 from typing import Any, Dict, List, Optional, Tuple
 
 import sentencepiece as _sentencepiece
+import torch as _torch
 import tensorflow as _tensorflow
 import pandas as pd
 import pytorch_lightning as pl
@@ -42,6 +43,7 @@ from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
 
 # imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
+_torch
 _tensorflow
 
 logger = logging.getLogger(__name__)
