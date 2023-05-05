@@ -43,8 +43,8 @@ from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
 
 # imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
-_torch
 _tensorflow
+_torch
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
