@@ -26,6 +26,9 @@ import json
 import logging
 from typing import Any, Dict
 
+import sentencepiece as _sentencepiece
+import torch as _torch
+import tensorflow as _tensorflow
 from gt4sd_trainer.hf_pl.core import (
     LanguageModelingDataArguments,
     LanguageModelingModelArguments,
@@ -125,6 +128,11 @@ from .torchdrug.graphaf.core import (
     TorchDrugGraphAFModelArguments,
     TorchDrugGraphAFTrainingPipeline,
 )
+
+# imports that have to be loaded before lightning to avoid segfaults
+_sentencepiece
+_tensorflow
+_torch
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

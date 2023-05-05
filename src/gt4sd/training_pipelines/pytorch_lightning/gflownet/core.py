@@ -28,6 +28,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Tuple, Union
 
 import sentencepiece as _sentencepiece
+import torch as _torch
+import tensorflow as _tensorflow
 from gt4sd_trainer.hf_pl.pytorch_lightning_trainer import (
     PytorchLightningTrainingArguments,
     PyTorchLightningTrainingPipeline,
@@ -49,8 +51,10 @@ from ....frameworks.gflownet.ml.models import MODEL_FACTORY
 from ....frameworks.gflownet.ml.module import GFlowNetModule
 from ...core import TrainingPipelineArguments
 
-# sentencepiece has to be loaded before lightning to avoid segfaults
+# imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
+_tensorflow
+_torch
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
