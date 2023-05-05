@@ -29,6 +29,8 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
 import importlib_resources
+import sentencepiece as _sentencepiece
+import tensorflow as _tensorflow
 from gt4sd_molformer.finetune.finetune_pubchem_light import (
     LightningModule as RegressionLightningModule,
 )
@@ -57,6 +59,10 @@ from pytorch_lightning import LightningDataModule, LightningModule
 from pytorch_lightning.utilities import seed
 
 from ...core import TrainingPipelineArguments
+
+# imports that have to be loaded before lightning to avoid segfaults
+_sentencepiece
+_tensorflow
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

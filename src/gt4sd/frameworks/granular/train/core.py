@@ -28,6 +28,7 @@ from argparse import Namespace
 from typing import Any, Dict
 
 import sentencepiece as _sentencepiece
+import tensorflow as _tensorflow
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -38,8 +39,9 @@ from ..dataloader.dataset import build_dataset_and_architecture
 from ..ml.models import AUTOENCODER_ARCHITECTURES
 from ..ml.module import GranularModule
 
-# sentencepiece has to be loaded before lightning to avoid segfaults
+# imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
+_tensorflow
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

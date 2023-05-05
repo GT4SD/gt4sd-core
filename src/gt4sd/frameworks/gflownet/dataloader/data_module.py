@@ -27,6 +27,7 @@ import logging
 from typing import Any, Dict, Optional
 
 import sentencepiece as _sentencepiece
+import tensorflow as _tensorflow
 import numpy as np
 import pytorch_lightning as pl
 import torch.nn as nn
@@ -38,8 +39,9 @@ from ..loss.trajectory_balance import TrajectoryBalance
 from ..ml.models import MODEL_FACTORY
 from .sampler import SamplingIterator
 
-# sentencepiece has to be loaded before lightning to avoid segfaults
+# imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
+_tensorflow
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

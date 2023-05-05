@@ -27,6 +27,7 @@ import os
 from typing import Any, Callable, Dict, List, Tuple, cast
 
 import sentencepiece as _sentencepiece
+import tensorflow as _tensorflow
 import pandas as pd
 import pytorch_lightning as pl
 import torch
@@ -34,8 +35,9 @@ import torch
 from .models import GranularBaseModel, GranularEncoderDecoderModel
 from .models.model_builder import building_models, define_latent_models_input_size
 
-# sentencepiece has to be loaded before lightning to avoid segfaults
+# imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
+_tensorflow
 
 
 class GranularModule(pl.LightningModule):
