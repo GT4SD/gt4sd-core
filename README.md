@@ -375,10 +375,14 @@ year = {2022}
 }
 
 @article{manica2022gt4sd,
-  title={GT4SD: Generative Toolkit for Scientific Discovery},
-  author={Manica, Matteo and Cadow, Joris and Christofidellis, Dimitrios and Dave, Ashish and Born, Jannis and Clarke, Dean and Teukam, Yves Gaetan Nana and Hoffman, Samuel C and Buchan, Matthew and Chenthamarakshan, Vijil and others},
-  journal={arXiv preprint arXiv:2207.03928},
-  year={2022}
+  title={Accelerating material design with the generative toolkit for scientific discovery},
+  author={Manica, Matteo and Born, Jannis and Cadow, Joris and Christofidellis, Dimitrios and Dave, Ashish and Clarke, Dean and Teukam, Yves Gaetan Nana and Giannone, Giorgio and Hoffman, Samuel C and Buchan, Matthew and others},
+  journal={npj Computational Materials},
+  volume={9},
+  number={1},
+  pages={69},
+  year={2023},
+  publisher={Nature Publishing Group UK London}
 }
 ```
 
