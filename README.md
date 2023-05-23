@@ -11,6 +11,7 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/GT4SD/gt4sd-core/main)
 [![DOI](https://zenodo.org/badge/458309249.svg)](https://zenodo.org/badge/latestdoi/458309249)
 [![2022 IEEE Open Software Services Award](https://img.shields.io/badge/Award-2022%20IEEE%20Open%20Software%20Services%20Award-yellow)](https://conferences.computer.org/services/2022/awards/oss_award.html)
+[![Paper DOI: 10.1038/s41524-023-01028-1](https://zenodo.org/badge/DOI/10.1038/s41524-023-01028-1.svg)](https://www.nature.com/articles/s41524-023-01028-1)
 
 <img src="./docs/_static/gt4sd_graphical_abstract.png" alt="logo" width="800">
 
@@ -359,6 +360,8 @@ Beyond implementing various generative modeling inference and training pipelines
 - [diffusers](https://github.com/huggingface/diffusers): training and inference pipelines for generative models from [Diffusers Models](https://github.com/huggingface/diffusers)
 - [GFlowNets](https://github.com/recursionpharma/gflownet): training and inference pipeline for [Generative Flow Networks](https://yoshuabengio.org/2022/03/05/generative-flow-networks/)
 - [MolGX](https://github.com/GT4SD/molgx-core/): training and inference pipelines to generate small molecules satisfying target properties. The full implementation of MolGX, including additional functionalities, is available [here](https://github.com/GT4SD/molgx-core/).
+- [Regression Transformers](https://github.com/IBM/regression-transformer/): training and inference pipelines to generate small molecules, polymers or peptides based on numerical property constraints. For details [read the paper](https://www.nature.com/articles/s42256-023-00639-z).
+
 
 ## References
 
@@ -366,12 +369,12 @@ If you use `gt4sd` in your projects, please consider citing the following:
 
 ```bib
 @software{GT4SD,
-author = {GT4SD Team},
-month = {2},
-title = {{GT4SD (Generative Toolkit for Scientific Discovery)}},
-url = {https://github.com/GT4SD/gt4sd-core},
-version = {main},
-year = {2022}
+  author = {GT4SD Team},
+  month = {2},
+  title = {{GT4SD (Generative Toolkit for Scientific Discovery)}},
+  url = {https://github.com/GT4SD/gt4sd-core},
+  version = {main},
+  year = {2022}
 }
 
 @article{manica2022gt4sd,
