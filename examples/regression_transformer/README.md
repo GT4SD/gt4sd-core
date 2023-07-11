@@ -18,11 +18,11 @@ To launch a finetuning of a RT pretrained on drug-like molecules from ChEMBL, ex
 ```
 *NOTE*: This is *dummy* example, do not use "as is" :warning: Substitute the train/test data path to point to your files. You can inspect the format of the example file to see the needed format (`.csv` with the first column called "text" and one or multiple property columns). Adjust the remaining arguments as desired. See full API [here](https://gt4sd.github.io/gt4sd-core/api/gt4sd.training_pipelines.regression_transformer.core.html).
 
-*NOTE*: Substitute the `--model_path` to the directorry of the pretrained model. GT4SD provides RT models pretrained on:
+*NOTE*: Substitute the `--model_path` to the directory of the pretrained model. GT4SD provides RT models pretrained on:
 - **small molecules**: `qed`, `esol`, `crippen_logp` ) or multiple ( `logp_and_synthesizability`, `cosmo_acdl`, `pfas`) properties
 - **proteins**: `stability`
 - **chemical reactions**: `uspto`
-- **polymers**: `rop_catalyst` and `block_copolymer`, both described in [Park et al., (2022; ChemRxiv)](https://chemrxiv.org/engage/chemrxiv/article-details/62b60865e84dd185e60214af)
+- **polymers**: `rop_catalyst` and `block_copolymer`, both described in [Park et al., (2023; Nature Communications)](https://www.nature.com/articles/s41467-023-39396-3)
 For details on these model versions, see the [HF spaces app](https://huggingface.co/spaces/GT4SD/regression_transformer).
 
 *NOTE*: :warning: The above assumes that you have the `qed` model cached locally. If this is not the case, run an inference to trigger the caching mechanism:
@@ -90,10 +90,17 @@ Afterwards everybody can sync your model from the hub and run it just like our o
 For details on this methodology see:
 
 ```bib
-@article{born2022regression,
-  title={Regression Transformer enables concurrent sequence regression and generation for molecular language modeling},
+@article{born2023regression,
+  title={Regression Transformer enables concurrent sequence regression and generation for molecular language modelling},
   author={Born, Jannis and Manica, Matteo},
   journal={Nature Machine Intelligence},
-  note={Article in press. arXiv preprint arXiv:2202.01338},
-  year={2023}
+  year={2023},
+  month={04},
+  day={06},
+  volume={5},
+  number={4},
+  pages={432--444},
+  doi={10.1038/s42256-023-00639-z},
+  url={https://doi.org/10.1038/s42256-023-00639-z},
 }
+```
