@@ -233,7 +233,7 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
                 try:
                     valid_item = self.configuration.validate_item(item)
                     # check if sample is hashable
-                    if not isinstance(item, collections.Hashable):
+                    if not isinstance(item, collections.abc.Hashable):
                         yield valid_item
                         item_set.add(str(index))
                     else:
