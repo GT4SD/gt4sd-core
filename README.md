@@ -13,9 +13,6 @@
 [![2022 IEEE Open Software Services Award](https://img.shields.io/badge/Award-2022%20IEEE%20Open%20Software%20Services%20Award-yellow)](https://conferences.computer.org/services/2022/awards/oss_award.html)
 [![Paper DOI: 10.1038/s41524-023-01028-1](https://zenodo.org/badge/DOI/10.1038/s41524-023-01028-1.svg)](https://www.nature.com/articles/s41524-023-01028-1)
 
-<img src="./docs/_static/gt4sd_graphical_abstract.png" alt="logo" width="800">
-
-
 The **GT4SD** (Generative Toolkit for Scientific Discovery) is an open-source platform to accelerate hypothesis generation in the scientific discovery process. It provides a library for making state-of-the-art generative AI models easier to use.
 
 For full details on the library API and examples see the [docs](https://gt4sd.github.io/gt4sd-core/).
