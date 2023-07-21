@@ -35,7 +35,6 @@ from typing_extensions import Protocol, runtime_checkable
 
 from ....domains.materials import Molecule, Sequence
 from ....exceptions import InvalidItem
-from ....properties.core import PropertyValue
 from ....training_pipelines.core import TrainingPipelineArguments
 from ....training_pipelines.regression_transformer.core import (
     RegressionTransformerSavingArguments,
@@ -48,7 +47,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 T = TypeVar("T", bound=Sequence)
-S = TypeVar("S", PropertyValue, Molecule)
+S = TypeVar("S", Union[float, int], Molecule)
 Targeted = Callable[[T], Iterable[Any]]
 
 

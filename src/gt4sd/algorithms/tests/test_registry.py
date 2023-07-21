@@ -33,7 +33,7 @@ from gt4sd.algorithms.core import AlgorithmConfiguration, GeneratorAlgorithm
 from gt4sd.algorithms.registry import ApplicationsRegistry
 from gt4sd.exceptions import DuplicateApplicationRegistration
 
-# there are at least 2 available versions, 1 per PaccMannRL configuration
+# there are at least 2 available versions, RegressionTransformer models
 AT_LEAST = 2
 
 
@@ -74,8 +74,8 @@ def test_validation():
         ApplicationsRegistry.get_configuration_instance(
             algorithm_type="conditional_generation",
             domain="materials",
-            algorithm_name="PaccMannRL",
-            algorithm_application="PaccMannRLProteinBasedGenerator",
+            algorithm_name="RegressionTransformer",
+            algorithm_application="RegressionTransformerMolecules",
             batch_size="wrong_type",
         )
 
