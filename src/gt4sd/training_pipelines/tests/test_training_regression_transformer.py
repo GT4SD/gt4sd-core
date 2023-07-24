@@ -98,7 +98,6 @@ xlnet_config = {
 def combine_defaults_and_user_args(
     config: Dict[str, Dict[str, Any]]
 ) -> Dict[str, Dict[str, Any]]:
-
     arguments = TRAINING_PIPELINE_ARGUMENTS_MAPPING["regression-transformer-trainer"]
     """
     We need `conflict_handler='resolve'` because the RT relies on the TrainingArguments
@@ -145,7 +144,6 @@ def combine_defaults_and_user_args(
 
 
 def test_train():
-
     pipeline = TRAINING_PIPELINE_MAPPING.get("regression-transformer-trainer")
     assert pipeline is not None
 
@@ -161,7 +159,6 @@ def test_train():
         importlib_resources.files("gt4sd")
         / "training_pipelines/tests/regression_transformer_raw.csv"
     ) as raw_path:
-
         # Test finetuning the QED model
         config["model_args"]["model_path"] = mol_path
         config["dataset_args"]["train_data_path"] = str(raw_path)
@@ -200,7 +197,6 @@ def test_train():
         importlib_resources.files("gt4sd")
         / "training_pipelines/tests/regression_transformer_copolymer_raw.csv"
     ) as raw_path:
-
         # Test finetuning the polymer model
         polymer_model = RegressionTransformerMolecules(
             algorithm_version="block_copolymer"

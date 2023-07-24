@@ -51,6 +51,7 @@ class GT4SDConfiguration(BaseSettings):
     gt4sd_max_runtime: int = 86400
     gt4sd_create_unverified_ssl_context: bool = False
     gt4sd_disable_cudnn: bool = False
+    gt4sd_skip_s3_sync_in_inference: bool = False
 
     gt4sd_s3_host: str = "s3.par01.cloud-object-storage.appdomain.cloud"
     gt4sd_s3_access_key: str = "6e9891531d724da89997575a65f4592e"
@@ -200,7 +201,6 @@ def sync_algorithm_with_s3(
 def get_cached_algorithm_path(
     prefix: Optional[str] = None, module: str = "algorithms"
 ) -> str:
-
     if module not in gt4sd_artifact_management_configuration.gt4sd_s3_modules:
         raise ValueError(
             f"Unknown cache module: {module}. Supported modules: "

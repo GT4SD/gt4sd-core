@@ -78,7 +78,6 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
             dataset_args: dataset arguments passed to the configuration.
         """
         try:
-
             params = {**training_args, **dataset_args, **model_args}
             # Setup logging
             logging.basicConfig(

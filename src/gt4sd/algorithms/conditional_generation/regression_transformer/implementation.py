@@ -401,7 +401,6 @@ class ConditionalGenerator:
             self.tokenizer.mask_token
             in x.split(self.tokenizer.expression_separator)[-1]
         ):
-
             return "generation"
 
         return "regression"

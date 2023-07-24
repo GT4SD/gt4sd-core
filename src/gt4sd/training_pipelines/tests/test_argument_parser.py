@@ -31,7 +31,6 @@ from gt4sd.cli.argument_parser import ArgumentParser
 
 @dataclass
 class TestArguments:
-
     int_arg: int = field(default=0)
 
     float_arg: float = field(default=0.0)
@@ -50,7 +49,6 @@ class TestArguments:
 
 
 def test_int_default():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses([])
@@ -60,7 +58,6 @@ def test_int_default():
 
 
 def test_float_default():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses([])
@@ -70,7 +67,6 @@ def test_float_default():
 
 
 def test_str_default():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses([])
@@ -80,7 +76,6 @@ def test_str_default():
 
 
 def test_bool_default():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses([])
@@ -90,7 +85,6 @@ def test_bool_default():
 
 
 def test_int_assigned():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses(["--int_arg", "1"])
@@ -100,7 +94,6 @@ def test_int_assigned():
 
 
 def test_float_assigned():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses(["--float_arg", "1.0"])
@@ -110,7 +103,6 @@ def test_float_assigned():
 
 
 def test_str_assigned():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses(["--str_arg", "my_test"])
@@ -120,7 +112,6 @@ def test_str_assigned():
 
 
 def test_bool_assigned():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses(["--bool_arg", "False"])
@@ -130,7 +121,6 @@ def test_bool_assigned():
 
 
 def test_bool_int_assigned():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses(["--bool_arg", "0"])
@@ -140,7 +130,6 @@ def test_bool_int_assigned():
 
 
 def test_int_none():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses([])
@@ -149,7 +138,6 @@ def test_int_none():
 
 
 def test_float_none():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses([])
@@ -158,7 +146,6 @@ def test_float_none():
 
 
 def test_str_none():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses([])
@@ -167,7 +154,6 @@ def test_str_none():
 
 
 def test_bool_none():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses([])
@@ -176,7 +162,6 @@ def test_bool_none():
 
 
 def test_int_str_none():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses(["--int_none_arg", ""])
@@ -185,7 +170,6 @@ def test_int_str_none():
 
 
 def test_float_str_none():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses(["--float_none_arg", ""])
@@ -194,7 +178,6 @@ def test_float_str_none():
 
 
 def test_str_str_none():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses(["--str_none_arg", ""])
@@ -203,7 +186,6 @@ def test_str_str_none():
 
 
 def test_bool_str_none():
-
     parser = ArgumentParser((TestArguments))  # type: ignore
 
     args = parser.parse_args_into_dataclasses(["--bool_none_arg", ""])

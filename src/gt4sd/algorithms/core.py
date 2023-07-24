@@ -759,17 +759,21 @@ class AlgorithmConfiguration(Generic[S, T]):
             cls.get_application_prefix(),
             algorithm_version,
         )
+        local_path = ""
         try:
-            local_path = sync_algorithm_with_s3(prefix)
+            if not gt4sd_configuration_instance.gt4sd_skip_s3_sync_in_inference:
+                local_path = sync_algorithm_with_s3(prefix)
         except (KeyError, S3SyncError) as error:
             logger.info(
                 f"searching S3 raised {error.__class__.__name__}, using local cache only."
             )
             logger.debug(error)
-            local_path = get_cached_algorithm_path(prefix)
+        finally:
+            if not local_path:
+                local_path = get_cached_algorithm_path(prefix)
             if not os.path.isdir(local_path):
                 raise OSError(
-                    f"artifacts directory {local_path} does not exist locally, and syncing with s3 failed: {error}"
+                    f"artifacts directory {local_path} does not exist locally"
                 )
 
         return local_path

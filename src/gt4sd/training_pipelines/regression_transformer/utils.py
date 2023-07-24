@@ -164,7 +164,6 @@ def prepare_datasets_from_files(
     for i, (data, path) in enumerate(
         zip([train_data, test_data], [train_path, test_path])
     ):
-
         if not path.endswith(".csv"):
             raise TypeError(f"Please provide a csv file not {path}.")
 

@@ -77,7 +77,6 @@ def training_pipeline_name_to_metadata(name: str) -> Dict[str, Any]:
 
     metadata: Dict[str, Any] = {"training_pipeline": name, "parameters": {}}
     if name in TRAINING_PIPELINE_ARGUMENTS_MAPPING:
-
         for training_argument_class in TRAINING_PIPELINE_ARGUMENTS_MAPPING[name]:
             field_types = extract_fields_from_class(training_argument_class)
             metadata["parameters"].update(field_types)

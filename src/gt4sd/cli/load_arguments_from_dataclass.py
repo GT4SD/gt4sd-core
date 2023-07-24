@@ -76,9 +76,7 @@ def extract_fields_from_class(
 
     # assign default values
     for field in fields(dataclass):
-
         if not isinstance(field.default, _MISSING_TYPE):
-
             if field.default is None:
                 field.default = "none"
 
@@ -86,18 +84,15 @@ def extract_fields_from_class(
 
     # convert type to str
     for field_name in arg_fields:
-
         field_type = find_type(arg_fields[field_name]["type"])
 
         if field_type:
-
             arg_fields[field_name]["type"] = field_type
 
         elif (
             hasattr(arg_fields[field_name]["type"], "__origin__")
             and arg_fields[field_name]["type"].__origin__ is Union
         ):
-
             types = [
                 find_type(type) for type in arg_fields[field_name]["type"].__args__
             ]
