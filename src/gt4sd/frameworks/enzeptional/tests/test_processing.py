@@ -38,7 +38,9 @@ def test_sanitize_intervals():
 
 
 def test_sanitize_intervals_padding():
-    assert sanitize_intervals_with_padding([(13, 14), (44, 45)], pad_value=8, max_value=50) == [(10, 17), (41, 48)]
+    assert sanitize_intervals_with_padding(
+        [(13, 14), (44, 45)], pad_value=8, max_value=50
+    ) == [(10, 17), (41, 48)]
 
 
 def test_reconstruct_sequence_with_mutation_range():
