@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""enzeptional - ENZymE OPTImizatiON for biocatALysis.
+"""enzeptional - Enzyme Optimization for biocatalysis.
 
 Module for enzyme optimization.
 """
