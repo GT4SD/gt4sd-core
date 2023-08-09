@@ -105,6 +105,8 @@ class AutoModelFromHFEmbedding(StringEmbedding):
             device: Device where the inference is running, either as a dedicated class or a string.
         """
         self.device = device_claim(device)
+        if model_kwargs is None:
+            raise ValueError("The model_kwargs argument is required.")
         self.model_path = model_kwargs.get("model_path", "facebook/esm2_t33_650M_UR50D")
         self.tokenizer_path = model_kwargs.get(
             "tokenizer_path", "facebook/esm2_t33_650M_UR50D"
@@ -188,14 +190,24 @@ class TAPEEmbedding(StringEmbedding):
         """
         self.device = device_claim(device)
         self.task_specification = registry.get_task_spec("embed")
+        if model_kwargs is None:
+            raise ValueError("The model_kwargs argument is required.")
         self.model = registry.get_task_model(
-            model_kwargs.get("model_path") if model_kwargs is not None else "transformer",
+            model_kwargs.get("model_path")
+            if model_kwargs is not None
+            else "transformer",
             self.task_specification.name,
-            load_dir=model_kwargs.get("model_dir") if model_kwargs is not None else "bert-base"
+            load_dir=model_kwargs.get("model_dir")
+            if model_kwargs is not None
+            else "bert-base",
         )
         self.model = self.model.to(self.device)
         self.model.eval()
-        self.tokenizer = TAPETokenizer(vocab=model_kwargs.get("aa_vocabulary") if model_kwargs is not None else "iupac")
+        self.tokenizer = TAPETokenizer(
+            vocab=model_kwargs.get("aa_vocabulary")
+            if model_kwargs is not None
+            else "iupac"
+        )
 
     def __type__(self):
         return type(self.model)
@@ -259,6 +271,8 @@ class Unmasker(ABC):
                 If not provided, it is inferred.
         """
         self.device = device_claim(device)
+        if model_kwargs is None:
+            raise ValueError("The model_kwargs argument is required.")
         self.model_path = model_kwargs.get("model_path", None)
         self.tokenizer_path = model_kwargs.get("tokenizer_path", None)
         self.cache_dir = model_kwargs.get("cache_dir", None)

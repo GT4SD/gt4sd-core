@@ -30,24 +30,21 @@ from gt4sd.frameworks.enzeptional import core
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 # Paths and data
-scorer_filepath = pkg_resources.resource_filename("gt4sd", "frameworks/enzeptional/tests/scorer.pkl")
+scorer_filepath = pkg_resources.resource_filename(
+    "gt4sd", "frameworks/enzeptional/tests/scorer.pkl"
+)
 substrate = "NC1=CC=C(N)C=C1"
 product = "CNC1=CC=C(NC(=O)C2=CC=C(C=C2)C(C)=O)C=C1"
 sequence = "EGALFVEAESSHVLEDFGDFRPNDELHRVMVPTCDYSKGISSFPLLMVQLTAESSHVLEDFGDFRPNVMVPTCDYSKGISSFPLLMVQLMVPTCDY"
 
 # Enzyme optimizer setup
-enzyme_optimizer = core.EnzymeOptimizer(
-    scorer_filepath,
-    substrate,
-    product,
-    sequence
-)
+enzyme_optimizer = core.EnzymeOptimizer(scorer_filepath, substrate, product, sequence)
 
 # Mutation language model setup
 mutation_object = core.MutationLanguageModel(
     mutation_model_parameters={
         "model_path": "facebook/esm2_t33_650M_UR50D",
-        "tokenizer_path": "facebook/esm2_t33_650M_UR50D"
+        "tokenizer_path": "facebook/esm2_t33_650M_UR50D",
     }
 )
 
@@ -62,7 +59,7 @@ results = enzyme_optimizer.optimize(
     batch_size=4,
     mutation_generator_parameters={
         "maximum_number_of_mutations": 5,
-        "mutation_object": mutation_object
+        "mutation_object": mutation_object,
     },
     population_per_iteration=5,
     with_genetic_algorithm=True,
