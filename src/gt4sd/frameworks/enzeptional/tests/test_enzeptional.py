@@ -22,102 +22,51 @@
 # SOFTWARE.
 #
 
+
 import warnings
-
 import pkg_resources
-
-<<<<<<< Updated upstream
-from gt4sd.frameworks.enzeptional import  core
-from gt4sd.frameworks.enzeptional.processing import AutoModelFromHFEmbedding, TAPEEmbedding
-=======
 from gt4sd.frameworks.enzeptional import core
-from gt4sd.frameworks.enzeptional.processing import (
-    TAPEEmbedding,
-)
->>>>>>> Stashed changes
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
-
-filepath = pkg_resources.resource_filename(
-    "gt4sd",
-    "frameworks/enzeptional/tests/scorer.pkl",
-)
-
-
+# Paths and data
+scorer_filepath = pkg_resources.resource_filename("gt4sd", "frameworks/enzeptional/tests/scorer.pkl")
 substrate = "NC1=CC=C(N)C=C1"
 product = "CNC1=CC=C(NC(=O)C2=CC=C(C=C2)C(C)=O)C=C1"
 sequence = "EGALFVEAESSHVLEDFGDFRPNDELHRVMVPTCDYSKGISSFPLLMVQLTAESSHVLEDFGDFRPNVMVPTCDYSKGISSFPLLMVQLMVPTCDY"
 
-designer = core.EnzymeOptimizer(
-<<<<<<< Updated upstream
-                    scorer_filepath=filepath, substrate=substrate, product=product, sequence=sequence,
-                    protein_embedding=TAPEEmbedding()
-                )
-=======
-    scorer_filepath=filepath,
-    substrate=substrate,
-    product=product,
-    sequence=sequence,
-    protein_embedding=TAPEEmbedding(),
+# Enzyme optimizer setup
+enzyme_optimizer = core.EnzymeOptimizer(
+    scorer_filepath,
+    substrate,
+    product,
+    sequence
 )
->>>>>>> Stashed changes
 
-model_path = pkg_resources.resource_filename(
-    "gt4sd",
-    "frameworks/enzeptional/tests/mutation_model",
-)
-<<<<<<< Updated upstream
-mutation_object = core.MutationLanguageModel(mutation_model_type="transformers", 
-                                             mutation_model_parameters=
-                                             {
-                                                 "mutation_model_path":model_path, 
-                                                 "mutation_tokenizer_filepath":model_path
-                                                 }
-                                             )
-=======
+# Mutation language model setup
 mutation_object = core.MutationLanguageModel(
-    mutation_model_type="transformers",
     mutation_model_parameters={
-        "model_path": model_path,
-        "tokenizer_path": model_path,
-    },
+        "model_path": "facebook/esm2_t33_650M_UR50D",
+        "tokenizer_path": "facebook/esm2_t33_650M_UR50D"
+    }
 )
->>>>>>> Stashed changes
 
-
-results = designer.optimize(
+# Optimization
+results = enzyme_optimizer.optimize(
     number_of_mutations=2,
-<<<<<<< Updated upstream
-    intervals=[(41,43), (106,107), (145,149), (174,176), (182,184), (376,379)],
-    number_of_steps=2,
-    full_sequence_embedding = True,
-    top_k=3,
-    mutation_generator_type="language-modeling",
-    batch_size=32,
-    mutation_generator_parameters = {"maximum_number_of_mutations":5, "mutation_object": mutation_object},
-    population_per_itaration = 20,
-    with_genetic_algorithm=True,
-    pad_intervals = True,
-    top_k_selection=8,
-    time_budget=2400
-    )
-
-=======
     intervals=[(41, 43), (106, 107), (145, 149), (174, 176), (182, 184), (376, 379)],
     number_of_steps=2,
     full_sequence_embedding=True,
     top_k=3,
-    mutation_generator_type="language-modeling",
-    batch_size=32,
+    mutation_generator="language-modeling",
+    batch_size=4,
     mutation_generator_parameters={
         "maximum_number_of_mutations": 5,
-        "mutation_object": mutation_object,
+        "mutation_object": mutation_object
     },
-    population_per_itaration=20,
+    population_per_iteration=5,
     with_genetic_algorithm=True,
     pad_intervals=True,
-    top_k_selection=8,
-    time_budget=2400,
+    top_k_selection=2,
+    time_budget=300,
 )
->>>>>>> Stashed changes
