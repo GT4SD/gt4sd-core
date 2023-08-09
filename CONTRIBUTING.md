@@ -70,7 +70,6 @@ If you would like to contribute to the package, we recommend the following devel
     ```sh
     # blacking and sorting imports (this might change your files)
     python -m black src/gt4sd
-    python -m isort src/gt4sd
     # checking flake8 and mypy
     python -m flake8 --disable-noqa --per-file-ignores="__init__.py:F401" src/gt4sd
     python -m mypy src/gt4sd

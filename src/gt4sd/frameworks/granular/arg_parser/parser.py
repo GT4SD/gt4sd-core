@@ -26,13 +26,17 @@ import configparser
 from typing import Any, Dict, Optional
 
 import sentencepiece as _sentencepiece
+import torch as _torch
+import tensorflow as _tensorflow
 from pytorch_lightning import Trainer
 
 from ..ml.models import ARCHITECTURE_FACTORY
 from .utils import convert_string_to_class
 
-# sentencepiece has to be loaded before lightning to avoid segfaults
+# imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
+_tensorflow
+_torch
 
 
 def parse_arguments_from_config(conf_file: Optional[str] = None) -> argparse.Namespace:

@@ -180,7 +180,7 @@ class ArgumentParser(HfArgumentParser):
                 kwargs["nargs"] = "+"
                 kwargs["type"] = partial(none_checker, dtype=field.type.__args__[0])
                 assert all(
-                    x == kwargs["type"] for x in field.type.__args__
+                    x == kwargs["type"].keywords["dtype"] for x in field.type.__args__
                 ), f"{field.name} cannot be a List of mixed types: {field.type.__args__}"
                 if field.default_factory is not dataclasses.MISSING:  # type: ignore
                     kwargs["default"] = field.default_factory()  # type: ignore

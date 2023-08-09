@@ -131,6 +131,52 @@ def test_crystals(property_key: str):
         assert np.isclose(prediction, crystal_ground_truths[property_key], atol=1e-2)
 
 
+def test_molformer_regression():
+
+    property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY[
+        "molformer_regression"
+    ]
+    model = property_class(
+        parameters_class(algorithm_version="molformer_alpha_public_test")  # type: ignore
+    )
+
+    output = model(input=["OC12COC3=NCC1C23"])  # type: ignore
+
+    assert isinstance(output, list)
+    assert len(output) == 1
+    assert np.isclose(output[0], 69.26847839355469, atol=1e-4)
+
+
+def test_molformer_classification():
+
+    property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY[
+        "molformer_classification"
+    ]
+    model = property_class(
+        parameters_class(algorithm_version="molformer_bace_public_test")  # type: ignore
+    )
+
+    output = model(input=["OC12COC3=NCC1C23"])  # type: ignore
+
+    assert isinstance(output, list)
+    assert len(output) == 1
+    assert output[0] == 1
+
+
+def test_molformer_multiclass_classification():
+
+    property_class, parameters_class = MOLECULE_PROPERTY_PREDICTOR_FACTORY[
+        "molformer_multitask_classification"
+    ]
+    model = property_class(parameters_class(algorithm_version="molformer_clintox_test"))  # type: ignore
+
+    output = model(input=["OC12COC3=NCC1C23"])  # type: ignore
+
+    assert isinstance(output, list)
+    assert len(output) == 1
+    assert output[0] == "FDA_APPROVED"
+
+
 def test_rfc():
     property_class, parameters_class = CRYSTALS_PROPERTY_PREDICTOR_FACTORY[
         "metal_nonmetal_classifier"

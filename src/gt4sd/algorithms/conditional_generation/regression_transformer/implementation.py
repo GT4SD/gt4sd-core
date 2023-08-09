@@ -34,7 +34,11 @@ from terminator.collators import MaskedTextCollator, PropertyCollator
 from terminator.inference import InferenceRT
 from terminator.search import SEARCH_FACTORY, Search
 from terminator.selfies import decoder, encoder
-from terminator.tokenization import InferenceBertTokenizer, PolymerGraphTokenizer
+from terminator.tokenization import (
+    InferenceBertTokenizer,
+    PolymerGraphTokenizer,
+    SelfiesTokenizer,
+)
 from transformers import AutoConfig, AutoModelWithLMHead, XLNetLMHeadModel
 
 from ....domains.materials import MoleculeFormat, Sequence, validate_molecules
@@ -158,6 +162,14 @@ class ConditionalGenerator:
                 data.get("property_ranges", {}).get(p, [0, 1])[1]
                 for p in self.properties
             ]
+            # In case custom normalization/denormalization is required
+            self.normalization_fns = [
+                data.get("normalization_fns", {}).get(p, None) for p in self.properties
+            ]
+            self.denormalization_fns = [
+                data.get("denormalization_fns", {}).get(p, None)
+                for p in self.properties
+            ]
             self.metadata = data
 
             # If tolerance dict is given, ensure it is well-formed
@@ -207,14 +219,25 @@ class ConditionalGenerator:
         Returns:
             float: Value in regular scale.
         """
-
         # If the property was not normalized, return the value
         if not self.do_normalize[idx]:
             return x
 
-        return round(
-            x * (self._maxs[idx] - self._mins[idx]) + self._mins[idx], precision
-        )
+        # The default normalization reverts a linear transformation to [0,1] scale
+        if self.denormalization_fns[idx] is None:
+            return round(
+                x * (self._maxs[idx] - self._mins[idx]) + self._mins[idx], precision
+            )
+
+        # This allows to revert arbitrarily complex preprocessing functions
+        fn = self.denormalization_fns[idx]
+        try:
+            denormed = eval(fn)(x)
+            return round(denormed, precision)
+        except SyntaxError:
+            raise SyntaxError(
+                f"Custom denormalization function {fn} seems improperly formatted"
+            )
 
     def normalize(self, x: str, idx: int, precision: int = 3) -> float:
         """
@@ -233,13 +256,32 @@ class ConditionalGenerator:
             raise TypeError(f"{x} is not a float and cant safely be casted.")
 
         x_float = float(x)
+        if x_float < self._mins[idx] or x_float > self._maxs[idx]:
+            raise ValueError(
+                f"Property value {x_float} for {self.properties[idx]} is outside of "
+                f"model's range [{self._mins[idx]}, {self._maxs[idx]}]."
+            )
         # If this property does not require normalization, return it
         if not self.do_normalize[idx]:
             return x_float
-        normed = round(
-            (x_float - self._mins[idx]) / (self._maxs[idx] - self._mins[idx]), precision
-        )
-        return normed
+
+        # This performs a standard linear normalization to [0,1]
+        if self.normalization_fns[idx] is None:
+            normed = round(
+                (x_float - self._mins[idx]) / (self._maxs[idx] - self._mins[idx]),
+                precision,
+            )
+            return normed
+
+        # Allows to apply arbitrary preprocessing functions
+        fn = self.normalization_fns[idx]
+        try:
+            normed = eval(fn)(x_float)
+            return round(normed, precision)
+        except SyntaxError:
+            raise SyntaxError(
+                f"Custom normalization function {fn} seems improperly formatted"
+            )
 
     def validate_input(self, x: str) -> None:
         """
@@ -279,9 +321,10 @@ class ConditionalGenerator:
             )
         if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
             self.validate_input_molecule(text_sequence, MoleculeFormat.copolymer)
+        elif isinstance(self.tokenizer.text_tokenizer, SelfiesTokenizer):
+            self.validate_input_molecule(text_sequence, MoleculeFormat.selfies)
         else:
-            # We can assume this to be a SELFIES
-            self.validate_input_molecule(text_sequence)
+            self.validate_input_molecule(text_sequence, MoleculeFormat.smiles)
 
         self.validate_input_numerical(number_sequence)
 
@@ -465,7 +508,12 @@ class ConditionalGenerator:
         ]
 
         # Second part: Predict the properties of the just generated sequence
-        _input = self.property_collator.mask_tokens(generations)
+        try:
+            _input = self.property_collator.mask_tokens(generations)
+        except UnboundLocalError:
+            # NOTE: in case there are errors with the collator we can't have successes
+            return ()
+
         prediction_input = {
             "input_ids": _input[0],
             "perm_mask": _input[1],
@@ -816,6 +864,9 @@ class ConditionalGenerator:
                 to_keep.append(keep)
 
         self.substructures_to_keep = to_keep
+        # Contains even the ones whose strings cant be found in seed string
+        self.all_substructures_to_keep = substructures_to_keep
+
         if len(set(self.substructures_to_keep + self.substructures_to_mask)) < len(
             self.substructures_to_keep
         ) + len(self.substructures_to_mask):
@@ -991,12 +1042,15 @@ class ChemicalLanguageRT(ConditionalGenerator):
         return [encoder(a) for a in tokens_to_mask]  # type: ignore
 
     def language_encoding(self, seq: str) -> str:
-        if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
+        if isinstance(self.tokenizer.text_tokenizer, SelfiesTokenizer):
+            selfie = encoder(seq)
+            if not isinstance(selfie, str):
+                raise TypeError(
+                    f"{seq} (type={type(seq)}) is not a SMILES sequence that can be converted to SELFIES."
+                )
+            return selfie
+        else:
             return seq
-        selfie = encoder(seq)
-        if not isinstance(selfie, str):
-            raise TypeError(f"{seq} (type={type(seq)}) is not a valid SMILES sequence.")
-        return selfie
 
     def filter_substructures(
         self, property_successes: Tuple[Tuple[str, str]]
@@ -1024,15 +1078,31 @@ class ChemicalLanguageRT(ConditionalGenerator):
         )
 
         successes: List[Tuple[str, str]] = []
-
-        subs_mols = []
-        for keep in self.substructures_to_keep:
-            subs_mols.append(Chem.MolFromSmiles(keep) or Chem.MolFromSmarts(keep))
-            if subs_mols[-1] is None:
+        subs_mols: List = []
+        for keep in self.all_substructures_to_keep:
+            subs_mol = Chem.MolFromSmiles(keep) or Chem.MolFromSmarts(keep)
+            if subs_mol is None:
                 logger.warning(
                     f"{keep} is not a valid SMILES/SELFIES. Instead substructure filtering "
                     f"based on sequence alone can be done and is set to: {self.text_filtering}"
                 )
+            if keep not in self.substructures_to_keep and not Chem.MolFromSmiles(
+                self.target
+            ).HasSubstructMatch(subs_mol):
+                logger.info(
+                    f"{keep} could not be identified in SMILES/SELFIES on text level AND no "
+                    "substructure match occurred, hence it will be ignored"
+                )
+                subs_mols.append(None)
+            elif keep not in self.substructures_to_keep:
+                logger.info(
+                    f"{keep} could not be identified in SMILES/SELFIES on *string*-level but since the"
+                    "RDKit match was successful, it will still be used for post-hoc filtering."
+                )
+                subs_mols.append(subs_mol)
+            else:
+                # "Normal" substructure
+                subs_mols.append(subs_mol)
 
         # Perform filtering
         for smi, prop in property_successes:
@@ -1040,9 +1110,13 @@ class ChemicalLanguageRT(ConditionalGenerator):
                 continue
             sane = True
             mol = Chem.MolFromSmiles(smi)
-            for subs_mol, subs_string in zip(subs_mols, self.substructures_to_keep):
+            for subs_mol, subs_string in zip(subs_mols, self.all_substructures_to_keep):
                 if subs_mol is None:
-                    if self.text_filtering and subs_string not in smi:
+                    if (
+                        self.text_filtering
+                        and subs_string not in smi
+                        and subs_string in self.substructures_to_keep
+                    ):
                         sane = False
                         break
                 else:
