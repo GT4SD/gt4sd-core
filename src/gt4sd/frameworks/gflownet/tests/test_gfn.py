@@ -23,6 +23,9 @@
 #
 from argparse import Namespace
 
+import sentencepiece as _sentencepiece
+import torch as _torch
+import tensorflow as _tensorflow
 import numpy as np
 import pytest
 import pytorch_lightning as pl
@@ -34,6 +37,11 @@ from gt4sd.frameworks.gflownet.loss import ALGORITHM_FACTORY
 from gt4sd.frameworks.gflownet.ml.models import MODEL_FACTORY
 from gt4sd.frameworks.gflownet.ml.module import GFlowNetModule
 from gt4sd.frameworks.gflownet.tests.qm9 import QM9Dataset, QM9GapTask
+
+# imports that have to be loaded before lightning to avoid segfaults
+_sentencepiece
+_tensorflow
+_torch
 
 configuration = {
     "bootstrap_own_reward": False,

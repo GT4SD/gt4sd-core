@@ -26,6 +26,19 @@ import json
 import logging
 from typing import Any, Dict
 
+import sentencepiece as _sentencepiece
+import torch as _torch
+import tensorflow as _tensorflow
+from gt4sd_trainer.hf_pl.core import (
+    LanguageModelingDataArguments,
+    LanguageModelingModelArguments,
+    LanguageModelingSavingArguments,
+    LanguageModelingTrainingPipeline,
+)
+from gt4sd_trainer.hf_pl.pytorch_lightning_trainer import (
+    PytorchLightningTrainingArguments,
+)
+
 from ..cli.load_arguments_from_dataclass import extract_fields_from_class
 from ..tests.utils import exitclose_file_creator
 from .cgcnn.core import (
@@ -72,7 +85,6 @@ from .paccmann.core import (
     PaccMannTrainingArguments,
 )
 from .paccmann.vae.core import PaccMannVAEModelArguments, PaccMannVAETrainingPipeline
-from .pytorch_lightning.core import PytorchLightningTrainingArguments
 from .pytorch_lightning.gflownet.core import (
     GFlowNetDataArguments,
     GFlowNetModelArguments,
@@ -87,11 +99,12 @@ from .pytorch_lightning.granular.core import (
     GranularSavingArguments,
     GranularTrainingPipeline,
 )
-from .pytorch_lightning.language_modeling.core import (
-    LanguageModelingDataArguments,
-    LanguageModelingModelArguments,
-    LanguageModelingSavingArguments,
-    LanguageModelingTrainingPipeline,
+from .pytorch_lightning.molformer.core import (
+    MolformerDataArguments,
+    MolformerModelArguments,
+    MolformerSavingArguments,
+    MolformerTrainingArguments,
+    MolformerTrainingPipeline,
 )
 from .regression_transformer.core import (
     RegressionTransformerDataArguments,
@@ -115,6 +128,11 @@ from .torchdrug.graphaf.core import (
     TorchDrugGraphAFModelArguments,
     TorchDrugGraphAFTrainingPipeline,
 )
+
+# imports that have to be loaded before lightning to avoid segfaults
+_sentencepiece
+_tensorflow
+_torch
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -190,6 +208,11 @@ TRAINING_PIPELINE_ARGUMENTS_MAPPING = {
         CrystalsRFCModelArguments,
         CrystalsRFCTrainingArguments,
     ),
+    "molformer": (
+        MolformerDataArguments,
+        MolformerModelArguments,
+        MolformerTrainingArguments,
+    ),
 }
 
 TRAINING_PIPELINE_MAPPING = {
@@ -206,6 +229,7 @@ TRAINING_PIPELINE_MAPPING = {
     "gflownet-trainer": GFlowNetTrainingPipeline,
     "cgcnn": CGCNNTrainingPipeline,
     "crystals-rfc": CrystalsRFCTrainingPipeline,
+    "molformer": MolformerTrainingPipeline,
 }
 
 TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
@@ -222,6 +246,7 @@ TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING = {
     "gflownet-trainer": GFlowNetSavingArguments,
     "cgcnn": CGCNNSavingArguments,
     "crystals-rfc": CrystalsRFCSavingArguments,
+    "molformer": MolformerSavingArguments,
 }
 
 

@@ -30,6 +30,12 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Tuple
 
 import sentencepiece as _sentencepiece
+import torch as _torch
+import tensorflow as _tensorflow
+from gt4sd_trainer.hf_pl.pytorch_lightning_trainer import (
+    PytorchLightningTrainingArguments,
+    PyTorchLightningTrainingPipeline,
+)
 from pytorch_lightning import LightningDataModule, LightningModule
 
 from ....frameworks.granular.dataloader.data_module import GranularDataModule
@@ -37,10 +43,11 @@ from ....frameworks.granular.dataloader.dataset import build_dataset_and_archite
 from ....frameworks.granular.ml.models import AUTOENCODER_ARCHITECTURES
 from ....frameworks.granular.ml.module import GranularModule
 from ...core import TrainingPipelineArguments
-from ..core import PytorchLightningTrainingArguments, PyTorchLightningTrainingPipeline
 
-# sentencepiece has to be loaded before lightning to avoid segfaults
+# imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
+_tensorflow
+_torch
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

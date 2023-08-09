@@ -30,6 +30,8 @@ import os
 from typing import Any, Dict, List, Optional, Tuple
 
 import sentencepiece as _sentencepiece
+import torch as _torch
+import tensorflow as _tensorflow
 import pandas as pd
 import pytorch_lightning as pl
 import torch
@@ -39,8 +41,10 @@ import torch_geometric.data as gd
 from ..dataloader.dataset import GFlowNetDataset, GFlowNetTask
 from ..envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvContext
 
-# sentencepiece has to be loaded before lightning to avoid segfaults
+# imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
+_tensorflow
+_torch
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

@@ -28,6 +28,8 @@ from argparse import Namespace
 from typing import Any, Dict
 
 import sentencepiece as _sentencepiece
+import torch as _torch
+import tensorflow as _tensorflow
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -46,8 +48,10 @@ from ..ml.module import GFlowNetModule
 
 # from ..train import build_task
 
-# sentencepiece has to be loaded before lightning to avoid segfaults
+# imports that have to be loaded before lightning to avoid segfaults
 _sentencepiece
+_tensorflow
+_torch
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
