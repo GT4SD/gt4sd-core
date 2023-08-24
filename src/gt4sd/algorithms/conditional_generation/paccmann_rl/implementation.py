@@ -27,16 +27,16 @@ import json
 import logging
 import os
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Set, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import torch
-from rdkit import Chem
 from paccmann_chemistry.models import StackGRUDecoder, StackGRUEncoder, TeacherVAE
 from paccmann_chemistry.utils.search import SamplingSearch
 from paccmann_omics.encoders import ENCODER_FACTORY
 from pytoda.smiles.smiles_language import SMILESLanguage
+from rdkit import Chem
 
 from ....domains.materials import MoleculeFormat, validate_molecules
 from ....domains.materials.protein_encoding import PrimarySequenceEncoder
