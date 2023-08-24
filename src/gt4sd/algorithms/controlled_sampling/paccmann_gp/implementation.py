@@ -29,6 +29,7 @@ import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
 
+import numpy as np
 import torch
 from paccmann_chemistry.models.vae import StackGRUDecoder, StackGRUEncoder, TeacherVAE
 from paccmann_chemistry.utils.search import SamplingSearch
@@ -162,7 +163,8 @@ class GPConditionalGenerator:
         else:
             self.number_of_steps = number_of_steps
         self.initial_point_generator = initial_point_generator
-        self.seed = seed
+        self.seed = None if seed == -1 else seed
+        self.set_seed()
         self.number_of_optimization_rounds = number_of_optimization_rounds
         self.sampling_variance = sampling_variance
         self.samples_for_evaluation = samples_for_evaluation
@@ -211,6 +213,17 @@ class GPConditionalGenerator:
             function_weights=weights,
         )
 
+    def set_seed(self):
+        """Set the seed for the random number generators."""
+        if self.seed is None:
+            return
+        np.random.seed(self.seed)
+        torch.manual_seed(self.seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(self.seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
     def generate_batch(self, target: Any) -> List[str]:
         """Generate molecules given a target.
 
@@ -220,8 +233,9 @@ class GPConditionalGenerator:
         Returns:
             a list of molecules as SMILES string.
         """
-        # make sure the seed is transformed to avoid redundancy over multiple calls (using Knuth multiplicative hashing)
-        self.seed = self.seed * 2654435761 % 2**32
+
+        # even if no seed is set, we want to avoid redundancy over multiple calls (using Knuth multiplicative hashing)
+        opt_seed = (self.seed or 42) * 2654435761 % 2**32
         logger.info(f"configuring optimization for target: {target}")
         # target configuration
         self.target = target
@@ -234,11 +248,13 @@ class GPConditionalGenerator:
             n_calls=self.number_of_steps,
             n_initial_points=self.number_of_initial_points,
             initial_point_generator=self.initial_point_generator,
-            random_state=self.seed,
+            random_state=opt_seed,
         )
-        logger.info(
-            f"running optimization with the following parameters: {optimization_parameters}"
-        )
+        log_params = deepcopy(optimization_parameters)
+        log_params["dimensions"] = np.mean(
+            optimization_parameters["dimensions"]
+        )  # type:ignore
+        logger.info(f"running optimization with the following parameters: {log_params}")
         smiles_set = set()
         logger.info(
             f"running at most {self.number_of_optimization_rounds} optmization rounds"
@@ -266,7 +282,7 @@ class GPConditionalGenerator:
                 smiles_set_per_round.update(set(generated_smiles))
             smiles_set.update(smiles_set_per_round)
             logger.info(f"completing round {optimization_round + 1}")
-        logger.info(f"generated {len(smiles_set)} molecules in the current run")
-        return list(
-            [molecule_smiles for molecule_smiles in smiles_set if molecule_smiles]
-        )
+        # Sort the molecules to ensure reproducibility
+        mols = sorted(list([s for s in smiles_set if s]), key=len, reverse=True)
+        logger.info(f"generated {len(mols)} molecules in the current run {mols}")
+        return mols

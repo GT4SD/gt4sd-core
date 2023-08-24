@@ -42,10 +42,9 @@ TARGET = {
     "affinity": {"protein": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT"},
 }
 PARAMETERS = {
-    "number_of_steps": 8,
-    "number_of_initial_points": 4,
+    "number_of_steps": 3,
+    "number_of_initial_points": 6,
     "number_of_optimization_rounds": 1,
-    "samples_for_evaluation": 10,
     "maximum_number_of_sampling_steps": 4,
 }
 
@@ -111,15 +110,27 @@ def test_available_versions(config_class: Type[AlgorithmConfiguration]):
     ],
 )
 def test_generation_via_import(config, algorithm, algorithm_parameters):
-    parameters = {
-        "batch_size": 1,
-    }
+    parameters = {"batch_size": 1, "seed": 42}
     for param, value in algorithm_parameters.items():
         parameters[param] = value
-    config = config(**parameters)
-    algorithm = algorithm(configuration=config, target=TARGET)
-    items = list(algorithm.sample(1))
-    assert len(items) == 1
+    configuration = config(**parameters)
+    model = algorithm(configuration=configuration, target=TARGET)
+    items = list(model.sample(5))
+    assert len(items) == 5
+
+    # Test that code is deterministic if seed is set
+    model = algorithm(configuration=configuration, target=TARGET)
+    new_items = list(model.sample(5))
+    assert len(new_items) == 5
+    assert items == new_items
+
+    # Test that code is not deterministic if seed is not set
+    parameters["seed"] = 43
+    configuration = config(**parameters)
+    model = algorithm(configuration=configuration, target=TARGET)
+    new_items = list(model.sample(5))
+    assert len(new_items) == 5
+    assert items != new_items
 
 
 @pytest.mark.parametrize(
@@ -151,6 +162,6 @@ def test_generation_via_registry(
     }
     for param, value in algorithm_parameters.items():
         parameters[param] = value
-    algorithm = ApplicationsRegistry.get_application_instance(**parameters)
-    items = list(algorithm.sample(1))
+    model = ApplicationsRegistry.get_application_instance(**parameters)
+    items = list(model.sample(1))
     assert len(items) == 1
