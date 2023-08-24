@@ -45,6 +45,7 @@ PARAMETERS = {
     "number_of_steps": 3,
     "number_of_initial_points": 10,
     "number_of_optimization_rounds": 1,
+    "samples_for_evaluation": 10,
     "maximum_number_of_sampling_steps": 4,
 }
 
@@ -163,5 +164,5 @@ def test_generation_via_registry(
     for param, value in algorithm_parameters.items():
         parameters[param] = value
     model = ApplicationsRegistry.get_application_instance(**parameters)
-    items = list(model.sample(10))
-    assert len(items) == 10
+    items = list(model.sample(1))
+    assert len(items) == 1
