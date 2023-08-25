@@ -27,16 +27,16 @@ import json
 import logging
 import os
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Set, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import torch
-from rdkit import Chem
 from paccmann_chemistry.models import StackGRUDecoder, StackGRUEncoder, TeacherVAE
 from paccmann_chemistry.utils.search import SamplingSearch
 from paccmann_omics.encoders import ENCODER_FACTORY
 from pytoda.smiles.smiles_language import SMILESLanguage
+from rdkit import Chem
 
 from ....domains.materials import MoleculeFormat, validate_molecules
 from ....domains.materials.protein_encoding import PrimarySequenceEncoder
@@ -112,34 +112,6 @@ class ConditionalGenerator(ABC):
     @abstractmethod
     def get_latent(self, condition: Any) -> torch.Tensor:
         pass
-
-    @abstractmethod
-    def generate_valid(self, condition: Any, number_of_molecules: int) -> List[str]:
-        """
-        Generate a given number of samples (molecules) from a given condition.
-
-        Args:
-            protein: the protein used as context/condition.
-            number_of_molecules: number of molecules to sample.
-
-        Returns:
-            list of SMILES generated.
-        """
-        # prepare the molecule set
-        generated_molecules: Set[str] = set()
-        logger.info("embedding condition and getting reparametrized latent samples")
-        latent = self.get_latent(condition)
-        logger.info("starting generation of molecules")
-        while len(generated_molecules) < number_of_molecules:
-            # generate the molecules
-            generated_smiles = self.get_smiles_from_latent(latent)
-            _, valid_ids = self.validate_molecules(generated_smiles)
-            generated_molecules |= set([generated_smiles[index] for index in valid_ids])
-        logger.info("completed generation of molecules")
-        # return the molecules listed by length
-        return sorted(list(generated_molecules), key=len, reverse=True)[
-            :number_of_molecules
-        ]
 
     def generate_batch(self, condition: Any) -> List[str]:
         logger.info("embedding condition and getting reparametrized latent samples")
@@ -252,21 +224,6 @@ class ProteinSequenceConditionalGenerator(ConditionalGenerator):
         proteins_logvar = torch.cat([protein_logvar] * self.samples_per_protein, dim=0)
         # get latent representation
         return torch.unsqueeze(reparameterize(proteins_mu, proteins_logvar), 0)
-
-    def generate_valid(self, protein: str, number_of_molecules: int) -> List[str]:
-        """
-        Generate a given number of samples (molecules) from a given protein.
-
-        Args:
-            protein: the protein used as context/condition.
-            number_of_molecules: number of molecules to sample.
-
-        Returns:
-            list of SMILES generated.
-        """
-        return super().generate_valid(
-            condition=protein, number_of_molecules=number_of_molecules
-        )
 
     def generate_batch(self, protein: str) -> List[str]:
         return super().generate_batch(condition=protein)
@@ -383,23 +340,6 @@ class TranscriptomicConditionalGenerator(ConditionalGenerator):
         # get latent representation
         return torch.unsqueeze(
             reparameterize(transcriptomic_mu, transcriptomic_logvar), 0
-        )
-
-    def generate_valid(
-        self, profile: Union[np.ndarray, pd.Series], number_of_molecules: int
-    ) -> List[str]:
-        """
-        Generate a given number of samples (molecules) from a given transcriptomic profile.
-
-        Args:
-            profile: the profile used as context/condition.
-            number_of_molecules: number of molecules to sample.
-
-        Returns:
-            list of SMILES generated.
-        """
-        return super().generate_valid(
-            condition=profile, number_of_molecules=number_of_molecules
         )
 
     def generate_batch(self, profile: Union[np.ndarray, pd.Series]) -> List[str]:
