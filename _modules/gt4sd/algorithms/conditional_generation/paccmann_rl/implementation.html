@@ -190,16 +190,16 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
 <span class="kn">from</span> <span class="nn">paccmann_chemistry.models</span> <span class="kn">import</span> <span class="n">StackGRUDecoder</span><span class="p">,</span> <span class="n">StackGRUEncoder</span><span class="p">,</span> <span class="n">TeacherVAE</span>
 <span class="kn">from</span> <span class="nn">paccmann_chemistry.utils.search</span> <span class="kn">import</span> <span class="n">SamplingSearch</span>
 <span class="kn">from</span> <span class="nn">paccmann_omics.encoders</span> <span class="kn">import</span> <span class="n">ENCODER_FACTORY</span>
 <span class="kn">from</span> <span class="nn">pytoda.smiles.smiles_language</span> <span class="kn">import</span> <span class="n">SMILESLanguage</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
 
 <span class="kn">from</span> <span class="nn">....domains.materials</span> <span class="kn">import</span> <span class="n">MoleculeFormat</span><span class="p">,</span> <span class="n">validate_molecules</span>
 <span class="kn">from</span> <span class="nn">....domains.materials.protein_encoding</span> <span class="kn">import</span> <span class="n">PrimarySequenceEncoder</span>
@@ -275,34 +275,6 @@
 <div class="viewcode-block" id="ConditionalGenerator.get_latent"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.get_latent">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="ConditionalGenerator.generate_valid"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.generate_valid">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">generate_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">number_of_molecules</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a given number of samples (molecules) from a given condition.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            protein: the protein used as context/condition.</span>
-<span class="sd">            number_of_molecules: number of molecules to sample.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list of SMILES generated.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># prepare the molecule set</span>
-        <span class="n">generated_molecules</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;embedding condition and getting reparametrized latent samples&quot;</span><span class="p">)</span>
-        <span class="n">latent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_latent</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;starting generation of molecules&quot;</span><span class="p">)</span>
-        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">generated_molecules</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">number_of_molecules</span><span class="p">:</span>
-            <span class="c1"># generate the molecules</span>
-            <span class="n">generated_smiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_smiles_from_latent</span><span class="p">(</span><span class="n">latent</span><span class="p">)</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">valid_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_molecules</span><span class="p">(</span><span class="n">generated_smiles</span><span class="p">)</span>
-            <span class="n">generated_molecules</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">([</span><span class="n">generated_smiles</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">valid_ids</span><span class="p">])</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;completed generation of molecules&quot;</span><span class="p">)</span>
-        <span class="c1"># return the molecules listed by length</span>
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">generated_molecules</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span>
-            <span class="p">:</span><span class="n">number_of_molecules</span>
-        <span class="p">]</span></div>
 
 <div class="viewcode-block" id="ConditionalGenerator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;embedding condition and getting reparametrized latent samples&quot;</span><span class="p">)</span>
@@ -415,21 +387,6 @@
         <span class="n">proteins_logvar</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">protein_logvar</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_protein</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="c1"># get latent representation</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">reparameterize</span><span class="p">(</span><span class="n">proteins_mu</span><span class="p">,</span> <span class="n">proteins_logvar</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="ProteinSequenceConditionalGenerator.generate_valid"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ProteinSequenceConditionalGenerator.generate_valid">[docs]</a>    <span class="k">def</span> <span class="nf">generate_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">number_of_molecules</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a given number of samples (molecules) from a given protein.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            protein: the protein used as context/condition.</span>
-<span class="sd">            number_of_molecules: number of molecules to sample.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list of SMILES generated.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">generate_valid</span><span class="p">(</span>
-            <span class="n">condition</span><span class="o">=</span><span class="n">protein</span><span class="p">,</span> <span class="n">number_of_molecules</span><span class="o">=</span><span class="n">number_of_molecules</span>
-        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ProteinSequenceConditionalGenerator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ProteinSequenceConditionalGenerator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="n">protein</span><span class="p">)</span></div></div>
@@ -546,23 +503,6 @@
         <span class="c1"># get latent representation</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span>
             <span class="n">reparameterize</span><span class="p">(</span><span class="n">transcriptomic_mu</span><span class="p">,</span> <span class="n">transcriptomic_logvar</span><span class="p">),</span> <span class="mi">0</span>
-        <span class="p">)</span></div>
-
-<div class="viewcode-block" id="TranscriptomicConditionalGenerator.generate_valid"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.TranscriptomicConditionalGenerator.generate_valid">[docs]</a>    <span class="k">def</span> <span class="nf">generate_valid</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span> <span class="n">number_of_molecules</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a given number of samples (molecules) from a given transcriptomic profile.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            profile: the profile used as context/condition.</span>
-<span class="sd">            number_of_molecules: number of molecules to sample.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list of SMILES generated.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">generate_valid</span><span class="p">(</span>
-            <span class="n">condition</span><span class="o">=</span><span class="n">profile</span><span class="p">,</span> <span class="n">number_of_molecules</span><span class="o">=</span><span class="n">number_of_molecules</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TranscriptomicConditionalGenerator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.TranscriptomicConditionalGenerator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>

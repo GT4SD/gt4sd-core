@@ -192,6 +192,7 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">paccmann_chemistry.models.vae</span> <span class="kn">import</span> <span class="n">StackGRUDecoder</span><span class="p">,</span> <span class="n">StackGRUEncoder</span><span class="p">,</span> <span class="n">TeacherVAE</span>
 <span class="kn">from</span> <span class="nn">paccmann_chemistry.utils.search</span> <span class="kn">import</span> <span class="n">SamplingSearch</span>
@@ -325,7 +326,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">number_of_steps</span> <span class="o">=</span> <span class="n">number_of_steps</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initial_point_generator</span> <span class="o">=</span> <span class="n">initial_point_generator</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">seed</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="n">seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_seed</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">number_of_optimization_rounds</span> <span class="o">=</span> <span class="n">number_of_optimization_rounds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_variance</span> <span class="o">=</span> <span class="n">sampling_variance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">samples_for_evaluation</span> <span class="o">=</span> <span class="n">samples_for_evaluation</span>
@@ -374,6 +376,17 @@
             <span class="n">function_weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
         <span class="p">)</span></div>
 
+<div class="viewcode-block" id="GPConditionalGenerator.set_seed"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.set_seed">[docs]</a>    <span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the seed for the random number generators.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="kc">False</span></div>
+
 <div class="viewcode-block" id="GPConditionalGenerator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate molecules given a target.</span>
 
@@ -383,8 +396,9 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            a list of molecules as SMILES string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># make sure the seed is transformed to avoid redundancy over multiple calls (using Knuth multiplicative hashing)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">*</span> <span class="mi">2654435761</span> <span class="o">%</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span>
+
+        <span class="c1"># even if no seed is set, we want to avoid redundancy over multiple calls (using Knuth multiplicative hashing)</span>
+        <span class="n">opt_seed</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">or</span> <span class="mi">42</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2654435761</span> <span class="o">%</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;configuring optimization for target: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># target configuration</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
@@ -397,11 +411,13 @@
             <span class="n">n_calls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_steps</span><span class="p">,</span>
             <span class="n">n_initial_points</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_initial_points</span><span class="p">,</span>
             <span class="n">initial_point_generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_point_generator</span><span class="p">,</span>
-            <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">opt_seed</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;running optimization with the following parameters: </span><span class="si">{</span><span class="n">optimization_parameters</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+        <span class="n">log_params</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">optimization_parameters</span><span class="p">)</span>
+        <span class="n">log_params</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+            <span class="n">optimization_parameters</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span>
+        <span class="p">)</span>  <span class="c1"># type:ignore</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;running optimization with the following parameters: </span><span class="si">{</span><span class="n">log_params</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">smiles_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;running at most </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_optimization_rounds</span><span class="si">}</span><span class="s2"> optmization rounds&quot;</span>
@@ -429,10 +445,10 @@
                 <span class="n">smiles_set_per_round</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">generated_smiles</span><span class="p">))</span>
             <span class="n">smiles_set</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">smiles_set_per_round</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;completing round </span><span class="si">{</span><span class="n">optimization_round</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;generated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">smiles_set</span><span class="p">)</span><span class="si">}</span><span class="s2"> molecules in the current run&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">molecule_smiles</span> <span class="k">for</span> <span class="n">molecule_smiles</span> <span class="ow">in</span> <span class="n">smiles_set</span> <span class="k">if</span> <span class="n">molecule_smiles</span><span class="p">]</span>
-        <span class="p">)</span></div></div>
+        <span class="c1"># Sort the molecules to ensure reproducibility</span>
+        <span class="n">mols</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">([</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">smiles_set</span> <span class="k">if</span> <span class="n">s</span><span class="p">]),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;generated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">mols</span><span class="p">)</span><span class="si">}</span><span class="s2"> molecules in the current run </span><span class="si">{</span><span class="n">mols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mols</span></div></div>
 </pre></div>
 
            </div>
