@@ -21,13 +21,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+from abc import ABC
 import os
 import torch
-import random
-import warnings
-from abc import ABC
-from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, Union
 import numpy as np
+from typing import Any, Dict, List, Optional, Tuple, Union
 from tape.datasets import pad_sequences
 from tape.registry import registry
 from tape.tokenizers import TAPETokenizer
@@ -35,194 +33,220 @@ from transformers import (
     AutoModel,
     AutoModelForMaskedLM,
     AutoTokenizer,
-    T5Model,
     T5Tokenizer,
 )
+import math
+import random
+import logging
+from itertools import product as iter_product
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
+# Set global cache directories
 os.environ["TRANSFORMERS_CACHE"] = "/dccstor/yna/.cache/"
 torch.hub.set_dir("/dccstor/yna/.cache/torch/hub")
 
 
-def device_claim(device: Optional[Union[torch.device, str]]) -> torch.device:
+class ModelCache:
     """
-    Claims the appropriate device for inference.
+    A simple cache mechanism for storing and retrieving models.
+    """
+
+    def __init__(self):
+        """
+        Initializes the cache as an empty dictionary.
+        """
+        self.cache = {}
+
+    def get(self, key):
+        """
+        Retrieves a model from the cache using the given key.
+
+        Args:
+            key: The key used to store the model.
+
+        Returns:
+            The model associated with the key, or None if not found.
+        """
+        return self.cache.get(key)
+
+    def add(self, key, model):
+        """
+        Adds a model to the cache with the specified key.
+
+        Args:
+            key: The key to associate with the model.
+            model: The model to be cached.
+        """
+        self.cache[key] = model
+
+
+model_cache = ModelCache()
+
+
+def get_device(device: Optional[Union[torch.device, str]] = None) -> torch.device:
+    """
+    Determines the appropriate torch device for computations.
 
     Args:
-        device: Device where the inference is running, either as a dedicated class or a string.
+        device (Optional[Union[torch.device, str]]): The desired device
+        'cpu' or 'cuda:0'). If None,
+        automatically selects the device.
 
     Returns:
-        The claimed device.
+        torch.device: The determined torch device for computations.
     """
     return torch.device(
         "cuda:0" if torch.cuda.is_available() and device != "cpu" else "cpu"
     )
 
 
-warnings.simplefilter(action="ignore", category=FutureWarning)
+class StringEmbedding(ABC):
+    """
+    Abstract base class for embedding string data.
 
-T = TypeVar("T")  # used for sample embedding
-
-
-class AbstractEmbedding(ABC, Generic[T]):
-    """Abstract embedding class."""
+    Attributes:
+        model (Any): The embedding model.
+    """
 
     model: Any
 
-    def embed(self, samples: List[T]) -> np.ndarray:
+    def embed(self, samples: List[str]) -> np.ndarray:
         """
-        Embed multiple samples.
+        Abstract method for embedding a list of string samples.
 
         Args:
-            samples: A list of sample representations.
+            samples (List[str]): The list of strings to be embedded.
 
         Returns:
-            Embedding vectors for the samples.
+            np.ndarray: The resulting embeddings as a NumPy array.
+
+        Raises:
+            NotImplementedError: If the method is not implemented in
+            the subclass.
         """
         raise NotImplementedError
 
 
-class StringEmbedding(AbstractEmbedding[str]):
-    pass
+class HFandTAPEModelUtility(StringEmbedding):
+    """
+    Utility class for handling both Hugging Face and TAPE models for embedding
+    and unmasking tasks.
+    """
 
-
-class AutoModelFromHFEmbedding(StringEmbedding):
     def __init__(
         self,
-        model_kwargs: Dict[str, Any] = None,
+        embedding_model_path: str,
+        tokenizer_path: str,
+        unmasking_model_path: Optional[str] = None,
+        is_tape_model: bool = False,
         device: Optional[Union[torch.device, str]] = None,
     ) -> None:
         """
-        Initialize the HF transformers embedding class.
+        Initializes the utility with specified model and tokenizer paths.
 
         Args:
-            model_kwargs: Contains arguments to load the model and tokenizer from Hugging Face.
-                The following arguments are required:
-                    - pretrained_model_name_or_path: Path to the pretrained model.
-                    - tokenizer_path: Path to the tokenizer.
-                Optional arguments:
-                    - model_name: Name of the model to load. If not provided, it is set to None.
-                    - cache_dir: Path to the cache directory. If not provided, it is set to None.
-            device: Device where the inference is running, either as a dedicated class or a string.
+            embedding_model_path (str): Path to the embedding
+            model.
+            tokenizer_path (str): Path to the tokenizer.
+            unmasking_model_path (Optional[str]): Path to the
+            unmasking model, if applicable.
+            is_tape_model (bool): Flag to indicate if a TAPE
+            model is being used.
+            device (Optional[Union[torch.device, str]]): The
+            compute device to use ('cpu' or 'cuda:0').
         """
-        self.device = device_claim(device)
-        if model_kwargs is None:
-            raise ValueError("The model_kwargs argument is required.")
-        self.model_path = model_kwargs.get("model_path", "facebook/esm2_t33_650M_UR50D")
-        self.tokenizer_path = model_kwargs.get(
-            "tokenizer_path", "facebook/esm2_t33_650M_UR50D"
-        )
-        self.cache_dir = model_kwargs.get("cache_dir", None)
+        self.device = get_device(device)
+        self.is_tape_model = is_tape_model
 
-        if self.cache_dir is not None:
-            os.environ["TRANSFORMERS_CACHE"] = self.cache_dir
-            model_kwargs = {
-                "pretrained_model_name_or_path": self.model_path,
-                "cache_dir": self.cache_dir,
-            }
-        else:
-            model_kwargs = {"pretrained_model_name_or_path": self.model_path}
-
-        self.model = AutoModel.from_pretrained(**model_kwargs).to(self.device).eval()
-        if self.device.type == "cuda:0":
-            self.model.cuda()
-
-        try:
-            self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_path)
-        except Exception:
-            self.tokenizer = T5Tokenizer.from_pretrained(self.tokenizer_path)
-
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.add_special_tokens({"pad_token": "[PAD]"})
-
-    def __type__(self):
-        return type(self.model)
-
-    def embed(self, samples: List[str]) -> np.ndarray:
-        """
-        Embed one or multiple samples.
-
-        Args:
-            samples: List of sequences.
-
-        Returns:
-            Embedding vector for each sample.
-        """
-        inputs = self.tokenizer(
-            samples, add_special_tokens=True, padding=True, return_tensors="pt"
-        )
-
-        with torch.no_grad():
-            sequence_embeddings = (
-                self.model.encoder(**inputs.to(self.device))[0].cpu().detach().numpy()
-                if self.__type__() == T5Model
-                else self.model(**inputs.to(self.device))[0].cpu().detach().numpy()
-            )
-
-        sequence_lengths = inputs["attention_mask"].sum(1)
-
-        return np.array(
-            [
-                sequence_embedding[:sequence_length].mean(0)
-                for sequence_embedding, sequence_length in zip(
-                    sequence_embeddings, sequence_lengths
+        embedding_cache_key = f"embedding_{embedding_model_path}"
+        self.embedding_model = model_cache.get(embedding_cache_key)
+        if not self.embedding_model:
+            if is_tape_model:
+                self.embedding_model = registry.get_task_model(
+                    embedding_model_path,
+                    "embed",
+                    load_dir=embedding_model_path,
+                ).to(self.device)
+            else:
+                self.embedding_model = (
+                    AutoModel.from_pretrained(
+                        embedding_model_path,
+                        cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    )
+                    .to(self.device)
+                    .eval()
                 )
-            ]
-        )
+                model_cache.add(embedding_cache_key, self.embedding_model)
 
+        if unmasking_model_path is not None:
+            unmasking_cache_key = f"unmasking_{unmasking_model_path}"
+            self.unmasking_model = model_cache.get(unmasking_cache_key)
+            if not self.unmasking_model:
+                self.unmasking_model = (
+                    AutoModelForMaskedLM.from_pretrained(
+                        unmasking_model_path,
+                        cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    )
+                    .to(self.device)
+                    .eval()
+                )
+                model_cache.add(unmasking_cache_key, self.unmasking_model)
+        else:
+            logger.error("No Unmasking model loaded. Check you model inputs")
 
-class TAPEEmbedding(StringEmbedding):
-    def __init__(
-        self,
-        model_kwargs: Optional[Dict[str, Any]] = None,
-        device: Optional[Union[torch.device, str]] = None,
-    ) -> None:
+        if is_tape_model:
+            self.tokenizer = TAPETokenizer(vocab="iupac")
+        else:
+            self.tokenizer = self._load_tokenizer(tokenizer_path)
+
+    def _load_tokenizer(self, tokenizer_path: str):
         """
-        Initialize the TAPE embedding class.
+        Loads a tokenizer based on the given path, caching it for future use.
 
         Args:
-            model_kwargs: Contains arguments to load the model and tokenizer from Hugging Face.
-                The following arguments are required:
-                    - model_type: TAPE model type. Defaults to "transformer".
-                    - model_dir: Model directory. Defaults to "bert-base".
-                    - aa_vocabulary: Type of vocabulary. Defaults to "iupac".
-            device: Device where the inference is running, either as a dedicated class or a string.
-                If not provided, it is inferred.
-        """
-        self.device = device_claim(device)
-        self.task_specification = registry.get_task_spec("embed")
-        if model_kwargs is None:
-            raise ValueError("The model_kwargs argument is required.")
-        self.model = registry.get_task_model(
-            model_kwargs.get("model_path")
-            if model_kwargs is not None
-            else "transformer",
-            self.task_specification.name,
-            load_dir=model_kwargs.get("model_dir")
-            if model_kwargs is not None
-            else "bert-base",
-        )
-        self.model = self.model.to(self.device)
-        self.model.eval()
-        self.tokenizer = TAPETokenizer(
-            vocab=model_kwargs.get("aa_vocabulary")
-            if model_kwargs is not None
-            else "iupac"
-        )
+            tokenizer_path (str): Path to the tokenizer.
 
-    def __type__(self):
-        return type(self.model)
+        Returns:
+            The loaded tokenizer.
+        """
+        tokenizer_cache_key = f"tokenizer_{tokenizer_path}"
+        tokenizer = model_cache.get(tokenizer_cache_key)
+        if not tokenizer:
+            try:
+                tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+            except Exception:
+                tokenizer = T5Tokenizer.from_pretrained(tokenizer_path)
+            model_cache.add(tokenizer_cache_key, tokenizer)
+        return tokenizer
 
     def embed(self, samples: List[str]) -> np.ndarray:
         """
-        Embed one or multiple samples.
+        Embeds a list of samples using either TAPE or Hugging Face models.
 
         Args:
-            samples: List of sequences.
+            samples (List[str]): List of strings to be embedded.
 
         Returns:
-            Embedding vector for each sample.
+            np.ndarray: The resulting embeddings as a NumPy array.
         """
-        token_ids: Dict[str, List[int]] = {"ids": [], "mask": []}
+        if self.is_tape_model:
+            return self._embed_tape(samples)
+        else:
+            return self._embed_huggingface(samples)
+
+    def _embed_tape(self, samples: List[str]) -> np.ndarray:
+        """
+        Embeds samples using a TAPE model.
+
+        Args:
+            samples (List[str]): List of strings to be embedded.
+
+        Returns:
+            np.ndarray: The resulting embeddings as a NumPy array.
+        """
+        token_ids: Dict[str, Any] = {"ids": [], "mask": []}
         for sequence in samples:
             encoded_sequence = self.tokenizer.encode(sequence)
             token_ids["ids"].append(encoded_sequence)
@@ -231,13 +255,12 @@ class TAPEEmbedding(StringEmbedding):
         input_ids = torch.from_numpy(pad_sequences(token_ids["ids"])).to(self.device)
         input_mask = torch.from_numpy(pad_sequences(token_ids["mask"])).to(self.device)
 
-        inputs = {
-            "input_ids": input_ids,
-            "input_mask": input_mask,
-        }
+        inputs = {"input_ids": input_ids, "input_mask": input_mask}
 
         with torch.no_grad():
-            sequence_embeddings = self.model(**inputs)[0].cpu().detach().numpy()
+            sequence_embeddings = (
+                self.embedding_model(**inputs)[0].cpu().detach().numpy()
+            )
 
         sequence_lengths = input_mask.sum(1)
 
@@ -250,268 +273,333 @@ class TAPEEmbedding(StringEmbedding):
             ]
         )
 
-
-class Unmasker(ABC):
-    def __init__(
-        self,
-        model_kwargs: Dict[str, Any] = None,
-        device: Optional[Union[torch.device, str]] = None,
-    ) -> None:
+    def _embed_huggingface(self, samples: List[str]) -> np.ndarray:
         """
-        Initialize the Unmasker class.
+        Embeds samples using a Hugging Face model.
 
         Args:
-            model_kwargs: Contains arguments to load the model and tokenizer from Hugging Face.
-                The following arguments are required:
-                    - model_path: Path to the pretrained model.
-                    - tokenizer_path: Path to the tokenizer.
-                Optional arguments:
-                    - cache_dir: Path to the cache directory.
-            device: Device where the inference is running, either as a dedicated class or a string.
-                If not provided, it is inferred.
-        """
-        self.device = device_claim(device)
-        if model_kwargs is None:
-            raise ValueError("The model_kwargs argument is required.")
-        self.model_path = model_kwargs.get("model_path", None)
-        self.tokenizer_path = model_kwargs.get("tokenizer_path", None)
-        self.cache_dir = model_kwargs.get("cache_dir", None)
-
-        if self.cache_dir is not None:
-            model_kwargs = {
-                "pretrained_model_name_or_path": self.model_path,
-                "cache_dir": self.cache_dir,
-            }
-        else:
-            model_kwargs = {"pretrained_model_name_or_path": self.model_path}
-
-        self.model = (
-            AutoModelForMaskedLM.from_pretrained(**model_kwargs).to(self.device).eval()
-        )
-        if self.device.type == "cuda:0":
-            self.model.cuda()
-
-        try:
-            self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_path)
-        except Exception:
-            self.tokenizer = T5Tokenizer.from_pretrained(self.tokenizer_path)
-
-    def unmask(self, sequence: str, top_k: int = 2) -> List[List[str]]:
-        """
-        Unmask a sequence.
-
-        Args:
-            sequence: Input sequence with masked tokens.
-            top_k: Number of top predicted tokens to return for each masked position. Defaults to 2.
+            samples (List[str]): List of strings to be embedded.
 
         Returns:
-            List of lists containing top predicted tokens for each masked position.
+            np.ndarray: The resulting embeddings as a NumPy array.
         """
         inputs = self.tokenizer(
-            sequence, return_tensors="pt", add_special_tokens=True, padding=True
+            samples,
+            add_special_tokens=True,
+            padding=True,
+            return_tensors="pt",
         )
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+
+        with torch.no_grad():
+            outputs = self.embedding_model(**inputs)
+            sequence_embeddings = outputs[0].cpu().detach().numpy()
+
+        sequence_lengths = inputs["attention_mask"].sum(1)
+
+        return np.array(
+            [
+                sequence_embedding[:sequence_length].mean(0)
+                for sequence_embedding, sequence_length in zip(
+                    sequence_embeddings, sequence_lengths
+                )
+            ]
+        )
+
+    def unmask(self, sequence: str, top_k: int = 2) -> List[str]:
+        """
+        Unmasks a given sequence using the model, retrieving top-k predictions.
+
+        Args:
+            sequence (str): The sequence with masked tokens.
+            top_k (int): Number of top predictions to retrieve.
+
+        Returns:
+            List[List[str]]: List of top-k predicted sequences.
+        """
+        if self.is_tape_model:
+            logger.error("Unmasking is not supported for TAPE models.")
+            raise NotImplementedError("Unmasking is not supported for TAPE models.")
+
+        try:
+            return self._unmask_with_model(sequence, top_k)
+        except (KeyError, NotImplementedError) as e:
+            logger.warning(f"{e} Standard unmasking failed ")
+            raise KeyError("Check the unmasking model you want to use")
+
+    def _unmask_with_model(self, sequence: str, top_k: int) -> List[str]:
+        """
+        Unmasks a sequence using the model, providing top-k predictions.
+
+        Args:
+            sequence (str): The sequence with masked tokens.
+            top_k (int): Number of top predictions to retrieve.
+
+        Returns:
+            List[List[str]]: List of top-k predicted sequences.
+        """
+        inputs = self.tokenizer(
+            sequence,
+            return_tensors="pt",
+            add_special_tokens=True,
+            padding=True,
+        ).to(self.device)
         mask_token_index = torch.where(
             inputs["input_ids"] == self.tokenizer.mask_token_id
         )[1]
-        logits = self.model(inputs["input_ids"], return_dict=True)["logits"]
+
+        with torch.no_grad():
+            outputs = self.unmasking_model(inputs["input_ids"].to(self.device))
+
+        if "logits" in outputs:
+            logits = outputs.logits
+        else:
+            raise KeyError("Logits not available in the model's output.")
+
         mask_token_logits = logits[0, mask_token_index, :]
 
-        top_tokens = []
+        top_tokens: List[Any] = []
         for i in range(len(mask_token_index)):
             top_n_tokens = (
                 torch.topk(mask_token_logits, top_k, dim=1).indices[i].tolist()
             )
-            tmp_top_tokens = []
-            for token in top_n_tokens:
-                tmp_top_tokens.append(self.tokenizer.decode([token]))
-            top_tokens.append(tmp_top_tokens)
+            top_tokens.append(
+                [self.tokenizer.decode([token]) for token in top_n_tokens]
+            )
 
-        return top_tokens
+        mask_token_index = mask_token_index.cpu().numpy()
+        mutated_sequences = []
+        tmp_top_tokens = [tuple(tokens) for tokens in top_tokens]
+        if len(set(tmp_top_tokens)) == 1:
+            for i in range(top_k):
+                temp_sequence = sequence.split(" ")
+                for mask_index in mask_token_index:
+                    temp_sequence[mask_index - 1] = tmp_top_tokens[0][i]
+                mutated_sequences.append("".join(temp_sequence))
+        else:
+            for combination in list(iter_product(*tmp_top_tokens)):
+                temp_sequence = sequence.split(" ")
+                for i, mask_index in enumerate(mask_token_index):
+                    temp_sequence[mask_index - 1] = combination[i]
+                mutated_sequences.append("".join(temp_sequence))
+
+        return mutated_sequences
 
 
 def mutate_sequence_with_variant(sequence: str, variant: str) -> str:
     """
-    Mutate an AA sequence with a variant.
+    Applies a specified variant mutation to an amino acid sequence.
 
     Args:
-        sequence: AA sequence.
-        variant: Variant annotation.
+        sequence (str): The original amino acid sequence.
+        variant (str): The variant to apply, formatted as a string.
 
     Returns:
-        Mutated AA sequence.
+        str: The mutated amino acid sequence.
     """
-    edits = [
-        (int(variant_string[1:-1]), variant[0], variant_string[-1])
-        for variant_string in map(str.strip, variant.split("/"))
-    ]
     mutated_sequence = list(sequence)
-    for index, _, aa_to in edits:
-        mutated_sequence[index] = aa_to
+    for variant_string in variant.split("/"):
+        index = (
+            int(variant_string[1:-1]) - 1
+        )  # Assuming 1-based indexing in the variant
+        mutated_sequence[index] = variant_string[-1]
     return "".join(mutated_sequence)
 
 
 def sanitize_intervals(intervals: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     """
-    Merge overlapping intervals.
+    Merges overlapping intervals into a single interval.
 
     Args:
-        intervals: List of tuples (int, int) representing intervals.
+        intervals (List[Tuple[int, int]]): A list of
+        start and end points of intervals.
 
     Returns:
-        Merged intervals.
+        List[Tuple[int, int]]: A list of merged intervals.
     """
-    intervals.sort(key=lambda x: x[0])
+    intervals.sort()
     merged: List[Tuple[int, int]] = []
-    for interval in intervals:
-        if not merged or merged[-1][1] < interval[0]:
-            merged.append(interval)
+    for start, end in intervals:
+        if not merged or merged[-1][1] < start:
+            merged.append((start, end))
         else:
-            merged[-1] = (merged[-1][0], max(merged[-1][1], interval[1]))
-    return sorted(merged, key=lambda x: x[0])
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+    return merged
 
 
 def round_up(number: float) -> int:
     """
-    Round up a floating-point number to the nearest integer.
+    Rounds up a floating-point number to the nearest integer.
 
     Args:
-        number: Floating-point number.
+        number (float): The number to round up.
 
     Returns:
-        Nearest integer rounded up.
+        int: The rounded-up integer.
     """
-    return int(number) + (number % 1 > 0)
+    return math.ceil(number)
 
 
 def sanitize_intervals_with_padding(
     intervals: List[Tuple[int, int]], pad_value: int, max_value: int
 ) -> List[Tuple[int, int]]:
     """
-    Sanitize intervals with padding.
+    Pads and sanitizes intervals within a given range.
 
     Args:
-        intervals: List of tuples (int, int) representing intervals.
-        pad_value: Value to pad the intervals.
-        max_value: Maximum length of the sequence.
+        intervals (List[Tuple[int, int]]): A list of intervals.
+        pad_value (int): The value to pad intervals with.
+        max_value (int): The maximum value for the range of intervals.
 
     Returns:
-        Padded intervals.
+        List[Tuple[int, int]]: A list of padded and sanitized intervals.
     """
-    padded_intervals = []
-    for interval in intervals:
-        diff = interval[1] - interval[0]
-        value_to_pad = int((pad_value - diff) / 2)
-        if value_to_pad >= 0:
-            left = interval[0] - value_to_pad
-            right = interval[1] + value_to_pad
-            if 0 <= left < right <= max_value:
-                padded_intervals.append((left, right))
-            elif left < 0 and right <= max_value:
-                padded_intervals.append((0, right))
-            elif 0 <= left < max_value < right:
-                padded_intervals.append((left, max_value))
-            else:
-                padded_intervals.append((0, max_value))
-        else:
-            padded_intervals.append(interval)
+
+    def pad_interval(
+        interval: Tuple[int, int], pad: int, max_val: int
+    ) -> Tuple[int, int]:
+        """
+        Pads an individual interval within the constraints of a maximum value.
+
+        Args:
+            interval (Tuple[int, int]): The interval to pad.
+            pad (int): The padding value.
+            max_val (int): The maximum value for the interval.
+
+        Returns:
+            Tuple[int, int]: The padded interval.
+        """
+        start, end = interval
+        interval_length = end - start
+        padding_needed = max(0, pad - interval_length) // 2
+
+        # Apply padding
+        padded_start = max(0, start - padding_needed)
+        padded_end = min(max_val, end + padding_needed)
+
+        # Adjust if padding goes beyond max_value
+        if padded_end > max_val:
+            padded_start = max(0, padded_start - (padded_end - max_val))
+        return padded_start, padded_end
+
+    padded_intervals = [
+        pad_interval(interval, pad_value, max_value) for interval in intervals
+    ]
     return sanitize_intervals(padded_intervals)
 
 
 def reconstruct_sequence_with_mutation_range(
-    sequence: str, mutated_sequence_range: str, intervals: List[Tuple[int, int]]
+    sequence: str,
+    mutated_sequence_range: str,
+    intervals: List[Tuple[int, int]],
 ) -> str:
     """
-    Reconstruct a sequence by replacing sub-sequences from a mutated range at given positions.
+    Reconstructs a sequence by inserting a mutated sequence
+    range at specific intervals.
 
     Args:
-        sequence: Original sequence.
-        mutated_sequence_range: Mutated sequence range.
-        intervals: Sorted and non-overlapping intervals.
+        sequence (str): The original sequence.
+        mutated_sequence_range (str): The range of the sequence to be mutated.
+        intervals (List[Tuple[int, int]]): The intervals where
+        mutations are applied.
 
     Returns:
-        Reconstructed sequence.
+        str: The reconstructed sequence with mutations.
     """
     mutated_sequence = list(sequence)
+    range_index = 0
     for start, end in intervals:
         size_fragment = end - start
-        mutated_sequence[start:end] = list(mutated_sequence_range[:size_fragment])
-        mutated_sequence_range = mutated_sequence_range[size_fragment:]
+        mutated_sequence[start:end] = list(
+            mutated_sequence_range[range_index : range_index + size_fragment]
+        )
+        range_index += size_fragment
     return "".join(mutated_sequence)
 
 
 class SelectionGenerator:
-    def __init__(self) -> None:
-        pass
+    """
+    A generator for selecting top sequences based on their scores.
+    """
 
     def selection(
-        self, scores: List[Dict[str, Any]], k: Optional[int] = -1
+        self,
+        pool_of_sequences: List[Dict[str, Any]],
+        k: float = 0.8,
     ) -> List[Any]:
         """
-        Select the top k mutated sequences based on the score.
+        Selects a subset of sequences from a pool based on their scores.
 
         Args:
-            scores: Dictionary containing sequences and scores.
-            k: Number of top sequences to return.
+            pool_of_sequences (List[Dict[str, Any]]): A list of
+            dictionaries, each containing a sequence and its score.
+            k (float): A fraction representing the proportion
+            of top sequences to select. Defaults to 0.8.
 
         Returns:
-            The top k sequences.
+            List[Any]: A list of the top k sequences based on scores.
         """
-        return list(sorted(scores, key=lambda d: d["score"], reverse=True))[:k]
+        n_samples_to_select = int(len(pool_of_sequences) * k)
+        return list(sorted(pool_of_sequences, key=lambda d: d["score"], reverse=True))[
+            :n_samples_to_select
+        ]
 
 
 class CrossoverGenerator:
+    """
+    A generator for performing crossover operations between sequences.
+    """
+
     def __init__(self, threshold_probability: float = 0.5) -> None:
         """
-        Initialize the CrossoverGenerator class.
+        Initializes the CrossoverGenerator with a specified
+        threshold probability.
 
         Args:
-            threshold_probability: Threshold probability of exchange of an AA between the two input sequences.
+            threshold_probability (float): The probability
+            threshold used in uniform crossover. Defaults to 0.5.
         """
         self.threshold_probability = threshold_probability
 
-    def single_point_crossover(
-        self, a_sequence: str, another_sequence: str
-    ) -> Tuple[str, str]:
+    def sp_crossover(self, a_sequence: str, another_sequence: str) -> Tuple[str, str]:
         """
-        Perform a single point crossover between two sequences.
+        Performs a single point crossover between two sequences.
 
         Args:
-            a_sequence: First sequence.
-            another_sequence: Second sequence.
+            a_sequence (str): The first sequence for crossover.
+            another_sequence (str): The second sequence for crossover.
 
         Returns:
-            Two sequences that are the crossover of the input sequences.
+            Tuple[str, str]: A tuple of two new sequences resulting
+            from the crossover.
         """
         random_point = random.randint(1, len(a_sequence) - 2)
-        new_sequence_1 = "".join(
-            np.append(a_sequence[:random_point], another_sequence[random_point:])
+        return (
+            a_sequence[:random_point] + another_sequence[random_point:],
+            another_sequence[:random_point] + a_sequence[random_point:],
         )
-        new_sequence_2 = "".join(
-            np.append(another_sequence[:random_point], a_sequence[random_point:])
-        )
-        return new_sequence_1, new_sequence_2
 
     def uniform_crossover(
         self, a_sequence: str, another_sequence: str
     ) -> Tuple[str, str]:
         """
-        Perform a uniform crossover between two sequences.
+        Performs a uniform crossover between two sequences.
 
         Args:
-            a_sequence: First sequence.
-            another_sequence: Second sequence.
+            a_sequence (str): The first sequence for crossover.
+            another_sequence (str): The second sequence for crossover.
 
         Returns:
-            Two sequences that are the crossover of the input sequences.
+            Tuple[str, str]: A tuple of two new sequences resulting
+            from the crossover.
         """
-        list_a_sequence = list(a_sequence)
-        list_another_sequence = list(another_sequence)
-
-        for pos in range(len(list_a_sequence)):
-            tmp_prob = random.uniform(0, 1)
-            if tmp_prob > self.threshold_probability:
-                tmp = list_a_sequence[pos]
-                list_a_sequence[pos] = list_another_sequence[pos]
-                list_another_sequence[pos] = tmp
-
-        return "".join(list_a_sequence), "".join(list_another_sequence)
+        return (
+            "".join(
+                a if random.random() > self.threshold_probability else b
+                for a, b in zip(a_sequence, another_sequence)
+            ),
+            "".join(
+                b if random.random() > self.threshold_probability else a
+                for a, b in zip(a_sequence, another_sequence)
+            ),
+        )

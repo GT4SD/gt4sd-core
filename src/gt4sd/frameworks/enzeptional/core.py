@@ -21,881 +21,609 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-import json
-import random
-import time
-from collections import OrderedDict
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    MutableMapping,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
+import pandas as pd
 import numpy as np
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Tuple
+import random
+import logging
+from itertools import product as iter_product
+import time
 from joblib import load
-from loguru import logger
-
 from .processing import (
-    AutoModelFromHFEmbedding,
-    CrossoverGenerator,
+    HFandTAPEModelUtility,
     SelectionGenerator,
-    StringEmbedding,
-    Unmasker,
-    reconstruct_sequence_with_mutation_range,
+    CrossoverGenerator,
     sanitize_intervals,
     sanitize_intervals_with_padding,
 )
 
-#: Transition matrix representation
-TransitionMatrix = MutableMapping[str, MutableMapping[str, float]]
-#: Transition matrix configuration
-TransitionConfiguration = MutableMapping[
-    str, Union[MutableMapping[str, float], Sequence[str]]
-]
-
-#: Supported features
-SUPPORTED_FEATURE_SET: Set[str] = {"substrate", "product", "sequence"}
-
-#: IUPAC code mapping
-IUPAC_CODES = OrderedDict(
-    [
-        ("Ala", "A"),
-        ("Asx", "B"),  # Aspartate or Asparagine
-        ("Cys", "C"),
-        ("Asp", "D"),
-        ("Glu", "E"),
-        ("Phe", "F"),
-        ("Gly", "G"),
-        ("His", "H"),
-        ("Ile", "I"),
-        ("Lys", "K"),
-        ("Leu", "L"),
-        ("Met", "M"),
-        ("Asn", "N"),
-        ("Pyl", "O"),  # Pyrrolysin
-        ("Pro", "P"),
-        ("Gln", "Q"),
-        ("Arg", "R"),
-        ("Ser", "S"),
-        ("Thr", "T"),
-        ("Sec", "U"),  # Selenocysteine
-        ("Val", "V"),
-        ("Trp", "W"),
-        ("Xaa", "X"),  # Any AA
-        ("Tyr", "Y"),
-        ("Glx", "Z"),  # Glutamate or Glutamine
-    ]
-)
-#: IUPAC character set
-IUPAC_CHARACTER_SET: Set[str] = set(IUPAC_CODES.values())
-#: IUPAC uniform mutation mapping
-IUPAC_MUTATION_MAPPING: TransitionConfiguration = {
-    iupac_character: sorted(list(IUPAC_CHARACTER_SET - {iupac_character, "X"}))
-    for iupac_character in IUPAC_CHARACTER_SET
-}
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
-class Mutations:
-    """Mutations definition class."""
+class MutationModelManager:
+    """
+    Manages and caches mutation models for efficient reuse.
+    """
 
-    def __init__(self, transition_configuration: Dict[str, Any]) -> None:
-        """Generate the mutation given the configuration for the transitions.
-
-        Args:
-            transition_configuration: transition configuration.
-        """
-        self.transition_matrix = Mutations.transition_configuration_to_matrix(
-            transition_configuration
-        )
+    _models_cache: Dict[Any, Any] = {}
 
     @staticmethod
-    def transition_configuration_to_matrix(
-        transition_configuration: Dict[str, Any],
-    ) -> Dict[str, Dict[str, float]]:
-        """Transform a configuration into a valid transition matrix.
+    def load_model(embedding_model_path, tokenizer_path, **kwargs):
+        """
+        Loads or retrieves a model from the cache based on the given paths.
 
         Args:
-            transition_configuration: transition configuration.
+            embedding_model_path (str): Path to the embedding model.
+            tokenizer_path (str): Path to the tokenizer.
+            **kwargs: Additional arguments for model loading.
 
         Returns:
-            A transition matrix.
+            An instance of the loaded model.
         """
-        transition_matrix: Dict[str, Dict[str, float]] = dict()
-        for transition_source, transition_targets in transition_configuration.items():
-            if isinstance(transition_targets, dict):
-                total = float(sum(transition_targets.values()))
-                transition_matrix[transition_source] = {
-                    transition_target: transtion_element / total
-                    for transition_target, transtion_element in transition_targets.items()
-                }
-            else:
-                transition_matrix[transition_source] = {
-                    transition_target: 1 / len(transition_targets)
-                    for transition_target in transition_targets
-                }
-        return transition_matrix
+        model_key = (embedding_model_path, tokenizer_path)
+
+        if model_key in MutationModelManager._models_cache:
+            return MutationModelManager._models_cache[model_key]
+
+        model = HFandTAPEModelUtility(embedding_model_path, tokenizer_path, **kwargs)
+        MutationModelManager._models_cache[model_key] = model
+        return model
 
     @staticmethod
-    def from_json(filepath: str) -> "Mutations":
-        """Parse the mutation from a JSON containing the transition configuration.
+    def clear_cache():
+        """
+        Clears the cached models.
+        """
+        MutationModelManager._models_cache.clear()
+
+
+class MutationStrategy(ABC):
+    """
+    Abstract base class for defining mutation strategies.
+    """
+
+    @abstractmethod
+    def mutate(
+        self, sequence: str, num_mutations: int, intervals: List[List[int]]
+    ) -> List[str]:
+        """
+        Abstract method for mutating a sequence.
+
+        Args:
+            sequence (str): The original sequence to be mutated.
+            num_mutations (int): The number of mutations to apply.
 
         Returns:
-            The mutations object.
+            List[str]: The mutated sequence.
         """
-        with open(filepath) as fp:
-            return Mutations(json.load(fp))
+        pass
 
-    def mutate(self, source: str) -> str:
-        """Mutate a source string.
+
+class LanguageModelMutationStrategy(MutationStrategy):
+    """
+    Mutation strategy using a language model.
+    """
+
+    def __init__(self, mutation_model):
+        """
+        Initializes the mutation strategy with a given model.
 
         Args:
-            source: Source string.
-
-        Returns:
-            The mutated target.
+            mutation_model: The model to be used for mutation.
         """
-        targets, probabilities = zip(*self.transition_matrix[source].items())
-        return np.random.choice(targets, size=1, p=probabilities).item()
+        self.mutation_model = mutation_model
+        self.top_k = 2
 
-
-class MutationGenerator:
-    def __init__(self, sequence: str) -> None:
-        self.sequence = sequence
-
-    def get_mutations(self, number_of_mutated_sequences: int = 1) -> List[str]:
-        raise NotImplementedError("Implement the method in a sub-class")
-
-
-class MutationLanguageModel:
-    def __init__(self, mutation_model_parameters: Dict[str, str]) -> None:
-        """Load language model for mutation suggestion
+    def set_top_k(self, top_k: int):
+        """
+        Sets the top k mutations to consider during mutation.
 
         Args:
-            mutation_model_parameters: Example: { "model_path" : "facebook/esm2_t33_650M_UR50D",
-            "tokenizer_path" : "facebook/esm2_t33_650M_UR50D" }.
+            top_k (int): The number of top mutations to consider.
         """
-        self.load_mutation_model = Unmasker(mutation_model_parameters)
-
-
-class MutationGeneratorLanguageModeling(MutationGenerator):
-    def __init__(
-        self,
-        sequence: str,
-        mutation_object: MutationLanguageModel,
-        top_k: int = 2,
-        maximum_number_of_mutations: int = 4,
-    ) -> None:
-        """Language model mutations generator
-
-        Args:
-            sequence (str): An amino acid sequence.
-            mutation_object (MutationLanguageModel): A mutation object.
-            top_k (int): Number of alternatives for each replacement. Defaults to 2.
-            maximum_number_of_mutations (int): Maximum number of mutations. Defaults to 4.
-        """
-        super().__init__(sequence)
-        self.sequence_length = len(sequence)
-        self.mutation_object = mutation_object
         self.top_k = top_k
-        self.maximum_number_of_mutations = maximum_number_of_mutations
 
-    def get_mutations(self, number_of_mutated_sequences: int = 1) -> List[str]:
-        """Get mutations.
+    def mutate(
+        self, sequence: str, num_mutations: int, intervals: List[List[int]]
+    ) -> List[str]:
+        """
+        Mutates a sequence within specified intervals using the model.
 
         Args:
-            number_of_mutated_sequences (int): Number of mutated sequences to return. Defaults to 1.
+            sequence (str): The original sequence to be mutated.
+            num_mutations (int): The number of mutations to introduce.
+            intervals (List[List[int]]): Intervals within the sequence
+            where mutations are allowed.
 
         Returns:
-            List[str]: Mutated sequence(s).
+            List[str]: A list of mutated sequences.
         """
-        output: List[str] = []
-        while len(output) < number_of_mutated_sequences:
 
-            tmp_sequence = list(self.sequence)
-
-            number_of_mutations = random.randint(1, self.maximum_number_of_mutations)
-            positions = sorted(
-                random.sample(range(self.sequence_length), number_of_mutations)
-            )
-
-            for pos in positions:
-                tmp_sequence[
-                    pos
-                ] = self.mutation_object.load_mutation_model.tokenizer.mask_token
-
-            tmp_masked_sequence = " ".join(tmp_sequence)
-
-            replacement_lst = self.mutation_object.load_mutation_model.unmask(
-                tmp_masked_sequence, self.top_k
-            )
-
-            if len(positions) > 1:
-                replacement_lst = list(map(list, zip(*replacement_lst)))
-
-                for replacement in replacement_lst:
-                    tmp_tokenized_sequence = list(self.sequence)
-                    for indx in range(len(replacement)):
-                        tmp_tokenized_sequence[positions[indx]] = replacement[indx]
-                    output.append("".join(tmp_tokenized_sequence))
-
-            else:
-                for i in range(len(replacement_lst[0])):
-                    tmp_tokenized_sequence = list(self.sequence)
-                    tmp_tokenized_sequence[positions[0]] = replacement_lst[0][i]
-                    output.append("".join(tmp_tokenized_sequence))
-
-        return output
-
-
-class MutationGeneratorTransitionMatrix(MutationGenerator):
-    def __init__(
-        self,
-        sequence: str,
-        mutation_object: Mutations,
-        maximum_number_of_mutations: int = 4,
-    ) -> None:
-        """Transition matrix mutations generator.
-
-        Args:
-            sequence (str): An amino acid sequence.
-            mutation_object (Mutations): A mutation object.
-            maximum_number_of_mutations (int): Maximum number of mutations. Defaults to 4.
-        """
-        super().__init__(sequence)
-        self.sequence_length = len(sequence)
-        self.mutation_object = mutation_object
-        self.maximum_number_of_mutations = maximum_number_of_mutations
-
-    def get_single_sequence_with_mutations(self) -> str:
-        """Mutate the sequence.
-
-        Returns:
-            str: Mutated sequence.
-        """
-        number_of_mutations = random.randint(1, self.maximum_number_of_mutations)
-        positions = sorted(
-            random.sample(range(self.sequence_length), number_of_mutations)
-        )
-        mutated_sequence = ""
-        start_position = -1
-        for position in positions:
-            mutated_sequence += self.sequence[(start_position + 1) : position]
-            mutated_sequence += self.mutation_object.mutate(self.sequence[position])
-            start_position = position
-        mutated_sequence += self.sequence[(start_position + 1) :]
-        return mutated_sequence
-
-    def get_mutations(self, number_of_mutated_sequences: int = 1) -> List[str]:
-        """Generate mutations.
-
-        Args:
-            number_of_mutated_sequences (int): Number of sequences to return. Defaults to 1.
-
-        Returns:
-            List[str]: Mutated sequence(s).
-        """
-        return [
-            self.get_single_sequence_with_mutations()
-            for _ in range(number_of_mutated_sequences)
+        flat_intervals = [
+            i for interval in intervals for i in range(interval[0], interval[1])
         ]
 
+        chosen_positions = random.sample(
+            flat_intervals, min(num_mutations, len(flat_intervals))
+        )
+        sequence_list = list(sequence)
 
-class MutationGeneratorFactory:
-    @staticmethod
-    def get_mutation_generator(
-        mutation_object: Union[Mutations, MutationLanguageModel],
-        sequence: str,
-        **mutation_object_parameters: int,
-    ) -> MutationGenerator:
-        """Get an instance of a mutation generator based on the mutation object.
+        for pos in chosen_positions:
+            sequence_list[pos] = self.mutation_model.tokenizer.mask_token
+
+        masked_sequence = " ".join(sequence_list)
+
+        return self.mutation_model.unmask(masked_sequence, self.top_k)
+
+
+class TransitionMatrixMutationStrategy(MutationStrategy):
+    """
+    Mutation strategy based on a transition matrix.
+    """
+
+    def __init__(self, transition_matrix: str):
+        """
+        Initializes the mutation strategy with a transition matrix.
 
         Args:
-            mutation_object (Union[Mutations, MutationLanguageModel]): Mutation object.
-            sequence (str): Amino acid sequence.
-            **mutation_object_parameters: Parameters for mutation object.
+            transition_matrix (str): Path to the CSV file containing
+            the transition matrix.
+        """
+        self.transition_matrix = pd.read_csv(
+            transition_matrix, index_col=None, header=0
+        )
+        self.top_k = 2
+
+    def set_top_k(self, top_k: int):
+        """
+        Sets the top k mutations to consider during mutation.
+
+        Args:
+            top_k (int): The number of top mutations to consider.
+        """
+
+        self.top_k = top_k
+
+    def mutate(
+        self, sequence: str, num_mutations: int, intervals: List[List[int]]
+    ) -> List[str]:
+        """
+        Mutates a sequence based on the transition matrix within
+        specified intervals.
+
+        Args:
+            sequence (str): The original sequence to be mutated.
+            num_mutations (int): The number of mutations to introduce.
+            intervals (List[List[int]]): Intervals within the sequence
+            where mutations are allowed.
 
         Returns:
-            MutationGenerator: Instance of mutation generator.
+            List[str]: A list of mutated sequences.
         """
-        mutation_generator: MutationGenerator
-        if isinstance(mutation_object, MutationLanguageModel):
-            mutation_generator = MutationGeneratorLanguageModeling(
-                sequence=sequence,
-                mutation_object=mutation_object,
-                top_k=mutation_object_parameters["top_k"],
-                maximum_number_of_mutations=mutation_object_parameters[
-                    "maximum_number_of_mutations"
-                ],
+        mutated_sequences = []
+        for interval in intervals:
+            start, end = interval
+            mutation_positions = sorted(
+                random.sample(range(start, end), min(num_mutations, end - start))
             )
-        elif isinstance(mutation_object, Mutations):
-            mutation_generator = MutationGeneratorTransitionMatrix(
-                sequence=sequence,
-                mutation_object=mutation_object,
-                maximum_number_of_mutations=mutation_object_parameters[
-                    "maximum_number_of_mutations"
-                ],
+
+            mutation_options = []
+            for pos in mutation_positions:
+                aa_probabilities = self.transition_matrix.iloc[pos]
+                top_mutations = aa_probabilities.nlargest(self.top_k).index.tolist()
+                mutation_options.append([(pos, aa) for aa in top_mutations])
+
+            for mutation_combination in iter_product(*mutation_options):
+                temp_sequence = list(sequence)
+                for pos, new_aa in mutation_combination:
+                    temp_sequence[pos] = new_aa
+                mutated_sequences.append("".join(temp_sequence))
+
+        return mutated_sequences
+
+
+class MutationFactory:
+    """
+    Factory class for creating mutation strategies based on configuration.
+    """
+
+    @staticmethod
+    def get_mutation_strategy(mutation_config: Dict[str, Any]):
+        """
+        Retrieves a mutation strategy based on the provided configuration.
+
+        Args:
+            mutation_config (Dict[str, Any]): Configuration specifying
+            the type of mutation strategy and its parameters.
+
+        Returns:
+            An instance of the specified mutation strategy.
+
+        Raises:
+            ValueError: If the mutation type is unsupported.
+            KeyError: If required configuration parameters are missing.
+        """
+        if mutation_config["type"] == "language-modeling":
+            mutation_model = MutationModelManager.load_model(
+                embedding_model_path=mutation_config["embedding_model_path"],
+                tokenizer_path=mutation_config["tokenizer_path"],
+                unmasking_model_path=mutation_config.get("unmasking_model_path"),
             )
+            return LanguageModelMutationStrategy(mutation_model)
+        elif mutation_config["type"] == "transition-matrix":
+            transition_matrix = mutation_config.get("transition_matrix")
+            if transition_matrix is None:
+                raise KeyError(
+                    "Transition matrix not provided in mutation configuration."
+                )
+            return TransitionMatrixMutationStrategy(transition_matrix)
         else:
-            raise ValueError(
-                f"Mutations with type: {type(mutation_object)} not supported!"
-            )
-        return mutation_generator
+            raise ValueError("Unsupported mutation type")
 
 
-SUPPORTED_FEATURE_SET = {"substrate", "sequence", "product"}
-MUTATION_GENERATORS: Dict[str, Type[MutationGenerator]] = {
-    "transition-matrix": MutationGeneratorTransitionMatrix,
-    "language-modeling": MutationGeneratorLanguageModeling,
-}
+class SequenceMutator:
+    """
+    Class for mutating sequences using a specified strategy.
+    """
 
-CROSSOVER_GENERATOR: Dict[str, Callable[[str, str, float], Tuple[str, str]]] = {
-    "single_point": lambda a_sequence, another_sequence, _: CrossoverGenerator().single_point_crossover(
-        a_sequence, another_sequence
-    ),
-    "uniform": lambda a_sequence, another_sequence, probability: CrossoverGenerator(
-        probability
-    ).uniform_crossover(a_sequence, another_sequence),
-}
+    def __init__(self, sequence: str, mutation_config: Dict[str, Any]):
+        """
+        Initializes the mutator with a sequence and a mutation strategy.
 
-SELECTION_GENERATOR: Dict[str, Callable[[Any, Any], List[Any]]] = {
-    "generic": lambda scores, k: SelectionGenerator().selection(scores, k)
-}
+        Args:
+            sequence (str): The sequence to be mutated.
+            mutation_config (Dict[str, Any]): Configuration for
+            the mutation strategy.
+        """
+        self.sequence = sequence
+        self.mutation_strategy = MutationFactory.get_mutation_strategy(mutation_config)
+        self.top_k = 2
 
+    def set_top_k(self, top_k: int):
+        """
+        Sets the number of top mutations to consider in the mutation strategy.
 
-class Scorer:
-    def __init__(self, scorer_filepath: str):
-        self.scorer_filepath = scorer_filepath
-        self.scorer = load(scorer_filepath)
+        Args:
+            top_k (int): The number of top mutations to consider.
+        """
+        self.top_k = top_k
+        if isinstance(
+            self.mutation_strategy,
+            (LanguageModelMutationStrategy, TransitionMatrixMutationStrategy),
+        ):
+            self.mutation_strategy.set_top_k(top_k)
 
-    def predict_proba(self, feature_vector):
-        return self.scorer.predict_proba(feature_vector)
+    def get_mutations(
+        self,
+        num_sequences: int,
+        number_of_mutations: int,
+        intervals: List[Tuple[int, int]],
+        current_population: List[str],
+        already_evaluated_sequences: List[str],
+    ) -> List[str]:
+        """
+        Generates a set of mutated sequences.
+
+        Args:
+            num_sequences (int): Number of mutated sequences to generate.
+            number_of_mutations (int): Number of mutations to apply to
+            each sequence.
+            intervals (List[List[int]]): Intervals within the sequence
+            where mutations are allowed.
+            already_evaluated_sequences (List[str]): List of sequences
+            that have already been evaluated.
+
+        Returns:
+            List[str]: A list of mutated sequences.
+        """
+        max_mutations = min(len(self.sequence), number_of_mutations)
+        if len(current_population) < 1:
+            current_population.append(self.sequence)
+
+        random.shuffle(current_population)
+        mutated_sequences_set: List[str] = []
+
+        while len(mutated_sequences_set) < num_sequences:
+            for temp_sequence in current_population:
+                new_mutations = self.mutation_strategy.mutate(
+                    temp_sequence, max_mutations, intervals
+                )
+                filtered_mutations = [
+                    element
+                    for element in new_mutations
+                    if element not in already_evaluated_sequences
+                ]
+                if not filtered_mutations:
+                    break
+                mutated_sequences_set.extend(filtered_mutations)
+
+                if len(mutated_sequences_set) >= num_sequences:
+                    break
+        return random.sample(mutated_sequences_set, num_sequences)
 
 
 class EnzymeOptimizer:
-    """Optimize an enzyme to catalyze a reaction from substrate to product."""
+    """
+    Optimizes protein sequences based on interaction with
+    substrates and products.
+    """
 
     def __init__(
         self,
+        sequence: str,
+        protein_model: HFandTAPEModelUtility,
+        substrate_smiles: str,
+        product_smiles: str,
+        chem_model_path: str,
+        chem_tokenizer_path: str,
         scorer_filepath: str,
-        substrate: str,
-        product: str,
-        sequence: str,
-        protein_embedding: StringEmbedding = AutoModelFromHFEmbedding(
-            model_kwargs={
-                "model_path": "facebook/esm2_t33_650M_UR50D",
-                "tokenizer_path": "facebook/esm2_t33_650M_UR50D",
-                "cache_dir": "/dccstor/yna/.cache/",
-            }
-        ),
-        molecule_embedding: StringEmbedding = AutoModelFromHFEmbedding(
-            model_kwargs={
-                "model_path": "seyonec/ChemBERTa-zinc-base-v1",
-                "tokenizer_path": "seyonec/ChemBERTa-zinc-base-v1",
-                "cache_dir": "/dccstor/yna/.cache/",
-            }
-        ),
-        ordering: List[str] = ["substrate", "sequence", "product"],
-    ) -> None:
-        """Initialize the enzyme designer.
+        mutator: SequenceMutator,
+        intervals: List[Tuple[int, int]],
+        batch_size: int = 2,
+        top_k: int = 2,
+        selection_ratio: float = 0.5,
+        perform_crossover: bool = False,
+        crossover_type: str = "uniform",
+        minimum_interval_length: int = 8,
+        pad_intervals: bool = False,
+        concat_order=["sequence", "substrate", "product"],
+    ):
+        """
+        Initializes the optimizer with models, sequences, and
+        optimization parameters.
 
         Args:
-            scorer_filepath (str): Pickled scorer filepath.
-            substrate (str): Substrate SMILES.
-            product (str): Product SMILES.
-            sequence (str): AA sequence representing the enzyme to optimize.
-            protein_embedding (StringEmbedding, optional): Protein embedding class.
-            Defaults to esm2_t33_650M_UR50D.
-            molecule_embedding (StringEmbedding, optional): Molecule embedding class.
-            Defaults to ChemBERTa version 1.
-            ordering (List[str], optional): Ordering of the features for the scorer.
-            Defaults to ["substrate", "product", "sequence"].
-
-        Raises:
-            ValueError: Ordering provided is not feasible.
+            sequence (str): The initial protein sequence.
+            protein_model (HFandTAPEModelUtility): Model for
+            protein embeddings.
+            substrate_smiles (str): SMILES representation of
+            the substrate.
+            product_smiles (str): SMILES representation of the
+            product.
+            chem_model_path (str): Path to the chemical model.
+            chem_tokenizer_path (str): Path to the chemical tokenizer.
+            scorer_filepath (str): File path to the scoring model.
+            mutator (SequenceMutator): The mutator for generating
+            sequence variants.
+            intervals (List[List[int]]): Intervals for mutation.
+            batch_size (int): The number of sequences to process in one batch.
+            top_k (int): Number of top mutations to consider.
+            selection_ratio (float): Ratio of sequences to select
+            after scoring.
+            perform_crossover (bool): Flag to perform crossover operation.
+            crossover_type (str): Type of crossover operation.
+            minimum_interval_length (int): Minimum length of
+            mutation intervals.
+            pad_intervals (bool): Flag to pad the intervals.
+            concat_order (list): Order of concatenating embeddings.
         """
-        if len(set(ordering).intersection(SUPPORTED_FEATURE_SET)) < 3:
-            raise ValueError(
-                f"Ordering={ordering} should contain only the three admissible values: {sorted(list(SUPPORTED_FEATURE_SET))}"
-            )
-        else:
-            self._ordering = ordering
-        self.scorer_filepath = scorer_filepath
-        self.scorer = Scorer(scorer_filepath)
-        self.substrate = substrate
-        self.product = product
-
-        self.protein_embedding = protein_embedding
-        self.molecule_embedding = molecule_embedding
-        self.embedded_vectors = {
-            "substrate": self.molecule_embedding.embed([self.substrate]),
-            "product": self.molecule_embedding.embed([self.product]),
-        }
         self.sequence = sequence
-        self.sequence_length = len(sequence)
+        self.protein_model = protein_model
+        self.mutator = mutator
+        self.intervals = intervals
+        self.batch_size = batch_size
+        self.top_k = top_k
+        self.selection_ratio = selection_ratio
+        self.perform_crossover = perform_crossover
+        self.crossover_type = crossover_type
+        self.concat_order = concat_order
+        self.minimum_interval_length = minimum_interval_length
+        self.pad_intervals = pad_intervals
+        self.mutator.set_top_k(top_k)  # Set top_k for the mutation model
+        self.concat_order = concat_order
+        self.scorer = load(scorer_filepath)
 
-    def extract_fragment_embedding(
-        self, sequence: str, intervals: List[Tuple[int, int]]
-    ) -> np.ndarray:
-        """Extract the embeddings for each fragment in a sequence.
+        # Initialize chem_model for SMILES embeddings
+        self.chem_model = HFandTAPEModelUtility(chem_model_path, chem_tokenizer_path)
 
-        Args:
-            sequence (str): A sequence from which to extract the fragments.
-            intervals (List[Tuple[int, int]]): List of ranges in the sequence, zero-based.
-            The same interval is applied to all sequences.
+        # Compute embeddings for substrate and product
+        self.substrate_embedding = self.chem_model.embed([substrate_smiles])[0]
+        self.product_embedding = self.chem_model.embed([product_smiles])[0]
 
-        Returns:
-            np.ndarray: The mean embedding of the input sequence based on the intervals.
-        """
-        fragments: List[str] = []
-        for start, end in intervals:
-            size_fragment = end - start
-            fragments.append("".join(sequence[:size_fragment]))
-            sequence = sequence[size_fragment:]
-        sequence_embedding = np.array(
-            [self.protein_embedding.embed([fragment]) for fragment in fragments]
-        )
-        sequence_embedding = (
-            sequence_embedding / np.linalg.norm(sequence_embedding)
-        ).mean(axis=0)
+        # Initialize selection and crossover generators
+        self.selection_generator = SelectionGenerator()
+        self.crossover_generator = CrossoverGenerator()
 
-        return sequence_embedding
-
-    def score_sequence(
-        self,
-        sequence: str,
-        intervals: Optional[List[Tuple[int, int]]] = None,
-        fragment_embeddings: Optional[bool] = False,
-    ) -> float:
-        """Score a given sequence.
-
-        Args:
-            sequence (str): A sequence to score.
-            intervals (Optional[List[Tuple[int, int]]], optional): List of ranges in the sequence, zero-based.
-            fragment_embeddings (Optional[bool], optional): Set to True for fragment embeddings. Defaults to False.
-
-        Returns:
-            float: The score of the input sequence.
-        """
-        if fragment_embeddings and intervals is not None:
-            embedded_vectors = {
-                "sequence": self.extract_fragment_embedding(sequence, intervals)
-            }
+        # Process intervals
+        if intervals is None:
+            self.intervals = [(0, len(sequence))]
         else:
-            embedded_vectors = {"sequence": self.protein_embedding.embed([sequence])}
-        embedded_vectors.update(self.embedded_vectors)
-        feature_vector = np.concatenate(
-            [embedded_vectors[feature] for feature in self._ordering], axis=1
-        )
-        return self.scorer.predict_proba(feature_vector)[0][1]
-
-    def score_sequences(
-        self,
-        sequences: List[str],
-        intervals: Optional[List[Tuple[int, int]]] = None,
-        fragment_embeddings: Optional[bool] = False,
-    ) -> List[Dict[str, Any]]:
-        """Score a given list of sequences.
-
-        Args:
-            sequences (List[str]): A list of sequences to score.
-            intervals (Optional[List[Tuple[int, int]]], optional): List of ranges in the sequence, zero-based.
-            fragment_embeddings (Optional[bool], optional): Set to True for fragment embeddings. Defaults to False.
-
-        Returns:
-            List[Dict[str, Any]]: A list of dictionaries containing sequence-score pairs.
-        """
-        number_of_sequences = len(sequences)
-        embedded_matrices = {
-            "substrate": np.repeat(
-                self.embedded_vectors["substrate"], number_of_sequences, axis=0
-            ),
-            "product": np.repeat(
-                self.embedded_vectors["product"], number_of_sequences, axis=0
-            ),
-        }
-
-        if fragment_embeddings and intervals is not None:
-            embeddings = []
-            for sequence in sequences:
-                embeddings.append(self.extract_fragment_embedding(sequence, intervals))
-            embedded_matrices["sequence"] = np.array(embeddings)
-        else:
-            embedded_matrices["sequence"] = self.protein_embedding.embed(sequences)
-        feature_vector = np.concatenate(
-            [embedded_matrices[feature] for feature in self._ordering], axis=1
-        )
-        return [
-            {"sequence": sequence, "score": score}
-            for sequence, score in zip(
-                sequences, self.scorer.predict_proba(feature_vector)[:, 1]
-            )
-        ]
-
-    def sequence_generation(
-        self,
-        sequence_from_intervals: str,
-        mutation_object: MutationGenerator,
-        initial_population: List[str] = [],
-        number_of_samples_to_generate: int = 1,
-    ) -> List[str]:
-        """Generate sequences.
-
-        Args:
-            sequence_from_intervals (str): Original sequence extracted from intervals.
-            mutation_object (MutationGenerator): A mutation object.
-            initial_population (List[str], optional): List of initial samples. Defaults to [].
-            number_of_samples_to_generate (int, optional): Number of samples to generate. Defaults to 1.
-
-        Returns:
-            List[str]: A list of generated sequences.
-        """
-        lst_mutated_sequences: List[str] = []
-
-        if len(initial_population) >= 1:
-            for initial_sequence in initial_population:
-                mutation_object.sequence = initial_sequence
-                lst_mutated_sequences += mutation_object.get_mutations()
-
-            if number_of_samples_to_generate > len(lst_mutated_sequences):
-                mutation_object.sequence = sequence_from_intervals
-                lst_mutated_sequences += mutation_object.get_mutations(
-                    number_of_mutated_sequences=number_of_samples_to_generate
-                    - len(lst_mutated_sequences)
+            self.intervals = sanitize_intervals(intervals)
+            if pad_intervals:
+                self.intervals = sanitize_intervals_with_padding(
+                    self.intervals, minimum_interval_length, len(sequence)
                 )
-
-        else:
-            lst_mutated_sequences += mutation_object.get_mutations(
-                number_of_mutated_sequences=number_of_samples_to_generate
-            )
-
-        return list(set(lst_mutated_sequences))
-
-    def sequence_evaluation(
-        self,
-        original_sequence_score: float,
-        current_best_score: float,
-        mutated_sequences_range: List[str],
-        visited_sequences: set,
-        intervals: List[Tuple[int, int]],
-        batch_size: Optional[int] = None,
-    ) -> Tuple[Set[Any], List[Dict[str, Any]], List[Dict[str, Any]], float]:
-        """Evaluate sequences.
-
-        Args:
-            original_sequence_score (float): Score of the original sequence.
-            current_best_score (float): Score of the current best sequence.
-            mutated_sequences_range (List[str]): List of mutated sequences (concatenated fragments of sequences).
-            visited_sequences (set): Set of sequences already evaluated in past optimization steps.
-            intervals (List[Tuple[int, int]]): List of ranges in the sequence, zero-based.
-            batch_size (Optional[int], optional): Number of sequences to evaluate in one round.
-
-        Returns:
-            Tuple[Set[Any], List[Dict[str, Any]], List[Dict[str, Any]], float]: A tuple containing visited sequences, temporary results, temporary results for selection, and the current best score.
-        """
-        temporary_results: List[Dict[str, Any]] = []
-        temporary_results_for_selection: List[Dict[str, Any]] = []
-
-        if not batch_size:
-            batch_size = 8
-
-        lst_mutated_sequences: List[str] = []
-
-        for mutated_fragments in mutated_sequences_range:
-            mutated_sequence = reconstruct_sequence_with_mutation_range(
-                sequence=self.sequence,
-                mutated_sequence_range=mutated_fragments.strip(),
-                intervals=intervals,
-            )
-
-            if mutated_sequence not in visited_sequences:
-                visited_sequences.add(mutated_sequence)
-                lst_mutated_sequences.append(mutated_sequence)
-
-        for i in range(0, len(lst_mutated_sequences), batch_size):
-            for scored_sequence in self.score_sequences(
-                lst_mutated_sequences[i : i + batch_size]
-            ):
-                if scored_sequence["score"] > original_sequence_score:
-                    temporary_results_for_selection.append(scored_sequence)
-                    temporary_results.append(scored_sequence)
-                    if scored_sequence["score"] > current_best_score:
-                        current_best_score = scored_sequence["score"]
-                else:
-                    temporary_results.append(scored_sequence)
-
-        return (
-            visited_sequences,
-            temporary_results,
-            temporary_results_for_selection,
-            current_best_score,
-        )
-
-    def selection_crossover(
-        self,
-        sequence_from_intervals: str,
-        tmp_results: List[Dict[str, Any]],
-        intervals: List[Tuple[int, int]],
-        selection_method: str,
-        crossover_method: str,
-        crossover_probability: float = 0.5,
-        top_k_selection: Optional[int] = -1,
-    ) -> List[str]:
-        """Perform Selection and Crossover.
-
-        Args:
-            sequence_from_intervals (str): Original sequence extracted from intervals.
-            tmp_results (List[Dict[str, Any]]): The temporary results.
-            intervals (List[Tuple[int, int]]): List of ranges in the sequence, zero-based.
-            selection_method (str): Methodology used for selection.
-            crossover_method (str): Methodology used for crossover.
-            crossover_probability (float, optional): Crossover probability. Used in case Uniform crossover is selected. Defaults to 0.5.
-            top_k_selection (Optional[int], optional): Number of samples to select. Defaults to -1.
-
-        Returns:
-            List[str]: New samples for the next round of optimization.
-        """
-        crossover: Optional[
-            Callable[[str, str, float], Tuple[str, str]]
-        ] = CROSSOVER_GENERATOR.get(crossover_method)
-        selection: Optional[Callable[[Any, Any], List[Any]]] = SELECTION_GENERATOR.get(
-            selection_method
-        )
-
-        if crossover is None:
-            raise ValueError(f"Invalid crossover method: {crossover_method}")
-        if selection is None:
-            raise ValueError(f"Invalid selection method: {selection_method}")
-
-        selected_children = selection(tmp_results, top_k_selection)
-
-        children: List[str] = []
-        for pos in range(len(selected_children)):
-            selected_child_mutated_fragments = "".join(
-                [self.sequence[start:end] for start, end in intervals]
-            )
-
-            if crossover_method == "uniform":
-                new_child_1, new_child_2 = crossover(
-                    selected_child_mutated_fragments,
-                    sequence_from_intervals,
-                    crossover_probability,
-                )
-            else:
-                new_child_1, new_child_2 = crossover(
-                    selected_child_mutated_fragments, sequence_from_intervals, 1
-                )
-
-            children.append(new_child_1)
-            children.append(new_child_2)
-
-        return list(set(children))
 
     def optimize(
         self,
-        number_of_mutations: int,
-        intervals: List[Tuple[int, int]] = None,
-        number_of_steps: int = 10,
-        batch_size: int = 8,
-        full_sequence_embedding: bool = True,
-        number_of_sequences: Optional[int] = None,
-        seed: int = 42,
-        minimum_interval_length: int = 8,
-        time_budget: Optional[int] = None,
-        mutation_generator: Optional[str] = "transition-matrix",
-        mutation_generator_parameters: Dict[str, Any] = {
-            "mutation_object": Mutations,
-            "maximum_number_of_mutations": 4,
-        },
-        top_k: Optional[int] = 2,
-        pad_intervals: Optional[bool] = False,
-        population_per_iteration: Optional[int] = None,
-        with_genetic_algorithm: Optional[bool] = False,
-        selection_method: str = "generic",
-        top_k_selection: Optional[int] = None,
-        crossover_method: str = "single_point",
-        crossover_probability: float = 0.5,
-    ) -> List[Dict[str, Any]]:
-        """Optimize the enzyme given a number of mutations and a range.
-        If the range limits are not provided, the full sequence is optimized, which might be inefficient.
-        The sampling is performed by exploring mutations with a slightly smart random sampling.
+        num_iterations: int,
+        num_sequences: int,
+        num_mutations: int,
+        time_budget: Optional[int] = 50000,
+    ):
+        """
+        Runs the optimization process over a specified number
+        of iterations.
 
         Args:
-            number_of_mutations (int): Number of allowed mutations.
-            intervals (List[Tuple[int, int]], optional): List of ranges in the sequence, zero-based. Defaults to None (optimize the full sequence).
-            number_of_steps (int, optional): Number of optimization steps. Defaults to 10.
-            batch_size (int, optional): Number of sequences to embed together. Defaults to 8.
-            full_sequence_embedding (bool, optional): Perform embeddings with respect to the full sequence. Defaults to True. False = respect to intervals fragments.
-            number_of_sequences (Optional[int], optional): Number of optimal sequences to return. Defaults to None (returns all).
-            seed (int, optional): Seed for random number generation. Defaults to 42.
-            minimum_interval_length (int, optional): Minimum length per interval in case full_sequence_embedding=True. Defaults to 8.
-            time_budget (Optional[int], optional): Maximum allowed runtime in seconds. Defaults to None (no time limit, running for number_of_steps steps).
-            mutation_generator (str, optional): Type of mutation generation. Defaults to "transition-matrix".
-            mutation_generator_parameters (Dict[str, Any], optional): Mutation generation parameters. Defaults to uniform sampling of IUPAC AAs.
-            top_k (Optional[int], optional): How many suggested AAs to accept. Defaults to top 2.
-            pad_intervals (Optional[bool], optional): If True, in case a fragment of sequence has length < 8: it's padded to a length of at least 8.
-            population_per_iteration (Optional[int], optional): Number of sample sequences per optimization step.
-            with_genetic_algorithm (Optional[bool], optional): Optimize using a genetic algorithm.
-            selection_method (str, optional): Methodology used for selection in case of genetic algorithm optimization. Defaults to "generic".
-            top_k_selection (Optional[int], optional): Number of suggested mutants per amino acid to consider.
-            crossover_method (str, optional): Crossover method selection. Options are "single_point" or "uniform". Defaults to "single_point".
-            crossover_probability (float, optional): Crossover probability in case of uniform crossover method. Defaults to 0.5.
+            num_iterations (int): Number of iterations to run
+            the optimization.
+            num_sequences (int): Number of sequences to generate
+            per iteration.
+            num_mutations (int): Number of mutations to apply.
+            time_budget (Optional[int]): Time budget for
+            optimizer (in seconds).
 
         Returns:
-            List[Dict[str, Any]]: A list of dictionaries containing a candidate optimal sequence and the related score. Sorted from best to worst.
-            Note that when no limit on the returned number of sequences is set, the worst sequence is the original unmutated sequence.
-            If the optimization fails, only the original sequence is returned.
+            A tuple containing the list of all sequences and
+            iteration information.
         """
+        current_population: List[str] = []
+        iteration_info = {}
 
-        random.seed(seed)
-        # check if interval is None. In case it is, take the interval as the whole sequence
-        if intervals is None:
-            intervals = [(0, self.sequence_length)]
-        else:
-            intervals = sanitize_intervals(
-                intervals
-            )  # here we merge and sort the intervals
-
-        # pad the sequences to a minimum length of 8
-        if pad_intervals:
-            intervals = sanitize_intervals_with_padding(
-                intervals=intervals,
-                max_value=self.sequence_length,
-                pad_value=minimum_interval_length,
-            )
-
-        # check that the intervals are within the range of the sequence length
-        if intervals[-1][1] > self.sequence_length:
-            raise ValueError(
-                "Check provided intervals; at least one interval is larger than the sequence length."
-            )
-
-        # mutate the sequence based on intervals
-        self.maximum_number_of_mutations = number_of_mutations
-
-        if self.maximum_number_of_mutations > self.sequence_length:
-            logger.warning(
-                f"Resetting maximum number of mutations ({self.maximum_number_of_mutations}), as it is higher than sequence length: {self.sequence_length}"
-            )
-            self.maximum_number_of_mutations = self.sequence_length
-        if self.maximum_number_of_mutations < 1:
-            logger.warning(
-                f"Maximum number of mutations cannot be lower than 1 ({self.maximum_number_of_mutations}), resetting to 1."
-            )
-            self.maximum_number_of_mutations = 1
-
-        logger.info(
-            f"Maximum number of mutations for the intervals: {self.maximum_number_of_mutations}"
-        )
-
-        # Check if population size is set
-        if not population_per_iteration:
-            population_per_iteration = batch_size
-
-        # Create a sequence based on the intervals
-        sequence_from_intervals = "".join(
-            [self.sequence[start:end] for start, end in intervals]
-        )
-
-        if isinstance(mutation_generator, str):
-            mutation_generator_type = MUTATION_GENERATORS[mutation_generator]
-        else:
-            raise ValueError(
-                f"Mutation generator with type: {type(mutation_generator_type)} not supported!"
-            )
-
-        if mutation_generator == "language-modeling":
-            mutation_generator_parameters["top_k"] = top_k
-            del mutation_generator_parameters["maximum_number_of_mutations"]
-
-        Mutation_Generator = mutation_generator_type(
-            sequence=sequence_from_intervals, **mutation_generator_parameters
-        )
-
-        if full_sequence_embedding:
-            scored_original_sequence: Dict[Any, Any] = {
-                "score": float(self.score_sequence(self.sequence)),
-                "sequence": self.sequence,
-            }
-        else:
-            scored_original_sequence = {
-                "score": float(
-                    self.score_sequence(
-                        self.sequence, intervals=intervals, fragment_embeddings=True
-                    )
-                ),
-                "sequence": self.sequence,
-            }
-
+        scored_original_sequence = self.score_sequence(self.sequence)
         original_sequence_score_ = scored_original_sequence["score"]
 
         logger.info(f"Original sequence score: {original_sequence_score_}")
-        results: List[Dict[str, Any]] = [scored_original_sequence]
 
-        visited_sequences: Set[str] = set()
-        start_time = time.time()
-
-        population: List[str] = []
+        all_mutated_sequences: List[str] = [scored_original_sequence["sequence"]]
         current_best_score = original_sequence_score_
-        for step in range(number_of_steps):
-            logger.info(f"Optimization step={step + 1}")
 
-            (
-                updated_visited_sequences,
-                temporary_results,
-                temporary_results_for_selection,
-                new_current_best_score,
-            ) = self.sequence_evaluation(
-                original_sequence_score=original_sequence_score_,
-                current_best_score=current_best_score,
-                mutated_sequences_range=self.sequence_generation(
-                    sequence_from_intervals=sequence_from_intervals,
-                    mutation_object=Mutation_Generator,
-                    initial_population=population,
-                    number_of_samples_to_generate=population_per_iteration,
-                ),
-                visited_sequences=visited_sequences,
-                intervals=intervals,
-                batch_size=batch_size,
-            )
+        all_scored_sequences: List[Dict[str, Any]] = []
 
-            current_best_score = new_current_best_score
-            visited_sequences = updated_visited_sequences
-            results += temporary_results
+        for iteration in range(num_iterations):
+            start_time = time.time()
 
-            if with_genetic_algorithm:
-                population = self.selection_crossover(
-                    sequence_from_intervals,
-                    temporary_results_for_selection,
-                    intervals=intervals,
-                    selection_method=selection_method,
-                    top_k_selection=top_k_selection,
-                    crossover_method=crossover_method,
-                    crossover_probability=crossover_probability,
-                )
-
-            logger.info(
-                f"Best score at step={step + 1}: {current_best_score}. Elapsed time: {int(time.time() - start_time)}s"
-            )
-            elapsed_time = int(time.time() - start_time)
-            if time_budget is not None:
-                if elapsed_time > time_budget:
-                    logger.warning(
-                        f"Used all the given time budget of {time_budget}s, exiting optimization loop"
+            scored_sequences: List[Dict[str, Any]] = [scored_original_sequence]
+            # Generate or use the existing population
+            if iteration > 0 and current_population:
+                all_mutated_sequences = current_population
+                for _ in range(0, len(all_mutated_sequences), self.batch_size):
+                    batch_sequences = self.mutator.get_mutations(
+                        self.batch_size,
+                        num_mutations,
+                        self.intervals,
+                        current_population,
+                        all_mutated_sequences,
                     )
-                    break
+                    scored_sequences.extend(self.score_sequences(batch_sequences))
+                    all_mutated_sequences.extend(batch_sequences)
+            else:
+                for _ in range(0, num_sequences, self.batch_size):
+                    batch_sequences = self.mutator.get_mutations(
+                        self.batch_size,
+                        num_mutations,
+                        self.intervals,
+                        current_population,
+                        all_mutated_sequences,
+                    )
+                    if len(batch_sequences) == 1:
+                        scored_sequences.append(self.score_sequence(batch_sequences[0]))
 
-        logger.info(
-            f"Optimization completed, visiting {len(visited_sequences)} mutated sequences"
+                    elif len(batch_sequences) > 1:
+                        scored_sequences.extend(self.score_sequences(batch_sequences))
+                    else:
+                        continue
+                    all_mutated_sequences.extend(batch_sequences)
+            all_scored_sequences.extend(scored_sequences)
+
+            if self.selection_ratio < 1.0:
+                selected_sequences = self.selection_generator.selection(
+                    scored_sequences, self.selection_ratio
+                )
+            else:
+                selected_sequences = scored_sequences
+
+            offspring_sequences = []
+            if self.perform_crossover and len(selected_sequences) > 1:
+                for i in range(0, len(selected_sequences), 2):
+                    if i + 1 < len(selected_sequences):
+                        parent1 = selected_sequences[i]["sequence"]
+                        parent2 = selected_sequences[i + 1]["sequence"]
+                        if self.crossover_type == "single_point":
+                            (
+                                offspring1,
+                                offspring2,
+                            ) = self.crossover_generator.sp_crossover(parent1, parent2)
+                        else:
+                            (
+                                offspring1,
+                                offspring2,
+                            ) = self.crossover_generator.uniform_crossover(
+                                parent1, parent2
+                            )
+                        offspring_sequences.extend([offspring1, offspring2])
+
+            current_population = [
+                seq["sequence"] for seq in selected_sequences
+            ] + offspring_sequences
+
+            # Update best sequences and count higher scoring sequences
+            higher_scoring_sequences = 0
+            best_seq = ""
+            for temp_seq in scored_sequences:
+                if temp_seq["score"] > current_best_score:
+                    current_best_score = temp_seq["score"]
+                    higher_scoring_sequences += 1
+                    best_seq = temp_seq["sequence"]
+
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            iteration_info[iteration + 1] = {
+                "best_score": current_best_score,
+                "higher_scoring_sequences": higher_scoring_sequences,
+                "elapsed_time": elapsed_time,
+                "best_sequence": best_seq,
+            }
+            logger.info(
+                f"Iteration {iteration + 1}: Best Score: {current_best_score},"
+                f"Higher Scoring Sequences: {higher_scoring_sequences}, "
+                f"Time: {elapsed_time} seconds"
+            )
+            if time_budget is not None and elapsed_time > time_budget:
+                logger.warning(f"Used all the given time budget of {time_budget}s")
+                break
+
+        all_scored_sequences = sorted(
+            all_scored_sequences, key=lambda x: x["score"], reverse=True
         )
-        sorted_results = sorted(
-            results, key=lambda result: result["score"], reverse=True
-        )[:number_of_sequences]
+        return all_scored_sequences, iteration_info
 
-        return sorted_results
+    def score_sequence(self, sequence: str) -> Dict[str, Any]:
+        """
+        Scores a single protein sequence.
+
+        Args:
+            sequence (str): The protein sequence to score.
+
+        Returns:
+            float: The score of the sequence.
+        """
+        sequence_embedding = self.protein_model.embed([sequence])[0]
+        embeddings = [
+            sequence_embedding,
+            self.substrate_embedding,
+            self.product_embedding,
+        ]
+        ordered_embeddings = [
+            embeddings[self.concat_order.index(item)] for item in self.concat_order
+        ]
+        combined_embedding = np.concatenate(ordered_embeddings)
+        combined_embedding = combined_embedding.reshape(1, -1)
+
+        score = self.scorer.predict_proba(combined_embedding)[0][1]
+        return {"sequence": sequence, "score": score}
+
+    def score_sequences(self, sequences: List[str]) -> List[Dict[str, float]]:
+        """
+        Scores a list of protein sequences.
+
+        Args:
+            sequences (List[str]): The list of protein sequences to score.
+
+        Returns:
+            List[Dict[str, float]]: A list of dictionaries
+            containing sequences and their scores.
+        """
+        sequence_embeddings = self.protein_model.embed(sequences)
+
+        output = []
+        for position in range(len(sequence_embeddings)):
+            sequence_embedding = sequence_embeddings[position]
+            embeddings = [
+                sequence_embedding,
+                self.substrate_embedding,
+                self.product_embedding,
+            ]
+            ordered_embeddings = [
+                embeddings[self.concat_order.index(item)] for item in self.concat_order
+                ]
+            combined_embedding = np.concatenate(ordered_embeddings)
+            combined_embedding = combined_embedding.reshape(1, -1)
+
+            score = self.scorer.predict_proba(combined_embedding)[0][1]
+            output.append({"sequence": sequences[position], "score": score})
+
+        return output

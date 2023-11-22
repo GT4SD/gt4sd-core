@@ -22,31 +22,47 @@
 # SOFTWARE.
 #
 """Enzeptional processing tests."""
-
 from gt4sd.frameworks.enzeptional.processing import (
-    reconstruct_sequence_with_mutation_range,
+    ModelCache,
+    get_device,
+    mutate_sequence_with_variant,
     sanitize_intervals,
     sanitize_intervals_with_padding,
+    reconstruct_sequence_with_mutation_range,
 )
+import torch
+import pytest
 
 
-def test_sanitize_intervals():
-    assert sanitize_intervals([(-5, 12), (13, 14), (2, 3), (-3, 4), (-2, 6)]) == [
-        (-5, 12),
-        (13, 14),
-    ]
+
+def test_add_and_get_model():
+    model_cache = ModelCache()
+    test_model = torch.nn.Module()
+    model_cache.add("test_model", test_model)
+    retrieved_model = model_cache.get("test_model")
+    assert test_model == retrieved_model
 
 
-def test_sanitize_intervals_padding():
-    assert sanitize_intervals_with_padding(
-        [(13, 14), (44, 45)], pad_value=8, max_value=50
-    ) == [(10, 17), (41, 48)]
+class TestUtilityFunctions:
+    def test_get_device(self):
+        expected_device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        assert str(get_device()) == expected_device
 
+    def test_sanitize_intervals(self):
+        intervals = [(1, 3), (2, 5), (6, 8)]
+        sanitized = sanitize_intervals(intervals)
+        assert sanitized == [(1, 5), (6, 8)]
 
-def test_reconstruct_sequence_with_mutation_range():
-    assert (
-        reconstruct_sequence_with_mutation_range(
-            "ABCDEFGHILMNOPQRSTUVWXYZ", "12789", [(0, 1), (6, 8)]
+    def test_sanitize_intervals_with_padding(self):
+        intervals = [(1, 3), (6, 8)]
+        padded_intervals = sanitize_intervals_with_padding(intervals, 8, 50)
+        assert padded_intervals == [(0, 11)]
+
+    def test_reconstruct_sequence_with_mutation_range(self):
+        original_sequence = "AACCGGTT"
+        mutation_range = "NNNN"
+        intervals = [(2, 4), (6, 8)]
+        reconstructed = reconstruct_sequence_with_mutation_range(
+            original_sequence, mutation_range, intervals
         )
-        == "12CDEF789LMNOPQRSTUVWXYZ"
-    )
+        assert reconstructed == "AANNGGNN"
