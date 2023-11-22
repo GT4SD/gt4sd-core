@@ -191,7 +191,7 @@ class PaccMannGPGenerator(AlgorithmConfiguration[SMILES, Any]):
     seed: int = field(
         default=42,
         metadata=dict(
-            description="Seed used for random number generation in the optimizer."
+            description="Seed used for random number generation in the optimizer. Set to -1 for no seed."
         ),
     )
     number_of_optimization_rounds: int = field(

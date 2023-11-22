@@ -6,8 +6,8 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Contributions](https://img.shields.io/badge/contributions-welcome-blue)](https://github.com/GT4SD/gt4sd-core/blob/main/CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/website-live-brightgreen)](https://gt4sd.github.io/gt4sd-core/)
-[![Total downloads](https://pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd)
-[![Monthly downloads](https://pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd)
+[![Total downloads](https://static.pepy.tech/badge/gt4sd)](https://pepy.tech/project/gt4sd)
+[![Monthly downloads](https://static.pepy.tech/badge/gt4sd/month)](https://pepy.tech/project/gt4sd)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/GT4SD/gt4sd-core/main)
 [![DOI](https://zenodo.org/badge/458309249.svg)](https://zenodo.org/badge/latestdoi/458309249)
 [![2022 IEEE Open Software Services Award](https://img.shields.io/badge/Award-2022%20IEEE%20Open%20Software%20Services%20Award-yellow)](https://conferences.computer.org/services/2022/awards/oss_award.html)
@@ -39,26 +39,17 @@ The recommended way to install the `gt4sd` is to create a dedicated conda enviro
 ```sh
 git clone https://github.com/GT4SD/gt4sd-core.git
 cd gt4sd-core/
-conda env create -f conda.yml
+conda env create -f conda.yml 
 conda activate gt4sd
-```
-
-**Note:** by default `gt4sd` is installed with CPU requirements on linux systems. If you have GPU available, run:
-
-```sh
-git clone https://github.com/GT4SD/gt4sd-core.git
-cd gt4sd-core/
-conda env create -f conda_gpu.yml
-conda activate gt4sd
-```
-
-And install the package via `pip` from [PyPI](https://pypi.org/project/gt4sd/):
-
-```sh
 pip install gt4sd
 ```
 
-**NOTE:** In case you want to reuse an existing compatible environment (see [requirements](#requirements)), you can use `pip`, but as of now (:eyes: on [issue](https://github.com/GT4SD/gt4sd-core/issues/31) for changes), some dependencies require installation from GitHub, so for a complete setup install them with:
+**NOTE 1:** By default `gt4sd` is installed with CPU requirements. For GPU usage replace `conda env create -f conda.yml` with:
+```sh
+conda env create -f conda_gpu.yml
+```
+
+**NOTE 2:** In case you want to reuse an existing compatible environment (see [requirements](#requirements)), you can use `pip`, but as of now (:eyes: on [issue](https://github.com/GT4SD/gt4sd-core/issues/31) for changes), some dependencies require installation from GitHub, so for a complete setup install them with:
 
 ```sh
 pip install -r vcs_requirements.txt

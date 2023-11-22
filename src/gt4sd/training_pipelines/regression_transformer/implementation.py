@@ -68,9 +68,9 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
     ) -> None:
         """Generic training function for training a Regression Transformer (RT) model.
            For details see:
-            Born, J., & Manica, M. (2022). Regression Transformer: Concurrent Conditional
-            Generation and Regression by Blending Numerical and Textual Tokens.
-            `ICLR Workshop on Machine Learning for Drug Discovery`.
+            Born, J., & Manica, M. (2023). Regression Transformer enables concurrent sequence
+            regression and generation for molecular language modelling.
+            `Nature Machine Intelligence`, 5(4), 432-444.
 
         Args:
             training_args: training arguments passed to the configuration.
@@ -78,7 +78,6 @@ class RegressionTransformerTrainingPipeline(TrainingPipeline):
             dataset_args: dataset arguments passed to the configuration.
         """
         try:
-
             params = {**training_args, **dataset_args, **model_args}
             # Setup logging
             logging.basicConfig(
