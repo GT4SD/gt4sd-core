@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2023 GT4SD team
+# Copyright (c) 2024 GT4SD team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,9 @@
 #
 from abc import ABC
 import torch
+import torch
 import numpy as np
+from typing import Any, Dict, List, Optional, Tuple, Union
 from typing import Any, Dict, List, Optional, Tuple, Union
 from tape.datasets import pad_sequences
 from tape.registry import registry
@@ -38,6 +40,7 @@ import math
 import random
 import logging
 from itertools import product as iter_product
+from gt4sd.frameworks.torch import get_device
 
 
 logging.basicConfig(level=logging.INFO)
@@ -61,8 +64,19 @@ class ModelCache:
     def get(self, key):
         """
         Retrieves a model from the cache using the given key.
+        """
+    def __init__(self):
+        """
+        Initializes the cache as an empty dictionary.
+        """
+        self.cache = {}
+
+    def get(self, key):
+        """
+        Retrieves a model from the cache using the given key.
 
         Args:
+            key: The key used to store the model.
             key: The key used to store the model.
 
         Returns:
@@ -81,24 +95,7 @@ class ModelCache:
         self.cache[key] = model
 
 
-model_cache = ModelCache()
-
-
-def get_device(device: Optional[Union[torch.device, str]] = None) -> torch.device:
-    """
-    Determines the appropriate torch device for computations.
-
-    Args:
-        device (Optional[Union[torch.device, str]]): The desired device
-        'cpu' or 'cuda:0'). If None,
-        automatically selects the device.
-
-    Returns:
-        torch.device: The determined torch device for computations.
-    """
-    return torch.device(
-        "cuda:0" if torch.cuda.is_available() and device != "cpu" else "cpu"
-    )
+ENZEPTIONAL_MODEL_CACHE = ModelCache()
 
 
 class StringEmbedding(ABC):
@@ -112,22 +109,25 @@ class StringEmbedding(ABC):
     model: Any
 
     def embed(self, samples: List[str]) -> np.ndarray:
-        """
-        Abstract method for embedding a list of string samples.
+        """Abstract method for embedding a list of string samples.
 
         Args:
             samples (List[str]): The list of strings to be embedded.
 
+        Raises:
+            NotImplementedError: If the method is not implemented in the subclass.
+
         Returns:
             np.ndarray: The resulting embeddings as a NumPy array.
-
-        Raises:
-            NotImplementedError: If the method is not implemented in
-            the subclass.
         """
         raise NotImplementedError
 
 
+class HFandTAPEModelUtility(StringEmbedding):
+    """
+    Utility class for handling both Hugging Face and TAPE models for embedding
+    and unmasking tasks.
+    """
 class HFandTAPEModelUtility(StringEmbedding):
     """
     Utility class for handling both Hugging Face and TAPE models for embedding
@@ -140,28 +140,29 @@ class HFandTAPEModelUtility(StringEmbedding):
         tokenizer_path: str,
         unmasking_model_path: Optional[str] = None,
         is_tape_model: bool = False,
+        embedding_model_path: str,
+        tokenizer_path: str,
+        unmasking_model_path: Optional[str] = None,
+        is_tape_model: bool = False,
         device: Optional[Union[torch.device, str]] = None,
         cache_dir: Optional[str] = None,
+        cache_dir: Optional[str] = None,
     ) -> None:
-        """
-        Initializes the utility with specified model and tokenizer paths.
+        """Initializes the utility with specified model and tokenizer paths.
 
         Args:
-            embedding_model_path (str): Path to the embedding
-            model.
+            embedding_model_path (str): Path to the embedding model.
             tokenizer_path (str): Path to the tokenizer.
-            unmasking_model_path (Optional[str]): Path to the
-            unmasking model, if applicable.
-            is_tape_model (bool): Flag to indicate if a TAPE
-            model is being used.
-            device (Optional[Union[torch.device, str]]): The
-            compute device to use ('cpu' or 'cuda:0').
+            unmasking_model_path (Optional[str], optional): Path to the unmasking model, if applicable. Defaults to None.
+            is_tape_model (bool, optional): Flag to indicate if a TAPE model is being used. Defaults to False.
+            device (Optional[Union[torch.device, str]], optional): The compute device to use ('cpu' or 'cuda:0'). Defaults to None.
+            cache_dir (Optional[str], optional): Path to cache directory. Defaults to None.
         """
-        self.device = get_device(device)
+        self.device = get_device()
         self.is_tape_model = is_tape_model
 
         embedding_cache_key = f"embedding_{embedding_model_path}"
-        self.embedding_model = model_cache.get(embedding_cache_key)
+        self.embedding_model = ENZEPTIONAL_MODEL_CACHE.get(embedding_cache_key)
         if not self.embedding_model:
             if is_tape_model:
                 self.embedding_model = registry.get_task_model(
@@ -188,11 +189,11 @@ class HFandTAPEModelUtility(StringEmbedding):
                         .eval()
                     )
 
-                model_cache.add(embedding_cache_key, self.embedding_model)
+                ENZEPTIONAL_MODEL_CACHE.add(embedding_cache_key, self.embedding_model)
 
         if unmasking_model_path is not None:
             unmasking_cache_key = f"unmasking_{unmasking_model_path}"
-            self.unmasking_model = model_cache.get(unmasking_cache_key)
+            self.unmasking_model = ENZEPTIONAL_MODEL_CACHE.get(unmasking_cache_key)
             if not self.unmasking_model:
                 if cache_dir:
                     self.unmasking_model = (
@@ -211,7 +212,7 @@ class HFandTAPEModelUtility(StringEmbedding):
                         .to(self.device)
                         .eval()
                     )
-                model_cache.add(unmasking_cache_key, self.unmasking_model)
+                ENZEPTIONAL_MODEL_CACHE.add(unmasking_cache_key, self.unmasking_model)
         else:
             logger.error("No Unmasking model loaded. Check you model inputs")
 
@@ -221,34 +222,32 @@ class HFandTAPEModelUtility(StringEmbedding):
             self.tokenizer = self._load_tokenizer(tokenizer_path)
 
     def _load_tokenizer(self, tokenizer_path: str):
-        """
-        Loads a tokenizer based on the given path, caching it for future use.
+        """Loads a tokenizer based on the given path, caching it for future use.
 
         Args:
             tokenizer_path (str): Path to the tokenizer.
 
         Returns:
-            The loaded tokenizer.
+            The loaded tokenizer
         """
         tokenizer_cache_key = f"tokenizer_{tokenizer_path}"
-        tokenizer = model_cache.get(tokenizer_cache_key)
+        tokenizer = ENZEPTIONAL_MODEL_CACHE.get(tokenizer_cache_key)
         if not tokenizer:
             try:
                 tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
             except Exception:
                 tokenizer = T5Tokenizer.from_pretrained(tokenizer_path)
-            model_cache.add(tokenizer_cache_key, tokenizer)
+            ENZEPTIONAL_MODEL_CACHE.add(tokenizer_cache_key, tokenizer)
         return tokenizer
 
     def embed(self, samples: List[str]) -> np.ndarray:
-        """
-        Embeds a list of samples using either TAPE or Hugging Face models.
+        """Embeds a list of samples using either TAPE or Hugging Face models.
 
         Args:
             samples (List[str]): List of strings to be embedded.
 
         Returns:
-            np.ndarray: The resulting embeddings as a NumPy array.
+            np.ndarray: The resulting embeddings.
         """
         if self.is_tape_model:
             return self._embed_tape(samples)
@@ -256,14 +255,14 @@ class HFandTAPEModelUtility(StringEmbedding):
             return self._embed_huggingface(samples)
 
     def _embed_tape(self, samples: List[str]) -> np.ndarray:
-        """
-        Embeds samples using a TAPE model.
+        """mbeds samples using a TAPE model.
 
         Args:
             samples (List[str]): List of strings to be embedded.
+            samples (List[str]): List of strings to be embedded.
 
         Returns:
-            np.ndarray: The resulting embeddings as a NumPy array.
+            np.ndarray: The resulting embeddings.
         """
         token_ids: Dict[str, Any] = {"ids": [], "mask": []}
         for sequence in samples:
@@ -293,15 +292,29 @@ class HFandTAPEModelUtility(StringEmbedding):
         )
 
     def _embed_huggingface(self, samples: List[str]) -> np.ndarray:
-        """
-        Embeds samples using a Hugging Face model.
+        """Embeds samples using a Hugging Face model.
 
         Args:
             samples (List[str]): List of strings to be embedded.
+            samples (List[str]): List of strings to be embedded.
 
         Returns:
-            np.ndarray: The resulting embeddings as a NumPy array.
+            np.ndarray: The resulting embeddings.
         """
+        inputs = self.tokenizer(
+            samples,
+            add_special_tokens=True,
+            padding=True,
+            return_tensors="pt",
+        )
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+
+        with torch.no_grad():
+            outputs = self.embedding_model(**inputs)
+            sequence_embeddings = outputs[0].cpu().detach().numpy()
+
+        sequence_lengths = inputs["attention_mask"].sum(1)
+
         inputs = self.tokenizer(
             samples,
             add_special_tokens=True,
@@ -321,21 +334,35 @@ class HFandTAPEModelUtility(StringEmbedding):
                 sequence_embedding[:sequence_length].mean(0)
                 for sequence_embedding, sequence_length in zip(
                     sequence_embeddings, sequence_lengths
+                for sequence_embedding, sequence_length in zip(
+                    sequence_embeddings, sequence_lengths
                 )
             ]
         )
 
     def unmask(self, sequence: str, top_k: int = 2) -> List[str]:
-        """
-        Unmasks a given sequence using the model, retrieving top-k predictions.
+        """Unmasks a given sequence using the model, retrieving top-k predictions.
 
         Args:
             sequence (str): The sequence with masked tokens.
-            top_k (int): Number of top predictions to retrieve.
+            top_k (int, optional): Number of top predictions to retrieve. Defaults to 2.
+
+        Raises:
+            NotImplementedError: If TAPE model is used.
+            KeyError: If the model used is not supported.
 
         Returns:
-            List[List[str]]: List of top-k predicted sequences.
+            List[str]: List of top-k predicted sequences.
         """
+        if self.is_tape_model:
+            logger.error("Unmasking is not supported for TAPE models.")
+            raise NotImplementedError("Unmasking is not supported for TAPE models.")
+
+        try:
+            return self._unmask_with_model(sequence, top_k)
+        except (KeyError, NotImplementedError) as e:
+            logger.warning(f"{e} Standard unmasking failed ")
+            raise KeyError("Check the unmasking model you want to use")
         if self.is_tape_model:
             logger.error("Unmasking is not supported for TAPE models.")
             raise NotImplementedError("Unmasking is not supported for TAPE models.")
@@ -347,15 +374,17 @@ class HFandTAPEModelUtility(StringEmbedding):
             raise KeyError("Check the unmasking model you want to use")
 
     def _unmask_with_model(self, sequence: str, top_k: int) -> List[str]:
-        """
-        Unmasks a sequence using the model, providing top-k predictions.
+        """Unmasks a sequence using the model, providing top-k predictions.
 
         Args:
             sequence (str): The sequence with masked tokens.
             top_k (int): Number of top predictions to retrieve.
 
+        Raises:
+            KeyError: If model used do not support unmasking.
+
         Returns:
-            List[List[str]]: List of top-k predicted sequences.
+            List[str]: List of top-k predicted sequences.
         """
         inputs = self.tokenizer(
             sequence,
@@ -406,36 +435,43 @@ class HFandTAPEModelUtility(StringEmbedding):
 
 
 def mutate_sequence_with_variant(sequence: str, variant: str) -> str:
-    """
-    Applies a specified variant mutation to an amino acid sequence.
+    """Applies a specified variant mutation to an amino acid sequence.
 
     Args:
+        sequence (str): The original amino acid sequence.
+        variant (str): The variant to apply, formatted as a string.
         sequence (str): The original amino acid sequence.
         variant (str): The variant to apply, formatted as a string.
 
     Returns:
         str: The mutated amino acid sequence.
+        str: The mutated amino acid sequence.
     """
     mutated_sequence = list(sequence)
     for variant_string in variant.split("/"):
-        index = (
-            int(variant_string[1:-1]) - 1
-        )  # Assuming 1-based indexing in the variant
+        index = int(variant_string[1:-1]) - 1
         mutated_sequence[index] = variant_string[-1]
     return "".join(mutated_sequence)
 
 
 def sanitize_intervals(intervals: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
-    """
-    Merges overlapping intervals into a single interval.
+    """Merges overlapping intervals into a single interval.
 
     Args:
+        intervals (List[Tuple[int, int]]): A list of
+        start and end points of intervals.
         intervals (List[Tuple[int, int]]): A list of
         start and end points of intervals.
 
     Returns:
         List[Tuple[int, int]]: A list of merged intervals.
+        List[Tuple[int, int]]: A list of merged intervals.
     """
+    intervals.sort()
+    merged: List[Tuple[int, int]] = []
+    for start, end in intervals:
+        if not merged or merged[-1][1] < start:
+            merged.append((start, end))
     intervals.sort()
     merged: List[Tuple[int, int]] = []
     for start, end in intervals:
@@ -447,8 +483,7 @@ def sanitize_intervals(intervals: List[Tuple[int, int]]) -> List[Tuple[int, int]
 
 
 def round_up(number: float) -> int:
-    """
-    Rounds up a floating-point number to the nearest integer.
+    """Rounds up a floating-point number to the nearest integer.
 
     Args:
         number (float): The number to round up.
@@ -462,8 +497,7 @@ def round_up(number: float) -> int:
 def sanitize_intervals_with_padding(
     intervals: List[Tuple[int, int]], pad_value: int, max_value: int
 ) -> List[Tuple[int, int]]:
-    """
-    Pads and sanitizes intervals within a given range.
+    """Pads and sanitizes intervals within a given range.
 
     Args:
         intervals (List[Tuple[int, int]]): A list of intervals.
@@ -477,8 +511,7 @@ def sanitize_intervals_with_padding(
     def pad_interval(
         interval: Tuple[int, int], pad: int, max_val: int
     ) -> Tuple[int, int]:
-        """
-        Pads an individual interval within the constraints of a maximum value.
+        """Pads an individual interval within the constraints of a maximum value.
 
         Args:
             interval (Tuple[int, int]): The interval to pad.
@@ -492,11 +525,9 @@ def sanitize_intervals_with_padding(
         interval_length = end - start
         padding_needed = max(0, pad - interval_length) // 2
 
-        # Apply padding
         padded_start = max(0, start - padding_needed)
         padded_end = min(max_val, end + padding_needed)
 
-        # Adjust if padding goes beyond max_value
         if padded_end > max_val:
             padded_start = max(0, padded_start - (padded_end - max_val))
         return padded_start, padded_end
@@ -512,8 +543,7 @@ def reconstruct_sequence_with_mutation_range(
     mutated_sequence_range: str,
     intervals: List[Tuple[int, int]],
 ) -> str:
-    """
-    Reconstructs a sequence by inserting a mutated sequence
+    """Reconstructs a sequence by inserting a mutated sequence
     range at specific intervals.
 
     Args:
@@ -521,10 +551,17 @@ def reconstruct_sequence_with_mutation_range(
         mutated_sequence_range (str): The range of the sequence to be mutated.
         intervals (List[Tuple[int, int]]): The intervals where
         mutations are applied.
+        sequence (str): The original sequence.
+        mutated_sequence_range (str): The range of the sequence to be mutated.
+        intervals (List[Tuple[int, int]]): The intervals where
+        mutations are applied.
 
     Returns:
         str: The reconstructed sequence with mutations.
+        str: The reconstructed sequence with mutations.
     """
+    mutated_sequence = list(sequence)
+    range_index = 0
     mutated_sequence = list(sequence)
     range_index = 0
     for start, end in intervals:
@@ -546,8 +583,7 @@ class SelectionGenerator:
         pool_of_sequences: List[Dict[str, Any]],
         k: float = 0.8,
     ) -> List[Any]:
-        """
-        Selects a subset of sequences from a pool based on their scores.
+        """Selects a subset of sequences from a pool based on their scores.
 
         Args:
             pool_of_sequences (List[Dict[str, Any]]): A list of
@@ -570,19 +606,17 @@ class CrossoverGenerator:
     """
 
     def __init__(self, threshold_probability: float = 0.5) -> None:
-        """
-        Initializes the CrossoverGenerator with a specified
+        """Initializes the CrossoverGenerator with a specified
         threshold probability.
 
         Args:
-            threshold_probability (float): The probability
+            threshold_probability (float, optional): The probability
             threshold used in uniform crossover. Defaults to 0.5.
         """
         self.threshold_probability = threshold_probability
 
     def sp_crossover(self, a_sequence: str, another_sequence: str) -> Tuple[str, str]:
-        """
-        Performs a single point crossover between two sequences.
+        """Performs a single point crossover between two sequences.
 
         Args:
             a_sequence (str): The first sequence for crossover.
@@ -601,8 +635,7 @@ class CrossoverGenerator:
     def uniform_crossover(
         self, a_sequence: str, another_sequence: str
     ) -> Tuple[str, str]:
-        """
-        Performs a uniform crossover between two sequences.
+        """Performs a uniform crossover between two sequences.
 
         Args:
             a_sequence (str): The first sequence for crossover.

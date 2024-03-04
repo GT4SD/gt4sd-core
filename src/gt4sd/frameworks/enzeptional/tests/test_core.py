@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2023 GT4SD team
+# Copyright (c) 2024 GT4SD team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
 # SOFTWARE.
 #
 import warnings
-import pkg_resources
 from gt4sd.frameworks.enzeptional.core import (
     SequenceMutator,
     EnzymeOptimizer,
@@ -30,11 +29,17 @@ from gt4sd.frameworks.enzeptional.core import (
 
 from gt4sd.frameworks.enzeptional.processing import HFandTAPEModelUtility
 
+from gt4sd.configuration import sync_algorithm_with_s3
+from gt4sd.configuration import GT4SDConfiguration
+
+configuration = GT4SDConfiguration.get_instance()
+
+
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
-scorer_filepath = pkg_resources.resource_filename(
-    "gt4sd", "frameworks/enzeptional/tests/scorer.pkl"
-)
+sync_algorithm_with_s3("proteins/enzeptional/scorers", module="properties")
+
+scorer_filepath = f"{configuration.gt4sd_local_cache_path}/properties/proteins/enzeptional/scorers/feasibility/model.pkl"
 
 
 def test_optimize():
