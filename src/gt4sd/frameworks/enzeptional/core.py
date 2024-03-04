@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2023 GT4SD team
+# Copyright (c) 2024 GT4SD team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -89,8 +89,7 @@ class MutationStrategy(ABC):
     def mutate(
         self, sequence: str, num_mutations: int, intervals: List[List[int]]
     ) -> List[str]:
-        """
-        Abstract method for mutating a sequence.
+        """Abstract method for mutating a sequence.
 
         Args:
             sequence (str): The original sequence to be mutated.
@@ -108,8 +107,7 @@ class LanguageModelMutationStrategy(MutationStrategy):
     """
 
     def __init__(self, mutation_model):
-        """
-        Initializes the mutation strategy with a given model.
+        """Initializes the mutation strategy with a given model.
 
         Args:
             mutation_model: The model to be used for mutation.
@@ -118,8 +116,7 @@ class LanguageModelMutationStrategy(MutationStrategy):
         self.top_k = 2
 
     def set_top_k(self, top_k: int):
-        """
-        Sets the top k mutations to consider during mutation.
+        """Sets the top k mutations to consider during mutation.
 
         Args:
             top_k (int): The number of top mutations to consider.
@@ -129,8 +126,7 @@ class LanguageModelMutationStrategy(MutationStrategy):
     def mutate(
         self, sequence: str, num_mutations: int, intervals: List[List[int]]
     ) -> List[str]:
-        """
-        Mutates a sequence within specified intervals using the model.
+        """Mutates a sequence within specified intervals using the model.
 
         Args:
             sequence (str): The original sequence to be mutated.
@@ -170,8 +166,7 @@ class TransitionMatrixMutationStrategy(MutationStrategy):
     """
 
     def __init__(self, transition_matrix: str):
-        """
-        Initializes the mutation strategy with a transition matrix.
+        """Initializes the mutation strategy with a transition matrix.
 
         Args:
             transition_matrix (str): Path to the CSV file containing
@@ -184,8 +179,7 @@ class TransitionMatrixMutationStrategy(MutationStrategy):
         self.top_k = 2
 
     def set_top_k(self, top_k: int):
-        """
-        Sets the top k mutations to consider during mutation.
+        """Sets the top k mutations to consider during mutation.
 
         Args:
             top_k (int): The number of top mutations to consider.
@@ -196,8 +190,7 @@ class TransitionMatrixMutationStrategy(MutationStrategy):
     def mutate(
         self, sequence: str, num_mutations: int, intervals: List[List[int]]
     ) -> List[str]:
-        """
-        Mutates a sequence based on the transition matrix within
+        """Mutates a sequence based on the transition matrix within
         specified intervals.
 
         Args:
@@ -247,19 +240,18 @@ class MutationFactory:
 
     @staticmethod
     def get_mutation_strategy(mutation_config: Dict[str, Any]):
-        """
-        Retrieves a mutation strategy based on the provided configuration.
+        """Retrieves a mutation strategy based on the provided configuration.
 
         Args:
             mutation_config (Dict[str, Any]): Configuration specifying
             the type of mutation strategy and its parameters.
 
-        Returns:
-            An instance of the specified mutation strategy.
-
         Raises:
-            ValueError: If the mutation type is unsupported.
             KeyError: If required configuration parameters are missing.
+            ValueError: If the mutation type is unsupported.
+
+        Returns:
+            _type_: An instance of the specified mutation strategy
         """
         if mutation_config["type"] == "language-modeling":
             mutation_model = MutationModelManager.load_model(
@@ -285,8 +277,7 @@ class SequenceMutator:
     """
 
     def __init__(self, sequence: str, mutation_config: Dict[str, Any]):
-        """
-        Initializes the mutator with a sequence and a mutation strategy.
+        """Initializes the mutator with a sequence and a mutation strategy.
 
         Args:
             sequence (str): The sequence to be mutated.
@@ -298,8 +289,7 @@ class SequenceMutator:
         self.top_k = 2
 
     def set_top_k(self, top_k: int):
-        """
-        Sets the number of top mutations to consider in the mutation strategy.
+        """Sets the number of top mutations to consider in the mutation strategy.
 
         Args:
             top_k (int): The number of top mutations to consider.
@@ -319,14 +309,13 @@ class SequenceMutator:
         current_population: List[str],
         already_evaluated_sequences: List[str],
     ) -> List[str]:
-        """
-        Generates a set of mutated sequences.
+        """Generates a set of mutated sequences.
 
         Args:
             num_sequences (int): Number of mutated sequences to generate.
             number_of_mutations (int): Number of mutations to apply to
             each sequence.
-            intervals (List[List[int]]): Intervals within the sequence
+            intervals (List[Tuple[int]]): Intervals within the sequence
             where mutations are allowed.
             already_evaluated_sequences (List[str]): List of sequences
             that have already been evaluated.
@@ -346,14 +335,6 @@ class SequenceMutator:
                 new_mutations = self.mutation_strategy.mutate(
                     temp_sequence, max_mutations, intervals
                 )
-                # filtered_mutations = [
-                #     element
-                #     for element in new_mutations
-                #     if element not in already_evaluated_sequences
-                # ]
-                # if not filtered_mutations:
-                #     break
-                # mutated_sequences_set.extend(filtered_mutations)
                 mutated_sequences_set.extend(new_mutations)
                 if len(mutated_sequences_set) >= num_sequences:
                     break
@@ -387,34 +368,29 @@ class EnzymeOptimizer:
         pad_intervals: bool = False,
         concat_order=["sequence", "substrate", "product"],
     ):
-        """
-        Initializes the optimizer with models, sequences, and
+        """Initializes the optimizer with models, sequences, and
         optimization parameters.
+
 
         Args:
             sequence (str): The initial protein sequence.
-            protein_model (HFandTAPEModelUtility): Model for
-            protein embeddings.
-            substrate_smiles (str): SMILES representation of
-            the substrate.
-            product_smiles (str): SMILES representation of the
-            product.
+            protein_model (HFandTAPEModelUtility): Model for protein embeddings.
+            substrate_smiles (str): SMILES representation of the substrate.
+            product_smiles (str): SMILES representation of the product.
             chem_model_path (str): Path to the chemical model.
             chem_tokenizer_path (str): Path to the chemical tokenizer.
-            scorer_filepath (str): File path to the scoring model.
-            mutator (SequenceMutator): The mutator for generating
-            sequence variants.
-            intervals (List[List[int]]): Intervals for mutation.
-            batch_size (int): The number of sequences to process in one batch.
-            top_k (int): Number of top mutations to consider.
-            selection_ratio (float): Ratio of sequences to select
-            after scoring.
-            perform_crossover (bool): Flag to perform crossover operation.
-            crossover_type (str): Type of crossover operation.
-            minimum_interval_length (int): Minimum length of
-            mutation intervals.
-            pad_intervals (bool): Flag to pad the intervals.
-            concat_order (list): Order of concatenating embeddings.
+            scorer_filepath (str): Path to the scoring model.
+            mutator (SequenceMutator): The mutator for generating sequence variants.
+            intervals (List[Tuple[int, int]]): Intervals for mutation.
+            batch_size (int, optional): The number of sequences to process in one batch. Defaults to 2.
+            seed (int, optional): Random seed. Defaults to 123.
+            top_k (int, optional): Number of top mutations to consider. Defaults to 2.
+            selection_ratio (float, optional): Ratio of sequences to select after scoring. Defaults to 0.5.
+            perform_crossover (bool, optional): Flag to perform crossover operation. Defaults to False.
+            crossover_type (str, optional): Type of crossover operation. Defaults to "uniform".
+            minimum_interval_length (int, optional): Minimum length of mutation intervals. Defaults to 8.
+            pad_intervals (bool, optional): Flag to pad the intervals. Defaults to False.
+            concat_order (list, optional): Order of concatenating embeddings. Defaults to ["sequence", "substrate", "product"].
         """
         self.sequence = sequence
         self.protein_model = protein_model
@@ -428,23 +404,18 @@ class EnzymeOptimizer:
         self.concat_order = concat_order
         self.minimum_interval_length = minimum_interval_length
         self.pad_intervals = pad_intervals
-        self.mutator.set_top_k(top_k)  # Set top_k for the mutation model
+        self.mutator.set_top_k(top_k)
         self.concat_order = concat_order
         self.scorer = load(scorer_filepath)
         self.seed = seed
 
-        # Initialize chem_model for SMILES embeddings
         self.chem_model = HFandTAPEModelUtility(chem_model_path, chem_tokenizer_path)
-
-        # Compute embeddings for substrate and product
         self.substrate_embedding = self.chem_model.embed([substrate_smiles])[0]
         self.product_embedding = self.chem_model.embed([product_smiles])[0]
 
-        # Initialize selection and crossover generators
         self.selection_generator = SelectionGenerator()
         self.crossover_generator = CrossoverGenerator()
 
-        # Process intervals
         if intervals is None:
             self.intervals = [(0, len(sequence))]
         else:
@@ -463,8 +434,7 @@ class EnzymeOptimizer:
         num_mutations: int,
         time_budget: Optional[int] = 360,
     ):
-        """
-        Runs the optimization process over a specified number
+        """Runs the optimization process over a specified number
         of iterations.
 
         Args:
@@ -474,7 +444,7 @@ class EnzymeOptimizer:
             per iteration.
             num_mutations (int): Max number of mutations to apply.
             time_budget (Optional[int]): Time budget for
-            optimizer (in seconds).
+            optimizer (in seconds). Defaults to 360.
 
         Returns:
             A tuple containing the list of all sequences and
@@ -498,9 +468,7 @@ class EnzymeOptimizer:
 
             scored_sequences: List[Dict[str, Any]] = [scored_original_sequence]
 
-            # Mutation step
             if iteration == 0:
-                # initialize population
                 current_population: List[str] = [self.sequence]
                 if len(current_population) < num_sequences:
                     while len(current_population) < num_sequences:
@@ -525,7 +493,6 @@ class EnzymeOptimizer:
                 f"Number of sequences in current population: {len(current_population)}"
             )
 
-            # Scoring step
             iteration_scored_sequences = []
             for _ in range(0, len(current_population), self.batch_size):
                 scored_sequences = self.score_sequences(
@@ -537,7 +504,6 @@ class EnzymeOptimizer:
                 all_scored_sequences.extend(scored_sequences)
                 iteration_scored_sequences.extend(scored_sequences)
 
-            # Selection step
             if self.selection_ratio < 1.0:
 
                 samples_with_higher_score = [
@@ -551,7 +517,6 @@ class EnzymeOptimizer:
             else:
                 selected_sequences = iteration_scored_sequences
 
-            # Crossover step
             offspring_sequences = []
             if self.perform_crossover and len(selected_sequences) > 1:
                 for i in range(0, len(selected_sequences), 2):
@@ -593,7 +558,6 @@ class EnzymeOptimizer:
                 random.shuffle(current_population)
                 current_population = current_population[:num_sequences]
 
-            # Update best sequences and count higher scoring sequences
             higher_scoring_sequences = 0
             for temp_seq in iteration_scored_sequences:
                 if temp_seq["score"] > current_best_score:
@@ -630,14 +594,13 @@ class EnzymeOptimizer:
         return all_scored_sequences, iteration_info
 
     def score_sequence(self, sequence: str) -> Dict[str, Any]:
-        """
-        Scores a single protein sequence.
+        """Scores a single protein sequence.
 
         Args:
             sequence (str): The protein sequence to score.
 
         Returns:
-            float: The score of the sequence.
+            Dict[str, Any]: The score of the sequence.
         """
         sequence_embedding = self.protein_model.embed([sequence])[0]
         embeddings = [
@@ -655,8 +618,7 @@ class EnzymeOptimizer:
         return {"sequence": sequence, "score": score}
 
     def score_sequences(self, sequences: List[str]) -> List[Dict[str, float]]:
-        """
-        Scores a list of protein sequences.
+        """Scores a list of protein sequences.
 
         Args:
             sequences (List[str]): The list of protein sequences to score.
