@@ -27,4 +27,3 @@ Module for enzyme optimization.
 """
 
 from .core import EnzymeOptimizer  # noqa: F401
-from .core import EnzymeOptimizer  # noqa: F401

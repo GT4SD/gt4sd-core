@@ -23,9 +23,7 @@
 #
 from abc import ABC
 import torch
-import torch
 import numpy as np
-from typing import Any, Dict, List, Optional, Tuple, Union
 from typing import Any, Dict, List, Optional, Tuple, Union
 from tape.datasets import pad_sequences
 from tape.registry import registry
@@ -64,19 +62,8 @@ class ModelCache:
     def get(self, key):
         """
         Retrieves a model from the cache using the given key.
-        """
-    def __init__(self):
-        """
-        Initializes the cache as an empty dictionary.
-        """
-        self.cache = {}
-
-    def get(self, key):
-        """
-        Retrieves a model from the cache using the given key.
 
         Args:
-            key: The key used to store the model.
             key: The key used to store the model.
 
         Returns:
@@ -116,18 +103,10 @@ class StringEmbedding(ABC):
 
         Raises:
             NotImplementedError: If the method is not implemented in the subclass.
-
-        Returns:
-            np.ndarray: The resulting embeddings as a NumPy array.
         """
         raise NotImplementedError
 
 
-class HFandTAPEModelUtility(StringEmbedding):
-    """
-    Utility class for handling both Hugging Face and TAPE models for embedding
-    and unmasking tasks.
-    """
 class HFandTAPEModelUtility(StringEmbedding):
     """
     Utility class for handling both Hugging Face and TAPE models for embedding
@@ -140,12 +119,7 @@ class HFandTAPEModelUtility(StringEmbedding):
         tokenizer_path: str,
         unmasking_model_path: Optional[str] = None,
         is_tape_model: bool = False,
-        embedding_model_path: str,
-        tokenizer_path: str,
-        unmasking_model_path: Optional[str] = None,
-        is_tape_model: bool = False,
         device: Optional[Union[torch.device, str]] = None,
-        cache_dir: Optional[str] = None,
         cache_dir: Optional[str] = None,
     ) -> None:
         """Initializes the utility with specified model and tokenizer paths.
@@ -259,7 +233,6 @@ class HFandTAPEModelUtility(StringEmbedding):
 
         Args:
             samples (List[str]): List of strings to be embedded.
-            samples (List[str]): List of strings to be embedded.
 
         Returns:
             np.ndarray: The resulting embeddings.
@@ -296,7 +269,6 @@ class HFandTAPEModelUtility(StringEmbedding):
 
         Args:
             samples (List[str]): List of strings to be embedded.
-            samples (List[str]): List of strings to be embedded.
 
         Returns:
             np.ndarray: The resulting embeddings.
@@ -315,25 +287,9 @@ class HFandTAPEModelUtility(StringEmbedding):
 
         sequence_lengths = inputs["attention_mask"].sum(1)
 
-        inputs = self.tokenizer(
-            samples,
-            add_special_tokens=True,
-            padding=True,
-            return_tensors="pt",
-        )
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
-
-        with torch.no_grad():
-            outputs = self.embedding_model(**inputs)
-            sequence_embeddings = outputs[0].cpu().detach().numpy()
-
-        sequence_lengths = inputs["attention_mask"].sum(1)
-
         return np.array(
             [
                 sequence_embedding[:sequence_length].mean(0)
-                for sequence_embedding, sequence_length in zip(
-                    sequence_embeddings, sequence_lengths
                 for sequence_embedding, sequence_length in zip(
                     sequence_embeddings, sequence_lengths
                 )
@@ -354,15 +310,6 @@ class HFandTAPEModelUtility(StringEmbedding):
         Returns:
             List[str]: List of top-k predicted sequences.
         """
-        if self.is_tape_model:
-            logger.error("Unmasking is not supported for TAPE models.")
-            raise NotImplementedError("Unmasking is not supported for TAPE models.")
-
-        try:
-            return self._unmask_with_model(sequence, top_k)
-        except (KeyError, NotImplementedError) as e:
-            logger.warning(f"{e} Standard unmasking failed ")
-            raise KeyError("Check the unmasking model you want to use")
         if self.is_tape_model:
             logger.error("Unmasking is not supported for TAPE models.")
             raise NotImplementedError("Unmasking is not supported for TAPE models.")
@@ -440,11 +387,8 @@ def mutate_sequence_with_variant(sequence: str, variant: str) -> str:
     Args:
         sequence (str): The original amino acid sequence.
         variant (str): The variant to apply, formatted as a string.
-        sequence (str): The original amino acid sequence.
-        variant (str): The variant to apply, formatted as a string.
 
     Returns:
-        str: The mutated amino acid sequence.
         str: The mutated amino acid sequence.
     """
     mutated_sequence = list(sequence)
@@ -460,18 +404,10 @@ def sanitize_intervals(intervals: List[Tuple[int, int]]) -> List[Tuple[int, int]
     Args:
         intervals (List[Tuple[int, int]]): A list of
         start and end points of intervals.
-        intervals (List[Tuple[int, int]]): A list of
-        start and end points of intervals.
 
     Returns:
         List[Tuple[int, int]]: A list of merged intervals.
-        List[Tuple[int, int]]: A list of merged intervals.
     """
-    intervals.sort()
-    merged: List[Tuple[int, int]] = []
-    for start, end in intervals:
-        if not merged or merged[-1][1] < start:
-            merged.append((start, end))
     intervals.sort()
     merged: List[Tuple[int, int]] = []
     for start, end in intervals:
@@ -551,17 +487,10 @@ def reconstruct_sequence_with_mutation_range(
         mutated_sequence_range (str): The range of the sequence to be mutated.
         intervals (List[Tuple[int, int]]): The intervals where
         mutations are applied.
-        sequence (str): The original sequence.
-        mutated_sequence_range (str): The range of the sequence to be mutated.
-        intervals (List[Tuple[int, int]]): The intervals where
-        mutations are applied.
 
     Returns:
         str: The reconstructed sequence with mutations.
-        str: The reconstructed sequence with mutations.
     """
-    mutated_sequence = list(sequence)
-    range_index = 0
     mutated_sequence = list(sequence)
     range_index = 0
     for start, end in intervals:
