@@ -48,7 +48,7 @@ If you would like to contribute to the package, we recommend the following devel
 5. Create and activate a dedicated conda environment:
 
     ```sh
-    conda env create -f conda.yml
+    conda env create -f conda_cpu_mac.yml
     conda activate gt4sd
     ```
 
