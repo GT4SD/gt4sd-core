@@ -45,6 +45,7 @@ pip install gt4sd
 ```
 
 **NOTE 1:** By default `gt4sd` is installed with CPU requirements. For GPU usage replace with:
+
 ```sh
 conda env create -f conda_gpu.yml
 ```
