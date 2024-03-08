@@ -17,7 +17,7 @@ This notebook show the basic usage of the GT4SD algorithms.
 
 ### A note on the setup
 
-In the following we assume that the toolkit has been setup using your preferred `conda` `yml` file as follows:
+In the following we assume that the toolkit has been setup using your preferred environment file (`conda*.yml`):
 
 ```{code-block} sh
 # create and activate environment
