@@ -5,12 +5,16 @@ from gt4sd.frameworks.enzeptional.core import SequenceMutator, EnzymeOptimizer
 from gt4sd.configuration import GT4SDConfiguration, sync_algorithm_with_s3
 
 
-def initialize_environment():
+def initialize_environment(model = "feasibility"):
     """Synchronize with GT4SD S3 storage and set up the environment."""
     # NOTE: For those interested in optimizing kcat values, it is important to adjust the scorer path to reflect this focus, thereby selecting the appropriate model for kcat optimization: f"{configuration.gt4sd_local_cache_path}/properties/proteins/enzeptional/scorers/kcat/model.pkl". The specification of the scaler, located within the same directory as the `scorer.pkl`, is mandatory for accurate model performance.
     configuration = GT4SDConfiguration.get_instance()
     sync_algorithm_with_s3("proteins/enzeptional/scorers", module="properties")
-    return f"{configuration.gt4sd_local_cache_path}/properties/proteins/enzeptional/scorers/feasibility/model.pkl"
+    name = model.lower()
+    if name == "kcat":
+        return f"{configuration.gt4sd_local_cache_path}/properties/proteins/enzeptional/scorers/{name}/model.pkl", f"{configuration.gt4sd_local_cache_path}/properties/proteins/enzeptional/scorers/{name}/scaler.pkl"
+    else:
+        return f"{configuration.gt4sd_local_cache_path}/properties/proteins/enzeptional/scorers/{name}/model.pkl", None
 
 
 def load_experiment_parameters():
@@ -20,7 +24,7 @@ def load_experiment_parameters():
 
 
 def setup_optimizer(
-    substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path
+    substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path, scaler_path, concat_order, fitness_kcat
 ):
     """Set up and return the optimizer with all necessary components configured."""
     model_tokenizer_paths = "facebook/esm2_t33_650M_UR50D"
@@ -52,7 +56,9 @@ def setup_optimizer(
         "selection_ratio": 0.25,
         "perform_crossover": True,
         "crossover_type": "single_point",
-        "concat_order": ["substrate", "sequence", "product"],
+        "concat_order": concat_order,
+        "scaler_filepath": scaler_path,
+        "fitness_kcat": fitness_kcat
     }
     return EnzymeOptimizer(**optimizer_config)
 
@@ -64,9 +70,10 @@ def optimize_sequences(optimizer):
     )
 
 
-def main():
+def main_kcat():
     logging.basicConfig(level=logging.INFO)
-    scorer_path = initialize_environment()
+    scorer_path, scaler_path = initialize_environment(model="kcat")
+    concat_order, fitness_kcat = ["substrate", "sequence"], True
     (
         substrate_smiles,
         product_smiles,
@@ -74,11 +81,28 @@ def main():
         intervals,
     ) = load_experiment_parameters()
     optimizer = setup_optimizer(
-        substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path
+        substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path, scaler_path, concat_order, fitness_kcat
     )
     optimized_sequences, iteration_info = optimize_sequences(optimizer)
     logging.info("Optimization completed.")
 
 
+def main_feasibility():
+    logging.basicConfig(level=logging.INFO)
+    scorer_path, scaler_path = initialize_environment()
+    concat_order, fitness_kcat = ["substrate", "sequence", "product"], False
+    (
+        substrate_smiles,
+        product_smiles,
+        sample_sequence,
+        intervals,
+    ) = load_experiment_parameters()
+    optimizer = setup_optimizer(
+        substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path, scaler_path, concat_order, fitness_kcat
+    )
+    optimized_sequences, iteration_info = optimize_sequences(optimizer)
+    logging.info("Optimization completed.")
+
 if __name__ == "__main__":
-    main()
+    main_feasibility()
+    main_kcat()
