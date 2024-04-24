@@ -30,6 +30,7 @@ import logging
 from itertools import product as iter_product
 import time
 from joblib import load
+import xgboost as xgb
 from .processing import (
     HFandTAPEModelUtility,
     SelectionGenerator,
@@ -367,6 +368,8 @@ class EnzymeOptimizer:
         minimum_interval_length: int = 8,
         pad_intervals: bool = False,
         concat_order=["sequence", "substrate", "product"],
+        scaler_filepath: Optional[str] = None,
+        use_xgboost_scorer: Optional[bool] = False,
     ):
         """Initializes the optimizer with models, sequences, and
         optimization parameters.
@@ -379,18 +382,22 @@ class EnzymeOptimizer:
             product_smiles (str): SMILES representation of the product.
             chem_model_path (str): Path to the chemical model.
             chem_tokenizer_path (str): Path to the chemical tokenizer.
-            scorer_filepath (str): Path to the scoring model.
-            mutator (SequenceMutator): The mutator for generating sequence variants.
-            intervals (List[Tuple[int, int]]): Intervals for mutation.
-            batch_size (int, optional): The number of sequences to process in one batch. Defaults to 2.
-            seed (int, optional): Random seed. Defaults to 123.
-            top_k (int, optional): Number of top mutations to consider. Defaults to 2.
-            selection_ratio (float, optional): Ratio of sequences to select after scoring. Defaults to 0.5.
-            perform_crossover (bool, optional): Flag to perform crossover operation. Defaults to False.
-            crossover_type (str, optional): Type of crossover operation. Defaults to "uniform".
-            minimum_interval_length (int, optional): Minimum length of mutation intervals. Defaults to 8.
-            pad_intervals (bool, optional): Flag to pad the intervals. Defaults to False.
-            concat_order (list, optional): Order of concatenating embeddings. Defaults to ["sequence", "substrate", "product"].
+            scorer_filepath (str): File path to the scoring model.
+            mutator (SequenceMutator): The mutator for generating
+            sequence variants.
+            intervals (List[List[int]]): Intervals for mutation.
+            batch_size (int): The number of sequences to process in one batch.
+            top_k (int): Number of top mutations to consider.
+            selection_ratio (float): Ratio of sequences to select
+            after scoring.
+            perform_crossover (bool): Flag to perform crossover operation.
+            crossover_type (str): Type of crossover operation.
+            minimum_interval_length (int): Minimum length of
+            mutation intervals.
+            pad_intervals (bool): Flag to pad the intervals.
+            concat_order (list): Order of concatenating embeddings.
+            scaler_filepath (str): Path to the scaller in case you are usinh the Kcat model.
+            use_xgboost_scorer (bool): flag to specify if the fitness function is the Kcat.
         """
         self.sequence = sequence
         self.protein_model = protein_model
@@ -407,7 +414,9 @@ class EnzymeOptimizer:
         self.mutator.set_top_k(top_k)
         self.concat_order = concat_order
         self.scorer = load(scorer_filepath)
-        self.seed = seed
+        if scaler_filepath is not None:
+            self.scaler = load(scaler_filepath)
+        self.use_xgboost_scorer = use_xgboost_scorer
 
         self.chem_model = HFandTAPEModelUtility(chem_model_path, chem_tokenizer_path)
         self.substrate_embedding = self.chem_model.embed([substrate_smiles])[0]
@@ -614,7 +623,13 @@ class EnzymeOptimizer:
         combined_embedding = np.concatenate(ordered_embeddings)
         combined_embedding = combined_embedding.reshape(1, -1)
 
-        score = self.scorer.predict_proba(combined_embedding)[0][1]
+        if self.use_xgboost_scorer:
+            if self.scaler is not None:
+                combined_embedding = self.scaler.transform(combined_embedding)
+            score = self.scorer.predict(xgb.DMatrix(combined_embedding))[0]
+        else:
+            score = self.scorer.predict_proba(combined_embedding)[0][1]
+
         return {"sequence": sequence, "score": score}
 
     def score_sequences(self, sequences: List[str]) -> List[Dict[str, float]]:
@@ -643,7 +658,12 @@ class EnzymeOptimizer:
             combined_embedding = np.concatenate(ordered_embeddings)
             combined_embedding = combined_embedding.reshape(1, -1)
 
-            score = self.scorer.predict_proba(combined_embedding)[0][1]
+            if self.use_xgboost_scorer:
+                if self.scaler is not None:
+                    combined_embedding = self.scaler.transform(combined_embedding)
+                score = self.scorer.predict(xgb.DMatrix(combined_embedding))[0]
+            else:
+                score = self.scorer.predict_proba(combined_embedding)[0][1]
             output.append({"sequence": sequences[position], "score": score})
 
         return output
