@@ -30,6 +30,7 @@ import logging
 from itertools import product as iter_product
 import time
 from joblib import load
+import xgboost as xgb
 from .processing import (
     HFandTAPEModelUtility,
     SelectionGenerator,
