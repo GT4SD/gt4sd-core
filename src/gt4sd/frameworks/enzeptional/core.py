@@ -433,7 +433,7 @@ class EnzymeOptimizer:
                 self.intervals = sanitize_intervals_with_padding(
                     self.intervals, minimum_interval_length, len(sequence)
                 )
-
+        self.seed = seed
         random.seed(self.seed)
 
     def optimize(
