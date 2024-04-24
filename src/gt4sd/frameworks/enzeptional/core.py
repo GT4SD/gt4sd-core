@@ -392,7 +392,7 @@ class EnzymeOptimizer:
         pad_intervals: bool = False,
         concat_order=["sequence", "substrate", "product"],
         scaler_filepath: Optional[str] = None,
-        fitness_kcat: Optional[bool] = False,
+        use_xgboost_scorer: Optional[bool] = False,
     ):
         """
         Initializes the optimizer with models, sequences, and
@@ -423,7 +423,7 @@ class EnzymeOptimizer:
             pad_intervals (bool): Flag to pad the intervals.
             concat_order (list): Order of concatenating embeddings.
             scaler_filepath (str): Path to the scaller in case you are usinh the Kcat model.
-            fitness_kcat (bool): flag to specify if the fitness function is the Kcat.
+            use_xgboost_scorer (bool): flag to specify if the fitness function is the Kcat.
         """
         self.sequence = sequence
         self.protein_model = protein_model
@@ -444,7 +444,7 @@ class EnzymeOptimizer:
         self.scorer = load(scorer_filepath)
         if scaler_filepath is not None:
             self.scaler = load(scaler_filepath)
-        self.fitness_kcat = fitness_kcat
+        self.use_xgboost_scorer = use_xgboost_scorer
 
         # Initialize chem_model for SMILES embeddings
         self.chem_model = HFandTAPEModelUtility(chem_model_path, chem_tokenizer_path)
@@ -624,7 +624,7 @@ class EnzymeOptimizer:
         combined_embedding = np.concatenate(ordered_embeddings)
         combined_embedding = combined_embedding.reshape(1, -1)
     
-        if self.fitness_kcat:
+        if self.use_xgboost_scorer:
             if self.scaler is not None:
                 combined_embedding = self.scaler.transform(combined_embedding)
             score = self.scorer.predict(xgb.DMatrix(combined_embedding))[0]
@@ -660,7 +660,7 @@ class EnzymeOptimizer:
             combined_embedding = np.concatenate(ordered_embeddings)
             combined_embedding = combined_embedding.reshape(1, -1)
 
-            if self.fitness_kcat:
+            if self.use_xgboost_scorer:
                 if self.scaler is not None:
                     combined_embedding = self.scaler.transform(combined_embedding)
                 score = self.scorer.predict(xgb.DMatrix(combined_embedding))[0]
