@@ -193,6 +193,7 @@
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span> <span class="k">as</span> <span class="n">iter_product</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">load</span>
+<span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
 <span class="kn">from</span> <span class="nn">.processing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">HFandTAPEModelUtility</span><span class="p">,</span>
     <span class="n">SelectionGenerator</span><span class="p">,</span>
@@ -530,6 +531,8 @@
         <span class="n">minimum_interval_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
         <span class="n">pad_intervals</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">concat_order</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sequence&quot;</span><span class="p">,</span> <span class="s2">&quot;substrate&quot;</span><span class="p">,</span> <span class="s2">&quot;product&quot;</span><span class="p">],</span>
+        <span class="n">scaler_filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_xgboost_scorer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the optimizer with models, sequences, and</span>
 <span class="sd">        optimization parameters.</span>
@@ -542,18 +545,22 @@
 <span class="sd">            product_smiles (str): SMILES representation of the product.</span>
 <span class="sd">            chem_model_path (str): Path to the chemical model.</span>
 <span class="sd">            chem_tokenizer_path (str): Path to the chemical tokenizer.</span>
-<span class="sd">            scorer_filepath (str): Path to the scoring model.</span>
-<span class="sd">            mutator (SequenceMutator): The mutator for generating sequence variants.</span>
-<span class="sd">            intervals (List[Tuple[int, int]]): Intervals for mutation.</span>
-<span class="sd">            batch_size (int, optional): The number of sequences to process in one batch. Defaults to 2.</span>
-<span class="sd">            seed (int, optional): Random seed. Defaults to 123.</span>
-<span class="sd">            top_k (int, optional): Number of top mutations to consider. Defaults to 2.</span>
-<span class="sd">            selection_ratio (float, optional): Ratio of sequences to select after scoring. Defaults to 0.5.</span>
-<span class="sd">            perform_crossover (bool, optional): Flag to perform crossover operation. Defaults to False.</span>
-<span class="sd">            crossover_type (str, optional): Type of crossover operation. Defaults to &quot;uniform&quot;.</span>
-<span class="sd">            minimum_interval_length (int, optional): Minimum length of mutation intervals. Defaults to 8.</span>
-<span class="sd">            pad_intervals (bool, optional): Flag to pad the intervals. Defaults to False.</span>
-<span class="sd">            concat_order (list, optional): Order of concatenating embeddings. Defaults to [&quot;sequence&quot;, &quot;substrate&quot;, &quot;product&quot;].</span>
+<span class="sd">            scorer_filepath (str): File path to the scoring model.</span>
+<span class="sd">            mutator (SequenceMutator): The mutator for generating</span>
+<span class="sd">            sequence variants.</span>
+<span class="sd">            intervals (List[List[int]]): Intervals for mutation.</span>
+<span class="sd">            batch_size (int): The number of sequences to process in one batch.</span>
+<span class="sd">            top_k (int): Number of top mutations to consider.</span>
+<span class="sd">            selection_ratio (float): Ratio of sequences to select</span>
+<span class="sd">            after scoring.</span>
+<span class="sd">            perform_crossover (bool): Flag to perform crossover operation.</span>
+<span class="sd">            crossover_type (str): Type of crossover operation.</span>
+<span class="sd">            minimum_interval_length (int): Minimum length of</span>
+<span class="sd">            mutation intervals.</span>
+<span class="sd">            pad_intervals (bool): Flag to pad the intervals.</span>
+<span class="sd">            concat_order (list): Order of concatenating embeddings.</span>
+<span class="sd">            scaler_filepath (str): Path to the scaller in case you are usinh the Kcat model.</span>
+<span class="sd">            use_xgboost_scorer (bool): flag to specify if the fitness function is the Kcat.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">protein_model</span> <span class="o">=</span> <span class="n">protein_model</span>
@@ -570,7 +577,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mutator</span><span class="o">.</span><span class="n">set_top_k</span><span class="p">(</span><span class="n">top_k</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">concat_order</span> <span class="o">=</span> <span class="n">concat_order</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">scorer_filepath</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="k">if</span> <span class="n">scaler_filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">scaler_filepath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_xgboost_scorer</span> <span class="o">=</span> <span class="n">use_xgboost_scorer</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">chem_model</span> <span class="o">=</span> <span class="n">HFandTAPEModelUtility</span><span class="p">(</span><span class="n">chem_model_path</span><span class="p">,</span> <span class="n">chem_tokenizer_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">substrate_embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chem_model</span><span class="o">.</span><span class="n">embed</span><span class="p">([</span><span class="n">substrate_smiles</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
@@ -587,7 +596,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span> <span class="o">=</span> <span class="n">sanitize_intervals_with_padding</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">,</span> <span class="n">minimum_interval_length</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
                 <span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EnzymeOptimizer.optimize"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.core.html#gt4sd.frameworks.enzeptional.core.EnzymeOptimizer.optimize">[docs]</a>    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span>
@@ -777,7 +786,13 @@
         <span class="n">combined_embedding</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">ordered_embeddings</span><span class="p">)</span>
         <span class="n">combined_embedding</span> <span class="o">=</span> <span class="n">combined_embedding</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">combined_embedding</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_xgboost_scorer</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">combined_embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">combined_embedding</span><span class="p">)</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">combined_embedding</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">combined_embedding</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">,</span> <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">score</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="EnzymeOptimizer.score_sequences"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.enzeptional.core.html#gt4sd.frameworks.enzeptional.core.EnzymeOptimizer.score_sequences">[docs]</a>    <span class="k">def</span> <span class="nf">score_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
@@ -806,7 +821,12 @@
             <span class="n">combined_embedding</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">ordered_embeddings</span><span class="p">)</span>
             <span class="n">combined_embedding</span> <span class="o">=</span> <span class="n">combined_embedding</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-            <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">combined_embedding</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_xgboost_scorer</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">combined_embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">combined_embedding</span><span class="p">)</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">combined_embedding</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">combined_embedding</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">sequences</span><span class="p">[</span><span class="n">position</span><span class="p">],</span> <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">score</span><span class="p">})</span>
 
         <span class="k">return</span> <span class="n">output</span></div></div>
