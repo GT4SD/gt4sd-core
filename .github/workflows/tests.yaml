@@ -24,7 +24,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: gt4sd
-          environment-file: conda.yml
+          environment-file: conda_cpu_linux.yml
           auto-activate-base: false
           use-only-tar-bz2: true
       - name: Install gt4sd from source
@@ -35,10 +35,12 @@ jobs:
         run: |
           conda activate gt4sd
           python -m black src/gt4sd --check --diff --color
-      # - name: Check isort
-      #   run: |
-      #     conda activate gt4sd
-      #     python -m isort src/gt4sd --check-only
+      - name: Remove unnecessary files (see https://stackoverflow.com/questions/75536771/github-runner-out-of-disk-space-after-building-docker-image)
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Check flake8
         run: |
           conda activate gt4sd

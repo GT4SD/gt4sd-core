@@ -39,12 +39,13 @@ The recommended way to install the `gt4sd` is to create a dedicated conda enviro
 ```sh
 git clone https://github.com/GT4SD/gt4sd-core.git
 cd gt4sd-core/
-conda env create -f conda.yml 
+conda env create -f conda_cpu_mac.yml # for linux use conda_cpu_linux.yml
 conda activate gt4sd
 pip install gt4sd
 ```
 
-**NOTE 1:** By default `gt4sd` is installed with CPU requirements. For GPU usage replace `conda env create -f conda.yml` with:
+**NOTE 1:** By default `gt4sd` is installed with CPU requirements. For GPU usage replace with:
+
 ```sh
 conda env create -f conda_gpu.yml
 ```
@@ -59,12 +60,10 @@ A few VCS dependencies require Git LFS (make sure it's available on your system)
 
 ### Development setup & installation
 
-If you would like to contribute to the package, we recommend the following development setup:
+If you would like to contribute to the package, we recommend to install gt4sd in
+editable mode inside your `conda` environment:
 
 ```sh
-conda env create -f conda.yml
-conda activate gt4sd
-# install gt4sd in editable mode
 pip install --no-deps -e .
 ```
 

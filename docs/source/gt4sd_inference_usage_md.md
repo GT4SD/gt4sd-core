@@ -17,11 +17,11 @@ This notebook show the basic usage of the GT4SD algorithms.
 
 ### A note on the setup
 
-In the following we assume that the toolkit has been setup using the provided `conda.yml` as follows:
+In the following we assume that the toolkit has been setup using your preferred environment file (`conda*.yml`):
 
 ```{code-block} sh
 # create and activate environment
-conda env create -f conda.yml
+conda env create -f conda_cpu_mac.yml # or conda_cpu_linux.yml or conda_gpu.yml
 conda activate gt4sd
 # install the toolkit
 pip install .
