@@ -19,6 +19,8 @@ jobs:
     defaults:
       run:
         shell: bash -l {0} # for conda command
+    env:
+      GIT_CLONE_PROTECTION_ACTIVE: false
     steps:
       - uses: actions/checkout@v2
       - uses: conda-incubator/setup-miniconda@v2
@@ -48,7 +50,7 @@ jobs:
       - name: Check mypy
         run: |
           conda activate gt4sd
-          python -m mypy src/gt4sd
+          python -m mypy src/gt4sd --show-traceback
       - name: Run pytests
         run: |
           conda activate gt4sd
