@@ -1086,7 +1086,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
                     f"{keep} is not a valid SMILES/SELFIES. Instead substructure filtering "
                     f"based on sequence alone can be done and is set to: {self.text_filtering}"
                 )
-            if keep not in self.substructures_to_keep and not Chem.MolFromSmiles(
+            if keep not in self.substructures_to_keep and not Chem.MolFromSmiles( # type: ignore
                 self.target
             ).HasSubstructMatch(subs_mol):
                 logger.info(
@@ -1120,7 +1120,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
                         sane = False
                         break
                 else:
-                    if not mol.HasSubstructMatch(subs_mol):
+                    if not mol.HasSubstructMatch(subs_mol): # type: ignore
                         # Desired substructure not found
                         sane = False
                         break
