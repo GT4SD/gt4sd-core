@@ -241,7 +241,9 @@ class GaussianDistance:
               Expanded distance matrix with the last dimension of length
               len(self.filter).
         """
-        return np.exp(-((distances[..., np.newaxis] - self.filter) ** 2) / self.var**2)
+        return np.exp(
+            -((distances[..., np.newaxis] - self.filter) ** 2) / self.var**2
+        )
 
 
 class AtomInitializer:

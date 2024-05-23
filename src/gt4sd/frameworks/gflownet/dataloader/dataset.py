@@ -50,7 +50,10 @@ class GFlowNetDataset(Dataset):
     """A dataset for gflownet."""
 
     def __init__(
-        self, h5_file: str | None = None, target: str = "gap", properties: List[str] = []
+        self,
+        h5_file: str | None = None,
+        target: str = "gap",
+        properties: List[str] = [],
     ) -> None:
 
         """Initialize a gflownet dataset.
