@@ -31,7 +31,7 @@ import json
 import logging
 import os
 import random
-from typing import Any, Callable, List, Tuple, Union
+from typing import Any, Callable, List, Tuple, Union, Optional
 
 import numpy as np
 import torch
@@ -49,7 +49,7 @@ def get_train_val_test_loader(
     dataset: torch.utils.data.Dataset,
     collate_fn: Callable[[List[Any]], Any] = default_collate,
     batch_size: int = 64,
-    train_ratio: float = None,
+    train_ratio: Optional[float] = None,
     val_ratio: float = 0.1,
     test_ratio: float = 0.1,
     return_test: bool = False,
@@ -241,9 +241,7 @@ class GaussianDistance:
               Expanded distance matrix with the last dimension of length
               len(self.filter).
         """
-        return np.exp(
-            -((distances[..., np.newaxis] - self.filter) ** 2) / self.var**2
-        )
+        return np.exp(-((distances[..., np.newaxis] - self.filter) ** 2) / self.var**2)
 
 
 class AtomInitializer:
