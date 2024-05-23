@@ -127,13 +127,13 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
         bond_index: torch.Tensor,
         bond_type: torch.Tensor,
         batch: torch.Tensor,
-        edge_index: torch.Tensor = None,
-        edge_type: torch.Tensor = None,
-        edge_length: int = None,
+        edge_index: torch.Tensor | None = None,
+        edge_type: torch.Tensor | None = None,
+        edge_length: int | None = None,
         return_edges: bool = False,
         extend_order: bool = True,
         extend_radius: bool = True,
-        is_sidechain: bool = None,
+        is_sidechain: bool | None = None,
     ) -> Tuple[Any, ...]:
         """Forward pass for edges features.
 

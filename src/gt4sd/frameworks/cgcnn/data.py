@@ -212,7 +212,7 @@ class GaussianDistance:
     Unit: angstrom
     """
 
-    def __init__(self, dmin: float, dmax: float, step: float, var: float = None):
+    def __init__(self, dmin: float, dmax: float, step: float, var: float | None = None):
         """
         Args:
             dmin: float
@@ -331,7 +331,7 @@ class CIFData(Dataset):
         dmin: int = 0,
         step: float = 0.2,
         random_seed: int = 123,
-        atom_initialization: AtomCustomJSONInitializer = None,
+        atom_initialization: AtomCustomJSONInitializer | None = None,
     ):
         """
         Args:

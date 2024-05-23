@@ -113,8 +113,8 @@ class QM9GapTask(GFlowNetTask):
         self,
         configuration: Dict[str, Any],
         dataset: GFlowNetDataset,
-        reward_model: nn.Module = None,
-        wrap_model: Callable[[nn.Module], nn.Module] = None,
+        reward_model: nn.Module | None = None,
+        wrap_model: Callable[[nn.Module], nn.Module] | None = None,
     ):
         """Initialize QM9 task.
 

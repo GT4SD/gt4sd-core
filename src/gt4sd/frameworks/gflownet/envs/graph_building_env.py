@@ -131,11 +131,11 @@ class GraphAction:
     def __init__(
         self,
         action: GraphActionType,
-        source: int = None,
-        target: int = None,
+        source: int | None = None,
+        target: int | None = None,
         value: Any = None,
-        attr: str = None,
-        relabel: int = None,
+        attr: str | None = None,
+        relabel: int | None = None,
     ):
         """Initialize a single graph-building action.
 
@@ -287,7 +287,7 @@ class GraphBuildingEnv:
 
 
 def generate_forward_trajectory(
-    g: Graph, max_nodes: int = None
+    g: Graph, max_nodes: int | None = None
 ) -> List[Tuple[Graph, GraphAction]]:
     """Sample (uniformly) a trajectory that generates g.
 

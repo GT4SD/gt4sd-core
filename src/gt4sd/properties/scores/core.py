@@ -151,7 +151,7 @@ class CombinedScorer:
     def __init__(
         self,
         scorer_list: List[Type[Any]],
-        weights: List[float] = None,
+        weights: List[float] | None = None,
     ) -> None:
         """Scoring function which generates a combined score for a SMILES as per the given scoring functions.
 

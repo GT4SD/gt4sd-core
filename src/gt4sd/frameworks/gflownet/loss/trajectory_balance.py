@@ -77,7 +77,7 @@ class TrajectoryBalance:
         configuration: Dict[str, Any],
         environment: GraphBuildingEnv,
         context: GraphBuildingEnvContext,
-        max_len: int = None,
+        max_len: int | None = None,
     ):
         """Initialize trajectory balance algorithm.
 

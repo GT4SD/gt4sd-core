@@ -1013,7 +1013,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
             if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
                 # Copolymer models require specific validation
                 return validate_molecules(
-                    pattern_list=list(zip(*sequences))[0],
+                    pattern_list=list(zip(*sequences))[0], # type: ignore
                     input_type=MoleculeFormat.copolymer,
                 )
 
