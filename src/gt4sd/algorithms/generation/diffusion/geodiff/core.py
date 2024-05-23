@@ -253,8 +253,8 @@ class GeoDiffPipeline:
         molSize = (450, 300)
         drawer = MD2.MolDraw2DSVG(molSize[0], molSize[1])
         drawer.DrawMolecule(mc)
-        drawer.FinishDrawing() # type: ignore
-        svg = drawer.GetDrawingText() #type: ignore
+        drawer.FinishDrawing()  # type: ignore
+        svg = drawer.GetDrawingText()  # type: ignore
         display(SVG(svg.replace("svg:", "")))
 
     def visualize_3d(self, mols_gen: List[Chem.Mol]) -> None:

@@ -195,7 +195,7 @@ def number_of_rotatable_bonds(mol: SmallMolecule) -> int:
 def number_of_large_rings(mol: SmallMolecule) -> int:
     """Calculate the amount of large rings (> 6 atoms) of a molecule."""
     mol = to_mol(mol)
-    ringinfo = mol.GetRingInfo() # type: ignore
+    ringinfo = mol.GetRingInfo()  # type: ignore
     return len([x for x in ringinfo.AtomRings() if len(x) > 6])
 
 

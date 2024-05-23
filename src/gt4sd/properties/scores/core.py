@@ -235,7 +235,7 @@ class RDKitDescriptorScorer(TargetValueScorer):
             descriptor=self.descriptor,
             score_modifier=self.modifier,
         )
-        return scoring_function.score_mol(Chem.MolFromSmiles(smiles)) # type: ignore
+        return scoring_function.score_mol(Chem.MolFromSmiles(smiles))  # type: ignore
 
 
 class TanimotoScorer(TargetValueScorer):
@@ -274,7 +274,7 @@ class TanimotoScorer(TargetValueScorer):
             fp_type=self.fp_type,
             score_modifier=self.modifier,
         )
-        return scoring_function.score_mol(Chem.MolFromSmiles(smiles)) # type: ignore
+        return scoring_function.score_mol(Chem.MolFromSmiles(smiles))  # type: ignore
 
 
 class IsomerScorer(TargetValueScorer):

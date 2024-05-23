@@ -71,7 +71,7 @@ def validate_smiles(
         for index, molecule in enumerate(molecules)
         if molecule is not None and molecule != ""
     ]
-    return molecules, valid_ids # type: ignore
+    return molecules, valid_ids  # type: ignore
 
 
 def validate_selfies(

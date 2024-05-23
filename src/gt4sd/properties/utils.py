@@ -49,14 +49,14 @@ def to_mol(mol: SmallMolecule) -> Chem.Mol:
         a rdkit.Chem.Mol object.
     """
     if isinstance(mol, str):
-        mol = Chem.MolFromSmiles(mol) # type: ignore
+        mol = Chem.MolFromSmiles(mol)  # type: ignore
     elif isinstance(mol, Chem.Mol):
         pass
     else:
         raise TypeError(
             f"Please provide SMILES string or rdkit.Chem.Mol object not {type(mol)}"
         )
-    return mol # type: ignore
+    return mol  # type: ignore
 
 
 def to_smiles(mol: SmallMolecule) -> str:
@@ -70,7 +70,7 @@ def to_smiles(mol: SmallMolecule) -> str:
     """
     if isinstance(mol, str):
         try:
-            mol = Chem.MolFromSmiles(mol) # type: ignore
+            mol = Chem.MolFromSmiles(mol)  # type: ignore
         except Exception:
             raise ValueError(
                 f"Could not convert SMILES string to rdkit.Chem.Mol: {mol}"
@@ -82,7 +82,7 @@ def to_smiles(mol: SmallMolecule) -> str:
             f"Pass a SMILES string or rdkit.Chem.Mol object not {type(mol)}"
         )
 
-    return Chem.MolToSmiles(mol, canonical=True) # type: ignore
+    return Chem.MolToSmiles(mol, canonical=True)  # type: ignore
 
 
 def get_similarity_fn(
