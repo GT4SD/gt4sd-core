@@ -326,7 +326,7 @@ class SMARTSScorer(TargetValueScorer):
             A score for the given SMILES
         """
         scoring_function = SMARTSScoringFunction(self.target_smile, self.inverse)
-        return scoring_function.score_mol(Chem.MolFromSmiles(smiles))
+        return scoring_function.score_mol(Chem.MolFromSmiles(smiles))  # type: ignore
 
 
 class QEDScorer(TargetValueScorer):

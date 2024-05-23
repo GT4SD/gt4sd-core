@@ -873,8 +873,8 @@ def rdkit_conformation(mol, n=5, addHs=False):
     confs = AllChem.EmbedMultipleConfs(mol, numConfs=n, params=params)
     minc, aminc = 1000, 0
     for i in range(len(confs)):
-        mp = AllChem.MMFFGetMoleculeProperties(mol, mmffVariant="MMFF94s")
-        ff = AllChem.MMFFGetMoleculeForceField(mol, mp, confId=i)
+        mp = AllChem.MMFFGetMoleculeProperties(mol, mmffVariant="MMFF94s")  # type: ignore
+        ff = AllChem.MMFFGetMoleculeForceField(mol, mp, confId=i)  # type: ignore
         if ff is None:
             continue
         e = ff.CalcEnergy()

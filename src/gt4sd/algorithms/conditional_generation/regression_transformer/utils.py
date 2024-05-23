@@ -67,7 +67,7 @@ def filter_stubbed(
 
     seed = Chem.MolFromSmiles(target)  # type: ignore
 
-    seed_atoms = len(list(seed.GetAtoms()))
+    seed_atoms = len(list(seed.GetAtoms()))  # type: ignore
     seed_bonds = seed.GetNumBonds()  # type: ignore
 
     smis: List[str] = []
@@ -77,8 +77,8 @@ def filter_stubbed(
             continue
         try:
             mol = Chem.MolFromSmiles(smi)  # type: ignore
-            num_atoms = len(list(mol.GetAtoms()))
-            num_bonds = mol.GetNumBonds()
+            num_atoms = len(list(mol.GetAtoms()))  # type: ignore
+            num_bonds = mol.GetNumBonds()  # type: ignore
 
             if num_atoms > (threshold * seed_atoms) and num_bonds > (
                 threshold * seed_bonds
