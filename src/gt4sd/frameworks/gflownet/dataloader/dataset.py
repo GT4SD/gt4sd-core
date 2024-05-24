@@ -24,7 +24,7 @@
 import ast
 import os
 import pickle
-from typing import Any, Callable, Dict, List, NewType, Tuple, Union
+from typing import Any, Callable, Dict, List, NewType, Tuple, Union, Optional
 
 import numpy as np
 import pandas as pd
@@ -51,7 +51,7 @@ class GFlowNetDataset(Dataset):
 
     def __init__(
         self,
-        h5_file: str | None = None,
+        h5_file: Optional[str] = None,
         target: str = "gap",
         properties: List[str] = [],
     ) -> None:
@@ -242,8 +242,8 @@ class GFlowNetTask:
         self,
         configuration: Dict[str, Any],
         dataset: GFlowNetDataset,
-        reward_model: nn.Module | None = None,
-        wrap_model: Callable[[nn.Module], nn.Module] | None = None,
+        reward_model: Optional[nn.Module] = None,
+        wrap_model: Optional[Callable[[nn.Module], nn.Module]] = None,
     ) -> None:
 
         """Initialize a generic gflownet task.

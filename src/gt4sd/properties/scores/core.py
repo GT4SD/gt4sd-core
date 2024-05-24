@@ -23,7 +23,7 @@
 #
 """Implementation of scorers."""
 from functools import partial
-from typing import Any, Callable, Dict, List, Type
+from typing import Any, Callable, Dict, List, Type, Optional
 
 import numpy as np
 from rdkit import Chem
@@ -151,7 +151,7 @@ class CombinedScorer:
     def __init__(
         self,
         scorer_list: List[Type[Any]],
-        weights: List[float] | None = None,
+        weights: Optional[List[float]] = None,
     ) -> None:
         """Scoring function which generates a combined score for a SMILES as per the given scoring functions.
 

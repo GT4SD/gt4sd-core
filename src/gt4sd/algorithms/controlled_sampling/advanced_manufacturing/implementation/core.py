@@ -154,7 +154,7 @@ class Objective:
         targets: Dict[str, float],
         property_predictors: Dict[str, PropertyPredictor],
         representations: RepresentationsDict,
-        representation_order: List[str] | None = None,
+        representation_order: Optional[List[str]] = None,
         scalers: Optional[Dict[str, Scaler]] = None,
         weights: Optional[Dict[str, float]] = None,
         custom_score_function: Optional[
