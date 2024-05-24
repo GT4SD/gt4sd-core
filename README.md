@@ -27,8 +27,8 @@ Almost all pretrained models are also available via `gradio`-powered [web apps](
 
 Currently `gt4sd` relies on:
 
-- python>=3.7,<3.9
-- pip>=19.1,<20.3
+- python>=3.7,<=3.10
+- pip==24.0
 
 We are actively working on relaxing these, so stay tuned or help us with this by [contributing](./CONTRIBUTING.md) to the project.
 
