@@ -23,7 +23,7 @@
 #
 import copy
 import enum
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, Optional
 
 import networkx as nx
 import numpy as np
@@ -131,11 +131,11 @@ class GraphAction:
     def __init__(
         self,
         action: GraphActionType,
-        source: int = None,
-        target: int = None,
+        source: Optional[int] = None,
+        target: Optional[int] = None,
         value: Any = None,
-        attr: str = None,
-        relabel: int = None,
+        attr: Optional[str] = None,
+        relabel: Optional[int] = None,
     ):
         """Initialize a single graph-building action.
 
@@ -287,7 +287,7 @@ class GraphBuildingEnv:
 
 
 def generate_forward_trajectory(
-    g: Graph, max_nodes: int = None
+    g: Graph, max_nodes: Optional[int] = None
 ) -> List[Tuple[Graph, GraphAction]]:
     """Sample (uniformly) a trajectory that generates g.
 

@@ -24,7 +24,7 @@
 import ast
 import os
 import pickle
-from typing import Any, Callable, Dict, List, NewType, Tuple, Union
+from typing import Any, Callable, Dict, List, NewType, Tuple, Union, Optional
 
 import numpy as np
 import pandas as pd
@@ -50,7 +50,10 @@ class GFlowNetDataset(Dataset):
     """A dataset for gflownet."""
 
     def __init__(
-        self, h5_file: str = None, target: str = "gap", properties: List[str] = []
+        self,
+        h5_file: Optional[str] = None,
+        target: str = "gap",
+        properties: List[str] = [],
     ) -> None:
 
         """Initialize a gflownet dataset.
@@ -239,8 +242,8 @@ class GFlowNetTask:
         self,
         configuration: Dict[str, Any],
         dataset: GFlowNetDataset,
-        reward_model: nn.Module = None,
-        wrap_model: Callable[[nn.Module], nn.Module] = None,
+        reward_model: Optional[nn.Module] = None,
+        wrap_model: Optional[Callable[[nn.Module], nn.Module]] = None,
     ) -> None:
 
         """Initialize a generic gflownet task.
@@ -282,7 +285,7 @@ class GFlowNetTask:
         Returns:
             model: a dictionary with the task models.
         """
-        pass
+        raise NotImplementedError()
 
     def sample_conditional_information(self, n: int) -> Dict[str, Any]:
         """Samples conditional information for a minibatch.
@@ -293,7 +296,7 @@ class GFlowNetTask:
         Returns:
             cond_info: a dictionary with the sampled conditional information.
         """
-        pass
+        raise NotImplementedError()
 
     def cond_info_to_reward(
         self, cond_info: Dict[str, Any], flat_reward: FlatRewards

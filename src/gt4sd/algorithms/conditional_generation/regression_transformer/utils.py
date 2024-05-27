@@ -65,10 +65,10 @@ def filter_stubbed(
         Tuple of tuples of length 2 with filtered, generated molecule and its properties.
     """
 
-    seed = Chem.MolFromSmiles(target)
+    seed = Chem.MolFromSmiles(target)  # type: ignore
 
-    seed_atoms = len(list(seed.GetAtoms()))
-    seed_bonds = seed.GetNumBonds()
+    seed_atoms = len(list(seed.GetAtoms()))  # type: ignore
+    seed_bonds = seed.GetNumBonds()  # type: ignore
 
     smis: List[str] = []
     props: List[str] = []
@@ -76,9 +76,9 @@ def filter_stubbed(
         if smi == "":
             continue
         try:
-            mol = Chem.MolFromSmiles(smi)
-            num_atoms = len(list(mol.GetAtoms()))
-            num_bonds = mol.GetNumBonds()
+            mol = Chem.MolFromSmiles(smi)  # type: ignore
+            num_atoms = len(list(mol.GetAtoms()))  # type: ignore
+            num_bonds = mol.GetNumBonds()  # type: ignore
 
             if num_atoms > (threshold * seed_atoms) and num_bonds > (
                 threshold * seed_bonds

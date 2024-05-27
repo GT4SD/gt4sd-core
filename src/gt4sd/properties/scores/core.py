@@ -23,7 +23,7 @@
 #
 """Implementation of scorers."""
 from functools import partial
-from typing import Any, Callable, Dict, List, Type
+from typing import Any, Callable, Dict, List, Type, Optional
 
 import numpy as np
 from rdkit import Chem
@@ -151,7 +151,7 @@ class CombinedScorer:
     def __init__(
         self,
         scorer_list: List[Type[Any]],
-        weights: List[float] = None,
+        weights: Optional[List[float]] = None,
     ) -> None:
         """Scoring function which generates a combined score for a SMILES as per the given scoring functions.
 
@@ -235,7 +235,7 @@ class RDKitDescriptorScorer(TargetValueScorer):
             descriptor=self.descriptor,
             score_modifier=self.modifier,
         )
-        return scoring_function.score_mol(Chem.MolFromSmiles(smiles))
+        return scoring_function.score_mol(Chem.MolFromSmiles(smiles))  # type: ignore
 
 
 class TanimotoScorer(TargetValueScorer):
@@ -274,7 +274,7 @@ class TanimotoScorer(TargetValueScorer):
             fp_type=self.fp_type,
             score_modifier=self.modifier,
         )
-        return scoring_function.score_mol(Chem.MolFromSmiles(smiles))
+        return scoring_function.score_mol(Chem.MolFromSmiles(smiles))  # type: ignore
 
 
 class IsomerScorer(TargetValueScorer):
@@ -326,7 +326,7 @@ class SMARTSScorer(TargetValueScorer):
             A score for the given SMILES
         """
         scoring_function = SMARTSScoringFunction(self.target_smile, self.inverse)
-        return scoring_function.score_mol(Chem.MolFromSmiles(smiles))
+        return scoring_function.score_mol(Chem.MolFromSmiles(smiles))  # type: ignore
 
 
 class QEDScorer(TargetValueScorer):

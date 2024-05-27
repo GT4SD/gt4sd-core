@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple, Union, Optional
 
 import numpy as np
 import torch
@@ -113,8 +113,8 @@ class QM9GapTask(GFlowNetTask):
         self,
         configuration: Dict[str, Any],
         dataset: GFlowNetDataset,
-        reward_model: nn.Module = None,
-        wrap_model: Callable[[nn.Module], nn.Module] = None,
+        reward_model: Optional[nn.Module] = None,
+        wrap_model: Optional[Callable[[nn.Module], nn.Module]] = None,
     ):
         """Initialize QM9 task.
 
