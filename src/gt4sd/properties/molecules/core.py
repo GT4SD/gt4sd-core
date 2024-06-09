@@ -186,7 +186,9 @@ class DockingParameters(PropertyPredictorParameters):
     box_center: List[int] = Field(
         examples=[[15.190, 53.903, 16.917]], description="Docking box center"
     )
-    box_size: List[float] = Field(examples=[[20, 20, 20]], description="Docking box size")
+    box_size: List[float] = Field(
+        examples=[[20, 20, 20]], description="Docking box size"
+    )
 
 
 class S3ParametersMolecules(S3Parameters):

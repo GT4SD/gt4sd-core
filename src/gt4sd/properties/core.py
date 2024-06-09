@@ -49,7 +49,9 @@ class S3Parameters(PropertyPredictorParameters):
     domain: DomainSubmodule = Field(
         ..., examples=["molecules"], description="Submodule of gt4sd.properties"
     )
-    algorithm_name: str = Field(..., examples=["MCA"], description="Name of the algorithm")
+    algorithm_name: str = Field(
+        ..., examples=["MCA"], description="Name of the algorithm"
+    )
     algorithm_version: str = Field(
         ..., examples=["v0"], description="Version of the algorithm"
     )
