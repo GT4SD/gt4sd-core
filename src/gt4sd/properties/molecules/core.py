@@ -138,7 +138,6 @@ class AskcosParameters(IpAdressParameters):
         default=Output.plausability,
         examples=[Output.synthesizability],
         description="Main output return type from ASKCOS",
-        options=["plausibility", "num_step", "synthesizability", "price"],
     )
     save_json: bool = Field(default=False)
     file_name: str = Field(default="tree_builder_result.json")
@@ -171,9 +170,8 @@ class DockingTdcParameters(PropertyPredictorParameters):
     # To dock against a receptor defined via TDC
     target: str = Field(
         ...,
-        examples=["1iep_docking"],
+        examples=download_receptor_oracle_name,
         description="Target for docking, provided via TDC",
-        options=download_receptor_oracle_name,
     )
 
 
@@ -271,7 +269,6 @@ class OrganToxParameters(MCAParameters):
         default=ToxType.all,
         examples=[ToxType.chronic],
         description="type of toxicity for which predictions are made.",
-        options=["chronic", "subchronic", "multigenerational", "all"],
     )
 
 
