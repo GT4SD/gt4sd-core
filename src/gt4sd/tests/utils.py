@@ -29,7 +29,7 @@ from functools import lru_cache
 from pathlib import PosixPath
 
 import importlib_resources
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class GT4SDTestSettings(BaseSettings):
@@ -40,10 +40,7 @@ class GT4SDTestSettings(BaseSettings):
     gt4sd_s3_secret_key: str = "5748375c761a4f09c30a68cd15e218e3b27ca3e2aebd7726"
     gt4sd_s3_secure: bool = True
     gt4sd_ci: bool = False
-
-    class Config:
-        # immutable and in turn hashable, that is required for lru_cache
-        frozen = True
+    model_config = SettingsConfigDict(frozen=True)
 
     @staticmethod
     @lru_cache(maxsize=None)
