@@ -196,7 +196,7 @@ class ApplicationsRegistry:
                 ],  # type: ignore
             )
             # NOTE: Needed to circumvent a pydantic TypeError: Parameter list to Generic[...] cannot be empty
-            VanillaConfiguration.__parameters__ = (TypeVar("T"),)
+            VanillaConfiguration.__parameters__ = (TypeVar("T"),) # type: ignore
             # NOTE: Duplicate call necessary for pydantic >=1.10.* - see https://github.com/pydantic/pydantic/issues/4695
             PydanticConfiguration: Type[AlgorithmConfiguration] = dataclass(  # type: ignore
                 VanillaConfiguration
