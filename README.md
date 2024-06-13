@@ -30,7 +30,7 @@ Currently `gt4sd` relies on:
 - python>=3.7,<=3.10
 - pip==24.0
 
-We are actively working on relaxing these, so stay tuned or help us with this by [contributing](./CONTRIBUTING.md) to the project.
+If you need others, help us by [contributing](./CONTRIBUTING.md) to the project.
 
 ### Conda
 
