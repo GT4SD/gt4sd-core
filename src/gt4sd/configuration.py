@@ -27,8 +27,7 @@ import logging
 import os
 from functools import lru_cache
 from typing import Dict, Optional, Set
-
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .s3 import GT4SDS3Client, S3SyncError, sync_folder_with_s3, upload_file_to_s3
 
@@ -65,10 +64,7 @@ class GT4SDConfiguration(BaseSettings):
     gt4sd_s3_secure_hub: bool = True
     gt4sd_s3_bucket_hub_algorithms: str = "gt4sd-cos-hub-algorithms-artifacts"
     gt4sd_s3_bucket_hub_properties: str = "gt4sd-cos-hub-properties-artifacts"
-
-    class Config:
-        # immutable and in turn hashable, that is required for lru_cache
-        frozen = True
+    model_config = SettingsConfigDict(frozen=True)
 
     @staticmethod
     @lru_cache(maxsize=None)
