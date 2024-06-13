@@ -14,6 +14,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -30,11 +32,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+        <script src="../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -177,11 +180,11 @@
            <div itemprop="articleBody">
             
   <section id="gt4sd-server-upload">
-<h1>GT4SD server upload<a class="headerlink" href="#gt4sd-server-upload" title="Permalink to this headline">¶</a></h1>
+<h1>GT4SD server upload<a class="headerlink" href="#gt4sd-server-upload" title="Permalink to this heading">¶</a></h1>
 <p>Here we report an example of how you can setup a custom minio server on localhost where you can upload your algorithms. Keep in mind that the same procedure can be used with a pre-existing COS simply setting the environment variables to the appropriate values.</p>
 <hr class="docutils" />
 <section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>docker</p></li>
 <li><p>minio</p></li>
@@ -190,9 +193,9 @@
 </section>
 <hr class="docutils" />
 <section id="run-a-local-minio-server">
-<h2>Run a local minio server<a class="headerlink" href="#run-a-local-minio-server" title="Permalink to this headline">¶</a></h2>
+<h2>Run a local minio server<a class="headerlink" href="#run-a-local-minio-server" title="Permalink to this heading">¶</a></h2>
 <section id="set-environment-variables">
-<h3>1) Set environment variables<a class="headerlink" href="#set-environment-variables" title="Permalink to this headline">¶</a></h3>
+<h3>1) Set environment variables<a class="headerlink" href="#set-environment-variables" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_HOST_HUB</span><span class="o">=</span><span class="s1">&#39;127.0.0.1:9000&#39;</span>
@@ -205,7 +208,7 @@
 <p>set <code class="docutils literal notranslate"><span class="pre">GT4SD_S3_SECURE</span></code> <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> if https/http server.</p>
 </section>
 <section id="create-a-docker-container-with-a-minio-server">
-<h3>2) Create a docker container with a minio server<a class="headerlink" href="#create-a-docker-container-with-a-minio-server" title="Permalink to this headline">¶</a></h3>
+<h3>2) Create a docker container with a minio server<a class="headerlink" href="#create-a-docker-container-with-a-minio-server" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/
 mkdir<span class="w"> </span>localhost-server
 <span class="nb">cd</span><span class="w"> </span>localhost-server
@@ -248,7 +251,7 @@ services:
 <p>You can store default environment variables in <code class="docutils literal notranslate"><span class="pre">.env.dev</span></code>.</p>
 </section>
 <section id="minio-server-configuration">
-<h3>3) MinIO server configuration<a class="headerlink" href="#minio-server-configuration" title="Permalink to this headline">¶</a></h3>
+<h3>3) MinIO server configuration<a class="headerlink" href="#minio-server-configuration" title="Permalink to this heading">¶</a></h3>
 <p>Add the new server to the minio configuration file (<code class="docutils literal notranslate"><span class="pre">~/.mc/config.json</span></code>):</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="o">{</span>
 <span class="w">	</span><span class="s2">&quot;version&quot;</span>:<span class="w"> </span><span class="s2">&quot;10&quot;</span>,
@@ -271,7 +274,7 @@ services:
 </div>
 </section>
 <section id="run-docker">
-<h3>4) run docker<a class="headerlink" href="#run-docker" title="Permalink to this headline">¶</a></h3>
+<h3>4) run docker<a class="headerlink" href="#run-docker" title="Permalink to this heading">¶</a></h3>
 <p>After running <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">up</span></code> inside localhost-server the script creates a local minio server and the bucket structure on <code class="docutils literal notranslate"><span class="pre">myminio</span></code>.
 If everything is working you should be able to see <code class="docutils literal notranslate"><span class="pre">a_file.txt</span></code> running:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mc</span> <span class="n">ls</span> <span class="n">myminio</span><span class="o">/</span><span class="n">gt4sd</span><span class="o">-</span><span class="n">cos</span><span class="o">-</span><span class="n">algorithms</span><span class="o">-</span><span class="n">artifacts</span><span class="o">/</span>
@@ -281,7 +284,7 @@ If everything is working you should be able to see <code class="docutils literal
 </section>
 <hr class="docutils" />
 <section id="upload-models">
-<h2>Upload models<a class="headerlink" href="#upload-models" title="Permalink to this headline">¶</a></h2>
+<h2>Upload models<a class="headerlink" href="#upload-models" title="Permalink to this heading">¶</a></h2>
 <p>After setting th environment variables appropriately and following steps 1-4), you can now upload your model on the server:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>gt4sd-upload<span class="w"> </span>--training_pipeline_name<span class="w"> </span>paccmann-vae-trainer<span class="w"> </span>--model_path<span class="w"> </span>/tmp/gt4sd-paccmann-gp<span class="w"> </span>--training_name<span class="w"> </span>fast-example<span class="w"> </span>--target_version<span class="w"> </span>fast-example-v0<span class="w"> </span>--algorithm_application<span class="w"> </span>PaccMannGPGenerator
 </pre></div>

@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,11 +31,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -214,14 +217,14 @@
 <span class="sd">        a rdkit.Chem.Mol object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">):</span>
         <span class="k">pass</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Please provide SMILES string or rdkit.Chem.Mol object not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
-    <span class="k">return</span> <span class="n">mol</span></div>
+    <span class="k">return</span> <span class="n">mol</span>  <span class="c1"># type: ignore</span></div>
 
 
 <div class="viewcode-block" id="to_smiles"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.to_smiles">[docs]</a><span class="k">def</span> <span class="nf">to_smiles</span><span class="p">(</span><span class="n">mol</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -235,7 +238,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+            <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Could not convert SMILES string to rdkit.Chem.Mol: </span><span class="si">{</span><span class="n">mol</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -247,7 +250,7 @@
             <span class="sa">f</span><span class="s2">&quot;Pass a SMILES string or rdkit.Chem.Mol object not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">canonical</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">canonical</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
 
 
 <div class="viewcode-block" id="get_similarity_fn"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_similarity_fn">[docs]</a><span class="k">def</span> <span class="nf">get_similarity_fn</span><span class="p">(</span>

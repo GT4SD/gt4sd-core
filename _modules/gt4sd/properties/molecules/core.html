@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,11 +31,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
@@ -224,7 +227,7 @@
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">OrganDB</span> <span class="k">as</span> <span class="n">_OrganTox</span>
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">SCScore</span>
 <span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">Tox21</span> <span class="k">as</span> <span class="n">_Tox21</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">Field</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span>
 <span class="kn">from</span> <span class="nn">tdc</span> <span class="kn">import</span> <span class="n">Oracle</span>
 <span class="kn">from</span> <span class="nn">tdc.metadata</span> <span class="kn">import</span> <span class="n">download_receptor_oracle_name</span>
 
@@ -284,12 +287,12 @@
 
 
 <div class="viewcode-block" id="SimilaritySeedParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SimilaritySeedParameters">[docs]</a><span class="k">class</span> <span class="nc">SimilaritySeedParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
-    <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">example</span><span class="o">=</span><span class="s2">&quot;c1ccccc1&quot;</span><span class="p">)</span>
+    <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;c1ccccc1&quot;</span><span class="p">])</span>
     <span class="n">fp_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ECFP4&quot;</span></div>
 
 
 <div class="viewcode-block" id="ActivityAgainstTargetParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ActivityAgainstTargetParameters">[docs]</a><span class="k">class</span> <span class="nc">ActivityAgainstTargetParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
-    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">example</span><span class="o">=</span><span class="s2">&quot;drd2&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;name of the target.&quot;</span><span class="p">)</span></div>
+    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;drd2&quot;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;name of the target.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="AskcosParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.AskcosParameters">[docs]</a><span class="k">class</span> <span class="nc">AskcosParameters</span><span class="p">(</span><span class="n">IpAdressParameters</span><span class="p">):</span>
@@ -301,9 +304,8 @@
 
     <span class="n">output</span><span class="p">:</span> <span class="n">Output</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="n">Output</span><span class="o">.</span><span class="n">plausability</span><span class="p">,</span>
-        <span class="n">example</span><span class="o">=</span><span class="n">Output</span><span class="o">.</span><span class="n">synthesizability</span><span class="p">,</span>
+        <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="n">Output</span><span class="o">.</span><span class="n">synthesizability</span><span class="p">],</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Main output return type from ASKCOS&quot;</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;plausibility&quot;</span><span class="p">,</span> <span class="s2">&quot;num_step&quot;</span><span class="p">,</span> <span class="s2">&quot;synthesizability&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">save_json</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;tree_builder_result.json&quot;</span><span class="p">)</span>
@@ -324,10 +326,7 @@
     <span class="n">min_chempop_products</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
     <span class="n">filter_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
     <span class="n">return_first</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;true&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Convert enum items back to strings</span>
-<div class="viewcode-block" id="AskcosParameters.Config"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.AskcosParameters.Config">[docs]</a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
-        <span class="n">use_enum_values</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">use_enum_values</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="MoleculeOneParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MoleculeOneParameters">[docs]</a><span class="k">class</span> <span class="nc">MoleculeOneParameters</span><span class="p">(</span><span class="n">ApiTokenParameters</span><span class="p">):</span>
@@ -339,9 +338,8 @@
     <span class="c1"># To dock against a receptor defined via TDC</span>
     <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="o">...</span><span class="p">,</span>
-        <span class="n">example</span><span class="o">=</span><span class="s2">&quot;1iep_docking&quot;</span><span class="p">,</span>
+        <span class="n">examples</span><span class="o">=</span><span class="n">download_receptor_oracle_name</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Target for docking, provided via TDC&quot;</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">=</span><span class="n">download_receptor_oracle_name</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -349,12 +347,14 @@
     <span class="c1"># To dock against a user-provided receptor</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;pyscreener&quot;</span><span class="p">)</span>
     <span class="n">receptor_pdb_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">example</span><span class="o">=</span><span class="s2">&quot;/tmp/2hbs.pdb&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Path to receptor PDB file&quot;</span>
+        <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/tmp/2hbs.pdb&quot;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Path to receptor PDB file&quot;</span>
     <span class="p">)</span>
     <span class="n">box_center</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">example</span><span class="o">=</span><span class="p">[</span><span class="mf">15.190</span><span class="p">,</span> <span class="mf">53.903</span><span class="p">,</span> <span class="mf">16.917</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Docking box center&quot;</span>
+        <span class="n">examples</span><span class="o">=</span><span class="p">[[</span><span class="mf">15.190</span><span class="p">,</span> <span class="mf">53.903</span><span class="p">,</span> <span class="mf">16.917</span><span class="p">]],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Docking box center&quot;</span>
     <span class="p">)</span>
-    <span class="n">box_size</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">example</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Docking box size&quot;</span><span class="p">)</span></div>
+    <span class="n">box_size</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">examples</span><span class="o">=</span><span class="p">[[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">]],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Docking box size&quot;</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="S3ParametersMolecules"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.S3ParametersMolecules">[docs]</a><span class="k">class</span> <span class="nc">S3ParametersMolecules</span><span class="p">(</span><span class="n">S3Parameters</span><span class="p">):</span>
@@ -430,14 +430,13 @@
     <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;OrganTox&quot;</span>
     <span class="n">site</span><span class="p">:</span> <span class="n">Organs</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="o">...</span><span class="p">,</span>
-        <span class="n">example</span><span class="o">=</span><span class="n">Organs</span><span class="o">.</span><span class="n">kidney</span><span class="p">,</span>
+        <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="n">Organs</span><span class="o">.</span><span class="n">kidney</span><span class="p">],</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;name of the target site of interest.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">toxicity_type</span><span class="p">:</span> <span class="n">ToxType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="n">ToxType</span><span class="o">.</span><span class="n">all</span><span class="p">,</span>
-        <span class="n">example</span><span class="o">=</span><span class="n">ToxType</span><span class="o">.</span><span class="n">chronic</span><span class="p">,</span>
+        <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="n">ToxType</span><span class="o">.</span><span class="n">chronic</span><span class="p">],</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;type of toxicity for which predictions are made.&quot;</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chronic&quot;</span><span class="p">,</span> <span class="s2">&quot;subchronic&quot;</span><span class="p">,</span> <span class="s2">&quot;multigenerational&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">],</span>
     <span class="p">)</span></div>
 
 

@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,11 +31,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -190,8 +193,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
-
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseSettings</span>
+<span class="kn">from</span> <span class="nn">pydantic_settings</span> <span class="kn">import</span> <span class="n">BaseSettings</span><span class="p">,</span> <span class="n">SettingsConfigDict</span>
 
 <span class="kn">from</span> <span class="nn">.s3</span> <span class="kn">import</span> <span class="n">GT4SDS3Client</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">,</span> <span class="n">sync_folder_with_s3</span><span class="p">,</span> <span class="n">upload_file_to_s3</span>
 
@@ -228,10 +230,7 @@
     <span class="n">gt4sd_s3_secure_hub</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">gt4sd_s3_bucket_hub_algorithms</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gt4sd-cos-hub-algorithms-artifacts&quot;</span>
     <span class="n">gt4sd_s3_bucket_hub_properties</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gt4sd-cos-hub-properties-artifacts&quot;</span>
-
-<div class="viewcode-block" id="GT4SDConfiguration.Config"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.GT4SDConfiguration.Config">[docs]</a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
-        <span class="c1"># immutable and in turn hashable, that is required for lru_cache</span>
-        <span class="n">frozen</span> <span class="o">=</span> <span class="kc">True</span></div>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GT4SDConfiguration.get_instance"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.GT4SDConfiguration.get_instance">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
