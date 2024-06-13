@@ -25,7 +25,7 @@
 
 from __future__ import annotations
 
-import collections
+from collections.abc import Hashable
 import logging
 import os
 import shutil
@@ -233,7 +233,7 @@ class GeneratorAlgorithm(ABC, Generic[S, T]):
                 try:
                     valid_item = self.configuration.validate_item(item)
                     # check if sample is hashable
-                    if not isinstance(item, collections.Hashable):
+                    if not isinstance(item, Hashable):
                         yield valid_item
                         item_set.add(str(index))
                     else:
@@ -623,9 +623,11 @@ class AlgorithmConfiguration(Generic[S, T]):
                 target_version,
             )
             filepaths_mapping = {
-                filename: source_filepath
-                if os.path.exists(source_filepath)
-                else os.path.join(source_missing_path, filename)
+                filename: (
+                    source_filepath
+                    if os.path.exists(source_filepath)
+                    else os.path.join(source_missing_path, filename)
+                )
                 for filename, source_filepath in filepaths_mapping.items()
             }
             logger.info(f"Saving artifacts into {target_path}...")
@@ -713,9 +715,11 @@ class AlgorithmConfiguration(Generic[S, T]):
 
             # mapping between filenames and paths for a version.
             filepaths_mapping = {
-                filename: source_filepath
-                if os.path.exists(source_filepath)
-                else os.path.join(source_missing_path, filename)
+                filename: (
+                    source_filepath
+                    if os.path.exists(source_filepath)
+                    else os.path.join(source_missing_path, filename)
+                )
                 for filename, source_filepath in filepaths_mapping.items()
             }
 

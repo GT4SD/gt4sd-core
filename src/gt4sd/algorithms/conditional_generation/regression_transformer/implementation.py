@@ -1013,7 +1013,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
             if isinstance(self.tokenizer.text_tokenizer, PolymerGraphTokenizer):
                 # Copolymer models require specific validation
                 return validate_molecules(
-                    pattern_list=list(zip(*sequences))[0],
+                    pattern_list=list(zip(*sequences))[0],  # type: ignore
                     input_type=MoleculeFormat.copolymer,
                 )
 
@@ -1086,9 +1086,11 @@ class ChemicalLanguageRT(ConditionalGenerator):
                     f"{keep} is not a valid SMILES/SELFIES. Instead substructure filtering "
                     f"based on sequence alone can be done and is set to: {self.text_filtering}"
                 )
-            if keep not in self.substructures_to_keep and not Chem.MolFromSmiles(
+            if keep not in self.substructures_to_keep and not Chem.MolFromSmiles(  # type: ignore
                 self.target
-            ).HasSubstructMatch(subs_mol):
+            ).HasSubstructMatch(
+                subs_mol
+            ):
                 logger.info(
                     f"{keep} could not be identified in SMILES/SELFIES on text level AND no "
                     "substructure match occurred, hence it will be ignored"
@@ -1120,7 +1122,7 @@ class ChemicalLanguageRT(ConditionalGenerator):
                         sane = False
                         break
                 else:
-                    if not mol.HasSubstructMatch(subs_mol):
+                    if not mol.HasSubstructMatch(subs_mol):  # type: ignore
                         # Desired substructure not found
                         sane = False
                         break

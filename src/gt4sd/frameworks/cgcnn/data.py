@@ -31,7 +31,7 @@ import json
 import logging
 import os
 import random
-from typing import Any, Callable, List, Tuple, Union
+from typing import Any, Callable, List, Tuple, Union, Optional
 
 import numpy as np
 import torch
@@ -49,7 +49,7 @@ def get_train_val_test_loader(
     dataset: torch.utils.data.Dataset,
     collate_fn: Callable[[List[Any]], Any] = default_collate,
     batch_size: int = 64,
-    train_ratio: float = None,
+    train_ratio: Optional[float] = None,
     val_ratio: float = 0.1,
     test_ratio: float = 0.1,
     return_test: bool = False,
@@ -212,7 +212,9 @@ class GaussianDistance:
     Unit: angstrom
     """
 
-    def __init__(self, dmin: float, dmax: float, step: float, var: float = None):
+    def __init__(
+        self, dmin: float, dmax: float, step: float, var: Optional[float] = None
+    ):
         """
         Args:
             dmin: float
@@ -333,7 +335,7 @@ class CIFData(Dataset):
         dmin: int = 0,
         step: float = 0.2,
         random_seed: int = 123,
-        atom_initialization: AtomCustomJSONInitializer = None,
+        atom_initialization: Optional[AtomCustomJSONInitializer] = None,
     ):
         """
         Args:
