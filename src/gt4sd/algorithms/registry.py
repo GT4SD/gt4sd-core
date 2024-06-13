@@ -28,7 +28,17 @@ import logging
 from dataclasses import dataclass as vanilla_dataclass
 from dataclasses import field, make_dataclass
 from functools import WRAPPER_ASSIGNMENTS, update_wrapper
-from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional, Type
+from typing import (
+    Any,
+    Callable,
+    ClassVar,
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Type,
+    TypeVar,
+)
 
 import pydantic
 
@@ -185,6 +195,8 @@ class ApplicationsRegistry:
                     ),
                 ],  # type: ignore
             )
+            # NOTE: Needed to circumvent a pydantic TypeError: Parameter list to Generic[...] cannot be empty
+            VanillaConfiguration.__parameters__ = (TypeVar("T"),)  # type: ignore
             # NOTE: Duplicate call necessary for pydantic >=1.10.* - see https://github.com/pydantic/pydantic/issues/4695
             PydanticConfiguration: Type[AlgorithmConfiguration] = dataclass(  # type: ignore
                 VanillaConfiguration

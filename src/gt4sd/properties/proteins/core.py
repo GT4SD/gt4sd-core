@@ -46,7 +46,7 @@ from .functions import (
 class AmideConfiguration(PropertyPredictorParameters):
     amide: bool = Field(
         False,
-        example=False,
+        examples=[False],
         description="whether the sequences are C-terminally amidated.",
     )
 
@@ -58,7 +58,7 @@ class PhConfiguration(PropertyPredictorParameters):
 class AmidePhConfiguration(PropertyPredictorParameters):
     amide: bool = Field(
         False,
-        example=False,
+        examples=[False],
         description="whether the sequences are C-terminally amidated.",
     )
     ph: float = 7.0

@@ -912,8 +912,6 @@ def get_configuration_class_with_attributes(
 
 
 class PropertyPredictor(ABC, Generic[S, U]):
-    """TODO: Might be deprecated in future release."""
-
     def __init__(self, context: U) -> None:
         """Property predictor to investigate items.
 

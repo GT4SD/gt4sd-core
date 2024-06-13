@@ -47,19 +47,21 @@ class S3Parameters(PropertyPredictorParameters):
     algorithm_type: str = "prediction"
 
     domain: DomainSubmodule = Field(
-        ..., example="molecules", description="Submodule of gt4sd.properties"
+        ..., examples=["molecules"], description="Submodule of gt4sd.properties"
     )
-    algorithm_name: str = Field(..., example="MCA", description="Name of the algorithm")
+    algorithm_name: str = Field(
+        ..., examples=["MCA"], description="Name of the algorithm"
+    )
     algorithm_version: str = Field(
-        ..., example="v0", description="Version of the algorithm"
+        ..., examples=["v0"], description="Version of the algorithm"
     )
-    algorithm_application: str = Field(..., example="Tox21")
+    algorithm_application: str = Field(..., examples=["Tox21"])
 
 
 class ApiTokenParameters(PropertyPredictorParameters):
     api_token: str = Field(
         ...,
-        example="apk-c9db......",
+        examples=["apk-c9db......"],
         description="The API token/key to access the service",
     )
 
@@ -68,7 +70,7 @@ class IpAdressParameters(PropertyPredictorParameters):
 
     host_ip: str = Field(
         ...,
-        example="xx.xx.xxx.xxx",
+        examples=["xx.xx.xxx.xxx"],
         description="The host IP address to access the service",
     )
 

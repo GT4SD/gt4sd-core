@@ -58,19 +58,15 @@ def test_list_available_local_via_S3SyncError(mock_wrong_s3_env):
 
 def test_inherited_validation():
     Config = next(iter(ApplicationsRegistry.applications.values())).configuration_class
-    with pytest.raises(
-        ValidationError, match="algorithm_version\n +none is not an allowed value"
-    ):
+    with pytest.raises(ValidationError, match="should be a valid string"):
         Config(algorithm_version=None)  # type: ignore
 
-    # NOTE: values convertible to string will not raise!
-    Config(algorithm_version=5)  # type: ignore
+    with pytest.raises(ValidationError, match="should be a valid string"):
+        Config(algorithm_version=5)  # type: ignore
 
 
 def test_validation():
-    with pytest.raises(
-        ValidationError, match="batch_size\n +value is not a valid integer"
-    ):
+    with pytest.raises(ValidationError, match="should be a valid integer"):
         ApplicationsRegistry.get_configuration_instance(
             algorithm_type="conditional_generation",
             domain="materials",
@@ -78,25 +74,6 @@ def test_validation():
             algorithm_application="PaccMannRLProteinBasedGenerator",
             batch_size="wrong_type",
         )
-
-
-def test_pickable_wrapped_configurations():
-    # https://github.com/samuelcolvin/pydantic/issues/2111
-    Config = next(iter(ApplicationsRegistry.applications.values())).configuration_class
-    restored_obj = assert_pickable(Config(algorithm_version="test"))
-
-    # wrong type assignment, but we did not configure it to raise here:
-    restored_obj.algorithm_version = object
-    # ensure the restored dataclass is still a pydantic dataclass (mimic validation)
-    _, optional_errors = restored_obj.__pydantic_model__.__fields__.get(
-        "algorithm_version"
-    ).validate(
-        restored_obj.algorithm_version,
-        restored_obj.__dict__,
-        loc="algorithm_version",
-        cls=restored_obj.__class__,
-    )
-    assert optional_errors is not None
 
 
 def test_multiple_registration():
