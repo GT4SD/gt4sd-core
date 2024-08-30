@@ -23,7 +23,7 @@
 #
 import copy
 from itertools import count
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, Optional
 
 import numpy as np
 import torch
@@ -77,7 +77,7 @@ class TrajectoryBalance:
         configuration: Dict[str, Any],
         environment: GraphBuildingEnv,
         context: GraphBuildingEnvContext,
-        max_len: int = None,
+        max_len: Optional[int] = None,
     ):
         """Initialize trajectory balance algorithm.
 

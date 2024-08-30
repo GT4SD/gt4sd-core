@@ -59,7 +59,7 @@ from paccmann_generator.drug_evaluators import ClinTox as _ClinTox
 from paccmann_generator.drug_evaluators import OrganDB as _OrganTox
 from paccmann_generator.drug_evaluators import SCScore
 from paccmann_generator.drug_evaluators import Tox21 as _Tox21
-from pydantic import Field
+from pydantic import ConfigDict, Field
 from tdc import Oracle
 from tdc.metadata import download_receptor_oracle_name
 
@@ -119,12 +119,12 @@ class ScscoreConfiguration(PropertyPredictorParameters):
 
 
 class SimilaritySeedParameters(PropertyPredictorParameters):
-    smiles: str = Field(..., example="c1ccccc1")
+    smiles: str = Field(..., examples=["c1ccccc1"])
     fp_key: str = "ECFP4"
 
 
 class ActivityAgainstTargetParameters(PropertyPredictorParameters):
-    target: str = Field(..., example="drd2", description="name of the target.")
+    target: str = Field(..., examples=["drd2"], description="name of the target.")
 
 
 class AskcosParameters(IpAdressParameters):
@@ -136,9 +136,8 @@ class AskcosParameters(IpAdressParameters):
 
     output: Output = Field(
         default=Output.plausability,
-        example=Output.synthesizability,
+        examples=[Output.synthesizability],
         description="Main output return type from ASKCOS",
-        options=["plausibility", "num_step", "synthesizability", "price"],
     )
     save_json: bool = Field(default=False)
     file_name: str = Field(default="tree_builder_result.json")
@@ -159,10 +158,7 @@ class AskcosParameters(IpAdressParameters):
     min_chempop_products: int = Field(default=5)
     filter_threshold: float = Field(default=0.1)
     return_first: str = Field(default="true")
-
-    # Convert enum items back to strings
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class MoleculeOneParameters(ApiTokenParameters):
@@ -174,9 +170,8 @@ class DockingTdcParameters(PropertyPredictorParameters):
     # To dock against a receptor defined via TDC
     target: str = Field(
         ...,
-        example="1iep_docking",
+        examples=download_receptor_oracle_name,
         description="Target for docking, provided via TDC",
-        options=download_receptor_oracle_name,
     )
 
 
@@ -184,12 +179,14 @@ class DockingParameters(PropertyPredictorParameters):
     # To dock against a user-provided receptor
     name: str = Field(default="pyscreener")
     receptor_pdb_file: str = Field(
-        example="/tmp/2hbs.pdb", description="Path to receptor PDB file"
+        examples=["/tmp/2hbs.pdb"], description="Path to receptor PDB file"
     )
     box_center: List[int] = Field(
-        example=[15.190, 53.903, 16.917], description="Docking box center"
+        examples=[[15.190, 53.903, 16.917]], description="Docking box center"
     )
-    box_size: List[float] = Field(example=[20, 20, 20], description="Docking box size")
+    box_size: List[float] = Field(
+        examples=[[20, 20, 20]], description="Docking box size"
+    )
 
 
 class S3ParametersMolecules(S3Parameters):
@@ -265,14 +262,13 @@ class OrganToxParameters(MCAParameters):
     algorithm_application: str = "OrganTox"
     site: Organs = Field(
         ...,
-        example=Organs.kidney,
+        examples=[Organs.kidney],
         description="name of the target site of interest.",
     )
     toxicity_type: ToxType = Field(
         default=ToxType.all,
-        example=ToxType.chronic,
+        examples=[ToxType.chronic],
         description="type of toxicity for which predictions are made.",
-        options=["chronic", "subchronic", "multigenerational", "all"],
     )
 
 

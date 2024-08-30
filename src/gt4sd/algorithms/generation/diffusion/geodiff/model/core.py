@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from typing import Any, Tuple, Union
+from typing import Any, Tuple, Union, Optional
 
 import torch
 from diffusers.configuration_utils import ConfigMixin
@@ -127,13 +127,13 @@ class MoleculeGNN(ModelMixin, ConfigMixin):
         bond_index: torch.Tensor,
         bond_type: torch.Tensor,
         batch: torch.Tensor,
-        edge_index: torch.Tensor = None,
-        edge_type: torch.Tensor = None,
-        edge_length: int = None,
+        edge_index: Optional[torch.Tensor] = None,
+        edge_type: Optional[torch.Tensor] = None,
+        edge_length: Optional[int] = None,
         return_edges: bool = False,
         extend_order: bool = True,
         extend_radius: bool = True,
-        is_sidechain: bool = None,
+        is_sidechain: Optional[bool] = None,
     ) -> Tuple[Any, ...]:
         """Forward pass for edges features.
 
