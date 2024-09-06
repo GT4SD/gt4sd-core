@@ -25,5 +25,17 @@
 
 Module for enzyme optimization.
 """
-
-from .core import EnzymeOptimizer  # noqa: F401
+from enzeptional import (  # noqa: F401
+    EnzymeOptimizer,
+    SequenceMutator,
+    SequenceScorer,
+    CrossoverGenerator,
+    HuggingFaceEmbedder,
+    HuggingFaceModelLoader,
+    HuggingFaceTokenizerLoader,
+    SelectionGenerator,
+    mutate_sequence_with_variant,
+    round_up,
+    sanitize_intervals,
+    sanitize_intervals_with_padding,
+)

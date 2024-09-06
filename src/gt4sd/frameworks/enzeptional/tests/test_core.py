@@ -22,12 +22,16 @@
 # SOFTWARE.
 #
 import warnings
-from gt4sd.frameworks.enzeptional.core import (
-    SequenceMutator,
+from gt4sd.frameworks.enzeptional import (
     EnzymeOptimizer,
+    SequenceMutator,
+    SequenceScorer,
+    CrossoverGenerator,
+    HuggingFaceEmbedder,
+    HuggingFaceModelLoader,
+    HuggingFaceTokenizerLoader,
+    SelectionGenerator,
 )
-
-from gt4sd.frameworks.enzeptional.processing import HFandTAPEModelUtility
 
 from gt4sd.configuration import sync_algorithm_with_s3
 from gt4sd.configuration import GT4SDConfiguration
@@ -45,46 +49,76 @@ scorer_filepath = f"{configuration.gt4sd_local_cache_path}/properties/proteins/e
 def test_optimize():
     language_model_path = "facebook/esm2_t33_650M_UR50D"
     tokenizer_path = "facebook/esm2_t33_650M_UR50D"
-    unmasking_model_path = "facebook/esm2_t33_650M_UR50D"
     chem_model_path = "seyonec/ChemBERTa-zinc-base-v1"
     chem_tokenizer_path = "seyonec/ChemBERTa-zinc-base-v1"
 
-    protein_model = HFandTAPEModelUtility(
-        embedding_model_path=language_model_path, tokenizer_path=tokenizer_path
+    model_loader = HuggingFaceModelLoader()
+    tokenizer_loader = HuggingFaceTokenizerLoader()
+
+    protein_model = HuggingFaceEmbedder(
+        model_loader=model_loader,
+        tokenizer_loader=tokenizer_loader,
+        model_path=language_model_path,
+        tokenizer_path=tokenizer_path,
+        cache_dir=None,
+        device="cpu",
+    )
+
+    chem_model = HuggingFaceEmbedder(
+        model_loader=model_loader,
+        tokenizer_loader=tokenizer_loader,
+        model_path=chem_model_path,
+        tokenizer_path=chem_tokenizer_path,
+        cache_dir=None,
+        device="cpu",
     )
 
     mutation_config = {
         "type": "language-modeling",
         "embedding_model_path": language_model_path,
         "tokenizer_path": tokenizer_path,
-        "unmasking_model_path": unmasking_model_path,
+        "unmasking_model_path": language_model_path,
     }
 
     intervals = [(5, 10), (20, 25)]
-    batch_size = 5
-    top_k = 3
+    batch_size = 2
+    top_k = 1
     substrate_smiles = "NC1=CC=C(N)C=C1"
     product_smiles = "CNC1=CC=C(NC(=O)C2=CC=C(C=C2)C(C)=O)C=C1"
 
     sample_sequence = "MSKLLMIGTGPVAIDQFLTRYEASCQAYKDMHQDQQLSSQFNTNLFEGDKALVTKFLEINRTLS"
+
     mutator = SequenceMutator(sequence=sample_sequence, mutation_config=mutation_config)
+    mutator.set_top_k(top_k)
+
+    scorer = SequenceScorer(
+        protein_model=protein_model,
+        scorer_filepath=scorer_filepath,
+        use_xgboost=False,
+        scaler_filepath=None,
+    )
+
+    selection_generator = SelectionGenerator()
+    crossover_generator = CrossoverGenerator()
 
     optimizer = EnzymeOptimizer(
         sequence=sample_sequence,
-        protein_model=protein_model,
+        mutator=mutator,
+        scorer=scorer,
+        intervals=intervals,
         substrate_smiles=substrate_smiles,
         product_smiles=product_smiles,
-        chem_model_path=chem_model_path,
-        chem_tokenizer_path=chem_tokenizer_path,
-        scorer_filepath=scorer_filepath,
-        mutator=mutator,
-        intervals=intervals,
+        chem_model=chem_model,
+        selection_generator=selection_generator,
+        crossover_generator=crossover_generator,
+        concat_order=["substrate", "sequence", "product"],
         batch_size=batch_size,
-        top_k=top_k,
         selection_ratio=0.25,
         perform_crossover=True,
         crossover_type="single_point",
-        concat_order=["substrate", "sequence", "product"],
+        pad_intervals=False,
+        minimum_interval_length=8,
+        seed=123,
     )
 
     num_iterations = 3

@@ -970,7 +970,7 @@ class Global_MP(MessagePassing):
 
         return h
 
-    def message(self, x_i, x_j, edge_attr, edge_index, num_nodes):
+    def message(self, x_i, x_j, edge_attr, edge_index, num_nodes):  # type:ignore
         num_edge = edge_attr.size()[0]
 
         x_edge = torch.cat((x_i[:num_edge], x_j[:num_edge], edge_attr), -1)
