@@ -1,8 +1,16 @@
 import logging
 import pandas as pd
 from typing import Tuple, List, Optional
-from gt4sd.frameworks.enzeptional.processing import HFandTAPEModelUtility
-from gt4sd.frameworks.enzeptional.core import SequenceMutator, EnzymeOptimizer
+from gt4sd.frameworks.enzeptional import (
+    EnzymeOptimizer,
+    SequenceMutator,
+    SequenceScorer,
+    CrossoverGenerator,
+    HuggingFaceEmbedder,
+    HuggingFaceModelLoader,
+    HuggingFaceTokenizerLoader,
+    SelectionGenerator,
+)
 from gt4sd.configuration import GT4SDConfiguration, sync_algorithm_with_s3
 
 
@@ -17,23 +25,33 @@ def initialize_environment(model = "feasibility") -> Tuple[str, Optional[str]]:
     """    
     configuration = GT4SDConfiguration.get_instance()
     sync_algorithm_with_s3("proteins/enzeptional/scorers", module="properties")
-    return f"{configuration.gt4sd_local_cache_path}/properties/proteins/enzeptional/scorers/feasibility/model.pkl"
+    scorer =  f"{configuration.gt4sd_local_cache_path}/properties/proteins/enzeptional/scorers/{model}/model.pkl"
+    if model == "feasibility":
+        return scorer, None
+    else:
+        scaler = f"{configuration.gt4sd_local_cache_path}/properties/proteins/enzeptional/scorers/{model}/scaler.pkl"
+        return scorer, scaler
 
-
-def load_experiment_parameters() -> Tuple[List, List, List, List]:
+def load_experiment_parameters(model="feasibility") -> Tuple[List, List, List, List]:
     """Load experiment parameters from a CSV file."""
-    df = pd.read_csv("data.csv").iloc[1]
-    return df["substrates"], df["products"], df["sequences"], eval(df["intervals"])
+    substrate_smiles = "NC1=CC=C(N)C=C1"
+    product_smiles = "CNC1=CC=C(NC(=O)C2=CC=C(C=C2)C(C)=O)C=C1"
+    intervals = [(5, 10), (20, 25)]
+    sample_sequence = "MSKLLMIGTGPVAIDQFLTRYEASCQAYKDMHQDQQLSSQFNTNLFEGDKALVTKFLEINRTLS"
+    scorer_path, scaler_path = initialize_environment(model)
+    return substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path, scaler_path
 
 
 def setup_optimizer(
     substrate_smiles: str,
     product_smiles: str,
     sample_sequence: str,
-    intervals: List[List[int]],
     scorer_path: str,
     scaler_path: str,
+    intervals: List[List[int]],
     concat_order: List[str],
+    top_k: int,
+    batch_size: int,
     use_xgboost_scorer: bool
 ):
     """Set up and return the optimizer with all necessary components configured
@@ -44,48 +62,82 @@ def setup_optimizer(
         product_smiles (str): SMILES representation of the
         product.
         sample_sequence (str): The initial protein sequence.
-        intervals (List[List[int]]): Intervals for mutation.
         scorer_path (str): File path to the scoring model.
         scaler_path (str): Path to the scaller in case you are usinh the Kcat model.
+        intervals (List[List[int]]): Intervals for mutation.
         concat_order (List[str]): Order of concatenating embeddings.
+        top_k (int): Number of top amino acids to use to create mutants.
+        batch_size (int): Batch size.
         use_xgboost_scorer (bool): flag to specify if the fitness function is the Kcat.
 
     Returns:
         Initialized optmizer
     """
-    model_tokenizer_paths = "facebook/esm2_t33_650M_UR50D"
-    chem_paths = "seyonec/ChemBERTa-zinc-base-v1"
+    language_model_path = "facebook/esm2_t33_650M_UR50D"
+    tokenizer_path = "facebook/esm2_t33_650M_UR50D"
+    chem_model_path = "seyonec/ChemBERTa-zinc-base-v1"
+    chem_tokenizer_path = "seyonec/ChemBERTa-zinc-base-v1"
 
-    protein_model = HFandTAPEModelUtility(
-        embedding_model_path=model_tokenizer_paths, tokenizer_path=model_tokenizer_paths
+    model_loader = HuggingFaceModelLoader()
+    tokenizer_loader = HuggingFaceTokenizerLoader()
+
+    protein_model = HuggingFaceEmbedder(
+        model_loader=model_loader,
+        tokenizer_loader=tokenizer_loader,
+        model_path=language_model_path,
+        tokenizer_path=tokenizer_path,
+        cache_dir=None,
+        device="cpu",
     )
+
+    chem_model = HuggingFaceEmbedder(
+        model_loader=model_loader,
+        tokenizer_loader=tokenizer_loader,
+        model_path=chem_model_path,
+        tokenizer_path=chem_tokenizer_path,
+        cache_dir=None,
+        device="cpu",
+    )
+
     mutation_config = {
         "type": "language-modeling",
-        "embedding_model_path": model_tokenizer_paths,
-        "tokenizer_path": model_tokenizer_paths,
-        "unmasking_model_path": model_tokenizer_paths,
+        "embedding_model_path": language_model_path,
+        "tokenizer_path": tokenizer_path,
+        "unmasking_model_path": language_model_path,
     }
 
     mutator = SequenceMutator(sequence=sample_sequence, mutation_config=mutation_config)
-    optimizer_config = {
-        "sequence": sample_sequence,
-        "protein_model": protein_model,
-        "substrate_smiles": substrate_smiles,
-        "product_smiles": product_smiles,
-        "chem_model_path": chem_paths,
-        "chem_tokenizer_path": chem_paths,
-        "scorer_filepath": scorer_path,
-        "mutator": mutator,
-        "intervals": intervals,
-        "batch_size": 5,
-        "top_k": 3,
-        "selection_ratio": 0.25,
-        "perform_crossover": True,
-        "crossover_type": "single_point",
-        "concat_order": concat_order,
-        "scaler_filepath": scaler_path,
-        "use_xgboost_scorer": use_xgboost_scorer
-    }
+    mutator.set_top_k(top_k)
+
+    scorer = SequenceScorer(
+        protein_model=protein_model,
+        scorer_filepath=scorer_path,
+        use_xgboost=use_xgboost_scorer,
+        scaler_filepath=scaler_path,
+    )
+
+    selection_generator = SelectionGenerator()
+    crossover_generator = CrossoverGenerator()
+    
+    optimizer_config = dict(
+        sequence=sample_sequence,
+        mutator=mutator,
+        scorer=scorer,
+        intervals=intervals,
+        substrate_smiles=substrate_smiles,
+        product_smiles=product_smiles,
+        chem_model=chem_model,
+        selection_generator=selection_generator,
+        crossover_generator=crossover_generator,
+        concat_order=concat_order,
+        batch_size=batch_size,
+        selection_ratio=0.25,
+        perform_crossover=True,
+        crossover_type="single_point",
+        pad_intervals=False,
+        minimum_interval_length=8,
+        seed=42,
+    )
     return EnzymeOptimizer(**optimizer_config)
 
 
@@ -106,17 +158,24 @@ def optimize_sequences(optimizer):
 def main_kcat():
     """Optimization using Kcat model"""    
     logging.basicConfig(level=logging.INFO)
-    scorer_path, scaler_path = initialize_environment(model="kcat")
-    concat_order, use_xgboost_scorer = ["substrate", "sequence"], True
-    (
+    concat_order = ["substrate", "sequence"]
+    use_xgboost_scorer=True
+    top_k=2
+    batch_size=2
+    substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path, scaler_path = load_experiment_parameters("kcat")
+    optimizer = setup_optimizer(
         substrate_smiles,
         product_smiles,
         sample_sequence,
+        scorer_path,
+        scaler_path,
         intervals,
-    ) = load_experiment_parameters()
-    optimizer = setup_optimizer(
-        substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path, scaler_path, concat_order, use_xgboost_scorer
+        concat_order,
+        top_k,
+        batch_size,
+        use_xgboost_scorer
     )
+
     optimized_sequences, iteration_info = optimize_sequences(optimizer)
     logging.info("Optimization completed.")
 
@@ -124,19 +183,27 @@ def main_kcat():
 def main_feasibility():
     """Optimization using Feasibility model"""    
     logging.basicConfig(level=logging.INFO)
-    scorer_path, scaler_path = initialize_environment()
-    concat_order, use_xgboost_scorer = ["substrate", "sequence", "product"], False
-    (
+    concat_order = ["substrate", "sequence", "product"]
+    use_xgboost_scorer=False
+    top_k=2
+    batch_size=2
+    substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path, scaler_path = load_experiment_parameters("feasilibity")
+    optimizer = setup_optimizer(
         substrate_smiles,
         product_smiles,
         sample_sequence,
+        scorer_path,
+        scaler_path,
         intervals,
-    ) = load_experiment_parameters()
-    optimizer = setup_optimizer(
-        substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path, scaler_path, concat_order, use_xgboost_scorer
+        concat_order,
+        top_k,
+        batch_size,
+        use_xgboost_scorer
     )
+
     optimized_sequences, iteration_info = optimize_sequences(optimizer)
     logging.info("Optimization completed.")
 
 if __name__ == "__main__":
-    main()
+    main_feasibility()
+    main_kcat()
