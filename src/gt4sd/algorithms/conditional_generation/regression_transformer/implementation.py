@@ -447,6 +447,7 @@ class ConditionalGenerator:
                 e.g., '<qed>0.727' or '<logp>6.65<scscore>3.82'.
         """
         properties = []
+        supported_properties_set = set(self.properties)
         for inp, pred in zip(input_ids, prediction):
             in_tokens = self.tokenizer.decode(
                 inp, clean_up_tokenization_spaces=False
@@ -455,6 +456,13 @@ class ConditionalGenerator:
                 pred, clean_up_tokenization_spaces=False
             ).split(" ")
             joined = self.tokenizer.get_sample_prediction(out_tokens, in_tokens)
+            # NOTE: clean-up unknown properties
+            joined = [
+                token
+                for token in joined
+                if token in supported_properties_set
+                or not (token.startswith("<") and token.endswith(">"))
+            ]
             _, gen_prop = self.tokenizer.aggregate_tokens(joined, label_mode=False)
             properties.append(
                 "".join(
