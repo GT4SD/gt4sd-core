@@ -29,6 +29,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import numpy as np
 import torch
+import warnings
 from rdkit import Chem
 from terminator.collators import MaskedTextCollator, PropertyCollator
 from terminator.inference import InferenceRT
@@ -151,9 +152,19 @@ class ConditionalGenerator:
             # Optional normalize parameter (for property) defaults to True
             self.do_normalize = data.get("normalize", [True] * len(self.properties))
 
-            self.property_mask_lengths = [
-                data["property_mask_length"][p] for p in self.properties
-            ]
+            self.property_mask_lengths = []
+            for p in self.properties:
+                mask_length = data["property_mask_length"][p]
+                if "property_ranges" in data:
+                    max_value = data["property_ranges"][p][1]
+                    max_value_as_string = f"{max_value:.3f}"
+                    if len(max_value_as_string) > mask_length:
+                        warnings.warn(
+                            f"property={p} length should be {len(max_value_as_string)} (instead of {mask_length}). Updating it...",
+                            RuntimeWarning,
+                        )
+                        mask_length = len(max_value_as_string)
+                self.property_mask_lengths.append(mask_length)
             self._mins = [
                 data.get("property_ranges", {}).get(p, [0, 1])[0]
                 for p in self.properties
