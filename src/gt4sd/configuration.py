@@ -52,15 +52,15 @@ class GT4SDConfiguration(BaseSettings):
     gt4sd_disable_cudnn: bool = False
 
     gt4sd_s3_host: str = "s3.par01.cloud-object-storage.appdomain.cloud"
-    gt4sd_s3_access_key: str = "6e9891531d724da89997575a65f4592e"
-    gt4sd_s3_secret_key: str = "5997d63c4002cc04e13c03dc0c2db9dae751293dab106ac5"
+    gt4sd_s3_access_key: str = "b087e6810a5d4246a64e07e36ace338f"
+    gt4sd_s3_secret_key: str = "ba4a1db5647a32c6109b58714befb7ea7145b983143e0836"
     gt4sd_s3_secure: bool = True
     gt4sd_s3_bucket_algorithms: str = "gt4sd-cos-algorithms-artifacts"
     gt4sd_s3_bucket_properties: str = "gt4sd-cos-properties-artifacts"
 
     gt4sd_s3_host_hub: str = "s3.par01.cloud-object-storage.appdomain.cloud"
-    gt4sd_s3_access_key_hub: str = "d9536662ebcf462f937efb9f58012830"
-    gt4sd_s3_secret_key_hub: str = "934d1f3afdaea55ac586f6c2f729ac2ba2694bb8e975ee0b"
+    gt4sd_s3_access_key_hub: str = "1168c1d9ce664e75a8a151e6f4a29078"
+    gt4sd_s3_secret_key_hub: str = "4996c6cc737828213a7afcc7e27450e1af2daf027af95c1d"
     gt4sd_s3_secure_hub: bool = True
     gt4sd_s3_bucket_hub_algorithms: str = "gt4sd-cos-hub-algorithms-artifacts"
     gt4sd_s3_bucket_hub_properties: str = "gt4sd-cos-hub-properties-artifacts"
