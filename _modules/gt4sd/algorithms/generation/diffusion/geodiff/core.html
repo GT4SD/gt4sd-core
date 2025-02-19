@@ -187,36 +187,36 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
-<span class="kn">from</span> <span class="nn">diffusers</span> <span class="kn">import</span> <span class="n">DDPMScheduler</span>
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">SVG</span><span class="p">,</span> <span class="n">display</span>
-<span class="kn">from</span> <span class="nn">nglview</span> <span class="kn">import</span> <span class="n">show_rdkit</span> <span class="k">as</span> <span class="n">show</span>
-<span class="kn">from</span> <span class="nn">rdkit.Chem.Draw</span> <span class="kn">import</span> <span class="n">rdMolDraw2D</span> <span class="k">as</span> <span class="n">MD2</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Data</span>
-<span class="kn">from</span> <span class="nn">torch_scatter</span> <span class="kn">import</span> <span class="n">scatter_mean</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">diffusers</span><span class="w"> </span><span class="kn">import</span> <span class="n">DDPMScheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">SVG</span><span class="p">,</span> <span class="n">display</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nglview</span><span class="w"> </span><span class="kn">import</span> <span class="n">show_rdkit</span> <span class="k">as</span> <span class="n">show</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem.Draw</span><span class="w"> </span><span class="kn">import</span> <span class="n">rdMolDraw2D</span> <span class="k">as</span> <span class="n">MD2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_scatter</span><span class="w"> </span><span class="kn">import</span> <span class="n">scatter_mean</span>
 
-<span class="kn">from</span> <span class="nn">.model.core</span> <span class="kn">import</span> <span class="n">MoleculeGNN</span>
-<span class="kn">from</span> <span class="nn">.model.utils</span> <span class="kn">import</span> <span class="n">repeat_data</span><span class="p">,</span> <span class="n">set_rdmol_positions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.model.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoleculeGNN</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.model.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">repeat_data</span><span class="p">,</span> <span class="n">set_rdmol_positions</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="GeoDiffPipeline"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline">[docs]</a><span class="k">class</span> <span class="nc">GeoDiffPipeline</span><span class="p">:</span>
+<div class="viewcode-block" id="GeoDiffPipeline"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GeoDiffPipeline</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pipeline for molecular conformation generation using GeoDiff.</span>
 <span class="sd">    The pipeline defined here is slightly different than the pipeline used in diffusers.</span>
 
 <span class="sd">    GeoDiff: a Geometric Diffusion Model for Molecular Conformation Generation, Minkai Xu, Lantao Yu, Yang Song, Chence Shi, Stefano Ermon, Jian Tang - https://arxiv.org/abs/2203.02923</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GeoDiffPipeline.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="GeoDiffPipeline.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">model_name_or_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params_json</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;GeoDiff pipeline for molecular conformation generation. Code adapted from colab:</span>
@@ -265,7 +265,7 @@
         <span class="c1"># load pretrained model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">MoleculeGNN</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name_or_path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GeoDiffPipeline.to"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.to">[docs]</a>    <span class="k">def</span> <span class="nf">to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="GeoDiffPipeline.to"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.to">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Move model to a device.</span>
 
 <span class="sd">        Args:</span>
@@ -274,7 +274,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GeoDiffPipeline.from_pretrained"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.from_pretrained">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_pretrained</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_pretrained</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">model_name_or_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params_json</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GeoDiffPipeline&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load pretrained model.</span>
@@ -291,7 +291,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GeoDiffPipeline.__call__"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.__call__">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate conformations for a molecule.</span>
@@ -369,7 +369,7 @@
         <span class="n">mols_gen</span><span class="p">,</span> <span class="n">mols_orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess_output</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;sample&quot;</span><span class="p">:</span> <span class="n">mols_gen</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="GeoDiffPipeline.postprocess_output"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.postprocess_output">[docs]</a>    <span class="k">def</span> <span class="nf">postprocess_output</span><span class="p">(</span>
+<div class="viewcode-block" id="GeoDiffPipeline.postprocess_output"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.postprocess_output">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">postprocess_output</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Data</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Postprocess output of diffusion pipeline.</span>
@@ -408,7 +408,7 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;collect </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">mols_gen</span><span class="p">)</span><span class="si">}</span><span class="s2"> generated molecules in `mols`&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mols_gen</span><span class="p">,</span> <span class="n">mols_orig</span></div>
 
-<div class="viewcode-block" id="GeoDiffPipeline.visualize_2d_input"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.visualize_2d_input">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_2d_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="GeoDiffPipeline.visualize_2d_input"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.visualize_2d_input">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">visualize_2d_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Visualize 2D input.</span>
 
 <span class="sd">        Args:</span>
@@ -423,7 +423,7 @@
         <span class="n">svg</span> <span class="o">=</span> <span class="n">drawer</span><span class="o">.</span><span class="n">GetDrawingText</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
         <span class="n">display</span><span class="p">(</span><span class="n">SVG</span><span class="p">(</span><span class="n">svg</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;svg:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)))</span></div>
 
-<div class="viewcode-block" id="GeoDiffPipeline.visualize_3d"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.visualize_3d">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_3d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mols_gen</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="GeoDiffPipeline.visualize_3d"><a class="viewcode-back" href="../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.core.html#gt4sd.algorithms.generation.diffusion.geodiff.core.GeoDiffPipeline.visualize_3d">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">visualize_3d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mols_gen</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Visualize 3D output.</span>
 
 <span class="sd">        Args:</span>

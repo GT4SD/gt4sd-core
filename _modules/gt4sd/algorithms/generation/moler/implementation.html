@@ -189,22 +189,22 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Implementation of MoLeR conditional generators.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">islice</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">islice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
-<span class="kn">from</span> <span class="nn">molecule_generation</span> <span class="kn">import</span> <span class="n">VaeWrapper</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">molecule_generation</span><span class="w"> </span><span class="kn">import</span> <span class="n">VaeWrapper</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="MoLeRGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.moler.implementation.html#gt4sd.algorithms.generation.moler.implementation.MoLeRGenerator">[docs]</a><span class="k">class</span> <span class="nc">MoLeRGenerator</span><span class="p">:</span>
+<div class="viewcode-block" id="MoLeRGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.moler.implementation.html#gt4sd.algorithms.generation.moler.implementation.MoLeRGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MoLeRGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface for MoLeR generator.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MoLeRGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.moler.implementation.html#gt4sd.algorithms.generation.moler.implementation.MoLeRGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="MoLeRGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.moler.implementation.html#gt4sd.algorithms.generation.moler.implementation.MoLeRGenerator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">scaffolds</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -255,7 +255,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed_smiles</span> <span class="o">!=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_smiles</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">seed_smiles</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">cycle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_smiles</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="MoLeRGenerator.generate"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.moler.implementation.html#gt4sd.algorithms.generation.moler.implementation.MoLeRGenerator.generate">[docs]</a>    <span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="MoLeRGenerator.generate"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.moler.implementation.html#gt4sd.algorithms.generation.moler.implementation.MoLeRGenerator.generate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample molecules using MoLeR.</span>
 
 <span class="sd">        Returns:</span>

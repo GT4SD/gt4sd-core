@@ -189,27 +189,27 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Implementation of the zero-shot classifier.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">paccmann_predictor.models</span> <span class="kn">import</span> <span class="n">MODEL_FACTORY</span>
-<span class="kn">from</span> <span class="nn">pytoda.proteins.protein_language</span> <span class="kn">import</span> <span class="n">ProteinLanguage</span>
-<span class="kn">from</span> <span class="nn">pytoda.smiles.smiles_language</span> <span class="kn">import</span> <span class="n">SMILESLanguage</span>
-<span class="kn">from</span> <span class="nn">pytoda.transforms</span> <span class="kn">import</span> <span class="n">LeftPadding</span><span class="p">,</span> <span class="n">ToTensor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_predictor.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MODEL_FACTORY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytoda.proteins.protein_language</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProteinLanguage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytoda.smiles.smiles_language</span><span class="w"> </span><span class="kn">import</span> <span class="n">SMILESLanguage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytoda.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">LeftPadding</span><span class="p">,</span> <span class="n">ToTensor</span>
 
-<span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....frameworks.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">device_claim</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="MCAPredictor"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.MCAPredictor">[docs]</a><span class="k">class</span> <span class="nc">MCAPredictor</span><span class="p">:</span>
+<div class="viewcode-block" id="MCAPredictor"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.MCAPredictor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MCAPredictor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base implementation of an MCAPredictor.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MCAPredictor.predict"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.MCAPredictor.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="MCAPredictor.predict"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.MCAPredictor.predict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get prediction.</span>
 
 <span class="sd">        Returns:</span>
@@ -217,7 +217,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;No prediction implemented for base MCAPredictor&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MCAPredictor.predict_values"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.MCAPredictor.predict_values">[docs]</a>    <span class="k">def</span> <span class="nf">predict_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="MCAPredictor.predict_values"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.MCAPredictor.predict_values">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get prediction for algorithm sample method.</span>
 
 <span class="sd">        Returns:</span>
@@ -228,14 +228,14 @@
         <span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="BimodalMCAAffinityPredictor"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor">[docs]</a><span class="k">class</span> <span class="nc">BimodalMCAAffinityPredictor</span><span class="p">(</span><span class="n">MCAPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="BimodalMCAAffinityPredictor"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">BimodalMCAAffinityPredictor</span><span class="p">(</span><span class="n">MCAPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Bimodal MCA (Multiscale Convolutional Attention) affinity prediction model.</span>
 
 <span class="sd">    For details see: https://pubs.acs.org/doi/10.1021/acs.molpharmaceut.9b00520</span>
 <span class="sd">    and https://iopscience.iop.org/article/10.1088/2632-2153/abe808.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BimodalMCAAffinityPredictor.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="BimodalMCAAffinityPredictor.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">protein_targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -289,7 +289,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">to_tensor</span> <span class="o">=</span> <span class="n">ToTensor</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="BimodalMCAAffinityPredictor.predict"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="BimodalMCAAffinityPredictor.predict"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor.predict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get predicted affinity.</span>
 
 <span class="sd">        Returns:</span>
@@ -340,7 +340,7 @@
 
         <span class="k">return</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">predictions_dict</span></div>
 
-<div class="viewcode-block" id="BimodalMCAAffinityPredictor.predict_values"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor.predict_values">[docs]</a>    <span class="k">def</span> <span class="nf">predict_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<div class="viewcode-block" id="BimodalMCAAffinityPredictor.predict_values"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor.predict_values">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get prediction for algorithm sample method.</span>
 
 <span class="sd">        Returns:</span>

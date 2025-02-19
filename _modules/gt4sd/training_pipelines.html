@@ -188,109 +188,109 @@
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Module initialization for gt4sd traning pipelines.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">import</span> <span class="nn">sentencepiece</span> <span class="k">as</span> <span class="nn">_sentencepiece</span>
-<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">_torch</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">_tensorflow</span>
-<span class="kn">from</span> <span class="nn">gt4sd_trainer.hf_pl.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sentencepiece</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_sentencepiece</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_tensorflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_trainer.hf_pl.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LanguageModelingDataArguments</span><span class="p">,</span>
     <span class="n">LanguageModelingModelArguments</span><span class="p">,</span>
     <span class="n">LanguageModelingSavingArguments</span><span class="p">,</span>
     <span class="n">LanguageModelingTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_trainer.hf_pl.pytorch_lightning_trainer</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_trainer.hf_pl.pytorch_lightning_trainer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PytorchLightningTrainingArguments</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">..cli.load_arguments_from_dataclass</span> <span class="kn">import</span> <span class="n">extract_fields_from_class</span>
-<span class="kn">from</span> <span class="nn">..tests.utils</span> <span class="kn">import</span> <span class="n">exitclose_file_creator</span>
-<span class="kn">from</span> <span class="nn">.cgcnn.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..cli.load_arguments_from_dataclass</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_fields_from_class</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..tests.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">exitclose_file_creator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cgcnn.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CGCNNDataArguments</span><span class="p">,</span>
     <span class="n">CGCNNModelArguments</span><span class="p">,</span>
     <span class="n">CGCNNSavingArguments</span><span class="p">,</span>
     <span class="n">CGCNNTrainingArguments</span><span class="p">,</span>
     <span class="n">CGCNNTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.crystals_crf.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.crystals_crf.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CrystalsRFCDataArguments</span><span class="p">,</span>
     <span class="n">CrystalsRFCModelArguments</span><span class="p">,</span>
     <span class="n">CrystalsRFCSavingArguments</span><span class="p">,</span>
     <span class="n">CrystalsRFCTrainingArguments</span><span class="p">,</span>
     <span class="n">CrystalsRFCTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.diffusion.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.diffusion.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DiffusionDataArguments</span><span class="p">,</span>
     <span class="n">DiffusionForVisionTrainingPipeline</span><span class="p">,</span>
     <span class="n">DiffusionModelArguments</span><span class="p">,</span>
     <span class="n">DiffusionSavingArguments</span><span class="p">,</span>
     <span class="n">DiffusionTrainingArguments</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.guacamol_baselines.core</span> <span class="kn">import</span> <span class="n">GuacaMolDataArguments</span><span class="p">,</span> <span class="n">GuacaMolSavingArguments</span>
-<span class="kn">from</span> <span class="nn">.guacamol_baselines.smiles_lstm.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.guacamol_baselines.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">GuacaMolDataArguments</span><span class="p">,</span> <span class="n">GuacaMolSavingArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.guacamol_baselines.smiles_lstm.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GuacaMolLSTMModelArguments</span><span class="p">,</span>
     <span class="n">GuacaMolLSTMTrainingArguments</span><span class="p">,</span>
     <span class="n">GuacaMolLSTMTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.moses.core</span> <span class="kn">import</span> <span class="n">MosesDataArguments</span><span class="p">,</span> <span class="n">MosesSavingArguments</span>
-<span class="kn">from</span> <span class="nn">.moses.organ.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.moses.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">MosesDataArguments</span><span class="p">,</span> <span class="n">MosesSavingArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.moses.organ.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MosesOrganModelArguments</span><span class="p">,</span>
     <span class="n">MosesOrganTrainingArguments</span><span class="p">,</span>
     <span class="n">MosesOrganTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.moses.vae.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.moses.vae.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MosesVAEModelArguments</span><span class="p">,</span>
     <span class="n">MosesVAETrainingArguments</span><span class="p">,</span>
     <span class="n">MosesVAETrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.paccmann.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.paccmann.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PaccMannDataArguments</span><span class="p">,</span>
     <span class="n">PaccMannSavingArguments</span><span class="p">,</span>
     <span class="n">PaccMannTrainingArguments</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.paccmann.vae.core</span> <span class="kn">import</span> <span class="n">PaccMannVAEModelArguments</span><span class="p">,</span> <span class="n">PaccMannVAETrainingPipeline</span>
-<span class="kn">from</span> <span class="nn">.pytorch_lightning.gflownet.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.paccmann.vae.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">PaccMannVAEModelArguments</span><span class="p">,</span> <span class="n">PaccMannVAETrainingPipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.pytorch_lightning.gflownet.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GFlowNetDataArguments</span><span class="p">,</span>
     <span class="n">GFlowNetModelArguments</span><span class="p">,</span>
     <span class="n">GFlowNetPytorchLightningTrainingArguments</span><span class="p">,</span>
     <span class="n">GFlowNetSavingArguments</span><span class="p">,</span>
     <span class="n">GFlowNetTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.pytorch_lightning.granular.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.pytorch_lightning.granular.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GranularDataArguments</span><span class="p">,</span>
     <span class="n">GranularModelArguments</span><span class="p">,</span>
     <span class="n">GranularPytorchLightningTrainingArguments</span><span class="p">,</span>
     <span class="n">GranularSavingArguments</span><span class="p">,</span>
     <span class="n">GranularTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.pytorch_lightning.molformer.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.pytorch_lightning.molformer.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MolformerDataArguments</span><span class="p">,</span>
     <span class="n">MolformerModelArguments</span><span class="p">,</span>
     <span class="n">MolformerSavingArguments</span><span class="p">,</span>
     <span class="n">MolformerTrainingArguments</span><span class="p">,</span>
     <span class="n">MolformerTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.regression_transformer.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.regression_transformer.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RegressionTransformerDataArguments</span><span class="p">,</span>
     <span class="n">RegressionTransformerSavingArguments</span><span class="p">,</span>
     <span class="n">RegressionTransformerTrainingArguments</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.regression_transformer.implementation</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.regression_transformer.implementation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RegressionTransformerModelArguments</span><span class="p">,</span>
     <span class="n">RegressionTransformerTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.torchdrug.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.torchdrug.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TorchDrugDataArguments</span><span class="p">,</span>
     <span class="n">TorchDrugSavingArguments</span><span class="p">,</span>
     <span class="n">TorchDrugTrainingArguments</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.torchdrug.gcpn.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.torchdrug.gcpn.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TorchDrugGCPNModelArguments</span><span class="p">,</span>
     <span class="n">TorchDrugGCPNTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.torchdrug.graphaf.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.torchdrug.graphaf.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TorchDrugGraphAFModelArguments</span><span class="p">,</span>
     <span class="n">TorchDrugGraphAFTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
@@ -416,7 +416,7 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="training_pipeline_name_to_metadata"><a class="viewcode-back" href="../../api/gt4sd.training_pipelines.html#gt4sd.training_pipelines.training_pipeline_name_to_metadata">[docs]</a><span class="k">def</span> <span class="nf">training_pipeline_name_to_metadata</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="training_pipeline_name_to_metadata"><a class="viewcode-back" href="../../api/gt4sd.training_pipelines.html#gt4sd.training_pipelines.training_pipeline_name_to_metadata">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">training_pipeline_name_to_metadata</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve training pipeline metadata from the name.</span>
 
 <span class="sd">    Args:</span>

@@ -191,20 +191,20 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Diffusion training utilities. Code adapted from: https://github.com/huggingface/diffusers/blob/main/examples/unconditional_image_generation/train_unconditional.py&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">from</span> <span class="nn">accelerate</span> <span class="kn">import</span> <span class="n">Accelerator</span>
-<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
-<span class="kn">from</span> <span class="nn">diffusers</span> <span class="kn">import</span> <span class="n">DDPMPipeline</span><span class="p">,</span> <span class="n">DDPMScheduler</span><span class="p">,</span> <span class="n">UNet2DModel</span>
-<span class="kn">from</span> <span class="nn">diffusers.optimization</span> <span class="kn">import</span> <span class="n">get_scheduler</span>
-<span class="kn">from</span> <span class="nn">diffusers.training_utils</span> <span class="kn">import</span> <span class="n">EMAModel</span>
-<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">Descriptors</span>
-<span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">accelerate</span><span class="w"> </span><span class="kn">import</span> <span class="n">Accelerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">diffusers</span><span class="w"> </span><span class="kn">import</span> <span class="n">DDPMPipeline</span><span class="p">,</span> <span class="n">DDPMScheduler</span><span class="p">,</span> <span class="n">UNet2DModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">diffusers.optimization</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_scheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">diffusers.training_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">EMAModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Descriptors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CenterCrop</span><span class="p">,</span>
     <span class="n">Compose</span><span class="p">,</span>
     <span class="n">InterpolationMode</span><span class="p">,</span>
@@ -213,9 +213,9 @@
     <span class="n">Resize</span><span class="p">,</span>
     <span class="n">ToTensor</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">TrainingPipeline</span><span class="p">,</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingPipeline</span><span class="p">,</span> <span class="n">TrainingPipelineArguments</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -225,10 +225,10 @@
 <span class="n">Descriptors</span>
 
 
-<div class="viewcode-block" id="DiffusionForVisionTrainingPipeline"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionForVisionTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">DiffusionForVisionTrainingPipeline</span><span class="p">(</span><span class="n">TrainingPipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="DiffusionForVisionTrainingPipeline"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionForVisionTrainingPipeline">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DiffusionForVisionTrainingPipeline</span><span class="p">(</span><span class="n">TrainingPipeline</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Diffusion training pipelines for image generation.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="DiffusionForVisionTrainingPipeline.train"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionForVisionTrainingPipeline.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+<div class="viewcode-block" id="DiffusionForVisionTrainingPipeline.train"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionForVisionTrainingPipeline.train">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">training_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -338,7 +338,7 @@
             <span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;dataset path: &quot;</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;train_data_dir&quot;</span><span class="p">])</span>
 
-        <span class="k">def</span> <span class="nf">transforms</span><span class="p">(</span><span class="n">examples</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">transforms</span><span class="p">(</span><span class="n">examples</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">images</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="n">augmentations</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]</span>
@@ -488,7 +488,7 @@
 
 
 <div class="viewcode-block" id="DiffusionDataArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionDataArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">DiffusionDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DiffusionDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Data arguments related to diffusion trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;dataset_args&quot;</span>
@@ -505,7 +505,7 @@
 
 
 <div class="viewcode-block" id="DiffusionModelArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionModelArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">DiffusionModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DiffusionModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Model arguments related to Diffusion trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>
@@ -538,7 +538,7 @@
 
 
 <div class="viewcode-block" id="DiffusionTrainingArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionTrainingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">DiffusionTrainingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DiffusionTrainingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Training arguments related to Diffusion trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;training_args&quot;</span>
@@ -583,7 +583,7 @@
 
 
 <div class="viewcode-block" id="DiffusionSavingArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.diffusion.core.html#gt4sd.training_pipelines.diffusion.core.DiffusionSavingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">DiffusionSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DiffusionSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Saving arguments related to Diffusion trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_args&quot;</span></div>

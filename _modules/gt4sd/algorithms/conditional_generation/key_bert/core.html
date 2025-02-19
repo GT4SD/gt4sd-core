@@ -189,17 +189,17 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Algortihms for keyword generation using BERT models.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span>
 
-<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AlgorithmConfiguration</span><span class="p">,</span>
     <span class="n">GeneratorAlgorithm</span><span class="p">,</span>
     <span class="n">get_configuration_class_with_attributes</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">...registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
-<span class="kn">from</span> <span class="nn">.implementation</span> <span class="kn">import</span> <span class="n">KeyBERT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.implementation</span><span class="w"> </span><span class="kn">import</span> <span class="n">KeyBERT</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -209,10 +209,10 @@
 <span class="n">Targeted</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
 
 
-<div class="viewcode-block" id="KeywordBERTGenerationAlgorithm"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeywordBERTGenerationAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">KeywordBERTGenerationAlgorithm</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
+<div class="viewcode-block" id="KeywordBERTGenerationAlgorithm"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeywordBERTGenerationAlgorithm">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">KeywordBERTGenerationAlgorithm</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Topics prediction algorithm.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="KeywordBERTGenerationAlgorithm.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeywordBERTGenerationAlgorithm.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="KeywordBERTGenerationAlgorithm.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeywordBERTGenerationAlgorithm.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
@@ -241,7 +241,7 @@
             <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>  <span class="c1"># type:ignore</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="KeywordBERTGenerationAlgorithm.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeywordBERTGenerationAlgorithm.get_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_generator</span><span class="p">(</span>
+<div class="viewcode-block" id="KeywordBERTGenerationAlgorithm.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeywordBERTGenerationAlgorithm.get_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_generator</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
@@ -264,7 +264,7 @@
 
 
 <div class="viewcode-block" id="KeyBERTGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeyBERTGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">KeywordBERTGenerationAlgorithm</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">KeyBERTGenerator</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">KeyBERTGenerator</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration to generate keywords.</span>
 
 <span class="sd">    If the  model is not found in the cache, models are collected from https://www.sbert.net/docs/pretrained_models.html.</span>
@@ -316,7 +316,7 @@
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Candidates considered when enabling use_maxsum.&quot;</span><span class="p">)),</span>
     <span class="p">)</span>
 
-<div class="viewcode-block" id="KeyBERTGenerator.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeyBERTGenerator.get_target_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="KeyBERTGenerator.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeyBERTGenerator.get_target_description">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
 
 <span class="sd">        Returns:</span>
@@ -328,7 +328,7 @@
             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
         <span class="p">}</span></div>
 
-<div class="viewcode-block" id="KeyBERTGenerator.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeyBERTGenerator.get_conditional_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KeyBERT</span><span class="p">:</span>
+<div class="viewcode-block" id="KeyBERTGenerator.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeyBERTGenerator.get_conditional_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KeyBERT</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
 
 <span class="sd">        Args:</span>
@@ -351,7 +351,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="KeyBERTGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.core.html#gt4sd.algorithms.conditional_generation.key_bert.core.KeyBERTGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
 
 <span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>

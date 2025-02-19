@@ -189,22 +189,22 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;VaeMlp implementation.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">argparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgumentParser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
 
-<span class="kn">from</span> <span class="nn">....arg_parser.utils</span> <span class="kn">import</span> <span class="n">str2bool</span>
-<span class="kn">from</span> <span class="nn">..base_model</span> <span class="kn">import</span> <span class="n">GranularEncoderDecoderModel</span>
-<span class="kn">from</span> <span class="nn">..loss</span> <span class="kn">import</span> <span class="n">LOSS_FACTORY</span>
-<span class="kn">from</span> <span class="nn">..module</span> <span class="kn">import</span> <span class="n">MlpDecoder</span><span class="p">,</span> <span class="n">MlpEncoder</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">KLAnnealer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....arg_parser.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">str2bool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..base_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">GranularEncoderDecoderModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOSS_FACTORY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlpDecoder</span><span class="p">,</span> <span class="n">MlpEncoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">KLAnnealer</span>
 
 
-<div class="viewcode-block" id="VaeMlp"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp">[docs]</a><span class="k">class</span> <span class="nc">VaeMlp</span><span class="p">(</span><span class="n">GranularEncoderDecoderModel</span><span class="p">):</span>
+<div class="viewcode-block" id="VaeMlp"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">VaeMlp</span><span class="p">(</span><span class="n">GranularEncoderDecoderModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;VaeMlp - variational encoder using MLP with Gaussian prior and approximate posterior.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="VaeMlp.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="VaeMlp.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">position</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -307,7 +307,7 @@
             <span class="n">start_epoch</span><span class="o">=</span><span class="n">kl_start_epoch</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="VaeMlp.decode"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="VaeMlp.decode"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.decode">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Decode a latent space point.</span>
 
 <span class="sd">        Args:</span>
@@ -318,7 +318,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">z</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="VaeMlp._sampling_step"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp._sampling_step">[docs]</a>    <span class="k">def</span> <span class="nf">_sampling_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="VaeMlp._sampling_step"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp._sampling_step">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">_sampling_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a sampling step in the model.</span>
 
 <span class="sd">        Args:</span>
@@ -332,7 +332,7 @@
         <span class="n">log_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc_var</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">log_var</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="VaeMlp.encode"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="VaeMlp.encode"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.encode">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Encode a sample.</span>
 
 <span class="sd">        Args:</span>
@@ -344,7 +344,7 @@
         <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_step</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">z</span></div>
 
-<div class="viewcode-block" id="VaeMlp._run_step"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp._run_step">[docs]</a>    <span class="k">def</span> <span class="nf">_run_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="VaeMlp._run_step"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp._run_step">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">_run_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a step in the model.</span>
 
 <span class="sd">        Args:</span>
@@ -356,7 +356,7 @@
         <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_step</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span></div>
 
-<div class="viewcode-block" id="VaeMlp.step"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span>
+<div class="viewcode-block" id="VaeMlp.step"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.step">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="n">target_data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -402,7 +402,7 @@
 
         <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">logs</span></div>
 
-<div class="viewcode-block" id="VaeMlp.val_step"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.val_step">[docs]</a>    <span class="k">def</span> <span class="nf">val_step</span><span class="p">(</span>
+<div class="viewcode-block" id="VaeMlp.val_step"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.val_step">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">val_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="n">target_data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -430,7 +430,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="VaeMlp.add_model_specific_args"><a class="viewcode-back" href="../../../../../../../api/gt4sd.frameworks.granular.ml.models.vae_mlp.core.html#gt4sd.frameworks.granular.ml.models.vae_mlp.core.VaeMlp.add_model_specific_args">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">add_model_specific_args</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_model_specific_args</span><span class="p">(</span>
         <span class="n">parent_parser</span><span class="p">:</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArgumentParser</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adding to a parser model specific arguments.</span>

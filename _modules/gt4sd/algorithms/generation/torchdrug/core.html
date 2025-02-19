@@ -189,15 +189,15 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Torchdrug generation algorithm.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span>
 
-<span class="kn">from</span> <span class="nn">....training_pipelines.core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
-<span class="kn">from</span> <span class="nn">....training_pipelines.torchdrug.core</span> <span class="kn">import</span> <span class="n">TorchDrugSavingArguments</span>
-<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">GeneratorAlgorithm</span><span class="p">,</span> <span class="n">Untargeted</span>
-<span class="kn">from</span> <span class="nn">...registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
-<span class="kn">from</span> <span class="nn">.implementation</span> <span class="kn">import</span> <span class="n">GAFGenerator</span><span class="p">,</span> <span class="n">GCPNGenerator</span><span class="p">,</span> <span class="n">Generator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....training_pipelines.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....training_pipelines.torchdrug.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchDrugSavingArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">GeneratorAlgorithm</span><span class="p">,</span> <span class="n">Untargeted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.implementation</span><span class="w"> </span><span class="kn">import</span> <span class="n">GAFGenerator</span><span class="p">,</span> <span class="n">GCPNGenerator</span><span class="p">,</span> <span class="n">Generator</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -206,8 +206,8 @@
 <span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="TorchDrugGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGenerator">[docs]</a><span class="k">class</span> <span class="nc">TorchDrugGenerator</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
-<div class="viewcode-block" id="TorchDrugGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="TorchDrugGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TorchDrugGenerator</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
+<div class="viewcode-block" id="TorchDrugGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGenerator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;TorchDrug generation algorithm.</span>
@@ -233,7 +233,7 @@
             <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type:ignore</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="TorchDrugGenerator.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGenerator.get_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_generator</span><span class="p">(</span>
+<div class="viewcode-block" id="TorchDrugGenerator.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGenerator.get_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_generator</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
@@ -254,7 +254,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">implementation</span><span class="o">.</span><span class="n">sample</span></div>
 
-<div class="viewcode-block" id="TorchDrugGenerator.validate_configuration"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGenerator.validate_configuration">[docs]</a>    <span class="k">def</span> <span class="nf">validate_configuration</span><span class="p">(</span>
+<div class="viewcode-block" id="TorchDrugGenerator.validate_configuration"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGenerator.validate_configuration">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_configuration</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfiguration</span><span class="p">:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">configuration</span><span class="p">,</span> <span class="n">AlgorithmConfiguration</span><span class="p">)</span>
@@ -262,7 +262,7 @@
 
 
 <div class="viewcode-block" id="TorchDrugGCPN"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGCPN">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">TorchDrugGenerator</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TorchDrugGCPN</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TorchDrugGCPN</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Interface for TorchDrug Graph-convolutional policy network (GCPN) algorithm.</span>
 <span class="sd">    Currently supported algorithm versions are &quot;zinc250k_v0&quot;, &quot;qed_v0&quot; and &quot;plogp_v0&quot;.</span>
@@ -272,7 +272,7 @@
     <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;materials&quot;</span>
     <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zinc250k_v0&quot;</span>
 
-<div class="viewcode-block" id="TorchDrugGCPN.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGCPN.get_conditional_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GCPNGenerator</span><span class="p">:</span>
+<div class="viewcode-block" id="TorchDrugGCPN.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGCPN.get_conditional_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GCPNGenerator</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: local path to model files.</span>
@@ -283,7 +283,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span></div>
 
 <div class="viewcode-block" id="TorchDrugGCPN.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGCPN.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get filepath mappings for the given training pipeline arguments.</span>
@@ -322,7 +322,7 @@
 
 
 <div class="viewcode-block" id="TorchDrugGraphAF"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGraphAF">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">TorchDrugGenerator</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TorchDrugGraphAF</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TorchDrugGraphAF</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Interface for TorchDrug flow-based autoregressive graph algorithm (GraphAF).</span>
 <span class="sd">    Currently supported algorithm versions are &quot;zinc250k_v0&quot;, &quot;qed_v0&quot; and &quot;plogp_v0&quot;.</span>
@@ -332,7 +332,7 @@
     <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;materials&quot;</span>
     <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zinc250k_v0&quot;</span>
 
-<div class="viewcode-block" id="TorchDrugGraphAF.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGraphAF.get_conditional_generator">[docs]</a>    <span class="k">def</span> <span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GAFGenerator</span><span class="p">:</span>
+<div class="viewcode-block" id="TorchDrugGraphAF.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGraphAF.get_conditional_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GAFGenerator</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: local path to model files.</span>
@@ -343,7 +343,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span></div>
 
 <div class="viewcode-block" id="TorchDrugGraphAF.get_filepath_mappings_for_training_pipeline_arguments"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.torchdrug.core.html#gt4sd.algorithms.generation.torchdrug.core.TorchDrugGraphAF.get_filepath_mappings_for_training_pipeline_arguments">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get filepath mappings for the given training pipeline arguments.</span>

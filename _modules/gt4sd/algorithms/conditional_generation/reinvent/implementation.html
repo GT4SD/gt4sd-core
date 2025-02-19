@@ -189,26 +189,26 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Implementation of Reinvent conditional generators.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">from</span> <span class="nn">reinvent_models.lib_invent.models.model</span> <span class="kn">import</span> <span class="n">DecoratorModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reinvent_models.lib_invent.models.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">DecoratorModel</span>
 
-<span class="kn">from</span> <span class="nn">.reinvent_core.core</span> <span class="kn">import</span> <span class="n">ReinventBase</span><span class="p">,</span> <span class="n">SampledSequencesDTO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.reinvent_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReinventBase</span><span class="p">,</span> <span class="n">SampledSequencesDTO</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="SampledTuple"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.SampledTuple">[docs]</a><span class="k">class</span> <span class="nc">SampledTuple</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<div class="viewcode-block" id="SampledTuple"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.SampledTuple">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SampledTuple</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="n">scaffold</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">decoration</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">nll</span><span class="p">:</span> <span class="nb">float</span></div>
 
 
-<div class="viewcode-block" id="ReinventConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator">[docs]</a><span class="k">class</span> <span class="nc">ReinventConditionalGenerator</span><span class="p">(</span><span class="n">ReinventBase</span><span class="p">):</span>
-<div class="viewcode-block" id="ReinventConditionalGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="ReinventConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ReinventConditionalGenerator</span><span class="p">(</span><span class="n">ReinventBase</span><span class="p">):</span>
+<div class="viewcode-block" id="ReinventConditionalGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -242,7 +242,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">randomize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_uniquely</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReinventConditionalGenerator.sample_unique_sequences"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.sample_unique_sequences">[docs]</a>    <span class="k">def</span> <span class="nf">sample_unique_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampled_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]:</span>
+<div class="viewcode-block" id="ReinventConditionalGenerator.sample_unique_sequences"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.sample_unique_sequences">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">sample_unique_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampled_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Samples the model for the given number of SMILES.</span>
 
@@ -261,7 +261,7 @@
             <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_unique_sequences</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
         <span class="p">]</span></div>
 
-<div class="viewcode-block" id="ReinventConditionalGenerator.generate_sampled_tuples"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.generate_sampled_tuples">[docs]</a>    <span class="k">def</span> <span class="nf">generate_sampled_tuples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scaffold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">SampledTuple</span><span class="p">]:</span>
+<div class="viewcode-block" id="ReinventConditionalGenerator.generate_sampled_tuples"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.generate_sampled_tuples">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_sampled_tuples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scaffold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">SampledTuple</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Samples the model for the given number of SMILES.</span>
 <span class="sd">        Args:</span>
@@ -292,7 +292,7 @@
             <span class="p">]</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReinventConditionalGenerator.generate_samples"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.generate_samples">[docs]</a>    <span class="k">def</span> <span class="nf">generate_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scaffold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="ReinventConditionalGenerator.generate_samples"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.generate_samples">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scaffold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Samples the model for the given number of SMILES.</span>
 

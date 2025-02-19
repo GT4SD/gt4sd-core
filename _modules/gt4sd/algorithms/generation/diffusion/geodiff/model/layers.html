@@ -187,35 +187,35 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">from</span> <span class="nn">diffusers.utils</span> <span class="kn">import</span> <span class="n">BaseOutput</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Embedding</span><span class="p">,</span> <span class="n">Linear</span><span class="p">,</span> <span class="n">Module</span><span class="p">,</span> <span class="n">ModuleList</span><span class="p">,</span> <span class="n">Sequential</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">MessagePassing</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.typing</span> <span class="kn">import</span> <span class="n">Adj</span><span class="p">,</span> <span class="n">OptPairTensor</span><span class="p">,</span> <span class="n">OptTensor</span><span class="p">,</span> <span class="n">Size</span>
-<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">diffusers.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseOutput</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Embedding</span><span class="p">,</span> <span class="n">Linear</span><span class="p">,</span> <span class="n">Module</span><span class="p">,</span> <span class="n">ModuleList</span><span class="p">,</span> <span class="n">Sequential</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessagePassing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Adj</span><span class="p">,</span> <span class="n">OptPairTensor</span><span class="p">,</span> <span class="n">OptTensor</span><span class="p">,</span> <span class="n">Size</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparseTensor</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
 <div class="viewcode-block" id="MoleculeGNNOutput"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MoleculeGNNOutput">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MoleculeGNNOutput</span><span class="p">(</span><span class="n">BaseOutput</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MoleculeGNNOutput</span><span class="p">(</span><span class="n">BaseOutput</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Hidden states output. Output of last layer of model.&quot;&quot;&quot;</span>
 
     <span class="n">sample</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span></div>
 
 
-<div class="viewcode-block" id="MultiLayerPerceptron"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MultiLayerPerceptron">[docs]</a><span class="k">class</span> <span class="nc">MultiLayerPerceptron</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiLayerPerceptron"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MultiLayerPerceptron">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MultiLayerPerceptron</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Multi-layer Perceptron. Note there is no activation or dropout in the last layer.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MultiLayerPerceptron.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MultiLayerPerceptron.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="MultiLayerPerceptron.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MultiLayerPerceptron.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">hidden_dims</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
@@ -249,7 +249,7 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]))</span></div>
 
-<div class="viewcode-block" id="MultiLayerPerceptron.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MultiLayerPerceptron.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="MultiLayerPerceptron.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MultiLayerPerceptron.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
 
 <span class="sd">        Args:</span>
@@ -268,21 +268,21 @@
         <span class="k">return</span> <span class="n">x</span></div></div>
 
 
-<div class="viewcode-block" id="ShiftedSoftplus"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.ShiftedSoftplus">[docs]</a><span class="k">class</span> <span class="nc">ShiftedSoftplus</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="ShiftedSoftplus"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.ShiftedSoftplus">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ShiftedSoftplus</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Shifted softplus activation function.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ShiftedSoftplus.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.ShiftedSoftplus.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ShiftedSoftplus.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.ShiftedSoftplus.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ShiftedSoftplus</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shift</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">2.0</span><span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ShiftedSoftplus.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.ShiftedSoftplus.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="ShiftedSoftplus.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.ShiftedSoftplus.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift</span></div></div>
 
 
-<div class="viewcode-block" id="CFConv"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.CFConv">[docs]</a><span class="k">class</span> <span class="nc">CFConv</span><span class="p">(</span><span class="n">MessagePassing</span><span class="p">):</span>
+<div class="viewcode-block" id="CFConv"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.CFConv">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CFConv</span><span class="p">(</span><span class="n">MessagePassing</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;CFConv layer.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CFConv.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.CFConv.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="CFConv.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.CFConv.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">out_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -310,13 +310,13 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CFConv.reset_parameters"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.CFConv.reset_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="CFConv.reset_parameters"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.CFConv.reset_parameters">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize parameters.&quot;&quot;&quot;</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lin1</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lin2</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lin2</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fill_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CFConv.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.CFConv.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="CFConv.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.CFConv.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_length</span><span class="p">,</span> <span class="n">edge_attr</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
@@ -344,14 +344,14 @@
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x</span></div>
 
-<div class="viewcode-block" id="CFConv.message"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.CFConv.message">[docs]</a>    <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_j</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="CFConv.message"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.CFConv.message">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_j</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">x_j</span> <span class="o">*</span> <span class="n">W</span></div></div>
 
 
-<div class="viewcode-block" id="InteractionBlock"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.InteractionBlock">[docs]</a><span class="k">class</span> <span class="nc">InteractionBlock</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="InteractionBlock"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.InteractionBlock">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">InteractionBlock</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Interaction block.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="InteractionBlock.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.InteractionBlock.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="InteractionBlock.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.InteractionBlock.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hidden_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">num_gaussians</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -380,7 +380,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">act</span> <span class="o">=</span> <span class="n">ShiftedSoftplus</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lin</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="InteractionBlock.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.InteractionBlock.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="InteractionBlock.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.InteractionBlock.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_length</span><span class="p">,</span> <span class="n">edge_attr</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
@@ -400,10 +400,10 @@
         <span class="k">return</span> <span class="n">x</span></div></div>
 
 
-<div class="viewcode-block" id="SchNetEncoder"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.SchNetEncoder">[docs]</a><span class="k">class</span> <span class="nc">SchNetEncoder</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="SchNetEncoder"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.SchNetEncoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SchNetEncoder</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;SchNet encoder.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SchNetEncoder.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.SchNetEncoder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="SchNetEncoder.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.SchNetEncoder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hidden_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
         <span class="n">num_filters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
@@ -438,7 +438,7 @@
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">interactions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SchNetEncoder.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.SchNetEncoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="SchNetEncoder.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.SchNetEncoder.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">edge_index</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -469,13 +469,13 @@
         <span class="k">return</span> <span class="n">h</span></div></div>
 
 
-<div class="viewcode-block" id="GINEConv"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEConv">[docs]</a><span class="k">class</span> <span class="nc">GINEConv</span><span class="p">(</span><span class="n">MessagePassing</span><span class="p">):</span>
+<div class="viewcode-block" id="GINEConv"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEConv">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GINEConv</span><span class="p">(</span><span class="n">MessagePassing</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;GINECONV layer.</span>
 <span class="sd">    Custom class of the graph isomorphism operator from the &quot;How Powerful are Graph Neural Networks?</span>
 <span class="sd">    https://arxiv.org/abs/1810.00826 paper. Note that this implementation has the added option of a custom activation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GINEConv.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEConv.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="GINEConv.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEConv.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mlp</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
         <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -505,7 +505,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;eps&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="n">eps</span><span class="p">]))</span></div>
 
-<div class="viewcode-block" id="GINEConv.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEConv.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="GINEConv.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEConv.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">OptPairTensor</span><span class="p">],</span>
         <span class="n">edge_index</span><span class="p">:</span> <span class="n">Adj</span><span class="p">,</span>
@@ -543,7 +543,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nn</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GINEConv.message"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEConv.message">[docs]</a>    <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_j</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="GINEConv.message"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEConv.message">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_j</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Message function.</span>
 
 <span class="sd">        Args:</span>
@@ -558,14 +558,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">x_j</span> <span class="o">+</span> <span class="n">edge_attr</span></div>
 
-<div class="viewcode-block" id="GINEConv.__repr__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEConv.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="GINEConv.__repr__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEConv.__repr__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(nn=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nn</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="GINEncoder"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEncoder">[docs]</a><span class="k">class</span> <span class="nc">GINEncoder</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="GINEncoder"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEncoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GINEncoder</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;GIN encoder.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GINEncoder.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEncoder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="GINEncoder.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEncoder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">num_convs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
@@ -606,7 +606,7 @@
                 <span class="p">)</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GINEncoder.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEncoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="GINEncoder.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.GINEncoder.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
@@ -644,10 +644,10 @@
         <span class="k">return</span> <span class="n">node_feature</span></div></div>
 
 
-<div class="viewcode-block" id="MLPEdgeEncoder"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MLPEdgeEncoder">[docs]</a><span class="k">class</span> <span class="nc">MLPEdgeEncoder</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="MLPEdgeEncoder"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MLPEdgeEncoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MLPEdgeEncoder</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;MLP edge encoder.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MLPEdgeEncoder.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MLPEdgeEncoder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;relu&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MLPEdgeEncoder.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MLPEdgeEncoder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;relu&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a MLP edge encoder.</span>
 
 <span class="sd">        Args:</span>
@@ -662,10 +662,10 @@
         <span class="p">)</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">out_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">out_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span>
 
-<div class="viewcode-block" id="MLPEdgeEncoder.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MLPEdgeEncoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="MLPEdgeEncoder.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.layers.html#gt4sd.algorithms.generation.diffusion.geodiff.model.layers.MLPEdgeEncoder.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">edge_length</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">edge_type</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

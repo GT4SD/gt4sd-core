@@ -187,22 +187,22 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">diffusers.configuration_utils</span> <span class="kn">import</span> <span class="n">ConfigMixin</span>
-<span class="kn">from</span> <span class="nn">diffusers.modeling_utils</span> <span class="kn">import</span> <span class="n">ModelMixin</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Data</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">diffusers.configuration_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">diffusers.modeling_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Data</span>
 
-<span class="kn">from</span> <span class="nn">.layers</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.layers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GINEncoder</span><span class="p">,</span>
     <span class="n">MLPEdgeEncoder</span><span class="p">,</span>
     <span class="n">MoleculeGNNOutput</span><span class="p">,</span>
     <span class="n">MultiLayerPerceptron</span><span class="p">,</span>
     <span class="n">SchNetEncoder</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">assemble_atom_pair_feature</span><span class="p">,</span>
     <span class="n">clip_norm</span><span class="p">,</span>
     <span class="n">extend_graph_order_radius</span><span class="p">,</span>
@@ -212,14 +212,14 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="MoleculeGNN"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN">[docs]</a><span class="k">class</span> <span class="nc">MoleculeGNN</span><span class="p">(</span><span class="n">ModelMixin</span><span class="p">,</span> <span class="n">ConfigMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="MoleculeGNN"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MoleculeGNN</span><span class="p">(</span><span class="n">ModelMixin</span><span class="p">,</span> <span class="n">ConfigMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Graph Neural Network Model for molecule conformation.</span>
 
 <span class="sd">    Code adapted from colab:</span>
 <span class="sd">        https://colab.research.google.com/drive/1pLYYWQhdLuv1q-JtEHGZybxp2RBF8gPs#scrollTo=-3-P4w5sXkRU written by Nathan Lambert.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MoleculeGNN.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="MoleculeGNN.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
         <span class="n">num_convs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
@@ -286,7 +286,7 @@
             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_encoder_local</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_local</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_local_dist_mlp</span><span class="p">]</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="MoleculeGNN._forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN._forward">[docs]</a>    <span class="k">def</span> <span class="nf">_forward</span><span class="p">(</span>
+<div class="viewcode-block" id="MoleculeGNN._forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN._forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">_forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">atom_type</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">pos</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -409,7 +409,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">edge_inv_global</span><span class="p">,</span> <span class="n">edge_inv_local</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MoleculeGNN.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="MoleculeGNN.forward"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.core.html#gt4sd.algorithms.generation.diffusion.geodiff.model.core.MoleculeGNN.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sample</span><span class="p">:</span> <span class="n">Data</span><span class="p">,</span>
         <span class="n">timestep</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>

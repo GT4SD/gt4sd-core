@@ -189,56 +189,56 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">importlib_resources</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib_resources</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LightningModule</span> <span class="k">as</span> <span class="n">RegressionLightningModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PropertyPredictionDataModule</span> <span class="k">as</span> <span class="n">RegressionDataModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PropertyPredictionDataset</span> <span class="k">as</span> <span class="n">RegressionDataset</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LightningModule</span> <span class="k">as</span> <span class="n">ClassificationLightningModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PropertyPredictionDataModule</span> <span class="k">as</span> <span class="n">ClassificationDataModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PropertyPredictionDataset</span> <span class="k">as</span> <span class="n">ClassificationDataset</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification_multitask</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification_multitask</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MultitaskEmbeddingDataset</span><span class="p">,</span>
     <span class="n">MultitaskModel</span><span class="p">,</span>
     <span class="n">PropertyPredictionDataModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.ft_tokenizer.ft_tokenizer</span> <span class="kn">import</span> <span class="n">MolTranBertTokenizer</span>
-<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">SIDER</span>
-<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">ClinTox</span> <span class="k">as</span> <span class="n">_ClinTox</span>
-<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">OrganDB</span> <span class="k">as</span> <span class="n">_OrganTox</span>
-<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">SCScore</span>
-<span class="kn">from</span> <span class="nn">paccmann_generator.drug_evaluators</span> <span class="kn">import</span> <span class="n">Tox21</span> <span class="k">as</span> <span class="n">_Tox21</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span>
-<span class="kn">from</span> <span class="nn">tdc</span> <span class="kn">import</span> <span class="n">Oracle</span>
-<span class="kn">from</span> <span class="nn">tdc.metadata</span> <span class="kn">import</span> <span class="n">download_receptor_oracle_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.ft_tokenizer.ft_tokenizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MolTranBertTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_generator.drug_evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">SIDER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_generator.drug_evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClinTox</span> <span class="k">as</span> <span class="n">_ClinTox</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_generator.drug_evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrganDB</span> <span class="k">as</span> <span class="n">_OrganTox</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_generator.drug_evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCScore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_generator.drug_evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tox21</span> <span class="k">as</span> <span class="n">_Tox21</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tdc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Oracle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tdc.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">download_receptor_oracle_name</span>
 
-<span class="kn">from</span> <span class="nn">...algorithms.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...algorithms.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ConfigurablePropertyAlgorithmConfiguration</span><span class="p">,</span>
     <span class="n">Predictor</span><span class="p">,</span>
     <span class="n">PredictorAlgorithm</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">...domains.materials</span> <span class="kn">import</span> <span class="n">SmallMolecule</span>
-<span class="kn">from</span> <span class="nn">...frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
-<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...domains.materials</span><span class="w"> </span><span class="kn">import</span> <span class="n">SmallMolecule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...frameworks.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">device_claim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ApiTokenParameters</span><span class="p">,</span>
     <span class="n">CallablePropertyPredictor</span><span class="p">,</span>
     <span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">,</span>
@@ -248,7 +248,7 @@
     <span class="n">PropertyValue</span><span class="p">,</span>
     <span class="n">S3Parameters</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">docking_import_check</span><span class="p">,</span>
     <span class="n">get_activity_fn</span><span class="p">,</span>
     <span class="n">get_similarity_fn</span><span class="p">,</span>
@@ -256,7 +256,7 @@
     <span class="n">validate_api_token</span><span class="p">,</span>
     <span class="n">validate_ip</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.functions</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.functions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">bertz</span><span class="p">,</span>
     <span class="n">esol</span><span class="p">,</span>
     <span class="n">is_scaffold</span><span class="p">,</span>
@@ -280,23 +280,23 @@
 
 
 <span class="c1"># NOTE: property prediction parameters</span>
-<div class="viewcode-block" id="ScscoreConfiguration"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ScscoreConfiguration">[docs]</a><span class="k">class</span> <span class="nc">ScscoreConfiguration</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="ScscoreConfiguration"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ScscoreConfiguration">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ScscoreConfiguration</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
     <span class="n">score_scale</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">fp_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
     <span class="n">fp_rad</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span></div>
 
 
-<div class="viewcode-block" id="SimilaritySeedParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SimilaritySeedParameters">[docs]</a><span class="k">class</span> <span class="nc">SimilaritySeedParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="SimilaritySeedParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SimilaritySeedParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SimilaritySeedParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
     <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;c1ccccc1&quot;</span><span class="p">])</span>
     <span class="n">fp_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ECFP4&quot;</span></div>
 
 
-<div class="viewcode-block" id="ActivityAgainstTargetParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ActivityAgainstTargetParameters">[docs]</a><span class="k">class</span> <span class="nc">ActivityAgainstTargetParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="ActivityAgainstTargetParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ActivityAgainstTargetParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ActivityAgainstTargetParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
     <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;drd2&quot;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;name of the target.&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="AskcosParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.AskcosParameters">[docs]</a><span class="k">class</span> <span class="nc">AskcosParameters</span><span class="p">(</span><span class="n">IpAdressParameters</span><span class="p">):</span>
-<div class="viewcode-block" id="AskcosParameters.Output"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.AskcosParameters.Output">[docs]</a>    <span class="k">class</span> <span class="nc">Output</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="AskcosParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.AskcosParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AskcosParameters</span><span class="p">(</span><span class="n">IpAdressParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="AskcosParameters.Output"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.AskcosParameters.Output">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">Output</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
         <span class="n">plausability</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plausibility&quot;</span>
         <span class="n">num_step</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;num_step&quot;</span>
         <span class="n">synthesizability</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;synthesizability&quot;</span>
@@ -329,12 +329,12 @@
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">use_enum_values</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MoleculeOneParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MoleculeOneParameters">[docs]</a><span class="k">class</span> <span class="nc">MoleculeOneParameters</span><span class="p">(</span><span class="n">ApiTokenParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="MoleculeOneParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MoleculeOneParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MoleculeOneParameters</span><span class="p">(</span><span class="n">ApiTokenParameters</span><span class="p">):</span>
 
     <span class="n">oracle_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Molecule One Synthesis&quot;</span></div>
 
 
-<div class="viewcode-block" id="DockingTdcParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingTdcParameters">[docs]</a><span class="k">class</span> <span class="nc">DockingTdcParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="DockingTdcParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingTdcParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DockingTdcParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
     <span class="c1"># To dock against a receptor defined via TDC</span>
     <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="o">...</span><span class="p">,</span>
@@ -343,7 +343,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="DockingParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingParameters">[docs]</a><span class="k">class</span> <span class="nc">DockingParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="DockingParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DockingParameters</span><span class="p">(</span><span class="n">PropertyPredictorParameters</span><span class="p">):</span>
     <span class="c1"># To dock against a user-provided receptor</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;pyscreener&quot;</span><span class="p">)</span>
     <span class="n">receptor_pdb_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
@@ -357,11 +357,11 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="S3ParametersMolecules"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.S3ParametersMolecules">[docs]</a><span class="k">class</span> <span class="nc">S3ParametersMolecules</span><span class="p">(</span><span class="n">S3Parameters</span><span class="p">):</span>
+<div class="viewcode-block" id="S3ParametersMolecules"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.S3ParametersMolecules">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">S3ParametersMolecules</span><span class="p">(</span><span class="n">S3Parameters</span><span class="p">):</span>
     <span class="n">domain</span><span class="p">:</span> <span class="n">DomainSubmodule</span> <span class="o">=</span> <span class="n">DomainSubmodule</span><span class="p">(</span><span class="s2">&quot;molecules&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MolformerParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerParameters">[docs]</a><span class="k">class</span> <span class="nc">MolformerParameters</span><span class="p">(</span><span class="n">S3ParametersMolecules</span><span class="p">):</span>
+<div class="viewcode-block" id="MolformerParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MolformerParameters</span><span class="p">(</span><span class="n">S3ParametersMolecules</span><span class="p">):</span>
     <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;molformer&quot;</span>
     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prediction batch size&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
     <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of data loading workers&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
@@ -370,36 +370,36 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MolformerClassificationParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerClassificationParameters">[docs]</a><span class="k">class</span> <span class="nc">MolformerClassificationParameters</span><span class="p">(</span><span class="n">MolformerParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="MolformerClassificationParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerClassificationParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MolformerClassificationParameters</span><span class="p">(</span><span class="n">MolformerParameters</span><span class="p">):</span>
     <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;classification&quot;</span></div>
 
 
-<div class="viewcode-block" id="MolformerMultitaskClassificationParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerMultitaskClassificationParameters">[docs]</a><span class="k">class</span> <span class="nc">MolformerMultitaskClassificationParameters</span><span class="p">(</span><span class="n">MolformerParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="MolformerMultitaskClassificationParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerMultitaskClassificationParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MolformerMultitaskClassificationParameters</span><span class="p">(</span><span class="n">MolformerParameters</span><span class="p">):</span>
     <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;multitask_classification&quot;</span></div>
 
 
-<div class="viewcode-block" id="MolformerRegressionParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerRegressionParameters">[docs]</a><span class="k">class</span> <span class="nc">MolformerRegressionParameters</span><span class="p">(</span><span class="n">MolformerParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="MolformerRegressionParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerRegressionParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MolformerRegressionParameters</span><span class="p">(</span><span class="n">MolformerParameters</span><span class="p">):</span>
     <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;regression&quot;</span></div>
 
 
-<div class="viewcode-block" id="MCAParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MCAParameters">[docs]</a><span class="k">class</span> <span class="nc">MCAParameters</span><span class="p">(</span><span class="n">S3ParametersMolecules</span><span class="p">):</span>
+<div class="viewcode-block" id="MCAParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MCAParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MCAParameters</span><span class="p">(</span><span class="n">S3ParametersMolecules</span><span class="p">):</span>
     <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MCA&quot;</span></div>
 
 
-<div class="viewcode-block" id="Tox21Parameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21Parameters">[docs]</a><span class="k">class</span> <span class="nc">Tox21Parameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="Tox21Parameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21Parameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Tox21Parameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
     <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Tox21&quot;</span></div>
 
 
-<div class="viewcode-block" id="ClinToxParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinToxParameters">[docs]</a><span class="k">class</span> <span class="nc">ClinToxParameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="ClinToxParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinToxParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ClinToxParameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
     <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ClinTox&quot;</span></div>
 
 
-<div class="viewcode-block" id="SiderParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SiderParameters">[docs]</a><span class="k">class</span> <span class="nc">SiderParameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="SiderParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SiderParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SiderParameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
     <span class="n">algorithm_application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;SIDER&quot;</span></div>
 
 
-<div class="viewcode-block" id="OrganToxParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganToxParameters">[docs]</a><span class="k">class</span> <span class="nc">OrganToxParameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
-<div class="viewcode-block" id="OrganToxParameters.Organs"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganToxParameters.Organs">[docs]</a>    <span class="k">class</span> <span class="nc">Organs</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="OrganToxParameters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganToxParameters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">OrganToxParameters</span><span class="p">(</span><span class="n">MCAParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="OrganToxParameters.Organs"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganToxParameters.Organs">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">Organs</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
         <span class="n">adrenal_gland</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Adrenal Gland&quot;</span>
         <span class="n">bone_marrow</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Bone Marrow&quot;</span>
         <span class="n">brain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Brain&quot;</span>
@@ -421,7 +421,7 @@
         <span class="n">urinary_bladder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Urinary Bladder&quot;</span>
         <span class="n">uterus</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Uterus&quot;</span></div>
 
-<div class="viewcode-block" id="OrganToxParameters.ToxType"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganToxParameters.ToxType">[docs]</a>    <span class="k">class</span> <span class="nc">ToxType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="OrganToxParameters.ToxType"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganToxParameters.ToxType">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">ToxType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
         <span class="n">chronic</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;chronic&quot;</span>
         <span class="n">subchronic</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;subchronic&quot;</span>
         <span class="n">multigenerational</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;multigenerational&quot;</span>
@@ -440,10 +440,10 @@
     <span class="p">)</span></div>
 
 
-<span class="k">class</span> <span class="nc">_Molformer</span><span class="p">(</span><span class="n">PredictorAlgorithm</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Molformer</span><span class="p">(</span><span class="n">PredictorAlgorithm</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all Molformer predictive algorithms.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">MolformerParameters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">MolformerParameters</span><span class="p">):</span>
 
         <span class="c1"># Set up the configuration from the parameters</span>
         <span class="n">configuration</span> <span class="o">=</span> <span class="n">ConfigurablePropertyAlgorithmConfiguration</span><span class="p">(</span>
@@ -466,7 +466,7 @@
         <span class="c1"># The parent constructor calls `self.get_model`.</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_resources_path_and_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resources_path_and_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 
         <span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;model.ckpt&quot;</span><span class="p">)</span>
         <span class="n">config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;hparams.yaml&quot;</span><span class="p">)</span>
@@ -477,10 +477,10 @@
         <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="n">model_path</span>
 
 
-<div class="viewcode-block" id="MolformerClassification"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerClassification">[docs]</a><span class="k">class</span> <span class="nc">MolformerClassification</span><span class="p">(</span><span class="n">_Molformer</span><span class="p">):</span>
+<div class="viewcode-block" id="MolformerClassification"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerClassification">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MolformerClassification</span><span class="p">(</span><span class="n">_Molformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for all Molformer classification algorithms.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MolformerClassification.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerClassification.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<div class="viewcode-block" id="MolformerClassification.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerClassification.get_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
 
 <span class="sd">        Args:</span>
@@ -508,7 +508,7 @@
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
         <span class="c1"># Wrapper to get the predictions</span>
-        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">informative_model</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">samples</span><span class="p">]</span>
@@ -534,10 +534,10 @@
         <span class="k">return</span> <span class="n">informative_model</span></div></div>
 
 
-<div class="viewcode-block" id="MolformerMultitaskClassification"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerMultitaskClassification">[docs]</a><span class="k">class</span> <span class="nc">MolformerMultitaskClassification</span><span class="p">(</span><span class="n">_Molformer</span><span class="p">):</span>
+<div class="viewcode-block" id="MolformerMultitaskClassification"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerMultitaskClassification">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MolformerMultitaskClassification</span><span class="p">(</span><span class="n">_Molformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for all Molformer multitask classification algorithms.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MolformerMultitaskClassification.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerMultitaskClassification.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<div class="viewcode-block" id="MolformerMultitaskClassification.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerMultitaskClassification.get_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
 
 <span class="sd">        Args:</span>
@@ -565,7 +565,7 @@
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
         <span class="c1"># Wrapper to get the predictions</span>
-        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">informative_model</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">samples</span><span class="p">]</span>
@@ -592,10 +592,10 @@
         <span class="k">return</span> <span class="n">informative_model</span></div></div>
 
 
-<div class="viewcode-block" id="MolformerRegression"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerRegression">[docs]</a><span class="k">class</span> <span class="nc">MolformerRegression</span><span class="p">(</span><span class="n">_Molformer</span><span class="p">):</span>
+<div class="viewcode-block" id="MolformerRegression"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerRegression">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MolformerRegression</span><span class="p">(</span><span class="n">_Molformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for all Molformer regression algorithms.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MolformerRegression.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerRegression.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<div class="viewcode-block" id="MolformerRegression.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolformerRegression.get_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
 
 <span class="sd">        Args:</span>
@@ -623,7 +623,7 @@
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
         <span class="c1"># Wrapper to get the predictions</span>
-        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">informative_model</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">samples</span><span class="p">]</span>
@@ -648,41 +648,41 @@
 
 
 <span class="c1"># NOTE: property prediction classes</span>
-<div class="viewcode-block" id="Plogp"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Plogp">[docs]</a><span class="k">class</span> <span class="nc">Plogp</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Plogp"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Plogp">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Plogp</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the penalized logP of a molecule. This is the logP minus the number of</span>
 <span class="sd">    rings with &gt; 6 atoms minus the SAS.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Plogp.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Plogp.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Plogp.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Plogp.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">plogp</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Lipinski"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Lipinski">[docs]</a><span class="k">class</span> <span class="nc">Lipinski</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Lipinski"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Lipinski">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Lipinski</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate whether a molecule adheres to the Lipinski-rule-of-5.</span>
 <span class="sd">    A crude approximation of druglikeness.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Lipinski.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Lipinski.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Lipinski.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Lipinski.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">lipinski</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Esol"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Esol">[docs]</a><span class="k">class</span> <span class="nc">Esol</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Esol"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Esol">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Esol</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate the water solubility of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Esol.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Esol.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Esol.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Esol.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">esol</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Scscore"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Scscore">[docs]</a><span class="k">class</span> <span class="nc">Scscore</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Scscore"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Scscore">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Scscore</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the synthetic complexity score (SCScore) of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Scscore.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Scscore.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Scscore.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Scscore.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ScscoreConfiguration</span> <span class="o">=</span> <span class="n">ScscoreConfiguration</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -690,154 +690,154 @@
         <span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Sas"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sas">[docs]</a><span class="k">class</span> <span class="nc">Sas</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Sas"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sas">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Sas</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the synthetic accessibility score (SAS) for a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Sas.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sas.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Sas.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sas.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">sas</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Bertz"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Bertz">[docs]</a><span class="k">class</span> <span class="nc">Bertz</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Bertz"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Bertz">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Bertz</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate Bertz index of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Bertz.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Bertz.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Bertz.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Bertz.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">bertz</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Tpsa"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tpsa">[docs]</a><span class="k">class</span> <span class="nc">Tpsa</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Tpsa"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tpsa">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Tpsa</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the total polar surface area of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Tpsa.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tpsa.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Tpsa.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tpsa.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">tpsa</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Logp"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Logp">[docs]</a><span class="k">class</span> <span class="nc">Logp</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Logp"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Logp">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Logp</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the partition coefficient of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Logp.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Logp.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Logp.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Logp.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">logp</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Qed"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Qed">[docs]</a><span class="k">class</span> <span class="nc">Qed</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Qed"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Qed">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Qed</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the quantitative estimate of drug-likeness (QED) of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Qed.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Qed.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Qed.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Qed.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">qed</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="NumberHAcceptors"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHAcceptors">[docs]</a><span class="k">class</span> <span class="nc">NumberHAcceptors</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="NumberHAcceptors"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHAcceptors">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NumberHAcceptors</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate number of H acceptors of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NumberHAcceptors.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHAcceptors.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="NumberHAcceptors.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHAcceptors.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">number_of_h_acceptors</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="NumberAtoms"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberAtoms">[docs]</a><span class="k">class</span> <span class="nc">NumberAtoms</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="NumberAtoms"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberAtoms">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NumberAtoms</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate number of atoms of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NumberAtoms.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberAtoms.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="NumberAtoms.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberAtoms.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">number_of_atoms</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="NumberHDonors"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHDonors">[docs]</a><span class="k">class</span> <span class="nc">NumberHDonors</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="NumberHDonors"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHDonors">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NumberHDonors</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate number of H donors of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NumberHDonors.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHDonors.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="NumberHDonors.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHDonors.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">number_of_h_donors</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="NumberAromaticRings"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberAromaticRings">[docs]</a><span class="k">class</span> <span class="nc">NumberAromaticRings</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="NumberAromaticRings"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberAromaticRings">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NumberAromaticRings</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate number of aromatic rings of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NumberAromaticRings.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberAromaticRings.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="NumberAromaticRings.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberAromaticRings.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">number_of_aromatic_rings</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="NumberRings"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberRings">[docs]</a><span class="k">class</span> <span class="nc">NumberRings</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="NumberRings"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberRings">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NumberRings</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate number of rings of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NumberRings.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberRings.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="NumberRings.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberRings.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">number_of_rings</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="NumberRotatableBonds"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberRotatableBonds">[docs]</a><span class="k">class</span> <span class="nc">NumberRotatableBonds</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="NumberRotatableBonds"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberRotatableBonds">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NumberRotatableBonds</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate number of rotatable bonds of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NumberRotatableBonds.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberRotatableBonds.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="NumberRotatableBonds.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberRotatableBonds.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">number_of_rotatable_bonds</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="NumberLargeRings"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberLargeRings">[docs]</a><span class="k">class</span> <span class="nc">NumberLargeRings</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="NumberLargeRings"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberLargeRings">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NumberLargeRings</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the amount of large rings (&gt; 6 atoms) of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NumberLargeRings.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberLargeRings.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="NumberLargeRings.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberLargeRings.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">number_of_large_rings</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="MolecularWeight"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolecularWeight">[docs]</a><span class="k">class</span> <span class="nc">MolecularWeight</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="MolecularWeight"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolecularWeight">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MolecularWeight</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate molecular weight of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MolecularWeight.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolecularWeight.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="MolecularWeight.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MolecularWeight.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">molecular_weight</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="IsScaffold"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.IsScaffold">[docs]</a><span class="k">class</span> <span class="nc">IsScaffold</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="IsScaffold"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.IsScaffold">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">IsScaffold</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether a molecule is identical to its Murcko Scaffold.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="IsScaffold.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.IsScaffold.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="IsScaffold.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.IsScaffold.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">is_scaffold</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="NumberHeterocycles"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHeterocycles">[docs]</a><span class="k">class</span> <span class="nc">NumberHeterocycles</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="NumberHeterocycles"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHeterocycles">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NumberHeterocycles</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The amount of heterocycles of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NumberHeterocycles.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHeterocycles.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="NumberHeterocycles.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberHeterocycles.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">number_of_heterocycles</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="NumberStereocenters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberStereocenters">[docs]</a><span class="k">class</span> <span class="nc">NumberStereocenters</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="NumberStereocenters"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberStereocenters">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NumberStereocenters</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The amount of stereo centers of a molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NumberStereocenters.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberStereocenters.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="NumberStereocenters.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.NumberStereocenters.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">PropertyPredictorParameters</span> <span class="o">=</span> <span class="n">PropertyPredictorParameters</span><span class="p">()</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">number_of_stereocenters</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="SimilaritySeed"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SimilaritySeed">[docs]</a><span class="k">class</span> <span class="nc">SimilaritySeed</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="SimilaritySeed"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SimilaritySeed">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SimilaritySeed</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the similarity of a molecule to a seed molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SimilaritySeed.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SimilaritySeed.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">SimilaritySeedParameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="SimilaritySeed.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.SimilaritySeed.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">SimilaritySeedParameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">callable_fn</span><span class="o">=</span><span class="n">get_similarity_fn</span><span class="p">(</span>
                 <span class="n">target_mol</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">smiles</span><span class="p">,</span> <span class="n">fp_key</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">fp_key</span>
@@ -846,22 +846,22 @@
         <span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="ActivityAgainstTarget"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ActivityAgainstTarget">[docs]</a><span class="k">class</span> <span class="nc">ActivityAgainstTarget</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="ActivityAgainstTarget"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ActivityAgainstTarget">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ActivityAgainstTarget</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the activity of a molecule against a target molecule.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ActivityAgainstTarget.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ActivityAgainstTarget.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ActivityAgainstTargetParameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ActivityAgainstTarget.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ActivityAgainstTarget.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ActivityAgainstTargetParameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">callable_fn</span><span class="o">=</span><span class="n">get_activity_fn</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">target</span><span class="p">),</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span>
         <span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Askcos"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Askcos">[docs]</a><span class="k">class</span> <span class="nc">Askcos</span><span class="p">(</span><span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Askcos"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Askcos">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Askcos</span><span class="p">(</span><span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A property predictor that uses the ASKCOs API to calculate the synthesizability</span>
 <span class="sd">    of a molecule.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Askcos.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Askcos.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">AskcosParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="Askcos.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Askcos.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">AskcosParameters</span><span class="p">):</span>
 
         <span class="c1"># Raises if IP is not valid</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
@@ -885,13 +885,13 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="n">Oracle</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ASKCOS&quot;</span><span class="p">),</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="MoleculeOne"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MoleculeOne">[docs]</a><span class="k">class</span> <span class="nc">MoleculeOne</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="MoleculeOne"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MoleculeOne">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MoleculeOne</span><span class="p">(</span><span class="n">CallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A property predictor that uses the MoleculeOne API to calculate the synthesizability</span>
 <span class="sd">    of a molecule.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MoleculeOne.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MoleculeOne.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">MoleculeOneParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="MoleculeOne.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.MoleculeOne.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">MoleculeOneParameters</span><span class="p">):</span>
 
         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;You have to provide a valid API key, for details on setting this up, see: &quot;</span>
@@ -909,26 +909,26 @@
         <span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="DockingTdc"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingTdc">[docs]</a><span class="k">class</span> <span class="nc">DockingTdc</span><span class="p">(</span><span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="DockingTdc"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingTdc">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DockingTdc</span><span class="p">(</span><span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A property predictor that computes the docking score against a target</span>
 <span class="sd">    provided via the TDC package (see: https://tdcommons.ai/functions/oracles/#docking-scores)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="DockingTdc.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingTdc.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">DockingTdcParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="DockingTdc.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.DockingTdc.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">DockingTdcParameters</span><span class="p">):</span>
 
         <span class="n">docking_import_check</span><span class="p">()</span>
         <span class="nb">callable</span> <span class="o">=</span> <span class="n">Oracle</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="nb">callable</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Docking"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Docking">[docs]</a><span class="k">class</span> <span class="nc">Docking</span><span class="p">(</span><span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="Docking"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Docking">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Docking</span><span class="p">(</span><span class="n">ConfigurableCallablePropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A property predictor that computes the docking score against a user-defined target.</span>
 <span class="sd">    Relies on TDC backend, see https://tdcommons.ai/functions/oracles/#docking-scores for setup.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Docking.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Docking.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">DockingParameters</span><span class="p">):</span>
+<div class="viewcode-block" id="Docking.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Docking.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">DockingParameters</span><span class="p">):</span>
 
         <span class="n">docking_import_check</span><span class="p">()</span>
         <span class="nb">callable</span> <span class="o">=</span> <span class="n">Oracle</span><span class="p">(</span>
@@ -940,10 +940,10 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">callable_fn</span><span class="o">=</span><span class="nb">callable</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">_MCA</span><span class="p">(</span><span class="n">PredictorAlgorithm</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_MCA</span><span class="p">(</span><span class="n">PredictorAlgorithm</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all MCA-based predictive algorithms.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">MCAParameters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">MCAParameters</span><span class="p">):</span>
 
         <span class="c1"># Set up the configuration from the parameters</span>
         <span class="n">configuration</span> <span class="o">=</span> <span class="n">ConfigurablePropertyAlgorithmConfiguration</span><span class="p">(</span>
@@ -958,10 +958,10 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="Tox21"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21">[docs]</a><span class="k">class</span> <span class="nc">Tox21</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
+<div class="viewcode-block" id="Tox21"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Tox21</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Model to predict environmental toxicity for the 12 endpoints in Tox21.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Tox21.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<div class="viewcode-block" id="Tox21.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21.get_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
 
 <span class="sd">        Args:</span>
@@ -974,7 +974,7 @@
         <span class="n">model</span> <span class="o">=</span> <span class="n">_Tox21</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
 
         <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
-        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">to_smiles</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -982,7 +982,7 @@
         <span class="k">return</span> <span class="n">informative_model</span></div>
 
 <div class="viewcode-block" id="Tox21.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Tox21.get_description">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        This model predicts the 12 endpoints from the Tox21 challenge.</span>
 <span class="s2">        The endpoints are: NR-AR, NR-AR-LBD, NR-AhR, NR-Aromatase, NR-ER, NR-ER-LBD, NR-PPAR-gamma, SR-ARE, SR-ATAD5, SR-HSE, SR-MMP, SR-p53</span>
@@ -991,10 +991,10 @@
         <span class="k">return</span> <span class="n">text</span></div></div>
 
 
-<div class="viewcode-block" id="ClinTox"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinTox">[docs]</a><span class="k">class</span> <span class="nc">ClinTox</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
+<div class="viewcode-block" id="ClinTox"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinTox">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ClinTox</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Model to predict environmental toxicity for the 12 endpoints in Tox21.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ClinTox.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinTox.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<div class="viewcode-block" id="ClinTox.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinTox.get_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
 
 <span class="sd">        Args:</span>
@@ -1007,7 +1007,7 @@
         <span class="n">model</span> <span class="o">=</span> <span class="n">_ClinTox</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
 
         <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
-        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">to_smiles</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -1015,7 +1015,7 @@
         <span class="k">return</span> <span class="n">informative_model</span></div>
 
 <div class="viewcode-block" id="ClinTox.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.ClinTox.get_description">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        This model is a multitask classifier for two classes:</span>
 <span class="s2">            1. Predicted probability to receive FDA approval.</span>
@@ -1025,8 +1025,8 @@
         <span class="k">return</span> <span class="n">text</span></div></div>
 
 
-<div class="viewcode-block" id="Sider"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sider">[docs]</a><span class="k">class</span> <span class="nc">Sider</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
-<div class="viewcode-block" id="Sider.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sider.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<div class="viewcode-block" id="Sider"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sider">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Sider</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
+<div class="viewcode-block" id="Sider.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sider.get_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
 
 <span class="sd">        Args:</span>
@@ -1039,7 +1039,7 @@
         <span class="n">model</span> <span class="o">=</span> <span class="n">SIDER</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">)</span>
 
         <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
-        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">to_smiles</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -1047,7 +1047,7 @@
         <span class="k">return</span> <span class="n">informative_model</span></div>
 
 <div class="viewcode-block" id="Sider.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.Sider.get_description">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        This model is a multitask classifier to predict side effects of drugs across</span>
 <span class="s2">        27 classes. For details on the data see:</span>
@@ -1056,10 +1056,10 @@
         <span class="k">return</span> <span class="n">text</span></div></div>
 
 
-<div class="viewcode-block" id="OrganTox"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox">[docs]</a><span class="k">class</span> <span class="nc">OrganTox</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
+<div class="viewcode-block" id="OrganTox"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">OrganTox</span><span class="p">(</span><span class="n">_MCA</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Model to predict toxicity for different organs.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="OrganTox.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">OrganToxParameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="OrganTox.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">OrganToxParameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="c1"># Extract model-specific parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">site</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">site</span>
@@ -1067,7 +1067,7 @@
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="OrganTox.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
+<div class="viewcode-block" id="OrganTox.get_model"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox.get_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Predictor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual model.</span>
 
 <span class="sd">        Args:</span>
@@ -1082,7 +1082,7 @@
         <span class="p">)</span>
 
         <span class="c1"># Wrapper to get toxicity-endpoint-level predictions</span>
-        <span class="k">def</span> <span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">informative_model</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyValue</span><span class="p">]:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">to_smiles</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">all_preds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
@@ -1092,7 +1092,7 @@
         <span class="k">return</span> <span class="n">informative_model</span></div>
 
 <div class="viewcode-block" id="OrganTox.get_description"><a class="viewcode-back" href="../../../../api/gt4sd.properties.molecules.core.html#gt4sd.properties.molecules.core.OrganTox.get_description">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        This model is a multitask classifier to toxicity across different organs and</span>
 <span class="s2">        toxicity types (`chronic`, `subchronic`, `multigenerational` or `all`).</span>

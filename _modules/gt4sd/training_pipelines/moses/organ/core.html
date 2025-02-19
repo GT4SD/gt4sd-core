@@ -190,27 +190,27 @@
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Moses Organ training pipeline.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">ast</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">from</span> <span class="nn">guacamol_baselines.moses_baselines.organ_train</span> <span class="kn">import</span> <span class="n">main</span>
-<span class="kn">from</span> <span class="nn">moses.script_utils</span> <span class="kn">import</span> <span class="n">MetricsReward</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol_baselines.moses_baselines.organ_train</span><span class="w"> </span><span class="kn">import</span> <span class="n">main</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">moses.script_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsReward</span>
 
-<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
-<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">MosesTrainingArguments</span><span class="p">,</span> <span class="n">MosesTrainingPipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core</span><span class="w"> </span><span class="kn">import</span> <span class="n">MosesTrainingArguments</span><span class="p">,</span> <span class="n">MosesTrainingPipeline</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="MosesOrganTrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.moses.organ.core.html#gt4sd.training_pipelines.moses.organ.core.MosesOrganTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">MosesOrganTrainingPipeline</span><span class="p">(</span><span class="n">MosesTrainingPipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="MosesOrganTrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.moses.organ.core.html#gt4sd.training_pipelines.moses.organ.core.MosesOrganTrainingPipeline">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MosesOrganTrainingPipeline</span><span class="p">(</span><span class="n">MosesTrainingPipeline</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Moses Organ training pipelines.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MosesOrganTrainingPipeline.train"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.moses.organ.core.html#gt4sd.training_pipelines.moses.organ.core.MosesOrganTrainingPipeline.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+<div class="viewcode-block" id="MosesOrganTrainingPipeline.train"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.moses.organ.core.html#gt4sd.training_pipelines.moses.organ.core.MosesOrganTrainingPipeline.train">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">training_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -241,7 +241,7 @@
 
 
 <div class="viewcode-block" id="MosesOrganTrainingArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.moses.organ.core.html#gt4sd.training_pipelines.moses.organ.core.MosesOrganTrainingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MosesOrganTrainingArguments</span><span class="p">(</span><span class="n">MosesTrainingArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MosesOrganTrainingArguments</span><span class="p">(</span><span class="n">MosesTrainingArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Arguments related to Moses Organ training.&quot;&quot;&quot;</span>
 
     <span class="n">generator_pretrain_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
@@ -294,7 +294,7 @@
 
 
 <div class="viewcode-block" id="MosesOrganModelArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.moses.organ.core.html#gt4sd.training_pipelines.moses.organ.core.MosesOrganModelArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MosesOrganModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MosesOrganModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Arguments related to Moses Organ model.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>

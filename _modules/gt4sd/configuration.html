@@ -189,19 +189,19 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Module configuration.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
-<span class="kn">from</span> <span class="nn">pydantic_settings</span> <span class="kn">import</span> <span class="n">BaseSettings</span><span class="p">,</span> <span class="n">SettingsConfigDict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseSettings</span><span class="p">,</span> <span class="n">SettingsConfigDict</span>
 
-<span class="kn">from</span> <span class="nn">.s3</span> <span class="kn">import</span> <span class="n">GT4SDS3Client</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">,</span> <span class="n">sync_folder_with_s3</span><span class="p">,</span> <span class="n">upload_file_to_s3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.s3</span><span class="w"> </span><span class="kn">import</span> <span class="n">GT4SDS3Client</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">,</span> <span class="n">sync_folder_with_s3</span><span class="p">,</span> <span class="n">upload_file_to_s3</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="GT4SDConfiguration"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.GT4SDConfiguration">[docs]</a><span class="k">class</span> <span class="nc">GT4SDConfiguration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+<div class="viewcode-block" id="GT4SDConfiguration"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.GT4SDConfiguration">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GT4SDConfiguration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;GT4SDConfiguration settings from environment variables.</span>
 
 <span class="sd">    Default configurations for gt4sd including a read-only COS for algorithms&#39; artifacts.</span>
@@ -218,15 +218,15 @@
     <span class="n">gt4sd_disable_cudnn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="n">gt4sd_s3_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s3.par01.cloud-object-storage.appdomain.cloud&quot;</span>
-    <span class="n">gt4sd_s3_access_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;6e9891531d724da89997575a65f4592e&quot;</span>
-    <span class="n">gt4sd_s3_secret_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;5997d63c4002cc04e13c03dc0c2db9dae751293dab106ac5&quot;</span>
+    <span class="n">gt4sd_s3_access_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;b087e6810a5d4246a64e07e36ace338f&quot;</span>
+    <span class="n">gt4sd_s3_secret_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ba4a1db5647a32c6109b58714befb7ea7145b983143e0836&quot;</span>
     <span class="n">gt4sd_s3_secure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">gt4sd_s3_bucket_algorithms</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gt4sd-cos-algorithms-artifacts&quot;</span>
     <span class="n">gt4sd_s3_bucket_properties</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gt4sd-cos-properties-artifacts&quot;</span>
 
     <span class="n">gt4sd_s3_host_hub</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s3.par01.cloud-object-storage.appdomain.cloud&quot;</span>
-    <span class="n">gt4sd_s3_access_key_hub</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;d9536662ebcf462f937efb9f58012830&quot;</span>
-    <span class="n">gt4sd_s3_secret_key_hub</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;934d1f3afdaea55ac586f6c2f729ac2ba2694bb8e975ee0b&quot;</span>
+    <span class="n">gt4sd_s3_access_key_hub</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1168c1d9ce664e75a8a151e6f4a29078&quot;</span>
+    <span class="n">gt4sd_s3_secret_key_hub</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;4996c6cc737828213a7afcc7e27450e1af2daf027af95c1d&quot;</span>
     <span class="n">gt4sd_s3_secure_hub</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">gt4sd_s3_bucket_hub_algorithms</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gt4sd-cos-hub-algorithms-artifacts&quot;</span>
     <span class="n">gt4sd_s3_bucket_hub_properties</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gt4sd-cos-hub-properties-artifacts&quot;</span>
@@ -234,16 +234,16 @@
 
 <div class="viewcode-block" id="GT4SDConfiguration.get_instance"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.GT4SDConfiguration.get_instance">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_instance</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;GT4SDConfiguration&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_instance</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;GT4SDConfiguration&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">GT4SDConfiguration</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="GT4SDArtifactManagementConfiguration"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.GT4SDArtifactManagementConfiguration">[docs]</a><span class="k">class</span> <span class="nc">GT4SDArtifactManagementConfiguration</span><span class="p">:</span>
+<div class="viewcode-block" id="GT4SDArtifactManagementConfiguration"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.GT4SDArtifactManagementConfiguration">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GT4SDArtifactManagementConfiguration</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Artifact management configuration.&quot;&quot;&quot;</span>
 
     <span class="n">gt4sd_s3_modules</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;algorithms&quot;</span><span class="p">,</span> <span class="s2">&quot;properties&quot;</span><span class="p">}</span>
 
-<div class="viewcode-block" id="GT4SDArtifactManagementConfiguration.__init__"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.GT4SDArtifactManagementConfiguration.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gt4sd_configuration</span><span class="p">:</span> <span class="n">GT4SDConfiguration</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="GT4SDArtifactManagementConfiguration.__init__"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.GT4SDArtifactManagementConfiguration.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gt4sd_configuration</span><span class="p">:</span> <span class="n">GT4SDConfiguration</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the artifact management configuration from the base one.</span>
 
 <span class="sd">        Args:</span>
@@ -277,7 +277,7 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;local cache path for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> already exists at </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="upload_to_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.upload_to_s3">[docs]</a><span class="k">def</span> <span class="nf">upload_to_s3</span><span class="p">(</span>
+<div class="viewcode-block" id="upload_to_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.upload_to_s3">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">upload_to_s3</span><span class="p">(</span>
     <span class="n">target_filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source_filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;algorithms&quot;</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Upload an algorithm in source_filepath in target_filepath on a bucket in the model hub.</span>
@@ -308,7 +308,7 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;error in syncing the cache with S3&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="sync_algorithm_with_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.sync_algorithm_with_s3">[docs]</a><span class="k">def</span> <span class="nf">sync_algorithm_with_s3</span><span class="p">(</span>
+<div class="viewcode-block" id="sync_algorithm_with_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.sync_algorithm_with_s3">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">sync_algorithm_with_s3</span><span class="p">(</span>
     <span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;algorithms&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sync an algorithm in the local cache using environment variables.</span>
@@ -359,7 +359,7 @@
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span> <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">folder_path</span></div>
 
 
-<div class="viewcode-block" id="get_cached_algorithm_path"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_cached_algorithm_path">[docs]</a><span class="k">def</span> <span class="nf">get_cached_algorithm_path</span><span class="p">(</span>
+<div class="viewcode-block" id="get_cached_algorithm_path"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_cached_algorithm_path">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_cached_algorithm_path</span><span class="p">(</span>
     <span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;algorithms&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 
@@ -383,7 +383,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_algorithm_subdirectories_from_s3_coordinates"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_from_s3_coordinates">[docs]</a><span class="k">def</span> <span class="nf">get_algorithm_subdirectories_from_s3_coordinates</span><span class="p">(</span>
+<div class="viewcode-block" id="get_algorithm_subdirectories_from_s3_coordinates"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_from_s3_coordinates">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_algorithm_subdirectories_from_s3_coordinates</span><span class="p">(</span>
     <span class="n">host</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">access_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">secret_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -398,7 +398,7 @@
     <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">list_directories</span><span class="p">(</span><span class="n">bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_algorithm_subdirectories_with_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_with_s3">[docs]</a><span class="k">def</span> <span class="nf">get_algorithm_subdirectories_with_s3</span><span class="p">(</span>
+<div class="viewcode-block" id="get_algorithm_subdirectories_with_s3"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_with_s3">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_algorithm_subdirectories_with_s3</span><span class="p">(</span>
     <span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;algorithms&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get algorithms in the s3 buckets.</span>
@@ -451,7 +451,7 @@
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_algorithm_subdirectories_in_cache"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_in_cache">[docs]</a><span class="k">def</span> <span class="nf">get_algorithm_subdirectories_in_cache</span><span class="p">(</span>
+<div class="viewcode-block" id="get_algorithm_subdirectories_in_cache"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_in_cache">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_algorithm_subdirectories_in_cache</span><span class="p">(</span>
     <span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;algorithms&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get algorithm subdirectories from the cache.</span>
@@ -472,7 +472,7 @@
         <span class="k">return</span> <span class="nb">set</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="reset_logging_root_logger"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.reset_logging_root_logger">[docs]</a><span class="k">def</span> <span class="nf">reset_logging_root_logger</span><span class="p">():</span>
+<div class="viewcode-block" id="reset_logging_root_logger"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.reset_logging_root_logger">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">reset_logging_root_logger</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reset the root logger from logging library.&quot;&quot;&quot;</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
     <span class="n">root</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">[]</span>

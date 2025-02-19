@@ -187,26 +187,26 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">IterableDataset</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">IterableDataset</span>
 
-<span class="kn">from</span> <span class="nn">..envs.graph_building_env</span> <span class="kn">import</span> <span class="n">GraphBuildingEnvContext</span>
-<span class="kn">from</span> <span class="nn">..loss.trajectory_balance</span> <span class="kn">import</span> <span class="n">TrajectoryBalance</span><span class="p">,</span> <span class="n">TrajectoryBalanceModel</span>
-<span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">GFlowNetDataset</span><span class="p">,</span> <span class="n">GFlowNetTask</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..envs.graph_building_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphBuildingEnvContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..loss.trajectory_balance</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrajectoryBalance</span><span class="p">,</span> <span class="n">TrajectoryBalanceModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">GFlowNetDataset</span><span class="p">,</span> <span class="n">GFlowNetTask</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="SamplingIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator">[docs]</a><span class="k">class</span> <span class="nc">SamplingIterator</span><span class="p">(</span><span class="n">IterableDataset</span><span class="p">):</span>
+<div class="viewcode-block" id="SamplingIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SamplingIterator</span><span class="p">(</span><span class="n">IterableDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sampler to speed up training based on IterableDataset.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SamplingIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="SamplingIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">GFlowNetDataset</span><span class="p">,</span>
         <span class="n">model</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">TrajectoryBalanceModel</span><span class="p">],</span>
@@ -253,7 +253,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span></div>
 
-<div class="viewcode-block" id="SamplingIterator._idx_iterator"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator._idx_iterator">[docs]</a>    <span class="k">def</span> <span class="nf">_idx_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
+<div class="viewcode-block" id="SamplingIterator._idx_iterator"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator._idx_iterator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">_idx_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an iterator over the indices of the dataset. The batch can be offline or online.</span>
 
 <span class="sd">        Yields:</span>
@@ -290,7 +290,7 @@
             <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="n">bs</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">bs</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SamplingIterator.__len__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SamplingIterator.__len__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__len__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Length of the offline or online dataset.</span>
 
 <span class="sd">        Returns:</span>
@@ -302,7 +302,7 @@
         <span class="c1"># if offline</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
 
-<div class="viewcode-block" id="SamplingIterator.sample_offline"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.sample_offline">[docs]</a>    <span class="k">def</span> <span class="nf">sample_offline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idcs</span><span class="p">):</span>
+<div class="viewcode-block" id="SamplingIterator.sample_offline"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.sample_offline">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">sample_offline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idcs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Samples offline data.</span>
 
 <span class="sd">        Args:</span>
@@ -322,7 +322,7 @@
         <span class="n">trajs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">create_training_data_from_graphs</span><span class="p">(</span><span class="n">graphs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span></div>
 
-<div class="viewcode-block" id="SamplingIterator.predict_reward_model"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.predict_reward_model">[docs]</a>    <span class="k">def</span> <span class="nf">predict_reward_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">):</span>
+<div class="viewcode-block" id="SamplingIterator.predict_reward_model"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.predict_reward_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict_reward_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict rewards using the model.</span>
 
 <span class="sd">        Args:</span>
@@ -339,7 +339,7 @@
         <span class="n">flat_rewards</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pred_reward</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">flat_rewards</span></div>
 
-<div class="viewcode-block" id="SamplingIterator.predict_reward_task"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.predict_reward_task">[docs]</a>    <span class="k">def</span> <span class="nf">predict_reward_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">,</span> <span class="n">is_valid</span><span class="p">):</span>
+<div class="viewcode-block" id="SamplingIterator.predict_reward_task"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.predict_reward_task">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict_reward_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">,</span> <span class="n">is_valid</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict rewards using the task.</span>
 
 <span class="sd">        Args:</span>
@@ -381,7 +381,7 @@
 
         <span class="k">return</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span></div>
 
-<div class="viewcode-block" id="SamplingIterator.sample_online"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.sample_online">[docs]</a>    <span class="k">def</span> <span class="nf">sample_online</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">cond_info</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">):</span>
+<div class="viewcode-block" id="SamplingIterator.sample_online"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.sample_online">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">sample_online</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span><span class="p">,</span> <span class="n">cond_info</span><span class="p">,</span> <span class="n">num_offline</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample on-policy data.</span>
 
 <span class="sd">        Args:</span>
@@ -415,7 +415,7 @@
 
         <span class="k">return</span> <span class="n">trajs</span><span class="p">,</span> <span class="n">flat_rewards</span></div>
 
-<div class="viewcode-block" id="SamplingIterator.set_seed"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.set_seed">[docs]</a>    <span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SamplingIterator.set_seed"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.set_seed">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the seed for the workers.&quot;&quot;&quot;</span>
         <span class="n">worker_info</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_worker_info</span><span class="p">()</span>
         <span class="n">wid</span> <span class="o">=</span> <span class="n">worker_info</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="n">worker_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
@@ -426,7 +426,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ctx</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span></div>
 
-<div class="viewcode-block" id="SamplingIterator.__iter__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SamplingIterator.__iter__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.dataloader.sampler.html#gt4sd.frameworks.gflownet.dataloader.sampler.SamplingIterator.__iter__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Build batch using online and offline data and multiple workers.</span>
 
 <span class="sd">        Yields:</span>

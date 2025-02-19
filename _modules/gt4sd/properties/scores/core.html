@@ -190,25 +190,25 @@
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Implementation of scorers.&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
-<span class="kn">from</span> <span class="nn">guacamol.common_scoring_functions</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol.common_scoring_functions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">IsomerScoringFunction</span><span class="p">,</span>
     <span class="n">RdkitScoringFunction</span><span class="p">,</span>
     <span class="n">SMARTSScoringFunction</span><span class="p">,</span>
     <span class="n">TanimotoScoringFunction</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">guacamol.score_modifier</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol.score_modifier</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ClippedScoreModifier</span><span class="p">,</span>
     <span class="n">GaussianModifier</span><span class="p">,</span>
     <span class="n">MaxGaussianModifier</span><span class="p">,</span>
     <span class="n">MinGaussianModifier</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">guacamol.scoring_function</span> <span class="kn">import</span> <span class="n">ScoringFunction</span>
-<span class="kn">from</span> <span class="nn">guacamol.utils.descriptors</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol.scoring_function</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScoringFunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol.utils.descriptors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">bertz</span><span class="p">,</span>
     <span class="n">logP</span><span class="p">,</span>
     <span class="n">mol_weight</span><span class="p">,</span>
@@ -243,7 +243,7 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="distance_to_score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.distance_to_score">[docs]</a><span class="k">def</span> <span class="nf">distance_to_score</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="distance_to_score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.distance_to_score">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">distance_to_score</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;calculating exponential for a given distance</span>
 
 <span class="sd">    Args:</span>
@@ -255,8 +255,8 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="n">distance</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="DistanceScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.DistanceScorer">[docs]</a><span class="k">class</span> <span class="nc">DistanceScorer</span><span class="p">(</span><span class="n">ScoringFunction</span><span class="p">):</span>
-<div class="viewcode-block" id="DistanceScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.DistanceScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.00000001</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="DistanceScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.DistanceScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DistanceScorer</span><span class="p">(</span><span class="n">ScoringFunction</span><span class="p">):</span>
+<div class="viewcode-block" id="DistanceScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.DistanceScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.00000001</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;DistanceScorer is used to call a partial copy of distance_to_score function.</span>
 
 <span class="sd">        Args:</span>
@@ -264,7 +264,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">partical_distance_score</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">distance_to_score</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DistanceScorer.get_distance"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.DistanceScorer.get_distance">[docs]</a>    <span class="k">def</span> <span class="nf">get_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smile_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="DistanceScorer.get_distance"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.DistanceScorer.get_distance">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smile_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a partial copy of distance_to_score function</span>
 
 <span class="sd">        Args:</span>
@@ -276,8 +276,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">partical_distance_score</span><span class="p">(</span><span class="n">smile_distance</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="TargetValueScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TargetValueScorer">[docs]</a><span class="k">class</span> <span class="nc">TargetValueScorer</span><span class="p">(</span><span class="n">DistanceScorer</span><span class="p">):</span>
-<div class="viewcode-block" id="TargetValueScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TargetValueScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scoring_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="TargetValueScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TargetValueScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TargetValueScorer</span><span class="p">(</span><span class="n">DistanceScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="TargetValueScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TargetValueScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scoring_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Scoring function which is used to generate a score based on a taget and a scoring function.</span>
 
 <span class="sd">        Args:</span>
@@ -288,7 +288,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scoring_function</span> <span class="o">=</span> <span class="n">scoring_function</span></div>
 
-<div class="viewcode-block" id="TargetValueScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TargetValueScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="TargetValueScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TargetValueScorer.score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
 
 <span class="sd">        Args:</span>
@@ -299,7 +299,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scoring_function</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TargetValueScorer.score_list"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TargetValueScorer.score_list">[docs]</a>    <span class="k">def</span> <span class="nf">score_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<div class="viewcode-block" id="TargetValueScorer.score_list"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TargetValueScorer.score_list">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a list of scores for a given SMILES List</span>
 
 <span class="sd">        Args:</span>
@@ -315,8 +315,8 @@
         <span class="p">]</span></div></div>
 
 
-<div class="viewcode-block" id="CombinedScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.CombinedScorer">[docs]</a><span class="k">class</span> <span class="nc">CombinedScorer</span><span class="p">:</span>
-<div class="viewcode-block" id="CombinedScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.CombinedScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="CombinedScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.CombinedScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CombinedScorer</span><span class="p">:</span>
+<div class="viewcode-block" id="CombinedScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.CombinedScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">scorer_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -330,7 +330,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scorer_list</span> <span class="o">=</span> <span class="n">scorer_list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CombinedScorer._normalize_weights"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.CombinedScorer._normalize_weights">[docs]</a>    <span class="k">def</span> <span class="nf">_normalize_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<div class="viewcode-block" id="CombinedScorer._normalize_weights"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.CombinedScorer._normalize_weights">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">_normalize_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;It is used for normalizing weights.</span>
 
 <span class="sd">        Args:</span>
@@ -343,7 +343,7 @@
         <span class="n">offsetted_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">weight</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="k">for</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">weight</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">offsetted_weights</span><span class="p">))</span> <span class="k">for</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">offsetted_weights</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="CombinedScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.CombinedScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="CombinedScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.CombinedScorer.score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
 
 <span class="sd">        Args:</span>
@@ -359,7 +359,7 @@
             <span class="p">]</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="CombinedScorer.score_list"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.CombinedScorer.score_list">[docs]</a>    <span class="k">def</span> <span class="nf">score_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<div class="viewcode-block" id="CombinedScorer.score_list"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.CombinedScorer.score_list">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a list of scores for a given SMILES List</span>
 
 <span class="sd">        Args:</span>
@@ -371,8 +371,8 @@
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="k">for</span> <span class="n">smiles</span> <span class="ow">in</span> <span class="n">smiles_list</span><span class="p">]</span></div></div>
 
 
-<div class="viewcode-block" id="RDKitDescriptorScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.RDKitDescriptorScorer">[docs]</a><span class="k">class</span> <span class="nc">RDKitDescriptorScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
-<div class="viewcode-block" id="RDKitDescriptorScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.RDKitDescriptorScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="RDKitDescriptorScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.RDKitDescriptorScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RDKitDescriptorScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="RDKitDescriptorScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.RDKitDescriptorScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">modifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gaussian_modifier&quot;</span><span class="p">,</span>
@@ -390,7 +390,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">descriptor</span> <span class="o">=</span> <span class="n">DESCRIPTOR</span><span class="p">[</span><span class="n">descriptor</span><span class="p">]</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RDKitDescriptorScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.RDKitDescriptorScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="RDKitDescriptorScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.RDKitDescriptorScorer.score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
 
 <span class="sd">        Args:</span>
@@ -406,8 +406,8 @@
         <span class="k">return</span> <span class="n">scoring_function</span><span class="o">.</span><span class="n">score_mol</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">))</span>  <span class="c1"># type: ignore</span></div></div>
 
 
-<div class="viewcode-block" id="TanimotoScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TanimotoScorer">[docs]</a><span class="k">class</span> <span class="nc">TanimotoScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
-<div class="viewcode-block" id="TanimotoScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TanimotoScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="TanimotoScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TanimotoScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TanimotoScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="TanimotoScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TanimotoScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">target_smile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -428,7 +428,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">modifier</span> <span class="o">=</span> <span class="n">MODIFIERS</span><span class="p">[</span><span class="n">modifier</span><span class="p">](</span><span class="o">**</span><span class="n">MODIFIERS_PARAMETERS</span><span class="p">[</span><span class="n">modifier</span><span class="p">])</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TanimotoScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TanimotoScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="TanimotoScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.TanimotoScorer.score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
 
 <span class="sd">        Args:</span>
@@ -445,8 +445,8 @@
         <span class="k">return</span> <span class="n">scoring_function</span><span class="o">.</span><span class="n">score_mol</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">))</span>  <span class="c1"># type: ignore</span></div></div>
 
 
-<div class="viewcode-block" id="IsomerScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.IsomerScorer">[docs]</a><span class="k">class</span> <span class="nc">IsomerScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
-<div class="viewcode-block" id="IsomerScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.IsomerScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">target_smile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="IsomerScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.IsomerScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">IsomerScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="IsomerScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.IsomerScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">target_smile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Scoring function for closeness to a molecular formula.</span>
 
 <span class="sd">        Args:</span>
@@ -457,7 +457,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">target_smile</span> <span class="o">=</span> <span class="n">target_smile</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IsomerScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.IsomerScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="IsomerScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.IsomerScorer.score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
 
 <span class="sd">        Args:</span>
@@ -470,8 +470,8 @@
         <span class="k">return</span> <span class="n">scoring_function</span><span class="o">.</span><span class="n">raw_score</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="SMARTSScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.SMARTSScorer">[docs]</a><span class="k">class</span> <span class="nc">SMARTSScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
-<div class="viewcode-block" id="SMARTSScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.SMARTSScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">target_smile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="SMARTSScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.SMARTSScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SMARTSScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="SMARTSScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.SMARTSScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">target_smile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Scoring function that looks at the fingerprint similarity against a target molecule.</span>
 
 <span class="sd">        Args:</span>
@@ -484,7 +484,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span> <span class="o">=</span> <span class="n">inverse</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SMARTSScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.SMARTSScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="SMARTSScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.SMARTSScorer.score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
 
 <span class="sd">        Args:</span>
@@ -497,8 +497,8 @@
         <span class="k">return</span> <span class="n">scoring_function</span><span class="o">.</span><span class="n">score_mol</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">))</span>  <span class="c1"># type: ignore</span></div></div>
 
 
-<div class="viewcode-block" id="QEDScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.QEDScorer">[docs]</a><span class="k">class</span> <span class="nc">QEDScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
-<div class="viewcode-block" id="QEDScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.QEDScorer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="QEDScorer"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.QEDScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">QEDScorer</span><span class="p">(</span><span class="n">TargetValueScorer</span><span class="p">):</span>
+<div class="viewcode-block" id="QEDScorer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.QEDScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Scoring function that calculates the weighted sum of ADS mapped properties using QED module of rdkit</span>
 
 <span class="sd">        Args:</span>
@@ -507,7 +507,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="QEDScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.QEDScorer.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="QEDScorer.score"><a class="viewcode-back" href="../../../../api/gt4sd.properties.scores.core.html#gt4sd.properties.scores.core.QEDScorer.score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a score for a given SMILES</span>
 
 <span class="sd">        Args:</span>

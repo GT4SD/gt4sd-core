@@ -190,26 +190,26 @@
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;SMILES LSTM training pipeline from GuacaMol.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">from</span> <span class="nn">guacamol_baselines.smiles_lstm_hc.smiles_rnn_distribution_learner</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol_baselines.smiles_lstm_hc.smiles_rnn_distribution_learner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">SmilesRnnDistributionLearner</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
-<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">GuacaMolBaselinesTrainingPipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core</span><span class="w"> </span><span class="kn">import</span> <span class="n">GuacaMolBaselinesTrainingPipeline</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="GuacaMolLSTMTrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.html#gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.GuacaMolLSTMTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">GuacaMolLSTMTrainingPipeline</span><span class="p">(</span><span class="n">GuacaMolBaselinesTrainingPipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="GuacaMolLSTMTrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.html#gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.GuacaMolLSTMTrainingPipeline">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GuacaMolLSTMTrainingPipeline</span><span class="p">(</span><span class="n">GuacaMolBaselinesTrainingPipeline</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;GuacaMol SMILES LSTM training pipeline.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GuacaMolLSTMTrainingPipeline.train"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.html#gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.GuacaMolLSTMTrainingPipeline.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+<div class="viewcode-block" id="GuacaMolLSTMTrainingPipeline.train"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.html#gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.GuacaMolLSTMTrainingPipeline.train">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">training_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -230,7 +230,7 @@
 
 
 <div class="viewcode-block" id="GuacaMolLSTMTrainingArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.html#gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.GuacaMolLSTMTrainingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">GuacaMolLSTMTrainingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GuacaMolLSTMTrainingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Training Arguments related to SMILES LSTM trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;training_args&quot;</span>
@@ -247,7 +247,7 @@
 
 
 <div class="viewcode-block" id="GuacaMolLSTMModelArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.html#gt4sd.training_pipelines.guacamol_baselines.smiles_lstm.core.GuacaMolLSTMModelArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">GuacaMolLSTMModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GuacaMolLSTMModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Arguments related to SMILES LSTM trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>

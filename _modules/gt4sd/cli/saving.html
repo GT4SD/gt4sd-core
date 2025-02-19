@@ -191,22 +191,22 @@
 
 <span class="sd">&quot;&quot;&quot;Run model saving for the GT4SD.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
 
-<span class="kn">from</span> <span class="nn">..algorithms.registry</span> <span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
-<span class="kn">from</span> <span class="nn">..training_pipelines</span> <span class="kn">import</span> <span class="n">TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING</span>
-<span class="kn">from</span> <span class="nn">..training_pipelines.core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
-<span class="kn">from</span> <span class="nn">.algorithms</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..algorithms.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApplicationsRegistry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..training_pipelines</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRAINING_PIPELINE_ARGUMENTS_FOR_MODEL_SAVING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..training_pipelines.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AVAILABLE_ALGORITHMS</span><span class="p">,</span>
     <span class="n">AVAILABLE_ALGORITHMS_CATEGORIES</span><span class="p">,</span>
     <span class="n">filter_algorithm_applications</span><span class="p">,</span>
     <span class="n">get_configuration_tuples</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.argument_parser</span> <span class="kn">import</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">DataClassType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.argument_parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">DataClassType</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -216,7 +216,7 @@
 
 
 <div class="viewcode-block" id="SavingArguments"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.SavingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">SavingArguments</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SavingArguments</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Algorithm saving arguments.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_base_args&quot;</span>
@@ -255,10 +255,10 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="SavingArgumentParser"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.SavingArgumentParser">[docs]</a><span class="k">class</span> <span class="nc">SavingArgumentParser</span><span class="p">(</span><span class="n">ArgumentParser</span><span class="p">):</span>
+<div class="viewcode-block" id="SavingArgumentParser"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.SavingArgumentParser">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SavingArgumentParser</span><span class="p">(</span><span class="n">ArgumentParser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Argument parser using a custom help logic.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SavingArgumentParser.print_help"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.SavingArgumentParser.print_help">[docs]</a>    <span class="k">def</span> <span class="nf">print_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IO</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="SavingArgumentParser.print_help"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.SavingArgumentParser.print_help">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">print_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IO</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Print help checking dynamically whether a specific pipeline is passed.</span>
 
 <span class="sd">        Args:</span>
@@ -298,7 +298,7 @@
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../api/gt4sd.cli.saving.html#gt4sd.cli.saving.main">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Run an algorithm saving pipeline.</span>
 

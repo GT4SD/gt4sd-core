@@ -351,7 +351,7 @@ so that you don’t have to change your code</p>
 </dd>
 </dl>
 <p>When using the DP strategy, only a portion of the batch is inside the training_step:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
     <span class="c1"># batch is 1/num_gpus big</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
 
@@ -364,7 +364,7 @@ so that you don’t have to change your code</p>
 </pre></div>
 </div>
 <p>If you wish to do something with all the parts of the batch, then use this method to do it:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
     <span class="c1"># batch is 1/num_gpus big</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
 
@@ -372,7 +372,7 @@ so that you don’t have to change your code</p>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;pred&quot;</span><span class="p">:</span> <span class="n">out</span><span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">training_step_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_step_outputs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">training_step_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_step_outputs</span><span class="p">):</span>
     <span class="n">gpu_0_pred</span> <span class="o">=</span> <span class="n">training_step_outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;pred&quot;</span><span class="p">]</span>
     <span class="n">gpu_1_pred</span> <span class="o">=</span> <span class="n">training_step_outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;pred&quot;</span><span class="p">]</span>
     <span class="n">gpu_n_pred</span> <span class="o">=</span> <span class="n">training_step_outputs</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="s2">&quot;pred&quot;</span><span class="p">]</span>

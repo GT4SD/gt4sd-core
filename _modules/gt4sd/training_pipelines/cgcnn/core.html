@@ -191,36 +191,36 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Cgcnn training utilities.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">sample</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">random</span><span class="w"> </span><span class="kn">import</span> <span class="n">sample</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
-<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Variable</span>
-<span class="kn">from</span> <span class="nn">torch.optim.lr_scheduler</span> <span class="kn">import</span> <span class="n">MultiStepLR</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">optim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn</span><span class="w"> </span><span class="kn">import</span> <span class="n">metrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.autograd</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.optim.lr_scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiStepLR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 
-<span class="kn">from</span> <span class="nn">...frameworks.cgcnn.data</span> <span class="kn">import</span> <span class="n">CIFData</span><span class="p">,</span> <span class="n">collate_pool</span><span class="p">,</span> <span class="n">get_train_val_test_loader</span>
-<span class="kn">from</span> <span class="nn">...frameworks.cgcnn.model</span> <span class="kn">import</span> <span class="n">CrystalGraphConvNet</span><span class="p">,</span> <span class="n">Normalizer</span>
-<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">TrainingPipeline</span><span class="p">,</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...frameworks.cgcnn.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">CIFData</span><span class="p">,</span> <span class="n">collate_pool</span><span class="p">,</span> <span class="n">get_train_val_test_loader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...frameworks.cgcnn.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrystalGraphConvNet</span><span class="p">,</span> <span class="n">Normalizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingPipeline</span><span class="p">,</span> <span class="n">TrainingPipelineArguments</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="CGCNNTrainingPipeline"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.CGCNNTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">CGCNNTrainingPipeline</span><span class="p">(</span><span class="n">TrainingPipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="CGCNNTrainingPipeline"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.CGCNNTrainingPipeline">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CGCNNTrainingPipeline</span><span class="p">(</span><span class="n">TrainingPipeline</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;CGCNN training pipelines for crystals.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CGCNNTrainingPipeline.train"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.CGCNNTrainingPipeline.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+<div class="viewcode-block" id="CGCNNTrainingPipeline.train"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.CGCNNTrainingPipeline.train">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">training_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -413,7 +413,7 @@
             <span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="train"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.train">[docs]</a><span class="k">def</span> <span class="nf">train</span><span class="p">(</span>
+<div class="viewcode-block" id="train"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.train">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span>
     <span class="n">train_loader</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">CrystalGraphConvNet</span><span class="p">,</span>
     <span class="n">criterion</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">],</span>
@@ -547,7 +547,7 @@
                 <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="validate"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.validate">[docs]</a><span class="k">def</span> <span class="nf">validate</span><span class="p">(</span>
+<div class="viewcode-block" id="validate"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.validate">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span>
     <span class="n">val_loader</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">CrystalGraphConvNet</span><span class="p">,</span>
     <span class="n">criterion</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">],</span>
@@ -693,7 +693,7 @@
         <span class="k">return</span> <span class="n">auc_scores</span><span class="o">.</span><span class="n">avg</span></div>
 
 
-<div class="viewcode-block" id="mae"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.mae">[docs]</a><span class="k">def</span> <span class="nf">mae</span><span class="p">(</span><span class="n">prediction</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="mae"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.mae">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">mae</span><span class="p">(</span><span class="n">prediction</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the mean absolute error between prediction and target.</span>
 
 <span class="sd">    Args:</span>
@@ -706,7 +706,7 @@
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">target</span> <span class="o">-</span> <span class="n">prediction</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="class_eval"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.class_eval">[docs]</a><span class="k">def</span> <span class="nf">class_eval</span><span class="p">(</span>
+<div class="viewcode-block" id="class_eval"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.class_eval">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">class_eval</span><span class="p">(</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class evaluation.</span>
@@ -740,15 +740,15 @@
     <span class="k">return</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">fscore</span><span class="p">,</span> <span class="n">auc_score</span></div>
 
 
-<div class="viewcode-block" id="AverageMeter"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.AverageMeter">[docs]</a><span class="k">class</span> <span class="nc">AverageMeter</span><span class="p">:</span>
+<div class="viewcode-block" id="AverageMeter"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.AverageMeter">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AverageMeter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes and stores the average and current value.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AverageMeter.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.AverageMeter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AverageMeter.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.AverageMeter.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize an AverageMeter object.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="AverageMeter.reset"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.AverageMeter.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="AverageMeter.reset"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.AverageMeter.reset">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset values to 0.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -756,7 +756,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="AverageMeter.update"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.AverageMeter.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="AverageMeter.update"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.AverageMeter.update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update values of the AverageMeter.</span>
 
 <span class="sd">        Args:</span>
@@ -769,7 +769,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">avg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span></div></div>
 
 
-<div class="viewcode-block" id="save_checkpoint"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.save_checkpoint">[docs]</a><span class="k">def</span> <span class="nf">save_checkpoint</span><span class="p">(</span>
+<div class="viewcode-block" id="save_checkpoint"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.save_checkpoint">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">save_checkpoint</span><span class="p">(</span>
     <span class="n">state</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">is_best</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;checkpoint.pth.tar&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Save CGCNN checkpoint.</span>
@@ -790,7 +790,7 @@
 
 
 <div class="viewcode-block" id="CGCNNDataArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.CGCNNDataArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">CGCNNDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CGCNNDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Data arguments related to CGCNN trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;dataset_args&quot;</span>
@@ -813,7 +813,7 @@
 
 
 <div class="viewcode-block" id="CGCNNModelArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.CGCNNModelArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">CGCNNModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CGCNNModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Model arguments related to CGCNN trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>
@@ -831,7 +831,7 @@
 
 
 <div class="viewcode-block" id="CGCNNTrainingArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.CGCNNTrainingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">CGCNNTrainingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CGCNNTrainingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Training arguments related to CGCNN trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;training_args&quot;</span>
@@ -865,7 +865,7 @@
 
 
 <div class="viewcode-block" id="CGCNNSavingArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.cgcnn.core.html#gt4sd.training_pipelines.cgcnn.core.CGCNNSavingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">CGCNNSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CGCNNSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Saving arguments related to CGCNN trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_args&quot;</span></div>

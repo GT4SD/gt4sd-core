@@ -193,13 +193,13 @@
 <span class="sd">Parts of the implementation inspired by: https://github.com/huggingface/transformers/blob/v4.2.1/examples/text-generation/run_generation.py.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AutoModelForSeq2SeqLM</span><span class="p">,</span>
     <span class="n">AutoTokenizer</span><span class="p">,</span>
     <span class="n">BasicTokenizer</span><span class="p">,</span>
@@ -217,7 +217,7 @@
     <span class="n">XLNetTokenizer</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....frameworks.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">device_claim</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -237,7 +237,7 @@
 <span class="s2">the Virgin Mary, prompting him to become a priest. &lt;eod&gt; &lt;/s&gt; &lt;eos&gt;&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="set_seed"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.set_seed">[docs]</a><span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="set_seed"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.set_seed">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set seed for all random number generators.</span>
 
 <span class="sd">    Args:</span>
@@ -249,7 +249,7 @@
         <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>  <span class="c1"># type:ignore</span></div>
 
 
-<div class="viewcode-block" id="prepare_ctrl_input"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.prepare_ctrl_input">[docs]</a><span class="k">def</span> <span class="nf">prepare_ctrl_input</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">:</span> <span class="n">BasicTokenizer</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="prepare_ctrl_input"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.prepare_ctrl_input">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">prepare_ctrl_input</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">:</span> <span class="n">BasicTokenizer</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="s2">&quot;CTRL typically works better with lower temperatures (and lower k).&quot;</span>
@@ -265,13 +265,13 @@
     <span class="k">return</span> <span class="n">prompt</span></div>
 
 
-<div class="viewcode-block" id="prepare_prefix_input"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.prepare_prefix_input">[docs]</a><span class="k">def</span> <span class="nf">prepare_prefix_input</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">:</span> <span class="n">BasicTokenizer</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="prepare_prefix_input"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.prepare_prefix_input">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">prepare_prefix_input</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">:</span> <span class="n">BasicTokenizer</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">prefix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prefix&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">PREFIX</span>
     <span class="n">prompt</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">prompt</span>
     <span class="k">return</span> <span class="n">prompt</span></div>
 
 
-<div class="viewcode-block" id="adjust_length_to_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.adjust_length_to_model">[docs]</a><span class="k">def</span> <span class="nf">adjust_length_to_model</span><span class="p">(</span><span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">maximum_sequence_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="adjust_length_to_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.adjust_length_to_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">adjust_length_to_model</span><span class="p">(</span><span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">maximum_sequence_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adjust sequence length.</span>
 
 <span class="sd">    Args:</span>
@@ -308,10 +308,10 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.Generator">[docs]</a><span class="k">class</span> <span class="nc">Generator</span><span class="p">:</span>
+<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.Generator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Generator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of a generator.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Generator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.Generator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Generator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.Generator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -364,7 +364,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">number_of_sequences</span> <span class="o">=</span> <span class="n">number_of_sequences</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Generator.load_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.Generator.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Generator.load_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.Generator.load_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load a pretrained HuggingFace generation model.&quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -397,7 +397,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_position_embeddings</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Generator.sample"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.Generator.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="Generator.sample"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.hugging_face.implementation.html#gt4sd.algorithms.generation.hugging_face.implementation.Generator.sample">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample text snippets.</span>
 
 <span class="sd">        Returns:</span>

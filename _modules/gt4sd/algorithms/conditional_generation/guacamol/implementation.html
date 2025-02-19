@@ -189,45 +189,45 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;GuacaMol algorithms implementation module.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">from</span> <span class="nn">guacamol_baselines.graph_ga.goal_directed_generation</span> <span class="kn">import</span> <span class="n">GB_GA_Generator</span>
-<span class="kn">from</span> <span class="nn">guacamol_baselines.graph_mcts.goal_directed_generation</span> <span class="kn">import</span> <span class="n">GB_MCTS_Generator</span>
-<span class="kn">from</span> <span class="nn">guacamol_baselines.moses_baselines.aae_distribution_learning</span> <span class="kn">import</span> <span class="n">AaeGenerator</span>
-<span class="kn">from</span> <span class="nn">guacamol_baselines.moses_baselines.organ_distribution_learning</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol_baselines.graph_ga.goal_directed_generation</span><span class="w"> </span><span class="kn">import</span> <span class="n">GB_GA_Generator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol_baselines.graph_mcts.goal_directed_generation</span><span class="w"> </span><span class="kn">import</span> <span class="n">GB_MCTS_Generator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol_baselines.moses_baselines.aae_distribution_learning</span><span class="w"> </span><span class="kn">import</span> <span class="n">AaeGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol_baselines.moses_baselines.organ_distribution_learning</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">OrganGenerator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">guacamol_baselines.moses_baselines.vae_distribution_learning</span> <span class="kn">import</span> <span class="n">VaeGenerator</span>
-<span class="kn">from</span> <span class="nn">guacamol_baselines.smiles_ga.goal_directed_generation</span> <span class="kn">import</span> <span class="n">ChemGEGenerator</span>
-<span class="kn">from</span> <span class="nn">guacamol_baselines.smiles_lstm_hc.goal_directed_generation</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol_baselines.moses_baselines.vae_distribution_learning</span><span class="w"> </span><span class="kn">import</span> <span class="n">VaeGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol_baselines.smiles_ga.goal_directed_generation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChemGEGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol_baselines.smiles_lstm_hc.goal_directed_generation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">SmilesRnnDirectedGenerator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">guacamol_baselines.smiles_lstm_ppo.goal_directed_generation</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">guacamol_baselines.smiles_lstm_ppo.goal_directed_generation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PPODirectedGenerator</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">.....frameworks.torch</span> <span class="kn">import</span> <span class="n">claim_device_name</span>
-<span class="kn">from</span> <span class="nn">.....properties.scores</span> <span class="kn">import</span> <span class="n">CombinedScorer</span>
-<span class="kn">from</span> <span class="nn">.....properties.utils</span> <span class="kn">import</span> <span class="n">get_target_parameters</span>
-<span class="kn">from</span> <span class="nn">.graph_ga</span> <span class="kn">import</span> <span class="n">GraphGA</span>
-<span class="kn">from</span> <span class="nn">.graph_mcts</span> <span class="kn">import</span> <span class="n">GraphMCTS</span>
-<span class="kn">from</span> <span class="nn">.moses_aae</span> <span class="kn">import</span> <span class="n">AAE</span>
-<span class="kn">from</span> <span class="nn">.moses_organ</span> <span class="kn">import</span> <span class="n">Organ</span>
-<span class="kn">from</span> <span class="nn">.moses_vae</span> <span class="kn">import</span> <span class="n">VAE</span>
-<span class="kn">from</span> <span class="nn">.smiles_ga</span> <span class="kn">import</span> <span class="n">SMILESGA</span>
-<span class="kn">from</span> <span class="nn">.smiles_lstm_hc</span> <span class="kn">import</span> <span class="n">SMILESLSTMHC</span>
-<span class="kn">from</span> <span class="nn">.smiles_lstm_ppo</span> <span class="kn">import</span> <span class="n">SMILESLSTMPPO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.....frameworks.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">claim_device_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.....properties.scores</span><span class="w"> </span><span class="kn">import</span> <span class="n">CombinedScorer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.....properties.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_target_parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.graph_ga</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphGA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.graph_mcts</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphMCTS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.moses_aae</span><span class="w"> </span><span class="kn">import</span> <span class="n">AAE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.moses_organ</span><span class="w"> </span><span class="kn">import</span> <span class="n">Organ</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.moses_vae</span><span class="w"> </span><span class="kn">import</span> <span class="n">VAE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.smiles_ga</span><span class="w"> </span><span class="kn">import</span> <span class="n">SMILESGA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.smiles_lstm_hc</span><span class="w"> </span><span class="kn">import</span> <span class="n">SMILESLSTMHC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.smiles_lstm_ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">SMILESLSTMPPO</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.Generator">[docs]</a><span class="k">class</span> <span class="nc">Generator</span><span class="p">:</span>
+<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.Generator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Generator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract interface for a conditional generator.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Generator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.Generator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="Generator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.Generator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a batch of molecules.</span>
 
 <span class="sd">        Args:</span>
@@ -241,8 +241,8 @@
         <span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="SMILESGAIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESGAIterator">[docs]</a><span class="k">class</span> <span class="nc">SMILESGAIterator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
-<div class="viewcode-block" id="SMILESGAIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESGAIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="SMILESGAIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESGAIterator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SMILESGAIterator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+<div class="viewcode-block" id="SMILESGAIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESGAIterator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource_path</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -278,7 +278,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">patience</span> <span class="o">=</span> <span class="n">patience</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chemGenerator</span><span class="p">:</span> <span class="n">ChemGEGenerator</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="SMILESGAIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESGAIterator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="SMILESGAIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESGAIterator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a batch of molecules.</span>
 
 <span class="sd">        Args:</span>
@@ -314,8 +314,8 @@
         <span class="k">return</span> <span class="n">molecules</span></div></div>
 
 
-<div class="viewcode-block" id="GraphGAIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphGAIterator">[docs]</a><span class="k">class</span> <span class="nc">GraphGAIterator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
-<div class="viewcode-block" id="GraphGAIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphGAIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="GraphGAIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphGAIterator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GraphGAIterator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+<div class="viewcode-block" id="GraphGAIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphGAIterator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource_path</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -351,7 +351,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">patience</span> <span class="o">=</span> <span class="n">patience</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gb_ga_generator</span><span class="p">:</span> <span class="n">GB_GA_Generator</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="GraphGAIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphGAIterator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="GraphGAIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphGAIterator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a batch of molecules.</span>
 
 <span class="sd">        Args:</span>
@@ -387,8 +387,8 @@
         <span class="k">return</span> <span class="n">molecules</span></div></div>
 
 
-<div class="viewcode-block" id="GraphMCTSIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphMCTSIterator">[docs]</a><span class="k">class</span> <span class="nc">GraphMCTSIterator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
-<div class="viewcode-block" id="GraphMCTSIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphMCTSIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="GraphMCTSIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphMCTSIterator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GraphMCTSIterator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+<div class="viewcode-block" id="GraphMCTSIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphMCTSIterator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">init_smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -424,7 +424,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">patience</span> <span class="o">=</span> <span class="n">patience</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grah_mcts_generator</span><span class="p">:</span> <span class="n">GB_MCTS_Generator</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="GraphMCTSIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphMCTSIterator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="GraphMCTSIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.GraphMCTSIterator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a batch of molecules.</span>
 
 <span class="sd">        Args:</span>
@@ -460,8 +460,8 @@
         <span class="k">return</span> <span class="n">molecules</span></div></div>
 
 
-<div class="viewcode-block" id="SMILESLSTMHCIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMHCIterator">[docs]</a><span class="k">class</span> <span class="nc">SMILESLSTMHCIterator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
-<div class="viewcode-block" id="SMILESLSTMHCIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMHCIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="SMILESLSTMHCIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMHCIterator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SMILESLSTMHCIterator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+<div class="viewcode-block" id="SMILESLSTMHCIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMHCIterator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource_path</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -503,7 +503,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">optimize_batch_size</span> <span class="o">=</span> <span class="n">optimize_batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">smiles_lstm_hc_generator</span><span class="p">:</span> <span class="n">SmilesRnnDirectedGenerator</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="SMILESLSTMHCIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMHCIterator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="SMILESLSTMHCIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMHCIterator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a batch of molecules.</span>
 
 <span class="sd">        Args:</span>
@@ -542,8 +542,8 @@
         <span class="k">return</span> <span class="n">molecules</span></div></div>
 
 
-<div class="viewcode-block" id="SMILESLSTMPPOIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMPPOIterator">[docs]</a><span class="k">class</span> <span class="nc">SMILESLSTMPPOIterator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
-<div class="viewcode-block" id="SMILESLSTMPPOIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMPPOIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="SMILESLSTMPPOIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMPPOIterator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SMILESLSTMPPOIterator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+<div class="viewcode-block" id="SMILESLSTMPPOIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMPPOIterator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource_path</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -576,7 +576,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">clip_param</span> <span class="o">=</span> <span class="n">clip_param</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">smiles_lstm_ppo_generator</span><span class="p">:</span> <span class="n">PPODirectedGenerator</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="SMILESLSTMPPOIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMPPOIterator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="SMILESLSTMPPOIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.SMILESLSTMPPOIterator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a batch of molecules.</span>
 
 <span class="sd">        Args:</span>
@@ -611,8 +611,8 @@
         <span class="k">return</span> <span class="n">molecules</span></div></div>
 
 
-<div class="viewcode-block" id="AaeIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.AaeIterator">[docs]</a><span class="k">class</span> <span class="nc">AaeIterator</span><span class="p">:</span>
-<div class="viewcode-block" id="AaeIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.AaeIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="AaeIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.AaeIterator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AaeIterator</span><span class="p">:</span>
+<div class="viewcode-block" id="AaeIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.AaeIterator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -637,7 +637,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">aae_generator</span><span class="p">:</span> <span class="n">AaeGenerator</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device_name</span> <span class="o">=</span> <span class="n">claim_device_name</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="AaeIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.AaeIterator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="AaeIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.AaeIterator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a batch of molecules.</span>
 
 <span class="sd">        Args:</span>
@@ -662,8 +662,8 @@
         <span class="k">return</span> <span class="n">molecules</span></div></div>
 
 
-<div class="viewcode-block" id="VaeIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.VaeIterator">[docs]</a><span class="k">class</span> <span class="nc">VaeIterator</span><span class="p">:</span>
-<div class="viewcode-block" id="VaeIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.VaeIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="VaeIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.VaeIterator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">VaeIterator</span><span class="p">:</span>
+<div class="viewcode-block" id="VaeIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.VaeIterator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -688,7 +688,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">vae_generator</span><span class="p">:</span> <span class="n">VaeGenerator</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device_name</span> <span class="o">=</span> <span class="n">claim_device_name</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="VaeIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.VaeIterator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="VaeIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.VaeIterator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a batch of molecules.</span>
 
 <span class="sd">        Args:</span>
@@ -713,8 +713,8 @@
         <span class="k">return</span> <span class="n">molecules</span></div></div>
 
 
-<div class="viewcode-block" id="OrganIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.OrganIterator">[docs]</a><span class="k">class</span> <span class="nc">OrganIterator</span><span class="p">:</span>
-<div class="viewcode-block" id="OrganIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.OrganIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="OrganIterator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.OrganIterator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">OrganIterator</span><span class="p">:</span>
+<div class="viewcode-block" id="OrganIterator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.OrganIterator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -739,7 +739,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">organ_generator</span><span class="p">:</span> <span class="n">OrganGenerator</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device_name</span> <span class="o">=</span> <span class="n">claim_device_name</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="OrganIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.OrganIterator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="OrganIterator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.guacamol.implementation.html#gt4sd.algorithms.conditional_generation.guacamol.implementation.OrganIterator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a batch of molecules.</span>
 
 <span class="sd">        Args:</span>

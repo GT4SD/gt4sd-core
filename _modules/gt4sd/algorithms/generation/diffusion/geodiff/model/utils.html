@@ -187,24 +187,24 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Batch</span><span class="p">,</span> <span class="n">Data</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius_graph</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span class="n">dense_to_sparse</span><span class="p">,</span> <span class="n">to_dense_adj</span>
-<span class="kn">from</span> <span class="nn">torch_scatter</span> <span class="kn">import</span> <span class="n">scatter_add</span>
-<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">coalesce</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Batch</span><span class="p">,</span> <span class="n">Data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius_graph</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">dense_to_sparse</span><span class="p">,</span> <span class="n">to_dense_adj</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_scatter</span><span class="w"> </span><span class="kn">import</span> <span class="n">scatter_add</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">coalesce</span>
 
 
-<div class="viewcode-block" id="assemble_atom_pair_feature"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.assemble_atom_pair_feature">[docs]</a><span class="k">def</span> <span class="nf">assemble_atom_pair_feature</span><span class="p">(</span><span class="n">node_attr</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">):</span>
+<div class="viewcode-block" id="assemble_atom_pair_feature"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.assemble_atom_pair_feature">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">assemble_atom_pair_feature</span><span class="p">(</span><span class="n">node_attr</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">):</span>
     <span class="n">h_row</span><span class="p">,</span> <span class="n">h_col</span> <span class="o">=</span> <span class="n">node_attr</span><span class="p">[</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">node_attr</span><span class="p">[</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
     <span class="n">h_pair</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">h_row</span> <span class="o">*</span> <span class="n">h_col</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (E, 2H)</span>
     <span class="k">return</span> <span class="n">h_pair</span></div>
 
 
-<span class="k">def</span> <span class="nf">_extend_graph_order</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_type</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extend_graph_order</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_type</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        num_nodes:  Number of atoms.</span>
@@ -215,10 +215,10 @@
 <span class="sd">        new_edge_index: Extended edge indices. new_edge_type: Extended edge types.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">binarize</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">binarize</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">get_higher_order_adj_matrix</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_higher_order_adj_matrix</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            adj:        (N, N)</span>
@@ -269,7 +269,7 @@
     <span class="k">return</span> <span class="n">new_edge_index</span><span class="p">,</span> <span class="n">new_edge_type</span>
 
 
-<span class="k">def</span> <span class="nf">_extend_to_radius_graph</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extend_to_radius_graph</span><span class="p">(</span>
     <span class="n">pos</span><span class="p">,</span>
     <span class="n">edge_index</span><span class="p">,</span>
     <span class="n">edge_type</span><span class="p">,</span>
@@ -325,7 +325,7 @@
     <span class="k">return</span> <span class="n">new_edge_index</span><span class="p">,</span> <span class="n">new_edge_type</span>
 
 
-<div class="viewcode-block" id="extend_graph_order_radius"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.extend_graph_order_radius">[docs]</a><span class="k">def</span> <span class="nf">extend_graph_order_radius</span><span class="p">(</span>
+<div class="viewcode-block" id="extend_graph_order_radius"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.extend_graph_order_radius">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">extend_graph_order_radius</span><span class="p">(</span>
     <span class="n">num_nodes</span><span class="p">,</span>
     <span class="n">pos</span><span class="p">,</span>
     <span class="n">edge_index</span><span class="p">,</span>
@@ -355,11 +355,11 @@
     <span class="k">return</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_type</span></div>
 
 
-<div class="viewcode-block" id="get_distance"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.get_distance">[docs]</a><span class="k">def</span> <span class="nf">get_distance</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">):</span>
+<div class="viewcode-block" id="get_distance"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.get_distance">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_distance</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="graph_field_network"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.graph_field_network">[docs]</a><span class="k">def</span> <span class="nf">graph_field_network</span><span class="p">(</span><span class="n">score_d</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_length</span><span class="p">):</span>
+<div class="viewcode-block" id="graph_field_network"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.graph_field_network">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">graph_field_network</span><span class="p">(</span><span class="n">score_d</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_length</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Transformation to make the epsilon predicted from the diffusion model roto-translational equivariant. See equations</span>
 <span class="sd">    5-7 of the GeoDiff Paper https://arxiv.org/pdf/2203.02923.pdf</span>
@@ -374,17 +374,17 @@
     <span class="k">return</span> <span class="n">score_pos</span></div>
 
 
-<div class="viewcode-block" id="clip_norm"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.clip_norm">[docs]</a><span class="k">def</span> <span class="nf">clip_norm</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<div class="viewcode-block" id="clip_norm"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.clip_norm">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">clip_norm</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="n">norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">denom</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">norm</span> <span class="o">&gt;</span> <span class="n">limit</span><span class="p">,</span> <span class="n">limit</span> <span class="o">/</span> <span class="n">norm</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">norm</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">vec</span> <span class="o">*</span> <span class="n">denom</span></div>
 
 
-<div class="viewcode-block" id="is_local_edge"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.is_local_edge">[docs]</a><span class="k">def</span> <span class="nf">is_local_edge</span><span class="p">(</span><span class="n">edge_type</span><span class="p">):</span>
+<div class="viewcode-block" id="is_local_edge"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.is_local_edge">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">is_local_edge</span><span class="p">(</span><span class="n">edge_type</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">edge_type</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
 
 
-<div class="viewcode-block" id="repeat_data"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.repeat_data">[docs]</a><span class="k">def</span> <span class="nf">repeat_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Data</span><span class="p">,</span> <span class="n">num_repeat</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Batch</span><span class="p">:</span>
+<div class="viewcode-block" id="repeat_data"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.repeat_data">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">repeat_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Data</span><span class="p">,</span> <span class="n">num_repeat</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Batch</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        data:  An `torch_geometric.data.Data` object.</span>
@@ -396,7 +396,7 @@
     <span class="k">return</span> <span class="n">Batch</span><span class="o">.</span><span class="n">from_data_list</span><span class="p">(</span><span class="n">datas</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="repeat_batch"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.repeat_batch">[docs]</a><span class="k">def</span> <span class="nf">repeat_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Batch</span><span class="p">,</span> <span class="n">num_repeat</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Batch</span><span class="p">:</span>
+<div class="viewcode-block" id="repeat_batch"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.repeat_batch">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">repeat_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Batch</span><span class="p">,</span> <span class="n">num_repeat</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Batch</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        batch:  An `torch_geometric.data.Batch` object.</span>
@@ -411,7 +411,7 @@
     <span class="k">return</span> <span class="n">Batch</span><span class="o">.</span><span class="n">from_data_list</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_rdmol_positions"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.set_rdmol_positions">[docs]</a><span class="k">def</span> <span class="nf">set_rdmol_positions</span><span class="p">(</span><span class="n">rdkit_mol</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+<div class="viewcode-block" id="set_rdmol_positions"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.set_rdmol_positions">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">set_rdmol_positions</span><span class="p">(</span><span class="n">rdkit_mol</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        rdkit_mol:  An `rdkit.Chem.rdchem.Mol` object.</span>
@@ -425,7 +425,7 @@
     <span class="k">return</span> <span class="n">mol</span></div>
 
 
-<div class="viewcode-block" id="set_rdmol_positions_"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.set_rdmol_positions_">[docs]</a><span class="k">def</span> <span class="nf">set_rdmol_positions_</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+<div class="viewcode-block" id="set_rdmol_positions_"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.generation.diffusion.geodiff.model.utils.html#gt4sd.algorithms.generation.diffusion.geodiff.model.utils.set_rdmol_positions_">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">set_rdmol_positions_</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        rdkit_mol:  An `rdkit.Chem.rdchem.Mol` object.</span>

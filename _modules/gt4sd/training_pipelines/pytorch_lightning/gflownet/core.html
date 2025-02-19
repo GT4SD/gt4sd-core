@@ -191,33 +191,33 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;GFlowNet training utilities.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">sentencepiece</span> <span class="k">as</span> <span class="nn">_sentencepiece</span>
-<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">_torch</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">_tensorflow</span>
-<span class="kn">from</span> <span class="nn">gt4sd_trainer.hf_pl.pytorch_lightning_trainer</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sentencepiece</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_sentencepiece</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_tensorflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_trainer.hf_pl.pytorch_lightning_trainer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PytorchLightningTrainingArguments</span><span class="p">,</span>
     <span class="n">PyTorchLightningTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span><span class="p">,</span> <span class="n">Trainer</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning.loggers</span> <span class="kn">import</span> <span class="n">TensorBoardLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytorch_lightning</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span><span class="p">,</span> <span class="n">Trainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytorch_lightning.loggers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorBoardLogger</span>
 
-<span class="kn">from</span> <span class="nn">....frameworks.gflownet.dataloader.data_module</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....frameworks.gflownet.dataloader.data_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GFlowNetDataModule</span><span class="p">,</span>
     <span class="n">GFlowNetTask</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">....frameworks.gflownet.dataloader.dataset</span> <span class="kn">import</span> <span class="n">GFlowNetDataset</span>
-<span class="kn">from</span> <span class="nn">....frameworks.gflownet.envs.graph_building_env</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....frameworks.gflownet.dataloader.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">GFlowNetDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....frameworks.gflownet.envs.graph_building_env</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GraphBuildingEnv</span><span class="p">,</span>
     <span class="n">GraphBuildingEnvContext</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">....frameworks.gflownet.loss</span> <span class="kn">import</span> <span class="n">ALGORITHM_FACTORY</span>
-<span class="kn">from</span> <span class="nn">....frameworks.gflownet.ml.models</span> <span class="kn">import</span> <span class="n">MODEL_FACTORY</span>
-<span class="kn">from</span> <span class="nn">....frameworks.gflownet.ml.module</span> <span class="kn">import</span> <span class="n">GFlowNetModule</span>
-<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....frameworks.gflownet.loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">ALGORITHM_FACTORY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....frameworks.gflownet.ml.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MODEL_FACTORY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....frameworks.gflownet.ml.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">GFlowNetModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
 
 <span class="c1"># imports that have to be loaded before lightning to avoid segfaults</span>
 <span class="n">_sentencepiece</span>
@@ -228,10 +228,10 @@
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="GFlowNetTrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.gflownet.core.html#gt4sd.training_pipelines.pytorch_lightning.gflownet.core.GFlowNetTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">GFlowNetTrainingPipeline</span><span class="p">(</span><span class="n">PyTorchLightningTrainingPipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="GFlowNetTrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.gflownet.core.html#gt4sd.training_pipelines.pytorch_lightning.gflownet.core.GFlowNetTrainingPipeline">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GFlowNetTrainingPipeline</span><span class="p">(</span><span class="n">PyTorchLightningTrainingPipeline</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;gflownet training pipelines.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GFlowNetTrainingPipeline.train"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.gflownet.core.html#gt4sd.training_pipelines.pytorch_lightning.gflownet.core.GFlowNetTrainingPipeline.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+<div class="viewcode-block" id="GFlowNetTrainingPipeline.train"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.gflownet.core.html#gt4sd.training_pipelines.pytorch_lightning.gflownet.core.GFlowNetTrainingPipeline.train">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pl_trainer_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
@@ -294,7 +294,7 @@
         <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model_module</span><span class="p">,</span> <span class="n">data_module</span><span class="p">)</span></div>
 
     <span class="c1"># TODO: compatible signature with Pytorch Lightning training pipelines</span>
-<div class="viewcode-block" id="GFlowNetTrainingPipeline.get_data_and_model_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.gflownet.core.html#gt4sd.training_pipelines.pytorch_lightning.gflownet.core.GFlowNetTrainingPipeline.get_data_and_model_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_model_modules</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+<div class="viewcode-block" id="GFlowNetTrainingPipeline.get_data_and_model_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.gflownet.core.html#gt4sd.training_pipelines.pytorch_lightning.gflownet.core.GFlowNetTrainingPipeline.get_data_and_model_modules">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_data_and_model_modules</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -361,7 +361,7 @@
 
 
 <div class="viewcode-block" id="GFlowNetPytorchLightningTrainingArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.gflownet.core.html#gt4sd.training_pipelines.pytorch_lightning.gflownet.core.GFlowNetPytorchLightningTrainingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">GFlowNetPytorchLightningTrainingArguments</span><span class="p">(</span><span class="n">PytorchLightningTrainingArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GFlowNetPytorchLightningTrainingArguments</span><span class="p">(</span><span class="n">PytorchLightningTrainingArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Arguments related to pytorch lightning trainer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -505,7 +505,7 @@
 
 
 <div class="viewcode-block" id="GFlowNetModelArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.gflownet.core.html#gt4sd.training_pipelines.pytorch_lightning.gflownet.core.GFlowNetModelArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">GFlowNetModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GFlowNetModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Arguments related to model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -633,7 +633,7 @@
 
 
 <div class="viewcode-block" id="GFlowNetDataArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.gflownet.core.html#gt4sd.training_pipelines.pytorch_lightning.gflownet.core.GFlowNetDataArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">GFlowNetDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GFlowNetDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Arguments related to data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -698,7 +698,7 @@
 
 
 <div class="viewcode-block" id="GFlowNetSavingArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.gflownet.core.html#gt4sd.training_pipelines.pytorch_lightning.gflownet.core.GFlowNetSavingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">GFlowNetSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GFlowNetSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Saving arguments related to Granular trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_args&quot;</span>

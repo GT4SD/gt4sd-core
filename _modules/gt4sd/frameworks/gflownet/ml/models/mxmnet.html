@@ -187,35 +187,35 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span> <span class="k">as</span> <span class="n">PI</span>
-<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">pi</span> <span class="k">as</span> <span class="n">PI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">sympy</span> <span class="k">as</span> <span class="nn">sym</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">special</span> <span class="k">as</span> <span class="n">sp</span>
-<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">brentq</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Linear</span><span class="p">,</span> <span class="n">Sequential</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Data</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">global_add_pool</span><span class="p">,</span> <span class="n">radius</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span class="n">add_self_loops</span><span class="p">,</span> <span class="n">remove_self_loops</span>
-<span class="kn">from</span> <span class="nn">torch_scatter</span> <span class="kn">import</span> <span class="n">scatter</span>
-<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">special</span> <span class="k">as</span> <span class="n">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">brentq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Linear</span><span class="p">,</span> <span class="n">Sequential</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">global_add_pool</span><span class="p">,</span> <span class="n">radius</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_self_loops</span><span class="p">,</span> <span class="n">remove_self_loops</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_scatter</span><span class="w"> </span><span class="kn">import</span> <span class="n">scatter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparseTensor</span>
 
 <span class="n">HAR2EV</span> <span class="o">=</span> <span class="mf">27.2113825435</span>
 <span class="n">KCALMOL2EV</span> <span class="o">=</span> <span class="mf">0.04336414</span>
 
 
-<div class="viewcode-block" id="MXMNetConfig"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNetConfig">[docs]</a><span class="k">class</span> <span class="nc">MXMNetConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MXMNetConfig"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNetConfig">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MXMNetConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;MXMNet configuration.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MXMNetConfig.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNetConfig.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
+<div class="viewcode-block" id="MXMNetConfig.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNetConfig.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize MXMNet configuration.</span>
 
 <span class="sd">        Args:</span>
@@ -228,10 +228,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="n">cutoff</span></div></div>
 
 
-<div class="viewcode-block" id="MXMNet"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet">[docs]</a><span class="k">class</span> <span class="nc">MXMNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="MXMNet"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MXMNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;MXMNet - Multiplex Molecular Graph Neural Network&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MXMNet.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="MXMNet.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">MXMNetConfig</span><span class="p">,</span> <span class="n">num_spherical</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">num_radial</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">envelope_exponent</span><span class="o">=</span><span class="mi">5</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an MXMNet.</span>
@@ -274,11 +274,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MXMNet.init"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MXMNet.init"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.init">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">stdv</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">stdv</span><span class="p">,</span> <span class="n">stdv</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MXMNet.indices"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.indices">[docs]</a>    <span class="k">def</span> <span class="nf">indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">):</span>
+<div class="viewcode-block" id="MXMNet.indices"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.indices">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute indices.</span>
 
 <span class="sd">        Args:</span>
@@ -332,7 +332,7 @@
             <span class="n">idx_ji_2</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="MXMNet.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="MXMNet.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MXMNet.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
 
 <span class="sd">        Args:</span>
@@ -412,10 +412,10 @@
         <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="EMA"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA">[docs]</a><span class="k">class</span> <span class="nc">EMA</span><span class="p">:</span>
+<div class="viewcode-block" id="EMA"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">EMA</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;EMA - Exponential Moving Average.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="EMA.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">decay</span><span class="p">):</span>
+<div class="viewcode-block" id="EMA.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">decay</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize ema.</span>
 
 <span class="sd">        Args:</span>
@@ -431,7 +431,7 @@
             <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="EMA.__call__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_updates</span><span class="o">=</span><span class="mi">99999</span><span class="p">):</span>
+<div class="viewcode-block" id="EMA.__call__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.__call__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_updates</span><span class="o">=</span><span class="mi">99999</span><span class="p">):</span>
         <span class="n">decay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decay</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">num_updates</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">10.0</span> <span class="o">+</span> <span class="n">num_updates</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
@@ -439,21 +439,21 @@
                 <span class="n">new_average</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">decay</span><span class="p">)</span> <span class="o">*</span> <span class="n">param</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="n">decay</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_average</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="EMA.assign"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.assign">[docs]</a>    <span class="k">def</span> <span class="nf">assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<div class="viewcode-block" id="EMA.assign"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.assign">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">original</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
                 <span class="n">param</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="EMA.resume"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.resume">[docs]</a>    <span class="k">def</span> <span class="nf">resume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<div class="viewcode-block" id="EMA.resume"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.EMA.resume">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">resume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span>
                 <span class="n">param</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div></div>
 
 
-<div class="viewcode-block" id="MLP"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MLP">[docs]</a><span class="k">def</span> <span class="nf">MLP</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">:</span>
+<div class="viewcode-block" id="MLP"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MLP">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">MLP</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;multi-layer perceptron.</span>
 
 <span class="sd">    Args:</span>
@@ -470,10 +470,10 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Res"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Res">[docs]</a><span class="k">class</span> <span class="nc">Res</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="Res"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Res">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Res</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Residual Block.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Res.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Res.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+<div class="viewcode-block" id="Res.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Res.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize residual block.</span>
 
 <span class="sd">        Args:</span>
@@ -483,13 +483,13 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="Res.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Res.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<div class="viewcode-block" id="Res.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Res.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
         <span class="n">m1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
         <span class="n">m_out</span> <span class="o">=</span> <span class="n">m1</span> <span class="o">+</span> <span class="n">m</span>
         <span class="k">return</span> <span class="n">m_out</span></div></div>
 
 
-<div class="viewcode-block" id="compute_idx"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.compute_idx">[docs]</a><span class="k">def</span> <span class="nf">compute_idx</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">):</span>
+<div class="viewcode-block" id="compute_idx"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.compute_idx">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">compute_idx</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the indices for the edges and angles.</span>
 
 <span class="sd">    Args:</span>
@@ -529,11 +529,11 @@
     <span class="k">return</span> <span class="n">counts_repeat1</span><span class="o">.</span><span class="n">long</span><span class="p">(),</span> <span class="n">counts_repeat2</span><span class="o">.</span><span class="n">long</span><span class="p">(),</span> <span class="n">angle</span></div>
 
 
-<div class="viewcode-block" id="Jn"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Jn">[docs]</a><span class="k">def</span> <span class="nf">Jn</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="Jn"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Jn">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">Jn</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span><span class="p">))</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">jv</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Jn_zeros"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Jn_zeros">[docs]</a><span class="k">def</span> <span class="nf">Jn_zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<div class="viewcode-block" id="Jn_zeros"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Jn_zeros">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">Jn_zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
     <span class="n">zerosj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
     <span class="n">zerosj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
     <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
@@ -548,7 +548,7 @@
     <span class="k">return</span> <span class="n">zerosj</span></div>
 
 
-<div class="viewcode-block" id="spherical_bessel_formulas"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.spherical_bessel_formulas">[docs]</a><span class="k">def</span> <span class="nf">spherical_bessel_formulas</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="spherical_bessel_formulas"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.spherical_bessel_formulas">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">spherical_bessel_formulas</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
     <span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span><span class="p">]</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span>
@@ -559,7 +559,7 @@
     <span class="k">return</span> <span class="n">f</span></div>
 
 
-<div class="viewcode-block" id="bessel_basis"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.bessel_basis">[docs]</a><span class="k">def</span> <span class="nf">bessel_basis</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<div class="viewcode-block" id="bessel_basis"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.bessel_basis">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">bessel_basis</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
     <span class="n">zeros</span> <span class="o">=</span> <span class="n">Jn_zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
     <span class="n">normalizer</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -586,7 +586,7 @@
     <span class="k">return</span> <span class="n">bess_basis</span></div>
 
 
-<div class="viewcode-block" id="sph_harm_prefactor"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.sph_harm_prefactor">[docs]</a><span class="k">def</span> <span class="nf">sph_harm_prefactor</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<div class="viewcode-block" id="sph_harm_prefactor"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.sph_harm_prefactor">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">sph_harm_prefactor</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
@@ -594,7 +594,7 @@
     <span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span></div>
 
 
-<div class="viewcode-block" id="associated_legendre_polynomials"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.associated_legendre_polynomials">[docs]</a><span class="k">def</span> <span class="nf">associated_legendre_polynomials</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">zero_m_only</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="associated_legendre_polynomials"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.associated_legendre_polynomials">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">associated_legendre_polynomials</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">zero_m_only</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">)</span>
     <span class="n">P_l_m</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
 
@@ -623,7 +623,7 @@
     <span class="k">return</span> <span class="n">P_l_m</span></div>
 
 
-<div class="viewcode-block" id="real_sph_harm"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.real_sph_harm">[docs]</a><span class="k">def</span> <span class="nf">real_sph_harm</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">zero_m_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">spherical_coordinates</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="real_sph_harm"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.real_sph_harm">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">real_sph_harm</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">zero_m_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">spherical_coordinates</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">zero_m_only</span><span class="p">:</span>
         <span class="n">S_m</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">C_m</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -676,10 +676,10 @@
     <span class="k">return</span> <span class="n">Y_func_l_m</span></div>
 
 
-<div class="viewcode-block" id="BesselBasisLayer"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer">[docs]</a><span class="k">class</span> <span class="nc">BesselBasisLayer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="BesselBasisLayer"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">BesselBasisLayer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Bessel Basis Layer.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BesselBasisLayer.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_radial</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">envelope_exponent</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="BesselBasisLayer.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_radial</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">envelope_exponent</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize Bessel basis layer.</span>
 
 <span class="sd">        Args:</span>
@@ -696,10 +696,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="BesselBasisLayer.reset_parameters"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer.reset_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BesselBasisLayer.reset_parameters"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer.reset_parameters">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">freq</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">freq</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">PI</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BesselBasisLayer.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
+<div class="viewcode-block" id="BesselBasisLayer.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.BesselBasisLayer.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
 
 <span class="sd">        Args:</span>
@@ -712,25 +712,25 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">envelope</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">freq</span> <span class="o">*</span> <span class="n">dist</span><span class="p">)</span><span class="o">.</span><span class="n">sin</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="SiLU"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SiLU">[docs]</a><span class="k">class</span> <span class="nc">SiLU</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="SiLU"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SiLU">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SiLU</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;SiLU Activation Function.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SiLU.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SiLU.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="SiLU.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SiLU.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the SiLU activation function.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SiLU.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SiLU.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<div class="viewcode-block" id="SiLU.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SiLU.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">silu</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="silu"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.silu">[docs]</a><span class="k">def</span> <span class="nf">silu</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+<div class="viewcode-block" id="silu"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.silu">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">silu</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">input</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Envelope"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Envelope">[docs]</a><span class="k">class</span> <span class="nc">Envelope</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="Envelope"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Envelope">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Envelope</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Envelope.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Envelope.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Envelope.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Envelope.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Envelope.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize envelope.</span>
 
 <span class="sd">        Args:</span>
@@ -742,7 +742,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
 
-<div class="viewcode-block" id="Envelope.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Envelope.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<div class="viewcode-block" id="Envelope.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Envelope.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
 
 <span class="sd">        Args:</span>
@@ -761,10 +761,10 @@
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="n">env_val</span><span class="p">,</span> <span class="n">zero</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="SphericalBasisLayer"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SphericalBasisLayer">[docs]</a><span class="k">class</span> <span class="nc">SphericalBasisLayer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="SphericalBasisLayer"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SphericalBasisLayer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SphericalBasisLayer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Spherical Basis Layer.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SphericalBasisLayer.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SphericalBasisLayer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="SphericalBasisLayer.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SphericalBasisLayer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">num_spherical</span><span class="p">,</span> <span class="n">num_radial</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">envelope_exponent</span><span class="o">=</span><span class="mi">5</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize spherical basis layer.</span>
@@ -800,7 +800,7 @@
                 <span class="n">bessel</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">lambdify</span><span class="p">([</span><span class="n">x</span><span class="p">],</span> <span class="n">bessel_forms</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">modules</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bessel_funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bessel</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SphericalBasisLayer.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SphericalBasisLayer.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">idx_kj</span><span class="p">):</span>
+<div class="viewcode-block" id="SphericalBasisLayer.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.SphericalBasisLayer.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">idx_kj</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
 
 <span class="sd">        Args:</span>
@@ -831,7 +831,7 @@
 <span class="n">update_special_args</span><span class="p">:</span> <span class="n">Set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
 
 
-<div class="viewcode-block" id="MessagePassing"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing">[docs]</a><span class="k">class</span> <span class="nc">MessagePassing</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="MessagePassing"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MessagePassing</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Message Passing Layer.</span>
 
 <span class="sd">    .. math::</span>
@@ -844,7 +844,7 @@
 <span class="sd">    MLPs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MessagePassing.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggr</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s2">&quot;target_to_source&quot;</span><span class="p">,</span> <span class="n">node_dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MessagePassing.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggr</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s2">&quot;target_to_source&quot;</span><span class="p">,</span> <span class="n">node_dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize message passing layer.</span>
 
 <span class="sd">        Args:</span>
@@ -880,7 +880,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__args__</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">msg_args</span><span class="p">,</span> <span class="n">aggr_args</span><span class="p">,</span> <span class="n">update_args</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MessagePassing.__set_size__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__set_size__">[docs]</a>    <span class="k">def</span> <span class="nf">__set_size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
+<div class="viewcode-block" id="MessagePassing.__set_size__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__set_size__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">__set_size__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
             <span class="k">pass</span>
         <span class="k">elif</span> <span class="n">size</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -892,7 +892,7 @@
                 <span class="p">)</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="MessagePassing.__collect__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__collect__">[docs]</a>    <span class="k">def</span> <span class="nf">__collect__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MessagePassing.__collect__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__collect__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">__collect__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
         <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow</span> <span class="o">==</span> <span class="s2">&quot;target_to_source&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">ij</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;_i&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;_j&quot;</span><span class="p">:</span> <span class="n">j</span><span class="p">}</span>
 
@@ -937,7 +937,7 @@
 
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="MessagePassing.__distribute__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__distribute__">[docs]</a>    <span class="k">def</span> <span class="nf">__distribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MessagePassing.__distribute__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.__distribute__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">__distribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -948,7 +948,7 @@
             <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="MessagePassing.propagate"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span>
+<div class="viewcode-block" id="MessagePassing.propagate"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.propagate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">propagate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The initial call to start propagating messages.</span>
@@ -984,7 +984,7 @@
 
         <span class="k">return</span> <span class="n">m</span></div>
 
-<div class="viewcode-block" id="MessagePassing.message"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.message">[docs]</a>    <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_j</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<div class="viewcode-block" id="MessagePassing.message"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.message">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_j</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Constructs messages to node :math:`i` in analogy to</span>
 <span class="sd">        :math:`\phi_{\mathbf{\Theta}}` for each edge in</span>
 <span class="sd">        :math:`(j,i) \in \mathcal{E}` if :obj:`flow=&quot;source_to_target&quot;` and</span>
@@ -997,7 +997,7 @@
 
         <span class="k">return</span> <span class="n">x_j</span></div>
 
-<div class="viewcode-block" id="MessagePassing.aggregate"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.aggregate">[docs]</a>    <span class="k">def</span> <span class="nf">aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">dim_size</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<div class="viewcode-block" id="MessagePassing.aggregate"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.aggregate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">dim_size</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Aggregates messages from neighbors as</span>
 <span class="sd">        :math:`\square_{j \in \mathcal{N}(i)}`.</span>
 <span class="sd">        By default, delegates call to scatter functions that support</span>
@@ -1009,7 +1009,7 @@
             <span class="n">inputs</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dim</span><span class="p">,</span> <span class="n">dim_size</span><span class="o">=</span><span class="n">dim_size</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aggr</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="MessagePassing.update"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<div class="viewcode-block" id="MessagePassing.update"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.MessagePassing.update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Updates node embeddings in analogy to</span>
 <span class="sd">        :math:`\gamma_{\mathbf{\Theta}}` for each node</span>
 <span class="sd">        :math:`i \in \mathcal{V}`.</span>
@@ -1023,7 +1023,7 @@
 <span class="n">params</span><span class="o">.</span><span class="n">useSmallRingTorsions</span> <span class="o">=</span> <span class="kc">True</span>
 
 
-<div class="viewcode-block" id="rdkit_conformation"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.rdkit_conformation">[docs]</a><span class="k">def</span> <span class="nf">rdkit_conformation</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">addHs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="rdkit_conformation"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.rdkit_conformation">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">rdkit_conformation</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">addHs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An function that finds the lowest energy conformation of a molecule.</span>
 
 <span class="sd">    Args:</span>
@@ -1056,7 +1056,7 @@
     <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="mol2graph"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.mol2graph">[docs]</a><span class="k">def</span> <span class="nf">mol2graph</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+<div class="viewcode-block" id="mol2graph"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.mol2graph">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">mol2graph</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a RDKit molecule to a graph.</span>
 
 <span class="sd">    Args:</span>
@@ -1092,10 +1092,10 @@
     <span class="k">return</span> <span class="n">data</span></div>
 
 
-<div class="viewcode-block" id="Global_MP"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP">[docs]</a><span class="k">class</span> <span class="nc">Global_MP</span><span class="p">(</span><span class="n">MessagePassing</span><span class="p">):</span>
+<div class="viewcode-block" id="Global_MP"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Global_MP</span><span class="p">(</span><span class="n">MessagePassing</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Global message passing.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Global_MP.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Global_MP.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the global message passing.</span>
 
 <span class="sd">        Args:</span>
@@ -1114,7 +1114,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">x_edge_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Global_MP.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">):</span>
+<div class="viewcode-block" id="Global_MP.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">):</span>
         <span class="n">edge_index</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">add_self_loops</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 
         <span class="n">res_h</span> <span class="o">=</span> <span class="n">h</span>
@@ -1136,7 +1136,7 @@
 
         <span class="k">return</span> <span class="n">h</span></div>
 
-<div class="viewcode-block" id="Global_MP.message"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.message">[docs]</a>    <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_i</span><span class="p">,</span> <span class="n">x_j</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">):</span>  <span class="c1"># type:ignore</span>
+<div class="viewcode-block" id="Global_MP.message"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.message">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_i</span><span class="p">,</span> <span class="n">x_j</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">):</span>  <span class="c1"># type:ignore</span>
         <span class="n">num_edge</span> <span class="o">=</span> <span class="n">edge_attr</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">x_edge</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">x_i</span><span class="p">[:</span><span class="n">num_edge</span><span class="p">],</span> <span class="n">x_j</span><span class="p">[:</span><span class="n">num_edge</span><span class="p">],</span> <span class="n">edge_attr</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -1146,15 +1146,15 @@
 
         <span class="k">return</span> <span class="n">x_j</span></div>
 
-<div class="viewcode-block" id="Global_MP.update"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggr_out</span><span class="p">):</span>
+<div class="viewcode-block" id="Global_MP.update"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Global_MP.update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggr_out</span><span class="p">):</span>
 
         <span class="k">return</span> <span class="n">aggr_out</span></div></div>
 
 
-<div class="viewcode-block" id="Local_MP"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Local_MP">[docs]</a><span class="k">class</span> <span class="nc">Local_MP</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="Local_MP"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Local_MP">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Local_MP</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Local message passing.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Local_MP.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Local_MP.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Local_MP.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Local_MP.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize local message passing.</span>
 
 <span class="sd">        Args:</span>
@@ -1187,7 +1187,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">y_mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_W</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Local_MP.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Local_MP.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="Local_MP.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.gflownet.ml.models.mxmnet.html#gt4sd.frameworks.gflownet.ml.models.mxmnet.Local_MP.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">h</span><span class="p">,</span>
         <span class="n">rbf</span><span class="p">,</span>

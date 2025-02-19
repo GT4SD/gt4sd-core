@@ -187,25 +187,25 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">queue</span>
-<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">queue</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.multiprocessing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
 
 
-<div class="viewcode-block" id="MPModelPlaceholder"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder">[docs]</a><span class="k">class</span> <span class="nc">MPModelPlaceholder</span><span class="p">:</span>
+<div class="viewcode-block" id="MPModelPlaceholder"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MPModelPlaceholder</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class can be used as a Model in a worker process, and</span>
 <span class="sd">    translates calls to queries to the main process.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MPModelPlaceholder.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_queues</span><span class="p">,</span> <span class="n">out_queues</span><span class="p">):</span>
+<div class="viewcode-block" id="MPModelPlaceholder.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_queues</span><span class="p">,</span> <span class="n">out_queues</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">qs</span> <span class="o">=</span> <span class="n">in_queues</span><span class="p">,</span> <span class="n">out_queues</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_init</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="MPModelPlaceholder._check_init"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder._check_init">[docs]</a>    <span class="k">def</span> <span class="nf">_check_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MPModelPlaceholder._check_init"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder._check_init">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_init</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="n">info</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_worker_info</span><span class="p">()</span>
@@ -213,18 +213,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">out_queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qs</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">info</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_init</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="MPModelPlaceholder.log_z"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder.log_z">[docs]</a>    <span class="k">def</span> <span class="nf">log_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">):</span>
+<div class="viewcode-block" id="MPModelPlaceholder.log_z"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder.log_z">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">log_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_init</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">in_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s2">&quot;log_z&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MPModelPlaceholder.__call__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">):</span>
+<div class="viewcode-block" id="MPModelPlaceholder.__call__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelPlaceholder.__call__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_init</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">in_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s2">&quot;__call__&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="MPModelProxy"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelProxy">[docs]</a><span class="k">class</span> <span class="nc">MPModelProxy</span><span class="p">:</span>
+<div class="viewcode-block" id="MPModelProxy"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelProxy">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MPModelProxy</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class maintains a reference to an in-cuda-memory model, and</span>
 <span class="sd">    creates a `placeholder` attribute which can be safely passed to</span>
 <span class="sd">    multiprocessing DataLoader workers.</span>
@@ -237,7 +237,7 @@
 <span class="sd">    processes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MPModelProxy.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelProxy.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cast_types</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
+<div class="viewcode-block" id="MPModelProxy.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelProxy.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cast_types</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a multiprocessing model proxy for torch DataLoaders.</span>
 
 <span class="sd">        Args:</span>
@@ -255,10 +255,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MPModelProxy.__del__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelProxy.__del__">[docs]</a>    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MPModelProxy.__del__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelProxy.__del__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MPModelProxy.run"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelProxy.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MPModelProxy.run"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.MPModelProxy.run">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">qi</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_queues</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -291,7 +291,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">out_queues</span><span class="p">[</span><span class="n">qi</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="wrap_model_mp"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.wrap_model_mp">[docs]</a><span class="k">def</span> <span class="nf">wrap_model_mp</span><span class="p">(</span>
+<div class="viewcode-block" id="wrap_model_mp"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.gflownet.util.html#gt4sd.frameworks.gflownet.util.wrap_model_mp">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wrap_model_mp</span><span class="p">(</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cast_types</span><span class="p">:</span> <span class="nb">tuple</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MPModelPlaceholder</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct a multiprocessing model proxy for torch DataLoaders so</span>

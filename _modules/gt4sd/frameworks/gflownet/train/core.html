@@ -189,28 +189,28 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Train module implementation.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">Namespace</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">argparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">import</span> <span class="nn">sentencepiece</span> <span class="k">as</span> <span class="nn">_sentencepiece</span>
-<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">_torch</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">_tensorflow</span>
-<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning.callbacks</span> <span class="kn">import</span> <span class="n">ModelCheckpoint</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning.loggers</span> <span class="kn">import</span> <span class="n">TensorBoardLogger</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sentencepiece</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_sentencepiece</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_tensorflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytorch_lightning</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytorch_lightning.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelCheckpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytorch_lightning.loggers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorBoardLogger</span>
 
-<span class="kn">from</span> <span class="nn">..arg_parser.parser</span> <span class="kn">import</span> <span class="n">parse_arguments_from_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..arg_parser.parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_arguments_from_config</span>
 
 <span class="c1"># from ..dataloader import build_dataset</span>
-<span class="kn">from</span> <span class="nn">..dataloader.data_module</span> <span class="kn">import</span> <span class="n">GFlowNetDataModule</span>
-<span class="kn">from</span> <span class="nn">..dataloader.dataset</span> <span class="kn">import</span> <span class="n">GFlowNetDataset</span><span class="p">,</span> <span class="n">GFlowNetTask</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..dataloader.data_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">GFlowNetDataModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..dataloader.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">GFlowNetDataset</span><span class="p">,</span> <span class="n">GFlowNetTask</span>
 
 <span class="c1"># from ..envs import build_env_context</span>
-<span class="kn">from</span> <span class="nn">..envs.graph_building_env</span> <span class="kn">import</span> <span class="n">GraphBuildingEnv</span><span class="p">,</span> <span class="n">GraphBuildingEnvContext</span>
-<span class="kn">from</span> <span class="nn">..loss</span> <span class="kn">import</span> <span class="n">ALGORITHM_FACTORY</span>
-<span class="kn">from</span> <span class="nn">..ml.models</span> <span class="kn">import</span> <span class="n">MODEL_FACTORY</span>
-<span class="kn">from</span> <span class="nn">..ml.module</span> <span class="kn">import</span> <span class="n">GFlowNetModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..envs.graph_building_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphBuildingEnv</span><span class="p">,</span> <span class="n">GraphBuildingEnvContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">ALGORITHM_FACTORY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..ml.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MODEL_FACTORY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..ml.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">GFlowNetModule</span>
 
 <span class="c1"># from ..train import build_task</span>
 
@@ -223,7 +223,7 @@
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="train_gflownet"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.train.core.html#gt4sd.frameworks.gflownet.train.core.train_gflownet">[docs]</a><span class="k">def</span> <span class="nf">train_gflownet</span><span class="p">(</span>
+<div class="viewcode-block" id="train_gflownet"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.train.core.html#gt4sd.frameworks.gflownet.train.core.train_gflownet">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">train_gflownet</span><span class="p">(</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">GFlowNetDataset</span><span class="p">,</span>
     <span class="n">environment</span><span class="p">:</span> <span class="n">GraphBuildingEnv</span><span class="p">,</span>
@@ -302,7 +302,7 @@
     <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">dm</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="train_gflownet_main"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.train.core.html#gt4sd.frameworks.gflownet.train.core.train_gflownet_main">[docs]</a><span class="k">def</span> <span class="nf">train_gflownet_main</span><span class="p">(</span>
+<div class="viewcode-block" id="train_gflownet_main"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.train.core.html#gt4sd.frameworks.gflownet.train.core.train_gflownet_main">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">train_gflownet_main</span><span class="p">(</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">GFlowNetDataset</span><span class="p">,</span>
     <span class="n">environment</span><span class="p">:</span> <span class="n">GraphBuildingEnv</span><span class="p">,</span>

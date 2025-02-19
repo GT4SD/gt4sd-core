@@ -189,21 +189,21 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Catalyst design for NCCR project.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">......domains.materials</span> <span class="kn">import</span> <span class="n">MoleculeFormat</span><span class="p">,</span> <span class="n">validate_molecules</span>
-<span class="kn">from</span> <span class="nn">......frameworks.granular.ml.models</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">......domains.materials</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoleculeFormat</span><span class="p">,</span> <span class="n">validate_molecules</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">......frameworks.granular.ml.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GranularEncoderDecoderModel</span><span class="p">,</span>
     <span class="n">MlpPredictor</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">......frameworks.granular.ml.module</span> <span class="kn">import</span> <span class="n">GranularModule</span>
-<span class="kn">from</span> <span class="nn">......frameworks.granular.tokenizer.tokenizer</span> <span class="kn">import</span> <span class="n">SmilesTokenizer</span>
-<span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">......frameworks.granular.ml.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">GranularModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">......frameworks.granular.tokenizer.tokenizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">SmilesTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GaussianProcessRepresentationsSampler</span><span class="p">,</span>
     <span class="n">Generator</span><span class="p">,</span>
     <span class="n">Point</span><span class="p">,</span>
@@ -216,12 +216,12 @@
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="CatalystVAE"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE">[docs]</a><span class="k">class</span> <span class="nc">CatalystVAE</span><span class="p">(</span><span class="n">Representation</span><span class="p">):</span>
+<div class="viewcode-block" id="CatalystVAE"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CatalystVAE</span><span class="p">(</span><span class="n">Representation</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Catalyst VAE for suzuki reactions.&quot;&quot;&quot;</span>
 
     <span class="n">model</span><span class="p">:</span> <span class="n">GranularEncoderDecoderModel</span>
 
-<div class="viewcode-block" id="CatalystVAE.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="CatalystVAE.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">padding_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">127</span><span class="p">,</span>
@@ -265,7 +265,7 @@
             <span class="sa">r</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span><span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="CatalystVAE.smiles_to_latent"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE.smiles_to_latent">[docs]</a>    <span class="k">def</span> <span class="nf">smiles_to_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point</span><span class="p">:</span>
+<div class="viewcode-block" id="CatalystVAE.smiles_to_latent"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE.smiles_to_latent">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">smiles_to_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Encode a SMILES into a latent point.</span>
 
 <span class="sd">        Args:</span>
@@ -289,7 +289,7 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="CatalystVAE.decode"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="CatalystVAE.decode"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystVAE.decode">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Decode a catalyst from the latent space.</span>
 
 <span class="sd">        Args:</span>
@@ -309,12 +309,12 @@
         <span class="k">return</span> <span class="n">reconstructed</span></div></div>
 
 
-<div class="viewcode-block" id="CatalystBindingEnergyPredictor"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor">[docs]</a><span class="k">class</span> <span class="nc">CatalystBindingEnergyPredictor</span><span class="p">(</span><span class="n">PropertyPredictor</span><span class="p">):</span>
+<div class="viewcode-block" id="CatalystBindingEnergyPredictor"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CatalystBindingEnergyPredictor</span><span class="p">(</span><span class="n">PropertyPredictor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Catalyst binding energy predictor for suzuki reactions.&quot;&quot;&quot;</span>
 
     <span class="n">model</span><span class="p">:</span> <span class="n">MlpPredictor</span>
 
-<div class="viewcode-block" id="CatalystBindingEnergyPredictor.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="CatalystBindingEnergyPredictor.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">checkpoint_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;epoch=199-step=5799.ckpt&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs a CatalystBindingEnergyPredictor.</span>
@@ -334,7 +334,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CatalystBindingEnergyPredictor.__call__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="CatalystBindingEnergyPredictor.__call__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystBindingEnergyPredictor.__call__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict binding energy.</span>
 
 <span class="sd">        Args:</span>
@@ -347,10 +347,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">z</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="CatalystGenerator"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystGenerator">[docs]</a><span class="k">class</span> <span class="nc">CatalystGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+<div class="viewcode-block" id="CatalystGenerator"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CatalystGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Catalyst generator.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CatalystGenerator.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="CatalystGenerator.__init__"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystGenerator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">generated_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
@@ -387,7 +387,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">minimum_latent_coordinate</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maximum_latent_coordinate</span> <span class="o">=</span> <span class="mf">100.0</span></div>
 
-<div class="viewcode-block" id="CatalystGenerator.generate_samples"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystGenerator.generate_samples">[docs]</a>    <span class="k">def</span> <span class="nf">generate_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_energy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="CatalystGenerator.generate_samples"><a class="viewcode-back" href="../../../../../../../api/gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.html#gt4sd.algorithms.controlled_sampling.advanced_manufacturing.implementation.nccr.core.CatalystGenerator.generate_samples">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_energy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate samples given a target energy.</span>
 
 <span class="sd">        Args:</span>

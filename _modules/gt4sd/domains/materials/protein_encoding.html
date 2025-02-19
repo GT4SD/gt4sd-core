@@ -191,18 +191,18 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Data processing utilities.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">tape.datasets</span> <span class="kn">import</span> <span class="n">pad_sequences</span>
-<span class="kn">from</span> <span class="nn">tape.registry</span> <span class="kn">import</span> <span class="n">registry</span>
-<span class="kn">from</span> <span class="nn">tape.tokenizers</span> <span class="kn">import</span> <span class="n">TAPETokenizer</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tape.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">pad_sequences</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tape.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">registry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tape.tokenizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TAPETokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
 
 
-<div class="viewcode-block" id="PrimarySequenceEncoder"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder">[docs]</a><span class="k">class</span> <span class="nc">PrimarySequenceEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="PrimarySequenceEncoder"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PrimarySequenceEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Model like class to create tape embeddings/encodings.</span>
 
 <span class="sd">    This follows tapes implementation via `run_embed` closely, but removes</span>
@@ -256,7 +256,7 @@
 <span class="sd">            )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="PrimarySequenceEncoder.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="PrimarySequenceEncoder.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;transformer&quot;</span><span class="p">,</span>
         <span class="n">from_pretrained</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;bert-base&quot;</span><span class="p">,</span>
@@ -306,11 +306,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="PrimarySequenceEncoder.train"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># type:ignore</span>
+<div class="viewcode-block" id="PrimarySequenceEncoder.train"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.train">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># type:ignore</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Avoid any setting to train mode.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PrimarySequenceEncoder.generate_tokenized"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.generate_tokenized">[docs]</a>    <span class="k">def</span> <span class="nf">generate_tokenized</span><span class="p">(</span>
+<div class="viewcode-block" id="PrimarySequenceEncoder.generate_tokenized"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.generate_tokenized">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_tokenized</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
         <span class="c1"># batch is list of len 2 (typically tuples[str] of length `batch_size`)</span>
@@ -320,7 +320,7 @@
             <span class="k">yield</span> <span class="n">sequence_id</span><span class="p">,</span> <span class="n">token_ids</span><span class="p">,</span> <span class="n">input_mask</span></div>
 
 <div class="viewcode-block" id="PrimarySequenceEncoder.collate_fn"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.collate_fn">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">collate_fn</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">collate_fn</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="c1"># from tape.datasets.EmbedDataset because there it&#39;s not a classmethod</span>
@@ -335,7 +335,7 @@
             <span class="s2">&quot;input_mask&quot;</span><span class="p">:</span> <span class="n">input_mask_tensor</span><span class="p">,</span>
         <span class="p">}</span>  <span class="c1"># type: ignore</span></div>
 
-<div class="viewcode-block" id="PrimarySequenceEncoder.from_collated_batch"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.from_collated_batch">[docs]</a>    <span class="k">def</span> <span class="nf">from_collated_batch</span><span class="p">(</span>
+<div class="viewcode-block" id="PrimarySequenceEncoder.from_collated_batch"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.from_collated_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">from_collated_batch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
         <span class="c1"># filter arguments</span>
@@ -352,7 +352,7 @@
             <span class="p">}</span>
         <span class="k">return</span> <span class="n">batch_tensors</span></div>
 
-<div class="viewcode-block" id="PrimarySequenceEncoder.forward"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>  <span class="c1"># type:ignore</span>
+<div class="viewcode-block" id="PrimarySequenceEncoder.forward"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>  <span class="c1"># type:ignore</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
         <span class="c1"># batch: List[(primary_sequences,), (sequence_ids,))] of length 2</span>
@@ -404,7 +404,7 @@
 
         <span class="k">return</span> <span class="n">sequences_out</span><span class="p">,</span> <span class="n">ids</span></div>
 
-<div class="viewcode-block" id="PrimarySequenceEncoder.get_dummy_ids"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.get_dummy_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_dummy_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<div class="viewcode-block" id="PrimarySequenceEncoder.get_dummy_ids"><a class="viewcode-back" href="../../../../api/gt4sd.domains.materials.protein_encoding.html#gt4sd.domains.materials.protein_encoding.PrimarySequenceEncoder.get_dummy_ids">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dummy_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
         <span class="n">first</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_dummy_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">next_dummy_id</span> <span class="o">+=</span> <span class="n">length</span>  <span class="c1"># before last</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_dummy_id</span><span class="p">)))</span></div></div>

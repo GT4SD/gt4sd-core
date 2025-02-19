@@ -189,22 +189,22 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">ipaddress</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipaddress</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
-<span class="kn">from</span> <span class="nn">modlamp.descriptors</span> <span class="kn">import</span> <span class="n">GlobalDescriptor</span>
-<span class="kn">from</span> <span class="nn">tdc</span> <span class="kn">import</span> <span class="n">Oracle</span>
-<span class="kn">from</span> <span class="nn">tdc.chem_utils.oracle.oracle</span> <span class="kn">import</span> <span class="n">fp2fpfunc</span>
-<span class="kn">from</span> <span class="nn">tdc.metadata</span> <span class="kn">import</span> <span class="n">download_oracle_names</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modlamp.descriptors</span><span class="w"> </span><span class="kn">import</span> <span class="n">GlobalDescriptor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tdc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Oracle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tdc.chem_utils.oracle.oracle</span><span class="w"> </span><span class="kn">import</span> <span class="n">fp2fpfunc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tdc.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">download_oracle_names</span>
 
-<span class="kn">from</span> <span class="nn">..domains.materials</span> <span class="kn">import</span> <span class="n">MacroMolecule</span><span class="p">,</span> <span class="n">SmallMolecule</span>
-<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">ApiTokenParameters</span><span class="p">,</span> <span class="n">PropertyValue</span>
-<span class="kn">from</span> <span class="nn">.scores</span> <span class="kn">import</span> <span class="n">SCORING_FACTORY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..domains.materials</span><span class="w"> </span><span class="kn">import</span> <span class="n">MacroMolecule</span><span class="p">,</span> <span class="n">SmallMolecule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApiTokenParameters</span><span class="p">,</span> <span class="n">PropertyValue</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.scores</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCORING_FACTORY</span>
 
 
-<div class="viewcode-block" id="to_mol"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.to_mol">[docs]</a><span class="k">def</span> <span class="nf">to_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">:</span>
+<div class="viewcode-block" id="to_mol"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.to_mol">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">to_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Safely convert a string or a rdkit.Chem.Mol to a rdkit.Chem.Mol.</span>
 
 <span class="sd">    Args:</span>
@@ -227,7 +227,7 @@
     <span class="k">return</span> <span class="n">mol</span>  <span class="c1"># type: ignore</span></div>
 
 
-<div class="viewcode-block" id="to_smiles"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.to_smiles">[docs]</a><span class="k">def</span> <span class="nf">to_smiles</span><span class="p">(</span><span class="n">mol</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="to_smiles"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.to_smiles">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">to_smiles</span><span class="p">(</span><span class="n">mol</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Safely returns a SMILES string from a SMILES or a rdkit.Chem.Mol object.</span>
 
 <span class="sd">    Args:</span>
@@ -253,7 +253,7 @@
     <span class="k">return</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">canonical</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
 
 
-<div class="viewcode-block" id="get_similarity_fn"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_similarity_fn">[docs]</a><span class="k">def</span> <span class="nf">get_similarity_fn</span><span class="p">(</span>
+<div class="viewcode-block" id="get_similarity_fn"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_similarity_fn">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_similarity_fn</span><span class="p">(</span>
     <span class="n">target_mol</span><span class="p">:</span> <span class="n">SmallMolecule</span><span class="p">,</span> <span class="n">fp_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;FCFP4&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SmallMolecule</span><span class="p">],</span> <span class="n">PropertyValue</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a similarity function for a target molecule.</span>
@@ -271,7 +271,7 @@
     <span class="k">return</span> <span class="n">Oracle</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;similarity_meta&quot;</span><span class="p">,</span> <span class="n">target_smiles</span><span class="o">=</span><span class="n">target_smiles</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">fp_key</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_activity_fn"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_activity_fn">[docs]</a><span class="k">def</span> <span class="nf">get_activity_fn</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SmallMolecule</span><span class="p">],</span> <span class="n">PropertyValue</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_activity_fn"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_activity_fn">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_activity_fn</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SmallMolecule</span><span class="p">],</span> <span class="n">PropertyValue</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a function to measure activity/affinity against a protein target.</span>
 
 <span class="sd">    Args:</span>
@@ -288,7 +288,7 @@
 
 
 <span class="c1"># for proteins</span>
-<div class="viewcode-block" id="get_sequence"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_sequence">[docs]</a><span class="k">def</span> <span class="nf">get_sequence</span><span class="p">(</span><span class="n">protein</span><span class="p">:</span> <span class="n">MacroMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="get_sequence"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_sequence">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_sequence</span><span class="p">(</span><span class="n">protein</span><span class="p">:</span> <span class="n">MacroMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Safely returns an amino acid sequence of a macromolecule</span>
 
 <span class="sd">    Args:</span>
@@ -315,7 +315,7 @@
     <span class="k">return</span> <span class="n">seq</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="get_descriptor"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_descriptor">[docs]</a><span class="k">def</span> <span class="nf">get_descriptor</span><span class="p">(</span><span class="n">protein</span><span class="p">:</span> <span class="n">MacroMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GlobalDescriptor</span><span class="p">:</span>
+<div class="viewcode-block" id="get_descriptor"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_descriptor">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_descriptor</span><span class="p">(</span><span class="n">protein</span><span class="p">:</span> <span class="n">MacroMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GlobalDescriptor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a macromolecule to a modlamp GlobalDescriptor object.</span>
 
 <span class="sd">    Args:</span>
@@ -328,7 +328,7 @@
     <span class="k">return</span> <span class="n">GlobalDescriptor</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_target_parameters"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_target_parameters">[docs]</a><span class="k">def</span> <span class="nf">get_target_parameters</span><span class="p">(</span>
+<div class="viewcode-block" id="get_target_parameters"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.get_target_parameters">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_target_parameters</span><span class="p">(</span>
     <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates a tuple of scorers and weight list</span>
@@ -359,7 +359,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">score_list</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="validate_ip"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.validate_ip">[docs]</a><span class="k">def</span> <span class="nf">validate_ip</span><span class="p">(</span><span class="n">ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="validate_ip"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.validate_ip">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">validate_ip</span><span class="p">(</span><span class="n">ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validates whether the parameter configuration contains a correct IP</span>
 <span class="sd">    address.</span>
@@ -375,7 +375,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ip</span><span class="si">}</span><span class="s2"> is not a IPv4 or IPv6 address</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="validate_api_token"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.validate_api_token">[docs]</a><span class="k">def</span> <span class="nf">validate_api_token</span><span class="p">(</span><span class="n">parameters</span><span class="p">:</span> <span class="n">ApiTokenParameters</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="validate_api_token"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.validate_api_token">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">validate_api_token</span><span class="p">(</span><span class="n">parameters</span><span class="p">:</span> <span class="n">ApiTokenParameters</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validates whether the parameter configuration contains something</span>
 <span class="sd">    that _could_ be a valid API key.</span>
@@ -394,7 +394,7 @@
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="docking_import_check"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.docking_import_check">[docs]</a><span class="k">def</span> <span class="nf">docking_import_check</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="docking_import_check"><a class="viewcode-back" href="../../../api/gt4sd.properties.utils.html#gt4sd.properties.utils.docking_import_check">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">docking_import_check</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Verifies that __some__ of the required packages for docking are installed.</span>
 
@@ -402,9 +402,9 @@
 <span class="sd">        ModuleNotFoundError: If a necessary module was not found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">openbabel</span>
-        <span class="kn">import</span> <span class="nn">pdbfixer</span>
-        <span class="kn">import</span> <span class="nn">pyscreener</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">openbabel</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pdbfixer</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyscreener</span>
 
         <span class="n">openbabel</span><span class="p">,</span> <span class="n">pdbfixer</span><span class="p">,</span> <span class="n">pyscreener</span>
     <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>

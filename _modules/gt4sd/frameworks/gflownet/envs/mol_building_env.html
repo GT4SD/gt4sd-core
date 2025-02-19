@@ -189,17 +189,17 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">rdkit.Chem</span> <span class="k">as</span> <span class="nn">Chem</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch_geometric.data</span> <span class="k">as</span> <span class="nn">gd</span>
-<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">Mol</span>
-<span class="kn">from</span> <span class="nn">rdkit.Chem.rdchem</span> <span class="kn">import</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">ChiralType</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">Chem</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch_geometric.data</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem.rdchem</span><span class="w"> </span><span class="kn">import</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">ChiralType</span>
 
-<span class="kn">from</span> <span class="nn">..envs.graph_building_env</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..envs.graph_building_env</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Graph</span><span class="p">,</span>
     <span class="n">GraphAction</span><span class="p">,</span>
     <span class="n">GraphActionType</span><span class="p">,</span>
@@ -207,10 +207,10 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="MolBuildingEnvContext"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext">[docs]</a><span class="k">class</span> <span class="nc">MolBuildingEnvContext</span><span class="p">(</span><span class="n">GraphBuildingEnvContext</span><span class="p">):</span>
+<div class="viewcode-block" id="MolBuildingEnvContext"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MolBuildingEnvContext</span><span class="p">(</span><span class="n">GraphBuildingEnvContext</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A context environment for building molecular graphs.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MolBuildingEnvContext.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="MolBuildingEnvContext.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">atoms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">],</span>
         <span class="n">num_cond_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
@@ -323,7 +323,7 @@
         <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span></div>
 
-<div class="viewcode-block" id="MolBuildingEnvContext.aidx_to_graph_action"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.aidx_to_graph_action">[docs]</a>    <span class="k">def</span> <span class="nf">aidx_to_graph_action</span><span class="p">(</span>
+<div class="viewcode-block" id="MolBuildingEnvContext.aidx_to_graph_action"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.aidx_to_graph_action">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">aidx_to_graph_action</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span> <span class="n">action_idx</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GraphAction</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate an action index (e.g. from a GraphActionCategorical) to a GraphAction.</span>
@@ -364,7 +364,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown action type: </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MolBuildingEnvContext.graph_action_to_aidx"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.graph_action_to_aidx">[docs]</a>    <span class="k">def</span> <span class="nf">graph_action_to_aidx</span><span class="p">(</span>
+<div class="viewcode-block" id="MolBuildingEnvContext.graph_action_to_aidx"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.graph_action_to_aidx">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">graph_action_to_aidx</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">GraphAction</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate a GraphAction to an index tuple.</span>
@@ -426,7 +426,7 @@
         <span class="n">col</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">type_idx</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MolBuildingEnvContext.graph_to_data"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.graph_to_data">[docs]</a>    <span class="k">def</span> <span class="nf">graph_to_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">:</span>
+<div class="viewcode-block" id="MolBuildingEnvContext.graph_to_data"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.graph_to_data">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">graph_to_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a networkx Graph to a torch geometric Data instance.</span>
 
 <span class="sd">        Args:</span>
@@ -465,7 +465,7 @@
         <span class="n">non_edge_index</span> <span class="o">=</span> <span class="n">non_edge_index</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">,</span> <span class="n">non_edge_index</span><span class="o">=</span><span class="n">non_edge_index</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MolBuildingEnvContext.collate"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.collate">[docs]</a>    <span class="k">def</span> <span class="nf">collate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graphs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">]):</span>
+<div class="viewcode-block" id="MolBuildingEnvContext.collate"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.collate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">collate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graphs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">gd</span><span class="o">.</span><span class="n">Data</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Batch Data instances.</span>
 
 <span class="sd">        Args:</span>
@@ -479,7 +479,7 @@
             <span class="n">graphs</span><span class="p">,</span> <span class="n">follow_batch</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;edge_index&quot;</span><span class="p">,</span> <span class="s2">&quot;non_edge_index&quot;</span><span class="p">]</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="MolBuildingEnvContext.mol_to_graph"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.mol_to_graph">[docs]</a>    <span class="k">def</span> <span class="nf">mol_to_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">:</span> <span class="n">Mol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
+<div class="viewcode-block" id="MolBuildingEnvContext.mol_to_graph"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.mol_to_graph">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">mol_to_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">:</span> <span class="n">Mol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert an RDMol to a Graph.</span>
 
 <span class="sd">        Args:</span>
@@ -520,7 +520,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">g</span></div>
 
-<div class="viewcode-block" id="MolBuildingEnvContext.graph_to_mol"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.graph_to_mol">[docs]</a>    <span class="k">def</span> <span class="nf">graph_to_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mol</span><span class="p">:</span>
+<div class="viewcode-block" id="MolBuildingEnvContext.graph_to_mol"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.graph_to_mol">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">graph_to_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mol</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a Graph to an RDKit molecule.</span>
 
 <span class="sd">        Args:</span>
@@ -551,7 +551,7 @@
         <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">mp</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mp</span></div>
 
-<div class="viewcode-block" id="MolBuildingEnvContext.is_sane"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.is_sane">[docs]</a>    <span class="k">def</span> <span class="nf">is_sane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="MolBuildingEnvContext.is_sane"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.gflownet.envs.mol_building_env.html#gt4sd.frameworks.gflownet.envs.mol_building_env.MolBuildingEnvContext.is_sane">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_sane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a graph is sane.</span>
 
 <span class="sd">        Args:</span>

@@ -191,43 +191,43 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Molformer training utilities.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">sentencepiece</span> <span class="k">as</span> <span class="nn">_sentencepiece</span>
-<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">_torch</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">_tensorflow</span>
-<span class="kn">import</span> <span class="nn">importlib_resources</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sentencepiece</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_sentencepiece</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_tensorflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib_resources</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LightningModule</span> <span class="k">as</span> <span class="n">RegressionLightningModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PropertyPredictionDataModule</span> <span class="k">as</span> <span class="n">RegressionDataModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LightningModule</span> <span class="k">as</span> <span class="n">ClassificationLightningModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PropertyPredictionDataModule</span> <span class="k">as</span> <span class="n">ClassificationDataModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification_multitask</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.finetune_pubchem_light_classification_multitask</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MultitaskModel</span><span class="p">,</span>
     <span class="n">PropertyPredictionDataModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.finetune.ft_tokenizer.ft_tokenizer</span> <span class="kn">import</span> <span class="n">MolTranBertTokenizer</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.training.train_pubchem_light</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.finetune.ft_tokenizer.ft_tokenizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MolTranBertTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.training.train_pubchem_light</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LightningModule</span> <span class="k">as</span> <span class="n">PretrainingModule</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">gt4sd_molformer.training.train_pubchem_light</span> <span class="kn">import</span> <span class="n">MoleculeModule</span>
-<span class="kn">from</span> <span class="nn">gt4sd_trainer.hf_pl.pytorch_lightning_trainer</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_molformer.training.train_pubchem_light</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoleculeModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gt4sd_trainer.hf_pl.pytorch_lightning_trainer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PyTorchLightningTrainingPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning.utilities</span> <span class="kn">import</span> <span class="n">seed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytorch_lightning</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightningDataModule</span><span class="p">,</span> <span class="n">LightningModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytorch_lightning.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">seed</span>
 
-<span class="kn">from</span> <span class="nn">...core</span> <span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingPipelineArguments</span>
 
 <span class="c1"># imports that have to be loaded before lightning to avoid segfaults</span>
 <span class="n">_sentencepiece</span>
@@ -238,10 +238,10 @@
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="MolformerTrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline">[docs]</a><span class="k">class</span> <span class="nc">MolformerTrainingPipeline</span><span class="p">(</span><span class="n">PyTorchLightningTrainingPipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="MolformerTrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MolformerTrainingPipeline</span><span class="p">(</span><span class="n">PyTorchLightningTrainingPipeline</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Molformer training pipelines for crystals.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MolformerTrainingPipeline.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="MolformerTrainingPipeline.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
@@ -255,7 +255,7 @@
             <span class="s2">&quot;regression&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_regression_modules</span><span class="p">,</span>
         <span class="p">}</span></div>
 
-<div class="viewcode-block" id="MolformerTrainingPipeline.get_data_and_model_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_data_and_model_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_model_modules</span><span class="p">(</span>
+<div class="viewcode-block" id="MolformerTrainingPipeline.get_data_and_model_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_data_and_model_modules">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_data_and_model_modules</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
         <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
@@ -291,7 +291,7 @@
 
         <span class="k">return</span> <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span></div>
 
-<div class="viewcode-block" id="MolformerTrainingPipeline.get_pretraining_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_pretraining_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_pretraining_modules</span><span class="p">(</span>
+<div class="viewcode-block" id="MolformerTrainingPipeline.get_pretraining_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_pretraining_modules">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_pretraining_modules</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
         <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
@@ -323,7 +323,7 @@
 
         <span class="k">return</span> <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span></div>
 
-<div class="viewcode-block" id="MolformerTrainingPipeline.get_classification_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_classification_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_classification_modules</span><span class="p">(</span>
+<div class="viewcode-block" id="MolformerTrainingPipeline.get_classification_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_classification_modules">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_classification_modules</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
         <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
@@ -362,7 +362,7 @@
 
         <span class="k">return</span> <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span></div>
 
-<div class="viewcode-block" id="MolformerTrainingPipeline.get_multitask_classification_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_multitask_classification_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_multitask_classification_modules</span><span class="p">(</span>
+<div class="viewcode-block" id="MolformerTrainingPipeline.get_multitask_classification_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_multitask_classification_modules">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_multitask_classification_modules</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
         <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
@@ -403,7 +403,7 @@
 
         <span class="k">return</span> <span class="n">data_module</span><span class="p">,</span> <span class="n">model_module</span></div>
 
-<div class="viewcode-block" id="MolformerTrainingPipeline.get_regression_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_regression_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_regression_modules</span><span class="p">(</span>
+<div class="viewcode-block" id="MolformerTrainingPipeline.get_regression_modules"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingPipeline.get_regression_modules">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_regression_modules</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
         <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
@@ -445,7 +445,7 @@
 
 
 <div class="viewcode-block" id="MolformerDataArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerDataArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MolformerDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MolformerDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Data arguments related to Molformer trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;dataset_args&quot;</span>
@@ -491,7 +491,7 @@
 
 
 <div class="viewcode-block" id="MolformerModelArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerModelArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MolformerModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MolformerModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Model arguments related to Molformer trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>
@@ -553,7 +553,7 @@
 
 
 <div class="viewcode-block" id="MolformerTrainingArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerTrainingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MolformerTrainingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MolformerTrainingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Training arguments related to Molformer trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;pl_trainer_args&quot;</span>
@@ -619,7 +619,7 @@
 
 
 <div class="viewcode-block" id="MolformerSavingArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.pytorch_lightning.molformer.core.html#gt4sd.training_pipelines.pytorch_lightning.molformer.core.MolformerSavingArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MolformerSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MolformerSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Saving arguments related to Molformer trainer.&quot;&quot;&quot;</span>
 
     <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_args&quot;</span></div>

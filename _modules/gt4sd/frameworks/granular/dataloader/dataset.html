@@ -189,18 +189,18 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Dataset module.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">,</span> <span class="n">StandardScaler</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">,</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="kn">from</span> <span class="nn">..ml.models</span> <span class="kn">import</span> <span class="n">ARCHITECTURE_FACTORY</span><span class="p">,</span> <span class="n">AUTOENCODER_ARCHITECTURES</span>
-<span class="kn">from</span> <span class="nn">..tokenizer.tokenizer</span> <span class="kn">import</span> <span class="n">TOKENIZER_FACTORY</span><span class="p">,</span> <span class="n">Tokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..ml.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ARCHITECTURE_FACTORY</span><span class="p">,</span> <span class="n">AUTOENCODER_ARCHITECTURES</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..tokenizer.tokenizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">TOKENIZER_FACTORY</span><span class="p">,</span> <span class="n">Tokenizer</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -213,10 +213,10 @@
 <span class="n">MODEL_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ARCHITECTURE_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="GranularDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset">[docs]</a><span class="k">class</span> <span class="nc">GranularDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<div class="viewcode-block" id="GranularDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GranularDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A dataset wrapper for granular&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GranularDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="GranularDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a granular dataset.</span>
 
 <span class="sd">        Args:</span>
@@ -230,7 +230,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">:</span> <span class="nb">int</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_size</span><span class="p">:</span> <span class="nb">int</span></div>
 
-<div class="viewcode-block" id="GranularDataset.__len__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="GranularDataset.__len__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__len__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dataset length.</span>
 
 <span class="sd">        Returns:</span>
@@ -241,7 +241,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mismatching dimensions for the data: </span><span class="si">{</span><span class="n">lengths</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">lengths</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="GranularDataset.__getitem__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="GranularDataset.__getitem__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__getitem__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve an item from the dataset by index.</span>
 
 <span class="sd">        Args:</span>
@@ -256,10 +256,10 @@
         <span class="k">return</span> <span class="n">result</span></div></div>
 
 
-<div class="viewcode-block" id="CombinedGranularDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset">[docs]</a><span class="k">class</span> <span class="nc">CombinedGranularDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<div class="viewcode-block" id="CombinedGranularDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CombinedGranularDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;General dataset combining multiple granular datasets.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CombinedGranularDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="CombinedGranularDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a general dataset.</span>
 
 <span class="sd">        Args:</span>
@@ -268,7 +268,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">datasets</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="CombinedGranularDataset.__len__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="CombinedGranularDataset.__len__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__len__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dataset length.</span>
 
 <span class="sd">        Returns:</span>
@@ -276,7 +276,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">([</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()][</span><span class="mi">0</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="CombinedGranularDataset.__getitem__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="CombinedGranularDataset.__getitem__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__getitem__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve an item from the dataset by index.</span>
 
 <span class="sd">        Args:</span>
@@ -293,10 +293,10 @@
         <span class="k">return</span> <span class="n">result</span></div></div>
 
 
-<div class="viewcode-block" id="SmilesTokenizationPreProcessingDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset">[docs]</a><span class="k">class</span> <span class="nc">SmilesTokenizationPreProcessingDataset</span><span class="p">(</span><span class="n">GranularDataset</span><span class="p">):</span>
+<div class="viewcode-block" id="SmilesTokenizationPreProcessingDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SmilesTokenizationPreProcessingDataset</span><span class="p">(</span><span class="n">GranularDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset for SMILES/SELFIES preprocessing.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SmilesTokenizationPreProcessingDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="SmilesTokenizationPreProcessingDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">data_columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -343,7 +343,7 @@
             <span class="p">},</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="SmilesTokenizationPreProcessingDataset.smiles_to_ids"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.smiles_to_ids">[docs]</a>    <span class="k">def</span> <span class="nf">smiles_to_ids</span><span class="p">(</span>
+<div class="viewcode-block" id="SmilesTokenizationPreProcessingDataset.smiles_to_ids"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.smiles_to_ids">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">smiles_to_ids</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_smiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">target_smiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Process input SMILES lists generating examples by tokenizing strings and converting them to tensors.</span>
@@ -388,10 +388,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">target_tokens</span> <span class="o">=</span> <span class="n">examples</span></div></div>
 
 
-<div class="viewcode-block" id="LatentModelDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset">[docs]</a><span class="k">class</span> <span class="nc">LatentModelDataset</span><span class="p">(</span><span class="n">GranularDataset</span><span class="p">):</span>
+<div class="viewcode-block" id="LatentModelDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">LatentModelDataset</span><span class="p">(</span><span class="n">GranularDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Latent model dataset.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="LatentModelDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="LatentModelDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">data_columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -418,10 +418,10 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_data</span><span class="p">})</span></div></div>
 
 
-<div class="viewcode-block" id="AutoEncoderDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset">[docs]</a><span class="k">class</span> <span class="nc">AutoEncoderDataset</span><span class="p">(</span><span class="n">GranularDataset</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoEncoderDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AutoEncoderDataset</span><span class="p">(</span><span class="n">GranularDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Autoencoder dataset.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AutoEncoderDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="AutoEncoderDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">data_columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -504,7 +504,7 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="build_data_columns"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.build_data_columns">[docs]</a><span class="k">def</span> <span class="nf">build_data_columns</span><span class="p">(</span><span class="n">hparams</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="build_data_columns"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.build_data_columns">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">build_data_columns</span><span class="p">(</span><span class="n">hparams</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build data columns from hyper-parameters.</span>
 
 <span class="sd">    Args:</span>
@@ -529,7 +529,7 @@
     <span class="k">return</span> <span class="n">data_columns</span></div>
 
 
-<div class="viewcode-block" id="build_dataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.build_dataset">[docs]</a><span class="k">def</span> <span class="nf">build_dataset</span><span class="p">(</span>
+<div class="viewcode-block" id="build_dataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.build_dataset">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">build_dataset</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">dataset_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -622,7 +622,7 @@
     <span class="k">return</span> <span class="n">dataset</span></div>
 
 
-<div class="viewcode-block" id="build_architecture"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.build_architecture">[docs]</a><span class="k">def</span> <span class="nf">build_architecture</span><span class="p">(</span>
+<div class="viewcode-block" id="build_architecture"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.build_architecture">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">build_architecture</span><span class="p">(</span>
     <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">data_columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">GranularDataset</span><span class="p">,</span>
@@ -678,7 +678,7 @@
     <span class="k">return</span> <span class="n">architecture</span></div>
 
 
-<div class="viewcode-block" id="build_dataset_and_architecture"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.build_dataset_and_architecture">[docs]</a><span class="k">def</span> <span class="nf">build_dataset_and_architecture</span><span class="p">(</span>
+<div class="viewcode-block" id="build_dataset_and_architecture"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.build_dataset_and_architecture">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">build_dataset_and_architecture</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">data_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">data_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>

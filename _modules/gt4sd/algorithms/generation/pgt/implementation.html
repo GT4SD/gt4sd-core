@@ -191,15 +191,15 @@
 <span class="sd">Implementation details for PGT algorithms.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GPT2LMHeadModel</span><span class="p">,</span> <span class="n">GPT2Tokenizer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPT2LMHeadModel</span><span class="p">,</span> <span class="n">GPT2Tokenizer</span>
 
-<span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....frameworks.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">device_claim</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -217,7 +217,7 @@
 <span class="n">STOPPING_PUNCTUATION_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(.+(?=\.|!|;)(.|!|;)|(.*))&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="adjust_length_to_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.adjust_length_to_model">[docs]</a><span class="k">def</span> <span class="nf">adjust_length_to_model</span><span class="p">(</span><span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">maximum_sequence_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="adjust_length_to_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.adjust_length_to_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">adjust_length_to_model</span><span class="p">(</span><span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">maximum_sequence_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adjust sequence length.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        length: target length.</span>
@@ -241,10 +241,10 @@
     <span class="k">return</span> <span class="n">length</span></div>
 
 
-<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator">[docs]</a><span class="k">class</span> <span class="nc">Generator</span><span class="p">:</span>
+<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Generator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of a generator.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Generator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Generator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -283,7 +283,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">number_of_sequences</span> <span class="o">=</span> <span class="n">num_return_sequences</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Generator.load_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Generator.load_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.load_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load a pretrained PGT model.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="p">(</span>
@@ -309,7 +309,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_position_embeddings</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Generator.generate_case"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case">[docs]</a>    <span class="k">def</span> <span class="nf">generate_case</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]:</span>
+<div class="viewcode-block" id="Generator.generate_case"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_case</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample text snippets.</span>
 
 <span class="sd">        Returns:</span>
@@ -358,7 +358,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span> <span class="n">generated_sequences</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Generator.format_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.format_output">[docs]</a>    <span class="k">def</span> <span class="nf">format_output</span><span class="p">(</span>
+<div class="viewcode-block" id="Generator.format_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.Generator.format_output">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">format_output</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">generated_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Format output. In the general case just return the generated sequences.</span>
@@ -373,10 +373,10 @@
         <span class="k">return</span> <span class="n">generated_sequences</span></div></div>
 
 
-<div class="viewcode-block" id="PartGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.PartGenerator">[docs]</a><span class="k">class</span> <span class="nc">PartGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+<div class="viewcode-block" id="PartGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.PartGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PartGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of edit generator.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="PartGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.PartGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="PartGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.PartGenerator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">input_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -426,10 +426,10 @@
         <span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="EditGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.EditGenerator">[docs]</a><span class="k">class</span> <span class="nc">EditGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+<div class="viewcode-block" id="EditGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.EditGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">EditGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of edit generator.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="EditGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.EditGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="EditGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.EditGenerator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">input_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -479,7 +479,7 @@
             <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="EditGenerator.format_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.EditGenerator.format_output">[docs]</a>    <span class="k">def</span> <span class="nf">format_output</span><span class="p">(</span>
+<div class="viewcode-block" id="EditGenerator.format_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.EditGenerator.format_output">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">format_output</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">generated_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Format output for the patent editing task.</span>
@@ -512,10 +512,10 @@
         <span class="k">return</span> <span class="n">filtered_generated_sequences</span></div></div>
 
 
-<div class="viewcode-block" id="CoherenceCheckGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator">[docs]</a><span class="k">class</span> <span class="nc">CoherenceCheckGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
+<div class="viewcode-block" id="CoherenceCheckGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CoherenceCheckGenerator</span><span class="p">(</span><span class="n">Generator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of coherence check generator.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CoherenceCheckGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="CoherenceCheckGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">input_a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -564,7 +564,7 @@
             <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="CoherenceCheckGenerator.extract_coherence_types"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator.extract_coherence_types">[docs]</a>    <span class="k">def</span> <span class="nf">extract_coherence_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="CoherenceCheckGenerator.extract_coherence_types"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator.extract_coherence_types">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">extract_coherence_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the validity and extract coherence types of input text.</span>
 
 <span class="sd">        Args:</span>
@@ -581,7 +581,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">coherence_type</span><span class="si">}</span><span class="s2"> is not a valid coherence type.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CoherenceCheckGenerator.format_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator.format_output">[docs]</a>    <span class="k">def</span> <span class="nf">format_output</span><span class="p">(</span>
+<div class="viewcode-block" id="CoherenceCheckGenerator.format_output"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.implementation.html#gt4sd.algorithms.generation.pgt.implementation.CoherenceCheckGenerator.format_output">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">format_output</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">generated_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Format output for the patent coherence task.</span>

@@ -189,29 +189,29 @@
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Implementation of PaccMann^GP conditional generator.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">paccmann_chemistry.models.vae</span> <span class="kn">import</span> <span class="n">StackGRUDecoder</span><span class="p">,</span> <span class="n">StackGRUEncoder</span><span class="p">,</span> <span class="n">TeacherVAE</span>
-<span class="kn">from</span> <span class="nn">paccmann_chemistry.utils.search</span> <span class="kn">import</span> <span class="n">SamplingSearch</span>
-<span class="kn">from</span> <span class="nn">paccmann_gp.affinity_minimization</span> <span class="kn">import</span> <span class="n">AffinityMinimization</span>
-<span class="kn">from</span> <span class="nn">paccmann_gp.callable_minimization</span> <span class="kn">import</span> <span class="n">CallableMinimization</span>
-<span class="kn">from</span> <span class="nn">paccmann_gp.combined_minimization</span> <span class="kn">import</span> <span class="n">CombinedMinimization</span>
-<span class="kn">from</span> <span class="nn">paccmann_gp.gp_optimizer</span> <span class="kn">import</span> <span class="n">GPOptimizer</span>
-<span class="kn">from</span> <span class="nn">paccmann_gp.mw_minimization</span> <span class="kn">import</span> <span class="n">MWMinimization</span>
-<span class="kn">from</span> <span class="nn">paccmann_gp.qed_minimization</span> <span class="kn">import</span> <span class="n">QEDMinimization</span>
-<span class="kn">from</span> <span class="nn">paccmann_gp.sa_minimization</span> <span class="kn">import</span> <span class="n">SAMinimization</span>
-<span class="kn">from</span> <span class="nn">paccmann_gp.smiles_generator</span> <span class="kn">import</span> <span class="n">SmilesGenerator</span>
-<span class="kn">from</span> <span class="nn">paccmann_predictor.models</span> <span class="kn">import</span> <span class="n">MODEL_FACTORY</span>
-<span class="kn">from</span> <span class="nn">pytoda.proteins.protein_language</span> <span class="kn">import</span> <span class="n">ProteinLanguage</span>
-<span class="kn">from</span> <span class="nn">pytoda.smiles.smiles_language</span> <span class="kn">import</span> <span class="n">SMILESLanguage</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_chemistry.models.vae</span><span class="w"> </span><span class="kn">import</span> <span class="n">StackGRUDecoder</span><span class="p">,</span> <span class="n">StackGRUEncoder</span><span class="p">,</span> <span class="n">TeacherVAE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_chemistry.utils.search</span><span class="w"> </span><span class="kn">import</span> <span class="n">SamplingSearch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_gp.affinity_minimization</span><span class="w"> </span><span class="kn">import</span> <span class="n">AffinityMinimization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_gp.callable_minimization</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallableMinimization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_gp.combined_minimization</span><span class="w"> </span><span class="kn">import</span> <span class="n">CombinedMinimization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_gp.gp_optimizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPOptimizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_gp.mw_minimization</span><span class="w"> </span><span class="kn">import</span> <span class="n">MWMinimization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_gp.qed_minimization</span><span class="w"> </span><span class="kn">import</span> <span class="n">QEDMinimization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_gp.sa_minimization</span><span class="w"> </span><span class="kn">import</span> <span class="n">SAMinimization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_gp.smiles_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">SmilesGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paccmann_predictor.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MODEL_FACTORY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytoda.proteins.protein_language</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProteinLanguage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pytoda.smiles.smiles_language</span><span class="w"> </span><span class="kn">import</span> <span class="n">SMILESLanguage</span>
 
-<span class="kn">from</span> <span class="nn">....frameworks.torch</span> <span class="kn">import</span> <span class="n">device_claim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....frameworks.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">device_claim</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
@@ -225,10 +225,10 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="GPConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator">[docs]</a><span class="k">class</span> <span class="nc">GPConditionalGenerator</span><span class="p">:</span>
+<div class="viewcode-block" id="GPConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GPConditionalGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Conditional generator as implemented in https://doi.org/10.1021/acs.jcim.1c00889.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GPConditionalGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="GPConditionalGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.4</span><span class="p">,</span>
@@ -336,7 +336,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">samples_for_evaluation</span> <span class="o">=</span> <span class="n">samples_for_evaluation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maximum_number_of_sampling_steps</span> <span class="o">=</span> <span class="n">maximum_number_of_sampling_steps</span></div>
 
-<div class="viewcode-block" id="GPConditionalGenerator.target_to_minimization_function"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.target_to_minimization_function">[docs]</a>    <span class="k">def</span> <span class="nf">target_to_minimization_function</span><span class="p">(</span>
+<div class="viewcode-block" id="GPConditionalGenerator.target_to_minimization_function"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.target_to_minimization_function">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">target_to_minimization_function</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CombinedMinimization</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Use the target to configure a minimization function.</span>
@@ -379,7 +379,7 @@
             <span class="n">function_weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GPConditionalGenerator.set_seed"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.set_seed">[docs]</a>    <span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="GPConditionalGenerator.set_seed"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.set_seed">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the seed for the random number generators.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
@@ -390,7 +390,7 @@
         <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="GPConditionalGenerator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.generate_batch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="GPConditionalGenerator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.implementation.GPConditionalGenerator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate molecules given a target.</span>
 
 <span class="sd">        Args:</span>
