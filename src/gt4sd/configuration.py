@@ -59,8 +59,8 @@ class GT4SDConfiguration(BaseSettings):
     gt4sd_s3_bucket_properties: str = "gt4sd-cos-properties-artifacts"
 
     gt4sd_s3_host_hub: str = "s3.par01.cloud-object-storage.appdomain.cloud"
-    gt4sd_s3_access_key_hub: str = "3b61d2e2b1154c428e8b8246cb87034e"
-    gt4sd_s3_secret_key_hub: str = "2c80b31d75d38ab3f6c3022ee5ea1fad128631b72c1aa15f"
+    gt4sd_s3_access_key_hub: str = "1168c1d9ce664e75a8a151e6f4a29078"
+    gt4sd_s3_secret_key_hub: str = "4996c6cc737828213a7afcc7e27450e1af2daf027af95c1d"
     gt4sd_s3_secure_hub: bool = True
     gt4sd_s3_bucket_hub_algorithms: str = "gt4sd-cos-hub-algorithms-artifacts"
     gt4sd_s3_bucket_hub_properties: str = "gt4sd-cos-hub-properties-artifacts"
