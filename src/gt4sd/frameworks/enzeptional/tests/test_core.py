@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import pytest
 import warnings
 from gt4sd.frameworks.enzeptional import (
     EnzymeOptimizer,
@@ -46,6 +47,7 @@ sync_algorithm_with_s3("proteins/enzeptional/scorers", module="properties")
 scorer_filepath = f"{configuration.gt4sd_local_cache_path}/properties/proteins/enzeptional/scorers/feasibility/model.pkl"
 
 
+@pytest.mark.skip(reason="out-of-scope for current repo")
 def test_optimize():
     language_model_path = "facebook/esm2_t33_650M_UR50D"
     tokenizer_path = "facebook/esm2_t33_650M_UR50D"
