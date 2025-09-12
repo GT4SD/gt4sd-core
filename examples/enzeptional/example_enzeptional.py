@@ -187,7 +187,7 @@ def main_feasibility():
     use_xgboost_scorer=False
     top_k=2
     batch_size=2
-    substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path, scaler_path = load_experiment_parameters("feasilibity")
+    substrate_smiles, product_smiles, sample_sequence, intervals, scorer_path, scaler_path = load_experiment_parameters("feasibility")
     optimizer = setup_optimizer(
         substrate_smiles,
         product_smiles,
