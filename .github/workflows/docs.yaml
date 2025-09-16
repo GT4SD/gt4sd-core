@@ -16,6 +16,13 @@ jobs:
         shell: bash -l {0} # for conda command
     steps:
       - uses: actions/checkout@v2
+      - name: Install Git LFS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+          git lfs install --skip-smudge
+      - name: Install dependencies with LFS smudge skipped
+        run: echo "GIT_LFS_SKIP_SMUDGE=1" >> $GITHUB_ENV
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: gt4sd
