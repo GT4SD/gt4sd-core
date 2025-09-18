@@ -176,7 +176,7 @@ def main_kcat():
         use_xgboost_scorer
     )
 
-    optimized_sequences, iteration_info = optimize_sequences(optimizer)
+    optimized_sequences = optimize_sequences(optimizer)
     logging.info("Optimization completed.")
 
 
@@ -201,7 +201,7 @@ def main_feasibility():
         use_xgboost_scorer
     )
 
-    optimized_sequences, iteration_info = optimize_sequences(optimizer)
+    optimized_sequences = optimize_sequences(optimizer)
     logging.info("Optimization completed.")
 
 if __name__ == "__main__":
