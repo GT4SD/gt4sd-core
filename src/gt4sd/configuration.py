@@ -311,4 +311,3 @@ def reset_logging_root_logger():
     root = logging.getLogger()
     root.handlers = []
     root.filters = []
-    root.filters = []
