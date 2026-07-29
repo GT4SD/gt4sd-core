@@ -22,7 +22,7 @@ jobs:
     env:
       GIT_CLONE_PROTECTION_ACTIVE: false
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
       - name: Install Git LFS
         run: |
           sudo apt-get update
@@ -30,11 +30,11 @@ jobs:
           git lfs install --skip-smudge
       - name: Install dependencies with LFS smudge skipped
         run: echo "GIT_LFS_SKIP_SMUDGE=1" >> $GITHUB_ENV
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v4
         with:
           activate-environment: gt4sd
           environment-file: conda_cpu_linux.yml
-          auto-activate-base: false
+          auto-activate: false
           use-only-tar-bz2: true
       - name: Install gt4sd from source
         run: |
