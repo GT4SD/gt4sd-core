@@ -193,6 +193,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseSettings</span><span class="p">,</span> <span class="n">SettingsConfigDict</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.s3</span><span class="w"> </span><span class="kn">import</span> <span class="n">GT4SDS3Client</span><span class="p">,</span> <span class="n">S3SyncError</span><span class="p">,</span> <span class="n">sync_folder_with_s3</span><span class="p">,</span> <span class="n">upload_file_to_s3</span>
@@ -218,8 +219,8 @@
     <span class="n">gt4sd_disable_cudnn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="n">gt4sd_s3_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s3.par01.cloud-object-storage.appdomain.cloud&quot;</span>
-    <span class="n">gt4sd_s3_access_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;b087e6810a5d4246a64e07e36ace338f&quot;</span>
-    <span class="n">gt4sd_s3_secret_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ba4a1db5647a32c6109b58714befb7ea7145b983143e0836&quot;</span>
+    <span class="n">gt4sd_s3_access_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;903d388dcbfe434da80b08ac8e74eaf6&quot;</span>
+    <span class="n">gt4sd_s3_secret_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1f33e15f41bcf7412551bd343108c40fc81a16da5a5fe081&quot;</span>
     <span class="n">gt4sd_s3_secure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">gt4sd_s3_bucket_algorithms</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gt4sd-cos-algorithms-artifacts&quot;</span>
     <span class="n">gt4sd_s3_bucket_properties</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gt4sd-cos-properties-artifacts&quot;</span>
@@ -362,7 +363,6 @@
 <div class="viewcode-block" id="get_cached_algorithm_path"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_cached_algorithm_path">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_cached_algorithm_path</span><span class="p">(</span>
     <span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;algorithms&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-
     <span class="k">if</span> <span class="n">module</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gt4sd_artifact_management_configuration</span><span class="o">.</span><span class="n">gt4sd_s3_modules</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Unknown cache module: </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s2">. Supported modules: &quot;</span>
@@ -429,6 +429,14 @@
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
         <span class="p">)</span>
 
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;generic syncing error&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">S3SyncError</span><span class="p">(</span>
+            <span class="s2">&quot;CacheSyncingError&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;error in getting directories of prefix=</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
         <span class="c1"># directories in the write public-hub bucket</span>
         <span class="n">dirs_hub</span> <span class="o">=</span> <span class="n">get_algorithm_subdirectories_from_s3_coordinates</span><span class="p">(</span>
             <span class="n">host</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_host_hub</span><span class="p">,</span>
@@ -438,17 +446,11 @@
             <span class="n">secure</span><span class="o">=</span><span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_s3_secure_hub</span><span class="p">,</span>
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
         <span class="p">)</span>
-
-        <span class="c1"># set of directories in the public bucket and public hub bucket</span>
-        <span class="n">versions</span> <span class="o">=</span> <span class="n">dirs</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">dirs_hub</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">versions</span>
-
+        <span class="n">dirs</span> <span class="o">=</span> <span class="n">dirs</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">dirs_hub</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;generic syncing error&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="n">S3SyncError</span><span class="p">(</span>
-            <span class="s2">&quot;CacheSyncingError&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;error in getting directories of prefix=</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;error in getting directories from hub, using public bucket only&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dirs</span></div>
 
 
 <div class="viewcode-block" id="get_algorithm_subdirectories_in_cache"><a class="viewcode-back" href="../../api/gt4sd.configuration.html#gt4sd.configuration.get_algorithm_subdirectories_in_cache">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_algorithm_subdirectories_in_cache</span><span class="p">(</span>
