@@ -263,6 +263,14 @@ def get_algorithm_subdirectories_with_s3(
             prefix=prefix,
         )
 
+    except Exception:
+        logger.exception("generic syncing error")
+        raise S3SyncError(
+            "CacheSyncingError",
+            f"error in getting directories of prefix={prefix}",
+        )
+
+    try:
         # directories in the write public-hub bucket
         dirs_hub = get_algorithm_subdirectories_from_s3_coordinates(
             host=gt4sd_configuration_instance.gt4sd_s3_host_hub,
@@ -272,17 +280,11 @@ def get_algorithm_subdirectories_with_s3(
             secure=gt4sd_configuration_instance.gt4sd_s3_secure_hub,
             prefix=prefix,
         )
-
-        # set of directories in the public bucket and public hub bucket
-        versions = dirs.union(dirs_hub)
-        return versions
-
+        dirs = dirs.union(dirs_hub)
     except Exception:
-        logger.exception("generic syncing error")
-        raise S3SyncError(
-            "CacheSyncingError",
-            f"error in getting directories of prefix={prefix}",
-        )
+        logger.info("error in getting directories from hub, using public bucket only")
+
+    return dirs
 
 
 def get_algorithm_subdirectories_in_cache(
