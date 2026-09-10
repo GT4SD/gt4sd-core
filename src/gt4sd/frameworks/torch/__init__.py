@@ -23,9 +23,50 @@
 #
 """Generic utils for pytorch."""
 
+import functools
+import inspect
 from typing import Dict, List, Optional, Union
 
 import torch
+
+_TORCH_LOAD_COMPAT_INSTALLED = False
+
+
+def install_torch_load_compat() -> None:
+    """Restore the pre-2.6 ``torch.load`` default of ``weights_only=False``.
+
+    torch 2.6 flipped the ``torch.load`` default to ``weights_only=True``, which
+    refuses to unpickle anything but plain tensors. GT4SD (and several of its
+    dependencies, e.g. ``pytorch_lightning``, ``guacamol_baselines``,
+    ``reinvent_models``) load full, trusted checkpoints published by the GT4SD
+    model hub, so they rely on the historic full-unpickle behaviour.
+
+    This shim only sets the default when the caller did not pass ``weights_only``
+    explicitly, so call sites that opt into the hardened ``weights_only=True``
+    path keep it. It is a no-op on torch < 2.6, where ``torch.load`` has no
+    ``weights_only`` parameter and already behaves this way.
+    """
+    global _TORCH_LOAD_COMPAT_INSTALLED
+    if _TORCH_LOAD_COMPAT_INSTALLED:
+        return
+    try:
+        parameters = inspect.signature(torch.load).parameters
+    except (TypeError, ValueError):
+        parameters = {}
+    if "weights_only" not in parameters:
+        # torch < 2.6: no weights_only kwarg, default is already a full unpickle.
+        _TORCH_LOAD_COMPAT_INSTALLED = True
+        return
+
+    original_load = torch.load
+
+    @functools.wraps(original_load)
+    def _load_with_full_unpickle(*args, **kwargs):  # type: ignore
+        kwargs.setdefault("weights_only", False)
+        return original_load(*args, **kwargs)
+
+    torch.load = _load_with_full_unpickle  # type: ignore
+    _TORCH_LOAD_COMPAT_INSTALLED = True
 
 
 def get_gpu_device_names() -> List[str]:

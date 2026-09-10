@@ -48,6 +48,16 @@ from torch.optim.lr_scheduler import (  # type: ignore
     StepLR,
     _LRScheduler,
 )
+
+try:
+    # torch >= 2.0 renamed the base scheduler from the private ``_LRScheduler``
+    # to the public ``LRScheduler``; ``_LRScheduler`` survives only as a
+    # deprecated subclass, so it is no longer the base every scheduler inherits
+    # from. Use the public base when it exists to keep the subclass checks below
+    # valid on both torch 1.x and torch 2.x.
+    from torch.optim.lr_scheduler import LRScheduler as _BaseLRScheduler  # type: ignore
+except ImportError:  # torch < 2.0
+    _BaseLRScheduler = _LRScheduler
 from torch.utils.cpp_extension import IS_WINDOWS
 from torch.utils.data.dataset import (
     ChainDataset,
@@ -81,7 +91,7 @@ if torch_version < version.parse("1.12") and torch_version >= version.parse("1.1
 
 
 sane_schedulers = [
-    _LRScheduler,
+    _BaseLRScheduler,
     ChainedScheduler,
     ConstantLR,
     CosineAnnealingLR,
@@ -149,6 +159,8 @@ def fix_schedulers(sane_schedulers: List[_LRScheduler]) -> None:
     """
     scheduler = sane_schedulers[0]
     torch.optim.lr_scheduler._LRScheduler = scheduler  # type: ignore
+    if hasattr(torch.optim.lr_scheduler, "LRScheduler"):  # torch >= 2.0
+        torch.optim.lr_scheduler.LRScheduler = scheduler  # type: ignore
     torch.optim.lr_scheduler.ChainedScheduler = sane_schedulers[1]  # type: ignore
     torch.optim.lr_scheduler.ConstantLR = sane_schedulers[2]  # type: ignore
     torch.optim.lr_scheduler.CosineAnnealingLR = sane_schedulers[3]  # type: ignore

@@ -26,8 +26,15 @@
 __version__ = "1.5.1"
 __name__ = "gt4sd"
 
+# NOTE: restore the pre-torch-2.6 ``torch.load`` default (weights_only=False) so
+# trusted GT4SD/dependency checkpoints keep loading. No-op on torch < 2.6.
+from .frameworks.torch import install_torch_load_compat
+
 # NOTE: configure SSL to allow unverified contexts by default
 from .configuration import GT4SDConfiguration
+
+# install the torch.load compatibility shim before any checkpoint is loaded
+install_torch_load_compat()
 
 gt4sd_configuration_instance = GT4SDConfiguration.get_instance()
 

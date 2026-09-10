@@ -67,7 +67,7 @@ editable mode inside your `conda` environment:
 pip install --no-deps -e .
 ```
 
-Learn more in [CONTRIBUTING.md](./CONTRIBUTING.md)
+Learn more in [CONTRIBUTING.md](./CONTRIBUTING.md). For the Torch 2.6 compatibility spike, see [TORCH2_COMPATIBILITY_STATUS.md](./TORCH2_COMPATIBILITY_STATUS.md).
 
 ## Getting started
 
