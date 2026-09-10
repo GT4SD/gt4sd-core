@@ -5,10 +5,12 @@ channels:
   - https://conda.anaconda.org/pyg
   - https://conda.anaconda.org/conda-forge
 dependencies:
-  - setuptools==69.5.1
+  - setuptools==78.1.1  # CVE-2025-47273 (path traversal). CVE-2026-59890 needs >=83 but 82+ drops pkg_resources (breaks accelerate<0.20 + 15 deps) - blocked.
   - python>=3.7,<3.11
   - pip=24.0
   - pytorch>=1.0,<=1.12.1=*cu*
+  # PyTorch 1.12 requires iJIT_NotifyEvent, which MKL 2024.1+ removed.
+  - mkl<2024.1
   - pytorch-scatter<=2.0.9=*cu102*
   - torchvision<=0.13.1=*cu*
   - torchaudio<=0.12.1=*cu*
