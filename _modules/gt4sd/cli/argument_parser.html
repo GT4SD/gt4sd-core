@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Argument parser for training pipelines.&quot;&quot;&quot;</span>
+<span class="sd">"""Argument parser for training pipelines."""</span>
 
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
@@ -202,7 +202,7 @@
 
 
 <div class="viewcode-block" id="eval_lambda"><a class="viewcode-back" href="../../../api/gt4sd.cli.argument_parser.html#gt4sd.cli.argument_parser.eval_lambda">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">eval_lambda</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse a lambda from a string safely.</span>
+<span class="w">    </span><span class="sd">"""Parse a lambda from a string safely.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        val: string representing a lambda.</span>
@@ -212,16 +212,16 @@
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: in case the lambda can not be parsed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">parsed_lamba</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>  <span class="c1"># type:ignore</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parsed_lamba</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Lambda</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;eval&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parsed_lamba</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Lambda</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"eval"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&#39; can not be safely parsed as a lambda function&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">' can not be safely parsed as a lambda function"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="none_checker_bool"><a class="viewcode-back" href="../../../api/gt4sd.cli.argument_parser.html#gt4sd.cli.argument_parser.none_checker_bool">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">none_checker_bool</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check given bool argument for None.</span>
+<span class="w">    </span><span class="sd">"""Check given bool argument for None.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        val: model arguments passed to the configuration.</span>
@@ -231,23 +231,23 @@
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ArgumentTypeError: value can not be parsed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">val</span>
-    <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"yes"</span><span class="p">,</span> <span class="s2">"true"</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">elif</span> <span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"no"</span><span class="p">,</span> <span class="s2">"false"</span><span class="p">,</span> <span class="s2">"f"</span><span class="p">,</span> <span class="s2">"n"</span><span class="p">,</span> <span class="s2">"0"</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">ArgumentTypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Truthy value expected: got </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> but expected one of yes/no, true/false, t/f, y/n, 1/0 (case insensitive).&quot;</span>
+            <span class="sa">f</span><span class="s2">"Truthy value expected: got </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> but expected one of yes/no, true/false, t/f, y/n, 1/0 (case insensitive)."</span>
         <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="none_checker"><a class="viewcode-back" href="../../../api/gt4sd.cli.argument_parser.html#gt4sd.cli.argument_parser.none_checker">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">none_checker</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check given argument for None.</span>
+<span class="w">    </span><span class="sd">"""Check given argument for None.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        val: model arguments passed to the configuration.</span>
@@ -255,76 +255,76 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Value casted in the expected type or None.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">"none"</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
 
 
-<span class="n">DataClass</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">&quot;DataClass&quot;</span><span class="p">,</span> <span class="n">Any</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-<span class="n">DataClassType</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">&quot;DataClassType&quot;</span><span class="p">,</span> <span class="n">Any</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+<span class="n">DataClass</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">"DataClass"</span><span class="p">,</span> <span class="n">Any</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+<span class="n">DataClassType</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">"DataClassType"</span><span class="p">,</span> <span class="n">Any</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
 
 <div class="viewcode-block" id="ArgumentParser"><a class="viewcode-back" href="../../../api/gt4sd.cli.argument_parser.html#gt4sd.cli.argument_parser.ArgumentParser">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ArgumentParser</span><span class="p">(</span><span class="n">HfArgumentParser</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;ArgumentParser inherited from hf&#39;s parser with modified dataclass arguments addition for better handling of None values.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""ArgumentParser inherited from hf's parser with modified dataclass arguments addition for better handling of None values."""</span>
 
 <div class="viewcode-block" id="ArgumentParser._add_dataclass_arguments"><a class="viewcode-back" href="../../../api/gt4sd.cli.argument_parser.html#gt4sd.cli.argument_parser.ArgumentParser._add_dataclass_arguments">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">_add_dataclass_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DataClassType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a dataclass arguments.</span>
+<span class="w">        </span><span class="sd">"""Add a dataclass arguments.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dtype: data class type.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="s2">&quot;_argument_group_name&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="s2">"_argument_group_name"</span><span class="p">):</span>
             <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="n">dtype</span><span class="o">.</span><span class="n">_argument_group_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span>  <span class="c1"># type: ignore</span>
         <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="o">.</span><span class="n">init</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">field_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">field_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"--</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
             <span class="n">kwargs</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
             <span class="c1"># field.metadata is not used at all by Data Classes,</span>
             <span class="c1"># it is provided as a third-party extension mechanism.</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                    <span class="s2">&quot;This implementation is not compatible with Postponed Evaluation of Annotations (PEP 563),&quot;</span>
-                    <span class="s2">&quot;which can be opted in from Python 3.7 with `from __future__ import annotations`.&quot;</span>
-                    <span class="s2">&quot;We will add compatibility when Python 3.9 is released.&quot;</span>
+                    <span class="s2">"This implementation is not compatible with Postponed Evaluation of Annotations (PEP 563),"</span>
+                    <span class="s2">"which can be opted in from Python 3.7 with `from __future__ import annotations`."</span>
+                    <span class="s2">"We will add compatibility when Python 3.9 is released."</span>
                 <span class="p">)</span>
             <span class="n">typestring</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">prim_type</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="p">(</span><span class="n">List</span><span class="p">,):</span>
                     <span class="k">if</span> <span class="p">(</span>
-                        <span class="n">typestring</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;typing.Union[</span><span class="si">{</span><span class="n">collection</span><span class="p">[</span><span class="n">prim_type</span><span class="p">]</span><span class="si">}</span><span class="s2">, NoneType]&quot;</span>  <span class="c1"># type: ignore</span>
-                        <span class="ow">or</span> <span class="n">typestring</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;typing.Optional[</span><span class="si">{</span><span class="n">collection</span><span class="p">[</span><span class="n">prim_type</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span>  <span class="c1"># type: ignore</span>
+                        <span class="n">typestring</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">"typing.Union[</span><span class="si">{</span><span class="n">collection</span><span class="p">[</span><span class="n">prim_type</span><span class="p">]</span><span class="si">}</span><span class="s2">, NoneType]"</span>  <span class="c1"># type: ignore</span>
+                        <span class="ow">or</span> <span class="n">typestring</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">"typing.Optional[</span><span class="si">{</span><span class="n">collection</span><span class="p">[</span><span class="n">prim_type</span><span class="p">]</span><span class="si">}</span><span class="s2">]"</span>  <span class="c1"># type: ignore</span>
                     <span class="p">):</span>
                         <span class="n">field</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">collection</span><span class="p">[</span><span class="n">prim_type</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
                 <span class="k">if</span> <span class="p">(</span>
-                    <span class="n">typestring</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;typing.Union[</span><span class="si">{</span><span class="n">prim_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, NoneType]&quot;</span>
-                    <span class="ow">or</span> <span class="n">typestring</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;typing.Optional[</span><span class="si">{</span><span class="n">prim_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">]&quot;</span>
+                    <span class="n">typestring</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">"typing.Union[</span><span class="si">{</span><span class="n">prim_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, NoneType]"</span>
+                    <span class="ow">or</span> <span class="n">typestring</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">"typing.Optional[</span><span class="si">{</span><span class="n">prim_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">]"</span>
                 <span class="p">):</span>
                     <span class="n">field</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">prim_type</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">"choices"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">"choices"</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">MISSING</span><span class="p">:</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;required&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"required"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">elif</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="nb">bool</span> <span class="ow">or</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
 
                 <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;--no_</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_false&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">"--no_</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s2">"store_false"</span><span class="p">,</span>
                         <span class="n">dest</span><span class="o">=</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
                     <span class="p">)</span>
 
                 <span class="c1"># Hack because type=bool in argparse does not behave as we want.</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">none_checker_bool</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="n">none_checker_bool</span>
                 <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="nb">bool</span> <span class="ow">or</span> <span class="p">(</span>
                     <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                     <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">MISSING</span>
@@ -333,33 +333,33 @@
                     <span class="n">default</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="kc">False</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">MISSING</span> <span class="k">else</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span>
                     <span class="p">)</span>
-                    <span class="c1"># This is the value that will get picked if we don&#39;t include --field_name in any way</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default</span>
+                    <span class="c1"># This is the value that will get picked if we don't include --field_name in any way</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]</span> <span class="o">=</span> <span class="n">default</span>
                     <span class="c1"># This tells argparse we accept 0 or 1 value after --field_name</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;nargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"nargs"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"?"</span>
                     <span class="c1"># This is the value that will get picked if we do --field_name (without value)</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;const&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"const"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">elif</span> <span class="p">(</span>
-                <span class="nb">hasattr</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">&quot;__origin__&quot;</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^typing\.List\[(.*)\]$&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="nb">hasattr</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">"__origin__"</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^typing\.List\[(.*)\]$"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="p">):</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;nargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">none_checker</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">"nargs"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"+"</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">none_checker</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
-                    <span class="n">x</span> <span class="o">==</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">__args__</span>
-                <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> cannot be a List of mixed types: </span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">__args__</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">x</span> <span class="o">==</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s2">"dtype"</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">__args__</span>
+                <span class="p">),</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> cannot be a List of mixed types: </span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">__args__</span><span class="si">}</span><span class="s2">"</span>
                 <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">MISSING</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default_factory</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default_factory</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
                 <span class="k">elif</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">MISSING</span><span class="p">:</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;required&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"required"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">none_checker</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">none_checker</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">MISSING</span><span class="p">:</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span>
                 <span class="k">elif</span> <span class="n">field</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">MISSING</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default_factory</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">default_factory</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;required&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"required"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>
 

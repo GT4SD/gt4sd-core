@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Implementation of Reinvent conditional generators.&quot;&quot;&quot;</span>
+<span class="sd">"""Implementation of Reinvent conditional generators."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -216,7 +216,7 @@
         <span class="n">sample_uniquely</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">max_sequence_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize Reinvent.</span>
+<span class="w">        </span><span class="sd">"""Initialize Reinvent.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: path where to load hypothesis, candidate labels and, optionally, the model.</span>
@@ -224,17 +224,17 @@
 <span class="sd">            randomize: randomize the scaffolds if set to true.</span>
 <span class="sd">            sample_uniquely: generate unique sample sequences if set to true.</span>
 <span class="sd">            max_sequence_length: maximum length of the generated sequences.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span> <span class="o">=</span> <span class="n">resources_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">randomize</span> <span class="o">=</span> <span class="n">randomize</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_uniquely</span> <span class="o">=</span> <span class="n">sample_uniquely</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;model.prior&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"model.prior"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;reinvent model files does not exist locally&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;artifacts file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="si">}</span><span class="s2"> does not exist locally&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"reinvent model files does not exist locally"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"artifacts file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="si">}</span><span class="s2"> does not exist locally"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">DecoratorModel</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max_sequence_length</span> <span class="o">=</span> <span class="n">max_sequence_length</span>
@@ -243,42 +243,42 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReinventConditionalGenerator.sample_unique_sequences"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.sample_unique_sequences">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">sample_unique_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampled_sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Samples the model for the given number of SMILES.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            scaffold_list: A list of SampledTuple.</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            A list of SampledTuple.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">SampledSequencesDTO</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span> <span class="n">decoration</span><span class="p">,</span> <span class="n">nll</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">scaffold</span><span class="p">,</span> <span class="n">decoration</span><span class="p">,</span> <span class="n">nll</span> <span class="ow">in</span> <span class="n">sampled_sequences</span>
         <span class="p">]</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;getting unique sample sequences from generated samples&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"getting unique sample sequences from generated samples"</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">scaffold</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">decoration</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">nll</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_unique_sequences</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
         <span class="p">]</span></div>
 
 <div class="viewcode-block" id="ReinventConditionalGenerator.generate_sampled_tuples"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.generate_sampled_tuples">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_sampled_tuples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scaffold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">SampledTuple</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Samples the model for the given number of SMILES.</span>
 <span class="sd">        Args:</span>
 <span class="sd">            scaffold_list: A list of scaffold SMILES.</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            A Set of SampledTuple.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">!=</span> <span class="n">scaffold</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">scaffold</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dataloader</span><span class="p">([</span><span class="n">scaffold</span><span class="p">])))</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;initialization of the dataloader&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"initialization of the dataloader"</span><span class="p">)</span>
             <span class="n">scaffold_seqs</span><span class="p">,</span> <span class="n">scaffold_seq_lengths</span> <span class="o">=</span> <span class="n">batch</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scaffold_seqs</span> <span class="o">=</span> <span class="n">scaffold_seqs</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scaffold_seqs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scaffold_seq_lengths</span> <span class="o">=</span> <span class="n">scaffold_seq_lengths</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;started generating samples with an nll score value&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"started generating samples with an nll score value"</span><span class="p">)</span>
         <span class="n">sampled_sequences</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sample_decorations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaffold_seqs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaffold_seq_lengths</span><span class="p">)</span>
         <span class="p">)</span>
@@ -293,14 +293,14 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReinventConditionalGenerator.generate_samples"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.reinvent.implementation.html#gt4sd.algorithms.conditional_generation.reinvent.implementation.ReinventConditionalGenerator.generate_samples">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scaffold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Samples the model for the given number of SMILES.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            scaffold: A scaffold SMILES.</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            A Set of SMILES representing molecules.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span>
             <span class="n">molecule</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">molecule</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_sampled_tuples</span><span class="p">(</span><span class="n">scaffold</span><span class="p">)</span>
         <span class="p">)</span></div></div>

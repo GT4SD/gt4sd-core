@@ -172,7 +172,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -181,7 +181,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -189,7 +189,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;PaccMann VAE training utilities.&quot;&quot;&quot;</span>
+<span class="sd">"""PaccMann VAE training utilities."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
@@ -216,7 +216,7 @@
 
 
 <div class="viewcode-block" id="PaccMannVAETrainingPipeline"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.paccmann.vae.core.html#gt4sd.training_pipelines.paccmann.vae.core.PaccMannVAETrainingPipeline">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PaccMannVAETrainingPipeline</span><span class="p">(</span><span class="n">PaccMannTrainingPipeline</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Language modeling training pipelines.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Language modeling training pipelines."""</span>
 
 <div class="viewcode-block" id="PaccMannVAETrainingPipeline.train"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.paccmann.vae.core.html#gt4sd.training_pipelines.paccmann.vae.core.PaccMannVAETrainingPipeline.train">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -224,34 +224,34 @@
         <span class="n">model_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">dataset_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generic training function for PaccMann training.</span>
+<span class="w">        </span><span class="sd">"""Generic training function for PaccMann training.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            training_args: training arguments passed to the configuration.</span>
 <span class="sd">            model_args: model arguments passed to the configuration.</span>
 <span class="sd">            dataset_args: dataset arguments passed to the configuration.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">device</span> <span class="o">=</span> <span class="n">get_device</span><span class="p">()</span>
             <span class="n">disable_rdkit_logging</span><span class="p">()</span>
             <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">training_args</span><span class="p">,</span> <span class="o">**</span><span class="n">dataset_args</span><span class="p">,</span> <span class="o">**</span><span class="n">model_args</span><span class="p">}</span>
-            <span class="n">train_smiles_filepath</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;train_smiles_filepath&quot;</span><span class="p">]</span>
-            <span class="n">test_smiles_filepath</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;test_smiles_filepath&quot;</span><span class="p">]</span>
-            <span class="n">smiles_language_filepath</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smiles_language_filepath&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;batch_mode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Padded&quot;</span>
+            <span class="n">train_smiles_filepath</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"train_smiles_filepath"</span><span class="p">]</span>
+            <span class="n">test_smiles_filepath</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"test_smiles_filepath"</span><span class="p">]</span>
+            <span class="n">smiles_language_filepath</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"smiles_language_filepath"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">"batch_mode"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Padded"</span>
 
-            <span class="n">model_path</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]</span>
-            <span class="n">training_name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;training_name&quot;</span><span class="p">]</span>
-            <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;checkpoint_path&quot;</span><span class="p">]</span>
+            <span class="n">model_path</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"model_path"</span><span class="p">]</span>
+            <span class="n">training_name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"training_name"</span><span class="p">]</span>
+            <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"checkpoint_path"</span><span class="p">]</span>
 
-            <span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;logs/</span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model with name </span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2"> starts.&quot;</span><span class="p">)</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="sa">f</span><span class="s2">"logs/</span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Model with name </span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2"> starts."</span><span class="p">)</span>
 
             <span class="n">model_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">training_name</span><span class="p">)</span>
-            <span class="n">log_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span>
-            <span class="n">val_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="s2">&quot;val_logs&quot;</span><span class="p">)</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;weights&quot;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;results&quot;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">log_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">"logs"</span><span class="p">)</span>
+            <span class="n">val_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="s2">"val_logs"</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">"weights"</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">"results"</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">val_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -260,45 +260,45 @@
             <span class="k">if</span> <span class="n">smiles_language_filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">smiles_language</span> <span class="o">=</span> <span class="n">SMILESLanguage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">smiles_language_filepath</span><span class="p">)</span>
 
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Smiles filepath: </span><span class="si">{</span><span class="n">train_smiles_filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Smiles filepath: </span><span class="si">{</span><span class="n">train_smiles_filepath</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
             <span class="c1"># create SMILES eager dataset</span>
             <span class="n">smiles_train_data</span> <span class="o">=</span> <span class="n">SMILESDataset</span><span class="p">(</span>
                 <span class="n">train_smiles_filepath</span><span class="p">,</span>
                 <span class="n">smiles_language</span><span class="o">=</span><span class="n">smiles_language</span><span class="p">,</span>
                 <span class="n">padding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">selfies</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;selfies&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">add_start_and_stop</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;add_start_stop_token&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
-                <span class="n">augment</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;augment_smiles&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">canonical</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;canonical&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">kekulize</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kekulize&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">all_bonds_explicit</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;all_bonds_explicit&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">all_hs_explicit</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;all_hs_explicit&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">remove_bonddir</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;remove_bonddir&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">remove_chirality</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;remove_chirality&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;lazy&quot;</span><span class="p">,</span>
+                <span class="n">selfies</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"selfies"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">add_start_and_stop</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"add_start_stop_token"</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                <span class="n">augment</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"augment_smiles"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">canonical</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"canonical"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">kekulize</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kekulize"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">all_bonds_explicit</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"all_bonds_explicit"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">all_hs_explicit</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"all_hs_explicit"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">remove_bonddir</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"remove_bonddir"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">remove_chirality</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"remove_chirality"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">backend</span><span class="o">=</span><span class="s2">"lazy"</span><span class="p">,</span>
                 <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">smiles_test_data</span> <span class="o">=</span> <span class="n">SMILESDataset</span><span class="p">(</span>
                 <span class="n">test_smiles_filepath</span><span class="p">,</span>
                 <span class="n">smiles_language</span><span class="o">=</span><span class="n">smiles_language</span><span class="p">,</span>
                 <span class="n">padding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">selfies</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;selfies&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">add_start_and_stop</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;add_start_stop_token&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
-                <span class="n">augment</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;augment_smiles&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">canonical</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;canonical&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">kekulize</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kekulize&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">all_bonds_explicit</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;all_bonds_explicit&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">all_hs_explicit</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;all_hs_explicit&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">remove_bonddir</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;remove_bonddir&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">remove_chirality</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;remove_chirality&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;lazy&quot;</span><span class="p">,</span>
+                <span class="n">selfies</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"selfies"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">add_start_and_stop</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"add_start_stop_token"</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                <span class="n">augment</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"augment_smiles"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">canonical</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"canonical"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">kekulize</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kekulize"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">all_bonds_explicit</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"all_bonds_explicit"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">all_hs_explicit</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"all_hs_explicit"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">remove_bonddir</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"remove_bonddir"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">remove_chirality</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"remove_chirality"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">backend</span><span class="o">=</span><span class="s2">"lazy"</span><span class="p">,</span>
                 <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">smiles_language_filepath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">smiles_language</span> <span class="o">=</span> <span class="n">smiles_train_data</span><span class="o">.</span><span class="n">smiles_language</span>
-                <span class="n">smiles_language</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2">.lang&quot;</span><span class="p">))</span>
+                <span class="n">smiles_language</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">training_name</span><span class="si">}</span><span class="s2">.lang"</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">smiles_language_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">smiles_language_filepath</span><span class="p">)</span>
                 <span class="n">cast</span><span class="p">(</span><span class="n">SMILESLanguage</span><span class="p">,</span> <span class="n">smiles_language</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
@@ -307,50 +307,50 @@
 
             <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;vocab_size&quot;</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span>
+                    <span class="s2">"vocab_size"</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span>
                         <span class="n">SMILESLanguage</span><span class="p">,</span> <span class="n">smiles_language</span>
                     <span class="p">)</span><span class="o">.</span><span class="n">number_of_tokens</span><span class="p">,</span>
-                    <span class="s2">&quot;pad_index&quot;</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">SMILESLanguage</span><span class="p">,</span> <span class="n">smiles_language</span><span class="p">)</span><span class="o">.</span><span class="n">padding_index</span><span class="p">,</span>
+                    <span class="s2">"pad_index"</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">SMILESLanguage</span><span class="p">,</span> <span class="n">smiles_language</span><span class="p">)</span><span class="o">.</span><span class="n">padding_index</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="p">)</span>
 
             <span class="n">vocab_dict</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">SMILESLanguage</span><span class="p">,</span> <span class="n">smiles_language</span><span class="p">)</span><span class="o">.</span><span class="n">index_to_token</span>
             <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;start_index&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">vocab_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span>
-                        <span class="nb">list</span><span class="p">(</span><span class="n">vocab_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;&lt;START&gt;&quot;</span><span class="p">)</span>
+                    <span class="s2">"start_index"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">vocab_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span>
+                        <span class="nb">list</span><span class="p">(</span><span class="n">vocab_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"&lt;START&gt;"</span><span class="p">)</span>
                     <span class="p">],</span>
-                    <span class="s2">&quot;end_index&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">vocab_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span>
-                        <span class="nb">list</span><span class="p">(</span><span class="n">vocab_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;&lt;STOP&gt;&quot;</span><span class="p">)</span>
+                    <span class="s2">"end_index"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">vocab_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span>
+                        <span class="nb">list</span><span class="p">(</span><span class="n">vocab_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"&lt;STOP&gt;"</span><span class="p">)</span>
                     <span class="p">],</span>
                 <span class="p">}</span>
             <span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;embedding&quot;</span><span class="p">,</span> <span class="s2">&quot;learned&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;one_hot&quot;</span><span class="p">:</span>
-                <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;embedding_size&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;vocab_size&quot;</span><span class="p">]})</span>
+            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"embedding"</span><span class="p">,</span> <span class="s2">"learned"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"one_hot"</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"embedding_size"</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s2">"vocab_size"</span><span class="p">]})</span>
 
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">&quot;model_params.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s2">"model_params.json"</span><span class="p">),</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
                 <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
 
             <span class="c1"># create DataLoaders</span>
             <span class="n">train_data_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
                 <span class="n">smiles_train_data</span><span class="p">,</span>
-                <span class="n">batch_size</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"batch_size"</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
                 <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">,</span>
                 <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">pin_memory</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pin_memory&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
-                <span class="n">num_workers</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_workers&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+                <span class="n">pin_memory</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pin_memory"</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                <span class="n">num_workers</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"num_workers"</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
             <span class="p">)</span>
 
             <span class="n">test_data_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
                 <span class="n">smiles_test_data</span><span class="p">,</span>
-                <span class="n">batch_size</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"batch_size"</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
                 <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">,</span>
                 <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">pin_memory</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pin_memory&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
-                <span class="n">num_workers</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_workers&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+                <span class="n">pin_memory</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pin_memory"</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                <span class="n">num_workers</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"num_workers"</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="c1"># initialize encoder and decoder</span>
             <span class="n">gru_encoder</span> <span class="o">=</span> <span class="n">StackGRUEncoder</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -359,45 +359,45 @@
 
             <span class="k">if</span> <span class="n">checkpoint</span><span class="p">:</span>
                 <span class="n">gru_vae</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Restored existing model from </span><span class="si">{</span><span class="n">checkpoint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Restored existing model from </span><span class="si">{</span><span class="n">checkpoint</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Model summary:&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Model summary:"</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">gru_vae</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Param </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, shape:</span><span class="se">\t</span><span class="si">{</span><span class="n">parameter</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Param </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, shape:</span><span class="se">\t</span><span class="si">{</span><span class="n">parameter</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">total_params</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">gru_vae</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total # params: </span><span class="si">{</span><span class="n">total_params</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total # params: </span><span class="si">{</span><span class="n">total_params</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
             <span class="n">loss_tracker</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;test_loss_a&quot;</span><span class="p">:</span> <span class="mf">10e4</span><span class="p">,</span>
-                <span class="s2">&quot;test_rec_a&quot;</span><span class="p">:</span> <span class="mf">10e4</span><span class="p">,</span>
-                <span class="s2">&quot;test_kld_a&quot;</span><span class="p">:</span> <span class="mf">10e4</span><span class="p">,</span>
-                <span class="s2">&quot;ep_loss&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;ep_rec&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;ep_kld&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"test_loss_a"</span><span class="p">:</span> <span class="mf">10e4</span><span class="p">,</span>
+                <span class="s2">"test_rec_a"</span><span class="p">:</span> <span class="mf">10e4</span><span class="p">,</span>
+                <span class="s2">"test_kld_a"</span><span class="p">:</span> <span class="mf">10e4</span><span class="p">,</span>
+                <span class="s2">"ep_loss"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"ep_rec"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"ep_kld"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="p">}</span>
 
             <span class="c1"># train for n_epoch epochs</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Model creation and data processing done, Training starts.&quot;</span><span class="p">)</span>
-            <span class="n">decoder_search</span> <span class="o">=</span> <span class="n">SEARCH_FACTORY</span><span class="p">[</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;decoder_search&quot;</span><span class="p">,</span> <span class="s2">&quot;sampling&quot;</span><span class="p">)](</span>
-                <span class="n">temperature</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
-                <span class="n">beam_width</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;beam_width&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-                <span class="n">top_tokens</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;top_tokens&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Model creation and data processing done, Training starts."</span><span class="p">)</span>
+            <span class="n">decoder_search</span> <span class="o">=</span> <span class="n">SEARCH_FACTORY</span><span class="p">[</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"decoder_search"</span><span class="p">,</span> <span class="s2">"sampling"</span><span class="p">)](</span>
+                <span class="n">temperature</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"temperature"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                <span class="n">beam_width</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"beam_width"</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                <span class="n">top_tokens</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"top_tokens"</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">writer</span><span class="p">:</span>
                 <span class="n">pparams</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="n">pparams</span><span class="p">[</span><span class="s2">&quot;training_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_smiles_filepath</span>
-                <span class="n">pparams</span><span class="p">[</span><span class="s2">&quot;test_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_smiles_filepath</span>
-                <span class="n">pparams</span><span class="p">[</span><span class="s2">&quot;language_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">smiles_language_filepath</span>
-                <span class="n">pparams</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_path</span>
-                <span class="n">pparams</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;N.A.&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-                <span class="n">pparams</span><span class="p">[</span><span class="s2">&quot;training_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">training_name</span>
+                <span class="n">pparams</span><span class="p">[</span><span class="s2">"training_file"</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_smiles_filepath</span>
+                <span class="n">pparams</span><span class="p">[</span><span class="s2">"test_file"</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_smiles_filepath</span>
+                <span class="n">pparams</span><span class="p">[</span><span class="s2">"language_file"</span><span class="p">]</span> <span class="o">=</span> <span class="n">smiles_language_filepath</span>
+                <span class="n">pparams</span><span class="p">[</span><span class="s2">"model_path"</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_path</span>
+                <span class="n">pparams</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"N.A."</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+                <span class="n">pparams</span><span class="p">[</span><span class="s2">"training_name"</span><span class="p">]</span> <span class="o">=</span> <span class="n">training_name</span>
                 <span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
 
                 <span class="n">pprint</span><span class="p">(</span><span class="n">pparams</span><span class="p">)</span>
                 <span class="n">writer</span><span class="o">.</span><span class="n">add_hparams</span><span class="p">(</span><span class="n">hparam_dict</span><span class="o">=</span><span class="n">pparams</span><span class="p">,</span> <span class="n">metric_dict</span><span class="o">=</span><span class="p">{})</span>
 
-            <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">"epochs"</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
                 <span class="n">loss_tracker</span> <span class="o">=</span> <span class="n">train_vae</span><span class="p">(</span>
                     <span class="n">epoch</span><span class="p">,</span>
@@ -407,95 +407,95 @@
                     <span class="n">smiles_language</span><span class="p">,</span>
                     <span class="n">model_dir</span><span class="p">,</span>
                     <span class="n">search</span><span class="o">=</span><span class="n">decoder_search</span><span class="p">,</span>
-                    <span class="n">optimizer</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;optimizer&quot;</span><span class="p">,</span> <span class="s2">&quot;adadelta&quot;</span><span class="p">),</span>
-                    <span class="n">lr</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">],</span>
-                    <span class="n">kl_growth</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;kl_growth&quot;</span><span class="p">],</span>
-                    <span class="n">input_keep</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;input_keep&quot;</span><span class="p">],</span>
-                    <span class="n">test_input_keep</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;test_input_keep&quot;</span><span class="p">],</span>
-                    <span class="n">generate_len</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;generate_len&quot;</span><span class="p">],</span>
-                    <span class="n">log_interval</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;log_interval&quot;</span><span class="p">],</span>
-                    <span class="n">save_interval</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;save_interval&quot;</span><span class="p">],</span>
-                    <span class="n">eval_interval</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;eval_interval&quot;</span><span class="p">],</span>
+                    <span class="n">optimizer</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"optimizer"</span><span class="p">,</span> <span class="s2">"adadelta"</span><span class="p">),</span>
+                    <span class="n">lr</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">"learning_rate"</span><span class="p">],</span>
+                    <span class="n">kl_growth</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">"kl_growth"</span><span class="p">],</span>
+                    <span class="n">input_keep</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">"input_keep"</span><span class="p">],</span>
+                    <span class="n">test_input_keep</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">"test_input_keep"</span><span class="p">],</span>
+                    <span class="n">generate_len</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">"generate_len"</span><span class="p">],</span>
+                    <span class="n">log_interval</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">"log_interval"</span><span class="p">],</span>
+                    <span class="n">save_interval</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">"save_interval"</span><span class="p">],</span>
+                    <span class="n">eval_interval</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">"eval_interval"</span><span class="p">],</span>
                     <span class="n">loss_tracker</span><span class="o">=</span><span class="n">loss_tracker</span><span class="p">,</span>
                     <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
-                    <span class="n">batch_mode</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;batch_mode&quot;</span><span class="p">],</span>
+                    <span class="n">batch_mode</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">"batch_mode"</span><span class="p">],</span>
                 <span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">, took </span><span class="si">{</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">, took </span><span class="si">{</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="s2">&quot;Overall:</span><span class="se">\t</span><span class="s2">Best loss = </span><span class="si">{0:.4f}</span><span class="s2"> in Ep </span><span class="si">{1}</span><span class="s2">, &quot;</span>
-                <span class="s2">&quot;best Rec = </span><span class="si">{2:.4f}</span><span class="s2"> in Ep </span><span class="si">{3}</span><span class="s2">, &quot;</span>
-                <span class="s2">&quot;best KLD = </span><span class="si">{4:.4f}</span><span class="s2"> in Ep </span><span class="si">{5}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">&quot;test_loss_a&quot;</span><span class="p">],</span>
-                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">&quot;ep_loss&quot;</span><span class="p">],</span>
-                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">&quot;test_rec_a&quot;</span><span class="p">],</span>
-                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">&quot;ep_rec&quot;</span><span class="p">],</span>
-                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">&quot;test_kld_a&quot;</span><span class="p">],</span>
-                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">&quot;ep_kld&quot;</span><span class="p">],</span>
+                <span class="s2">"Overall:</span><span class="se">\t</span><span class="s2">Best loss = </span><span class="si">{0:.4f}</span><span class="s2"> in Ep </span><span class="si">{1}</span><span class="s2">, "</span>
+                <span class="s2">"best Rec = </span><span class="si">{2:.4f}</span><span class="s2"> in Ep </span><span class="si">{3}</span><span class="s2">, "</span>
+                <span class="s2">"best KLD = </span><span class="si">{4:.4f}</span><span class="s2"> in Ep </span><span class="si">{5}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">"test_loss_a"</span><span class="p">],</span>
+                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">"ep_loss"</span><span class="p">],</span>
+                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">"test_rec_a"</span><span class="p">],</span>
+                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">"ep_rec"</span><span class="p">],</span>
+                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">"test_kld_a"</span><span class="p">],</span>
+                    <span class="n">loss_tracker</span><span class="p">[</span><span class="s2">"ep_kld"</span><span class="p">],</span>
                 <span class="p">)</span>
             <span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training done, shutting down.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Training done, shutting down."</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
-                <span class="s2">&quot;Exception occurred while running PaccMannVAETrainingPipeline&quot;</span>
+                <span class="s2">"Exception occurred while running PaccMannVAETrainingPipeline"</span>
             <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="PaccMannVAEModelArguments"><a class="viewcode-back" href="../../../../../api/gt4sd.training_pipelines.paccmann.vae.core.html#gt4sd.training_pipelines.paccmann.vae.core.PaccMannVAEModelArguments">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PaccMannVAEModelArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Arguments pertaining to model instantiation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Arguments pertaining to model instantiation."""</span>
 
-    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;model_args&quot;</span>
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">"model_args"</span>
 
     <span class="n">n_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of layers for the RNNs.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Number of layers for the RNNs."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">bidirectional</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether the RNN cells are bidirectional.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Whether the RNN cells are bidirectional."</span><span class="p">}</span>
     <span class="p">)</span>
-    <span class="n">rnn_cell_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Size of the RNN cells.&quot;</span><span class="p">})</span>
-    <span class="n">latent_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Size of the RNN cells.&quot;</span><span class="p">})</span>
+    <span class="n">rnn_cell_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Size of the RNN cells."</span><span class="p">})</span>
+    <span class="n">latent_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Size of the RNN cells."</span><span class="p">})</span>
     <span class="n">stack_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Width of the memory stack for the RNN cell.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Width of the memory stack for the RNN cell."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">stack_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Depth of the memory stack for the RNN cell.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Depth of the memory stack for the RNN cell."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">decode_search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;sampling&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Decoder search strategy.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"sampling"</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Decoder search strategy."</span><span class="p">}</span>
     <span class="p">)</span>
-    <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Dropout rate to apply.&quot;</span><span class="p">})</span>
+    <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Dropout rate to apply."</span><span class="p">})</span>
     <span class="n">generate_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Length in tokens of the generated molecules.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Length in tokens of the generated molecules."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">kl_growth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mf">0.003</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Growth of the KL term weight in the loss.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.003</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Growth of the KL term weight in the loss."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">input_keep</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Probability to keep input tokens in train.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Probability to keep input tokens in train."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">test_input_keep</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Probability to keep input tokens in test.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Probability to keep input tokens in test."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Temperature for the sampling.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Temperature for the sampling."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">embedding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;one_hot&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"one_hot"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Embedding technique for the tokens. &#39;one_hot&#39; or &#39;learned&#39;.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Embedding technique for the tokens. 'one_hot' or 'learned'."</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">vocab_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">380</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Size of the vocabulary of chemical tokens.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">380</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Size of the vocabulary of chemical tokens."</span><span class="p">}</span>
     <span class="p">)</span>
-    <span class="n">pad_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Index for the padding token.&quot;</span><span class="p">})</span>
+    <span class="n">pad_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Index for the padding token."</span><span class="p">})</span>
     <span class="n">embedding_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">380</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Size of the embedding vectors.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">380</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Size of the embedding vectors."</span><span class="p">}</span>
     <span class="p">)</span>
-    <span class="n">beam_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Width of the beam search.&quot;</span><span class="p">})</span>
+    <span class="n">beam_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Width of the beam search."</span><span class="p">})</span>
     <span class="n">top_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of tokens to consider in the beam search.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Number of tokens to consider in the beam search."</span><span class="p">}</span>
     <span class="p">)</span></div>
 </pre></div>
 

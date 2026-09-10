@@ -171,7 +171,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -180,7 +180,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -189,7 +189,7 @@
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
 
-<span class="sd">&quot;&quot;&quot;Run training pipelines for the GT4SD.&quot;&quot;&quot;</span>
+<span class="sd">"""Run training pipelines for the GT4SD."""</span>
 
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
@@ -220,34 +220,34 @@
 
 <div class="viewcode-block" id="TrainerArguments"><a class="viewcode-back" href="../../../api/gt4sd.cli.trainer.html#gt4sd.cli.trainer.TrainerArguments">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TrainerArguments</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Trainer arguments.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Trainer arguments."""</span>
 
-    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;trainer_base_args&quot;</span>
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">"trainer_base_args"</span>
 
     <span class="n">training_pipeline_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Training pipeline name, supported pipelines: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUPPORTED_TRAINING_PIPELINES</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Training pipeline name, supported pipelines: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUPPORTED_TRAINING_PIPELINES</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">configuration_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Configuration file for the training in JSON format. It can be used to completely by-pass pipeline specific arguments.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Configuration file for the training in JSON format. It can be used to completely by-pass pipeline specific arguments."</span>
         <span class="p">},</span>
     <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TrainerArgumentParser"><a class="viewcode-back" href="../../../api/gt4sd.cli.trainer.html#gt4sd.cli.trainer.TrainerArgumentParser">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TrainerArgumentParser</span><span class="p">(</span><span class="n">ArgumentParser</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Argument parser using a custom help logic.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Argument parser using a custom help logic."""</span>
 
 <div class="viewcode-block" id="TrainerArgumentParser.print_help"><a class="viewcode-back" href="../../../api/gt4sd.cli.trainer.html#gt4sd.cli.trainer.TrainerArgumentParser.print_help">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">print_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IO</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print help checking dynamically whether a specific pipeline is passed.</span>
+<span class="w">        </span><span class="sd">"""Print help checking dynamically whether a specific pipeline is passed.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            file: an optional I/O stream. Defaults to None, a.k.a., stdout and stderr.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">help_args_set</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;-h&quot;</span><span class="p">,</span> <span class="s2">&quot;--help&quot;</span><span class="p">}</span>
+            <span class="n">help_args_set</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"-h"</span><span class="p">,</span> <span class="s2">"--help"</span><span class="p">}</span>
             <span class="k">if</span> <span class="p">(</span>
                 <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">help_args_set</span><span class="p">))</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">help_args_set</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
             <span class="p">):</span>  <span class="c1"># considering filename</span>
@@ -259,7 +259,7 @@
             <span class="p">)</span>
             <span class="n">trainer_arguments</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">for</span> <span class="n">arguments</span> <span class="ow">in</span> <span class="n">parsed_arguments</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;trainer_base_args&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"trainer_base_args"</span><span class="p">:</span>
                     <span class="n">trainer_arguments</span> <span class="o">=</span> <span class="n">arguments</span>
                     <span class="k">break</span>
             <span class="k">if</span> <span class="n">trainer_arguments</span><span class="p">:</span>
@@ -277,7 +277,7 @@
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TrainerArgumentParser.parse_json_file"><a class="viewcode-back" href="../../../api/gt4sd.cli.trainer.html#gt4sd.cli.trainer.TrainerArgumentParser.parse_json_file">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">parse_json_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DataClass</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Overriding default .json parser.</span>
+<span class="w">        </span><span class="sd">"""Overriding default .json parser.</span>
 
 <span class="sd">        It by-passes all command line arguments and simply add the training pipeline.</span>
 
@@ -286,12 +286,12 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            parsed arguments in a tuple of dataclasses.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">number_of_dataclass_types</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataclass_types</span><span class="p">)</span>  <span class="c1"># type:ignore</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataclass_types</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">dataclass_type</span>
             <span class="k">for</span> <span class="n">dataclass_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataclass_types</span>  <span class="c1"># type:ignore</span>
-            <span class="k">if</span> <span class="s2">&quot;gt4sd.cli.trainer.TrainerArguments&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataclass_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">"gt4sd.cli.trainer.TrainerArguments"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataclass_type</span><span class="p">)</span>
         <span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">parsed_arguments</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">parse_json_file</span><span class="p">(</span>  <span class="c1"># type:ignore</span>
@@ -299,7 +299,7 @@
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;error parsing configuration file: </span><span class="si">{</span><span class="n">json_file</span><span class="si">}</span><span class="s2">, printing error and exiting&quot;</span>
+                <span class="sa">f</span><span class="s2">"error parsing configuration file: </span><span class="si">{</span><span class="n">json_file</span><span class="si">}</span><span class="s2">, printing error and exiting"</span>
             <span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">number_of_dataclass_types</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataclass_types</span><span class="p">):</span>
@@ -308,12 +308,12 @@
 
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../api/gt4sd.cli.trainer.html#gt4sd.cli.trainer.main">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Run a training pipeline.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: in case the provided training pipeline provided is not supported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
     <span class="n">base_args</span> <span class="o">=</span> <span class="n">TrainerArgumentParser</span><span class="p">(</span>
@@ -322,7 +322,7 @@
     <span class="n">training_pipeline_name</span> <span class="o">=</span> <span class="n">base_args</span><span class="o">.</span><span class="n">training_pipeline_name</span>
     <span class="k">if</span> <span class="n">training_pipeline_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">SUPPORTED_TRAINING_PIPELINES</span><span class="p">):</span>
         <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Training pipeline </span><span class="si">{</span><span class="n">training_pipeline_name</span><span class="si">}</span><span class="s2"> is not supported. Supported types: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUPPORTED_TRAINING_PIPELINES</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Training pipeline </span><span class="si">{</span><span class="n">training_pipeline_name</span><span class="si">}</span><span class="s2"> is not supported. Supported types: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUPPORTED_TRAINING_PIPELINES</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="n">arguments</span> <span class="o">=</span> <span class="n">TRAINING_PIPELINE_ARGUMENTS_MAPPING</span><span class="p">[</span><span class="n">training_pipeline_name</span><span class="p">]</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">TrainerArgumentParser</span><span class="p">(</span>
@@ -342,16 +342,16 @@
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="p">(</span>
-        <span class="n">base_args</span><span class="o">.</span><span class="n">training_pipeline_name</span> <span class="o">==</span> <span class="s2">&quot;granular-trainer&quot;</span>
-        <span class="ow">and</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;model_args&quot;</span><span class="p">][</span><span class="s2">&quot;model_list_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="n">base_args</span><span class="o">.</span><span class="n">training_pipeline_name</span> <span class="o">==</span> <span class="s2">"granular-trainer"</span>
+        <span class="ow">and</span> <span class="n">config</span><span class="p">[</span><span class="s2">"model_args"</span><span class="p">][</span><span class="s2">"model_list_path"</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
     <span class="p">):</span>
-        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;model_args&quot;</span><span class="p">][</span><span class="s2">&quot;model_list_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">configuration_filepath</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">"model_args"</span><span class="p">][</span><span class="s2">"model_list_path"</span><span class="p">]</span> <span class="o">=</span> <span class="n">configuration_filepath</span>
 
     <span class="n">pipeline</span> <span class="o">=</span> <span class="n">TRAINING_PIPELINE_MAPPING</span><span class="p">[</span><span class="n">training_pipeline_name</span><span class="p">]</span>
     <span class="n">pipeline</span><span class="p">()</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span></div>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 

@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,10 +187,10 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;PaccMann\\ :superscript:`GP` Algorithm.</span>
+<span class="sd">"""PaccMann\\ :superscript:`GP` Algorithm.</span>
 
 <span class="sd">PaccMann\\ :superscript:`GP` generation is conditioned via gaussian processes.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -210,20 +210,20 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
-<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">SMILES</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"S"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">SMILES</span><span class="p">)</span>
 <span class="n">Targeted</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
 
 
 <div class="viewcode-block" id="PaccMannGP"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.core.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.core.PaccMannGP">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PaccMannGP</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;PaccMann\\ :superscript:`GP` Algorithm.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""PaccMann\\ :superscript:`GP` Algorithm."""</span>
 
 <div class="viewcode-block" id="PaccMannGP.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.core.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.core.PaccMannGP.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate PaccMannGP ready to generate items.</span>
+<span class="w">        </span><span class="sd">"""Instantiate PaccMannGP ready to generate items.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            configuration: domain and application</span>
@@ -236,15 +236,15 @@
 
 <span class="sd">                configuration = PaccMannGPGenerator()</span>
 <span class="sd">                target = {</span>
-<span class="sd">                    &quot;qed&quot;: {&quot;weight&quot;: 1.0},</span>
-<span class="sd">                    &quot;molwt&quot;: {&quot;target&quot;: 200},</span>
-<span class="sd">                    &quot;sa&quot;: {&quot;weight&quot;: 2.0},</span>
-<span class="sd">                    &quot;affinity&quot;: {&quot;protein&quot;: &quot;MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT&quot;}</span>
+<span class="sd">                    "qed": {"weight": 1.0},</span>
+<span class="sd">                    "molwt": {"target": 200},</span>
+<span class="sd">                    "sa": {"weight": 2.0},</span>
+<span class="sd">                    "affinity": {"protein": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTT"}</span>
 <span class="sd">                }</span>
 <span class="sd">                paccmann_gp = PaccMannGP(configuration=configuration, target=target)</span>
 <span class="sd">                items = list(paccmann_gp.sample(10))</span>
 <span class="sd">                print(items)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
         <span class="c1"># TODO there might also be a validation/check on the target input</span>
@@ -259,7 +259,7 @@
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Targeted</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the function to sample batches via PaccMannGP&#39;s GPConditionalGenerator.</span>
+<span class="w">        </span><span class="sd">"""Get the function to sample batches via PaccMannGP's GPConditionalGenerator.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            configuration: helps to set up specific application of PaccMannGP.</span>
@@ -267,8 +267,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            callable with target generating a batch of items.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ensure artifacts for the application are present.&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"ensure artifacts for the application are present."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">ensure_artifacts</span><span class="p">()</span>
         <span class="n">implementation</span><span class="p">:</span> <span class="n">GPConditionalGenerator</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">get_conditional_generator</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span>
@@ -280,7 +280,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
         <span class="nd">@runtime_checkable</span>
         <span class="k">class</span><span class="w"> </span><span class="nc">AnyPaccMannGPConfiguration</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Protocol for PaccMannGP configurations.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">"""Protocol for PaccMannGP configurations."""</span>
 
             <span class="k">def</span><span class="w"> </span><span class="nf">get_conditional_generator</span><span class="p">(</span>
                 <span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span>
@@ -298,112 +298,112 @@
 
 <div class="viewcode-block" id="PaccMannGPGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.core.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.core.PaccMannGPGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">PaccMannGP</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PaccMannGPGenerator</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">SMILES</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Configuration to generate compounds controlling molecules properties.</span>
 
 <span class="sd">    Implementation from the paper: https://doi.org/10.1021/acs.jcim.1c00889.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;controlled_sampling&quot;</span>
-    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;materials&quot;</span>
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;v0&quot;</span>
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"controlled_sampling"</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"materials"</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"v0"</span>
 
     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Batch size used for the generative model sampling.&quot;</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Batch size used for the generative model sampling."</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Temperature parameter for the softmax sampling in decoding.&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"Temperature parameter for the softmax sampling in decoding."</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">generated_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum length in tokens of the generated molcules (relates to the SMILES length).&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"Maximum length in tokens of the generated molcules (relates to the SMILES length)."</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Hypercube limits in the latent space.&quot;</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Hypercube limits in the latent space."</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">acquisition_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;EI&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"EI"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;Acquisition function used in the Gaussian process. &quot;</span>
-                <span class="s2">&quot;More details in https://scikit-optimize.github.io/stable/modules/generated/skopt.gp_minimize.html.&quot;</span>
+                <span class="s2">"Acquisition function used in the Gaussian process. "</span>
+                <span class="s2">"More details in https://scikit-optimize.github.io/stable/modules/generated/skopt.gp_minimize.html."</span>
             <span class="p">)</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">number_of_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of steps for an optmization round.&quot;</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Number of steps for an optmization round."</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">number_of_initial_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of initial points evaluated.&quot;</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Number of initial points evaluated."</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">initial_point_generator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;Scheme to generate initial points. &quot;</span>
-                <span class="s2">&quot;More details in https://scikit-optimize.github.io/stable/modules/generated/skopt.gp_minimize.html.&quot;</span>
+                <span class="s2">"Scheme to generate initial points. "</span>
+                <span class="s2">"More details in https://scikit-optimize.github.io/stable/modules/generated/skopt.gp_minimize.html."</span>
             <span class="p">)</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Seed used for random number generation in the optimizer. Set to -1 for no seed.&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"Seed used for random number generation in the optimizer. Set to -1 for no seed."</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">number_of_optimization_rounds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum number of optimization rounds.&quot;</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Maximum number of optimization rounds."</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">sampling_variance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Variance of the Gaussian noise applied during sampling from the optimal point.&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"Variance of the Gaussian noise applied during sampling from the optimal point."</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">samples_for_evaluation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of samples averaged for each minimization function evaluation.&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"Number of samples averaged for each minimization function evaluation."</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">maximum_number_of_sampling_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum number of sampling steps in an optimization round.&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"Maximum number of sampling steps in an optimization round."</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="PaccMannGPGenerator.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.core.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.core.PaccMannGPGenerator.get_target_description">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+<span class="w">        </span><span class="sd">"""Get description of the target for generation.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            target description.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Scoring functions with parameters&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Scoring functions will be used to generate a score for the generated molecules.&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Scoring functions with parameters"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Scoring functions will be used to generate a score for the generated molecules."</span><span class="p">,</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span>
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="PaccMannGPGenerator.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.core.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.core.PaccMannGPGenerator.get_conditional_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GPConditionalGenerator</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
+<span class="w">        </span><span class="sd">"""Instantiate the actual generator implementation.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: local path to model files.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            instance with :meth:`generate_batch&lt;gt4sd.algorithms.controlled_sampling.paccmann_rl.implementation.GPConditionalGenerator.generate_batch&gt;` method for targeted generation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">GPConditionalGenerator</span><span class="p">(</span>
             <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
             <span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
@@ -422,7 +422,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PaccMannGPGenerator.validate_item"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.controlled_sampling.paccmann_gp.core.html#gt4sd.algorithms.controlled_sampling.paccmann_gp.core.PaccMannGPGenerator.validate_item">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SMILES</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that item is a valid SMILES.</span>
+<span class="w">        </span><span class="sd">"""Check that item is a valid SMILES.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            item: a generated item that is possibly not valid.</span>
@@ -432,15 +432,15 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            the validated SMILES.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="p">(</span>
             <span class="n">molecules</span><span class="p">,</span>
             <span class="n">_</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">=</span> <span class="n">validate_molecules</span><span class="p">([</span><span class="n">item</span><span class="p">],</span> <span class="n">MoleculeFormat</span><span class="o">.</span><span class="n">smiles</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">molecules</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidItem</span><span class="p">(</span>
-                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;InvalidSMILES&quot;</span><span class="p">,</span>
-                <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;rdkit.Chem.MolFromSmiles returned None for &quot;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">"InvalidSMILES"</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">'rdkit.Chem.MolFromSmiles returned None for "</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1">"'</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">SMILES</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
 
@@ -448,35 +448,35 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get filepath mappings for the given training pipeline arguments.</span>
+<span class="w">        </span><span class="sd">"""Get filepath mappings for the given training pipeline arguments.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            a mapping between artifacts&#39; files and training pipeline&#39;s output files.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            a mapping between artifacts' files and training pipeline's output files.</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">PaccMannSavingArguments</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">{</span>
-                <span class="s2">&quot;selfies_language.pkl&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="s2">"selfies_language.pkl"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">training_name</span><span class="si">}</span><span class="s2">.lang&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">training_name</span><span class="si">}</span><span class="s2">.lang"</span><span class="p">,</span>
                 <span class="p">),</span>
-                <span class="s2">&quot;vae_model_params.json&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
-                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">training_name</span><span class="p">,</span>
-                    <span class="s2">&quot;model_params.json&quot;</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="s2">&quot;vae_weights.pt&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="s2">"vae_model_params.json"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
                     <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">training_name</span><span class="p">,</span>
-                    <span class="s2">&quot;weights&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;best_rec.pt&quot;</span><span class="p">,</span>
+                    <span class="s2">"model_params.json"</span><span class="p">,</span>
                 <span class="p">),</span>
-                <span class="s2">&quot;mca_model_params.json&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;protein_language.pkl&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;smiles_language.pkl&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;mca_weights.pt&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">"vae_weights.pt"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
+                    <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">training_name</span><span class="p">,</span>
+                    <span class="s2">"weights"</span><span class="p">,</span>
+                    <span class="s2">"best_rec.pt"</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">"mca_model_params.json"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+                <span class="s2">"protein_language.pkl"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+                <span class="s2">"smiles_language.pkl"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+                <span class="s2">"mca_weights.pt"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
             <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>

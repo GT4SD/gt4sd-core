@@ -172,7 +172,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -181,7 +181,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -189,7 +189,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Regression Transformer training utilities.&quot;&quot;&quot;</span>
+<span class="sd">"""Regression Transformer training utilities."""</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
@@ -199,7 +199,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformersTrainingArgumentsCLI</span>
 
 <span class="n">DATA_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-    <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_local_cache_path</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;RegressionTransformer&quot;</span>
+    <span class="n">gt4sd_configuration_instance</span><span class="o">.</span><span class="n">gt4sd_local_cache_path</span><span class="p">,</span> <span class="s2">"data"</span><span class="p">,</span> <span class="s2">"RegressionTransformer"</span>
 <span class="p">)</span>
 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -208,144 +208,144 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">RegressionTransformerTrainingArguments</span><span class="p">(</span>
     <span class="n">TrainingPipelineArguments</span><span class="p">,</span> <span class="n">TransformersTrainingArgumentsCLI</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Arguments related to RegressionTransformer trainer.</span>
 <span class="sd">    NOTE: All arguments from `transformers.training_args.TrainingArguments` can be used.</span>
 <span class="sd">    Only additional ones are specified below.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;training_args&quot;</span>
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">"training_args"</span>
 
     <span class="n">training_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;rt_training&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Name used to identify the training.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"rt_training"</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Name used to identify the training."</span><span class="p">}</span>
     <span class="p">)</span>
-    <span class="n">num_train_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of epochs.&quot;</span><span class="p">})</span>
-    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Size of the batch.&quot;</span><span class="p">})</span>
+    <span class="n">num_train_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Number of epochs."</span><span class="p">})</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Size of the batch."</span><span class="p">})</span>
     <span class="n">log_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of steps between log intervals.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Number of steps between log intervals."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">gradient_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Gradient accumulation steps&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Gradient accumulation steps"</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">eval_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The time interval at which validation is performed.&quot;</span><span class="p">},</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"The time interval at which validation is performed."</span><span class="p">},</span>
     <span class="p">)</span>
 
     <span class="n">max_span_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Max length of a span of masked tokens for PLM.&quot;</span><span class="p">}</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Max length of a span of masked tokens for PLM."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">plm_probability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">6</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Ratio of length of a span of masked tokens to surrounding context length for PLM.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Ratio of length of a span of masked tokens to surrounding context length for PLM."</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">alternate_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Per default, training alternates between property prediction and &quot;</span>
-            <span class="s2">&quot;conditional generation. This argument specifies the alternation frequency.&quot;</span>
-            <span class="s2">&quot;If you set it to 0, no alternation occurs and we fall back to vanilla &quot;</span>
-            <span class="s2">&quot;permutation language modeling (PLM). Default: 50.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Per default, training alternates between property prediction and "</span>
+            <span class="s2">"conditional generation. This argument specifies the alternation frequency."</span>
+            <span class="s2">"If you set it to 0, no alternation occurs and we fall back to vanilla "</span>
+            <span class="s2">"permutation language modeling (PLM). Default: 50."</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">cc_loss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether the cycle-consistency loss is computed during the conditional &quot;</span>
-            <span class="s2">&quot;generation task. Defaults to False.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Whether the cycle-consistency loss is computed during the conditional "</span>
+            <span class="s2">"generation task. Defaults to False."</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">cg_collator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;vanilla_cg&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"vanilla_cg"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The collator class. Following options are implemented: &quot;</span>
-            <span class="s2">&quot;&#39;vanilla_cg&#39;: Collator class that does not mask the properties but anything else as a regular DataCollatorForPermutationLanguageModeling. Can optionally replace the properties with sampled values. &quot;</span>
-            <span class="s2">&quot;NOTE: This collator can deal with multiple properties. &quot;</span>
-            <span class="s2">&quot;&#39;multientity_cg&#39;: A training collator the conditional-generation task that can handle multiple entities. &quot;</span>
-            <span class="s2">&quot;Default: vanilla_cg.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"The collator class. Following options are implemented: "</span>
+            <span class="s2">"'vanilla_cg': Collator class that does not mask the properties but anything else as a regular DataCollatorForPermutationLanguageModeling. Can optionally replace the properties with sampled values. "</span>
+            <span class="s2">"NOTE: This collator can deal with multiple properties. "</span>
+            <span class="s2">"'multientity_cg': A training collator the conditional-generation task that can handle multiple entities. "</span>
+            <span class="s2">"Default: vanilla_cg."</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">entity_to_mask</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Only applies if `cg_collator=&#39;multientity_cg&#39;`. The entity that is being masked during training. 0 corresponds to first entity and so on. -1 corresponds to &quot;</span>
-            <span class="s2">&quot;a random sampling scheme where the entity-to-be-masked is determined &quot;</span>
-            <span class="s2">&quot;at runtime in the collator. NOTE: If &#39;mask_entity_separator&#39; is true, &quot;</span>
-            <span class="s2">&quot;this argument will not have any effect. Defaults to -1.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Only applies if `cg_collator='multientity_cg'`. The entity that is being masked during training. 0 corresponds to first entity and so on. -1 corresponds to "</span>
+            <span class="s2">"a random sampling scheme where the entity-to-be-masked is determined "</span>
+            <span class="s2">"at runtime in the collator. NOTE: If 'mask_entity_separator' is true, "</span>
+            <span class="s2">"this argument will not have any effect. Defaults to -1."</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">entity_separator_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Only applies if `cg_collator=&#39;multientity_cg&#39;`.The token that is used to separate &quot;</span>
-            <span class="s2">&quot;entities in the input. Defaults to &#39;.&#39; (applicable to SMILES &amp; SELFIES)&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Only applies if `cg_collator='multientity_cg'`.The token that is used to separate "</span>
+            <span class="s2">"entities in the input. Defaults to '.' (applicable to SMILES &amp; SELFIES)"</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">mask_entity_separator</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Only applies if `cg_collator=&#39;multientity_cg&#39;`. Whether or not the entity separator token can be masked. If True, *all** textual tokens can be masked and we &quot;</span>
-            <span class="s2">&quot;the collator behaves like the `vanilla_cg ` even though it is a `multientity_cg`. If False, the exact behavior &quot;</span>
-            <span class="s2">&quot;depends on the entity_to_mask argument. Defaults to False.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Only applies if `cg_collator='multientity_cg'`. Whether or not the entity separator token can be masked. If True, *all** textual tokens can be masked and we "</span>
+            <span class="s2">"the collator behaves like the `vanilla_cg ` even though it is a `multientity_cg`. If False, the exact behavior "</span>
+            <span class="s2">"depends on the entity_to_mask argument. Defaults to False."</span>
         <span class="p">},</span>
     <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RegressionTransformerDataArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.core.html#gt4sd.training_pipelines.regression_transformer.core.RegressionTransformerDataArguments">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RegressionTransformerDataArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Arguments related to RegressionTransformer data loading.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Arguments related to RegressionTransformer data loading."""</span>
 
-    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;dataset_args&quot;</span>
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">"dataset_args"</span>
 
     <span class="n">train_data_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path to a `.csv` file with the input training data. The file has to &quot;</span>
-            <span class="s2">&quot;contain a `text` column (with the string input, e.g, SMILES, AAS, natural &quot;</span>
-            <span class="s2">&quot;text) and an arbitrary number of numerical columns.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Path to a `.csv` file with the input training data. The file has to "</span>
+            <span class="s2">"contain a `text` column (with the string input, e.g, SMILES, AAS, natural "</span>
+            <span class="s2">"text) and an arbitrary number of numerical columns."</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">test_data_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path to a `.csv` file with the input testing data. The file has to &quot;</span>
-            <span class="s2">&quot;contain a `text` column (with the string input, e.g, SMILES, AAS, natural &quot;</span>
-            <span class="s2">&quot;text) and an arbitrary number of numerical columns.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Path to a `.csv` file with the input testing data. The file has to "</span>
+            <span class="s2">"contain a `text` column (with the string input, e.g, SMILES, AAS, natural "</span>
+            <span class="s2">"text) and an arbitrary number of numerical columns."</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">augment</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Factor by which the training data is augmented. The data modality &quot;</span>
-            <span class="s2">&quot;(SMILES, SELFIES, AAS, natural text) is inferred from the tokenizer. &quot;</span>
-            <span class="s2">&quot;NOTE: For natural text, no augmentation is supported. Defaults to 0, &quot;</span>
-            <span class="s2">&quot;meaning no augmentation. &quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Factor by which the training data is augmented. The data modality "</span>
+            <span class="s2">"(SMILES, SELFIES, AAS, natural text) is inferred from the tokenizer. "</span>
+            <span class="s2">"NOTE: For natural text, no augmentation is supported. Defaults to 0, "</span>
+            <span class="s2">"meaning no augmentation. "</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">save_datasets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether to save the datasets to disk. Datasets will be saved as `.txt` file to &quot;</span>
-            <span class="s2">&quot;the same location where `train_data_path` and `test_data_path` live. Defaults to False.&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Whether to save the datasets to disk. Datasets will be saved as `.txt` file to "</span>
+            <span class="s2">"the same location where `train_data_path` and `test_data_path` live. Defaults to False."</span>
         <span class="p">},</span>
     <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RegressionTransformerSavingArguments"><a class="viewcode-back" href="../../../../api/gt4sd.training_pipelines.regression_transformer.core.html#gt4sd.training_pipelines.regression_transformer.core.RegressionTransformerSavingArguments">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RegressionTransformerSavingArguments</span><span class="p">(</span><span class="n">TrainingPipelineArguments</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Saving arguments related to RegressionTransformer trainer.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Saving arguments related to RegressionTransformer trainer."""</span>
 
-    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;saving_args&quot;</span>
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">"saving_args"</span>
 
     <span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path where the model artifacts are stored.&quot;</span><span class="p">}</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Path where the model artifacts are stored."</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="n">checkpoint_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">(),</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Name for the checkpoint that should be copied to inference model. &quot;</span>
-            <span class="s2">&quot;Has to be a subfolder of `model_path`. Defaults to empty string meaning that &quot;</span>
-            <span class="s2">&quot;files are taken from `model_path` (i.e., after training finished).&quot;</span>
+            <span class="s2">"help"</span><span class="p">:</span> <span class="s2">"Name for the checkpoint that should be copied to inference model. "</span>
+            <span class="s2">"Has to be a subfolder of `model_path`. Defaults to empty string meaning that "</span>
+            <span class="s2">"files are taken from `model_path` (i.e., after training finished)."</span>
         <span class="p">},</span>
     <span class="p">)</span></div>
 </pre></div>

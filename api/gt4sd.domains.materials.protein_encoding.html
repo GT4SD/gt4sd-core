@@ -231,8 +231,8 @@ the training loop like for any other nn.Module.</p>
 mock/rdkit and pytoda&gt;0.2) passing ids with the primary sequence:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s1">&#39;rdkit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s1">&#39;rdkit.Chem&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s1">'rdkit'</span><span class="p">]</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s1">'rdkit.Chem'</span><span class="p">]</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pytoda.datasets.protein_sequence_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">protein_sequence_dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pytoda.datasets.tests.test_protein_sequence_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -242,15 +242,15 @@ mock/rdkit and pytoda&gt;0.2) passing ids with the primary sequence:</p>
 
 <span class="k">with</span> <span class="n">TestFileContent</span><span class="p">(</span><span class="n">FASTA_CONTENT_GENERIC</span><span class="p">)</span> <span class="k">as</span> <span class="n">a_test_file</span><span class="p">:</span>
     <span class="n">sequence_dataset</span> <span class="o">=</span> <span class="n">keyed</span><span class="p">(</span><span class="n">protein_sequence_dataset</span><span class="p">(</span>
-        <span class="n">a_test_file</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;.fasta&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span>
+        <span class="n">a_test_file</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">'.fasta'</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'lazy'</span>
     <span class="p">))</span>
     <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">sequence_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
 
     <span class="n">encoder</span> <span class="o">=</span> <span class="n">PrimarySequenceEncoder</span><span class="p">(</span>
-        <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;transformer&#39;</span><span class="p">,</span>
-        <span class="n">from_pretrained</span><span class="o">=</span><span class="s1">&#39;bert-base&#39;</span><span class="p">,</span>
-        <span class="n">tokenizer</span><span class="o">=</span><span class="s1">&#39;iupac&#39;</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s1">'transformer'</span><span class="p">,</span>
+        <span class="n">from_pretrained</span><span class="o">=</span><span class="s1">'bert-base'</span><span class="p">,</span>
+        <span class="n">tokenizer</span><span class="o">=</span><span class="s1">'iupac'</span><span class="p">,</span>
         <span class="n">log_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="c1"># sending encoder to cuda device should work, not tested</span>
@@ -266,7 +266,7 @@ mock/rdkit and pytoda&gt;0.2) passing ids with the primary sequence:</p>
 has to be wrapped as list (of length 1):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">encoded</span><span class="p">,</span> <span class="n">dummy_ids</span> <span class="o">=</span> <span class="n">PrimarySequenceEncoder</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span>
     <span class="p">[</span>
-        <span class="p">[</span><span class="s1">&#39;MQNP&#39;</span><span class="p">,</span> <span class="s1">&#39;LLLLL&#39;</span><span class="p">],</span>  <span class="c1"># type: Sequence[str]</span>
+        <span class="p">[</span><span class="s1">'MQNP'</span><span class="p">,</span> <span class="s1">'LLLLL'</span><span class="p">],</span>  <span class="c1"># type: Sequence[str]</span>
         <span class="c1"># sequence_ids may be missing here</span>
     <span class="p">]</span>
 <span class="p">)</span>

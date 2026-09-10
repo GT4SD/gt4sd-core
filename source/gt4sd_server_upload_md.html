@@ -196,13 +196,13 @@
 <h2>Run a local minio server<a class="headerlink" href="#run-a-local-minio-server" title="Permalink to this heading">¶</a></h2>
 <section id="set-environment-variables">
 <h3>1) Set environment variables<a class="headerlink" href="#set-environment-variables" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_HOST_HUB</span><span class="o">=</span><span class="s1">&#39;127.0.0.1:9000&#39;</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="o">=</span><span class="s1">''</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="o">=</span><span class="s1">''</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_HOST_HUB</span><span class="o">=</span><span class="s1">'127.0.0.1:9000'</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_SECURE_HUB</span><span class="o">=</span>False
-<span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_BUCKET_HUB</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-artifacts&#39;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_BUCKET_MODELS_HUB</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-models&#39;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_BUCKET_DATA_HUB</span><span class="o">=</span><span class="s1">&#39;gt4sd-cos-algorithms-data&#39;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_BUCKET_HUB</span><span class="o">=</span><span class="s1">'gt4sd-cos-algorithms-artifacts'</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_BUCKET_MODELS_HUB</span><span class="o">=</span><span class="s1">'gt4sd-cos-algorithms-models'</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GT4SD_S3_BUCKET_DATA_HUB</span><span class="o">=</span><span class="s1">'gt4sd-cos-algorithms-data'</span>
 </pre></div>
 </div>
 <p>set <code class="docutils literal notranslate"><span class="pre">GT4SD_S3_SECURE</span></code> <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> if https/http server.</p>
@@ -217,7 +217,7 @@ mkdir<span class="w"> </span>env/
 </pre></div>
 </div>
 <p>copy this configuration script in <code class="docutils literal notranslate"><span class="pre">docker-compose.yml</span></code>:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>version:<span class="w"> </span><span class="s1">&#39;10&#39;</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>version:<span class="w"> </span><span class="s1">'10'</span>
 services:
 <span class="w">  </span>cos:
 <span class="w">    </span>image:<span class="w"> </span>minio/minio:RELEASE.2022-06-07T00-33-41Z
@@ -226,8 +226,8 @@ services:
 <span class="w">    </span>env_file:
 <span class="w">     </span>-<span class="w"> </span>env/.env.dev<span class="w"> </span>
 <span class="w">    </span>environment:
-<span class="w">      </span>MINIO_ACCESS_KEY:<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">      </span>MINIO_SECRET_KEY:<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">      </span>MINIO_ACCESS_KEY:<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="si">}</span><span class="s2">"</span>
+<span class="w">      </span>MINIO_SECRET_KEY:<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">    </span>command:<span class="w"> </span>server<span class="w"> </span>/export
 <span class="w">  </span>createbuckets:
 <span class="w">    </span>image:<span class="w"> </span>minio/mc
@@ -237,15 +237,15 @@ services:
 <span class="w">     </span>-<span class="w"> </span>env/.env.dev
 <span class="w">    </span><span class="c1"># ensure there is a file in the artifacts bucket</span>
 <span class="w">    </span>entrypoint:<span class="w"> </span>&gt;
-<span class="w">      </span>/bin/sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<span class="w">      </span>/bin/sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">"</span>
 <span class="s2">      /usr/bin/mc config host add myminio http://cos:9000 </span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="si">}</span><span class="s2"> </span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="si">}</span><span class="s2">;</span>
 <span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_HUB</span><span class="si">}</span><span class="s2">;</span>
 <span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_DATA_HUB</span><span class="si">}</span><span class="s2">;</span>
 <span class="s2">      /usr/bin/mc mb myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_MODELS_HUB</span><span class="si">}</span><span class="s2">;</span>
-<span class="s2">      echo &#39;this is an artifact&#39; &gt;&gt; a_file.txt;</span>
+<span class="s2">      echo 'this is an artifact' &gt;&gt; a_file.txt;</span>
 <span class="s2">      /usr/bin/mc cp a_file.txt myminio/</span><span class="si">${</span><span class="nv">GT4SD_S3_BUCKET_HUB</span><span class="si">}</span><span class="s2">/a_file.txt;</span>
 <span class="s2">      exit 0;</span>
-<span class="s2">      &quot;</span>
+<span class="s2">      "</span>
 </pre></div>
 </div>
 <p>You can store default environment variables in <code class="docutils literal notranslate"><span class="pre">.env.dev</span></code>.</p>
@@ -254,14 +254,14 @@ services:
 <h3>3) MinIO server configuration<a class="headerlink" href="#minio-server-configuration" title="Permalink to this heading">¶</a></h3>
 <p>Add the new server to the minio configuration file (<code class="docutils literal notranslate"><span class="pre">~/.mc/config.json</span></code>):</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="o">{</span>
-<span class="w">	</span><span class="s2">&quot;version&quot;</span>:<span class="w"> </span><span class="s2">&quot;10&quot;</span>,
-<span class="w">	</span><span class="s2">&quot;aliases&quot;</span>:<span class="w"> </span><span class="o">{</span>
-<span class="w">                </span><span class="s2">&quot;myminio&quot;</span>:<span class="w"> </span><span class="o">{</span>
-<span class="w">                        </span><span class="s2">&quot;url&quot;</span>:<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_HOST_HUB</span><span class="si">}</span><span class="s2">&quot;</span>,
-<span class="w">                        </span><span class="s2">&quot;accessKey&quot;</span>:<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="si">}</span><span class="s2">&quot;</span>,
-<span class="w">                        </span><span class="s2">&quot;secretKey&quot;</span>:<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="si">}</span><span class="s2">&quot;</span>,
-<span class="w">                        </span><span class="s2">&quot;api&quot;</span>:<span class="w"> </span><span class="s2">&quot;s3v4&quot;</span>,
-<span class="w">                        </span><span class="s2">&quot;path&quot;</span>:<span class="w"> </span><span class="s2">&quot;auto&quot;</span>
+<span class="w">	</span><span class="s2">"version"</span>:<span class="w"> </span><span class="s2">"10"</span>,
+<span class="w">	</span><span class="s2">"aliases"</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">                </span><span class="s2">"myminio"</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">                        </span><span class="s2">"url"</span>:<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GT4SD_S3_HOST_HUB</span><span class="si">}</span><span class="s2">"</span>,
+<span class="w">                        </span><span class="s2">"accessKey"</span>:<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GT4SD_S3_ACCESS_KEY_HUB</span><span class="si">}</span><span class="s2">"</span>,
+<span class="w">                        </span><span class="s2">"secretKey"</span>:<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GT4SD_S3_SECRET_KEY_HUB</span><span class="si">}</span><span class="s2">"</span>,
+<span class="w">                        </span><span class="s2">"api"</span>:<span class="w"> </span><span class="s2">"s3v4"</span>,
+<span class="w">                        </span><span class="s2">"path"</span>:<span class="w"> </span><span class="s2">"auto"</span>
 <span class="w">                </span><span class="o">}</span>,
 <span class="w">                </span>...
 <span class="w">                </span><span class="o">}</span>

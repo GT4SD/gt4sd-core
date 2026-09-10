@@ -369,13 +369,13 @@ so that you don’t have to change your code</p>
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;pred&quot;</span><span class="p">:</span> <span class="n">out</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"pred"</span><span class="p">:</span> <span class="n">out</span><span class="p">}</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">training_step_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_step_outputs</span><span class="p">):</span>
-    <span class="n">gpu_0_pred</span> <span class="o">=</span> <span class="n">training_step_outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;pred&quot;</span><span class="p">]</span>
-    <span class="n">gpu_1_pred</span> <span class="o">=</span> <span class="n">training_step_outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;pred&quot;</span><span class="p">]</span>
-    <span class="n">gpu_n_pred</span> <span class="o">=</span> <span class="n">training_step_outputs</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="s2">&quot;pred&quot;</span><span class="p">]</span>
+    <span class="n">gpu_0_pred</span> <span class="o">=</span> <span class="n">training_step_outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"pred"</span><span class="p">]</span>
+    <span class="n">gpu_1_pred</span> <span class="o">=</span> <span class="n">training_step_outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">"pred"</span><span class="p">]</span>
+    <span class="n">gpu_n_pred</span> <span class="o">=</span> <span class="n">training_step_outputs</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="s2">"pred"</span><span class="p">]</span>
 
     <span class="c1"># this softmax now uses the full batch</span>
     <span class="n">loss</span> <span class="o">=</span> <span class="n">nce_loss</span><span class="p">([</span><span class="n">gpu_0_pred</span><span class="p">,</span> <span class="n">gpu_1_pred</span><span class="p">,</span> <span class="n">gpu_n_pred</span><span class="p">])</span>

@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Generic modules.&quot;&quot;&quot;</span>
+<span class="sd">"""Generic modules."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
@@ -204,7 +204,7 @@
 
 
 <div class="viewcode-block" id="Mlp"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.Mlp">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Mlp</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;MLP module.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""MLP module."""</span>
 
 <div class="viewcode-block" id="Mlp.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.Mlp.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -216,7 +216,7 @@
         <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct Mlp.</span>
+<span class="w">        </span><span class="sd">"""Construct Mlp.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input_size: size of the input.</span>
@@ -225,7 +225,7 @@
 <span class="sd">            n_layers: number of layers.</span>
 <span class="sd">            activation: name of the activation.</span>
 <span class="sd">            dropout: dropout rate.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">ACTIVATION_FACTORY</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -241,14 +241,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span> <span class="o">=</span> <span class="n">output_size</span></div>
 
 <div class="viewcode-block" id="Mlp.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.Mlp.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: model input.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">middle_layers</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
@@ -259,7 +259,7 @@
 
 
 <div class="viewcode-block" id="MlpEncoder"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.MlpEncoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MlpEncoder</span><span class="p">(</span><span class="n">Mlp</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;MLP encoder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""MLP encoder."""</span>
 
 <div class="viewcode-block" id="MlpEncoder.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.MlpEncoder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -271,7 +271,7 @@
         <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct MlpEncoder.</span>
+<span class="w">        </span><span class="sd">"""Construct MlpEncoder.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input_size: size of the input.</span>
@@ -280,7 +280,7 @@
 <span class="sd">            n_layers: number of layers.</span>
 <span class="sd">            activation: name of the activation.</span>
 <span class="sd">            dropout: dropout rate. Defaults to 0.0.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">input_size</span><span class="o">=</span><span class="n">input_size</span><span class="p">,</span>
             <span class="n">hidden_size</span><span class="o">=</span><span class="n">hidden_size</span><span class="p">,</span>
@@ -292,7 +292,7 @@
 
 
 <div class="viewcode-block" id="MlpDecoder"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.MlpDecoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MlpDecoder</span><span class="p">(</span><span class="n">Mlp</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;MLP decoder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""MLP decoder."""</span>
 
 <div class="viewcode-block" id="MlpDecoder.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.MlpDecoder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -304,7 +304,7 @@
         <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct MlpEncoder.</span>
+<span class="w">        </span><span class="sd">"""Construct MlpEncoder.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            latent_size: size of the input.</span>
@@ -313,7 +313,7 @@
 <span class="sd">            n_layers: number of layers.</span>
 <span class="sd">            activation: name of the activation.</span>
 <span class="sd">            dropout: dropout rate. Defaults to 0.0.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">input_size</span><span class="o">=</span><span class="n">latent_size</span><span class="p">,</span>
             <span class="n">hidden_size</span><span class="o">=</span><span class="n">hidden_size</span><span class="p">,</span>
@@ -325,7 +325,7 @@
 
 
 <div class="viewcode-block" id="RnnEncoder"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.RnnEncoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RnnEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;RNN encoder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""RNN encoder."""</span>
 
 <div class="viewcode-block" id="RnnEncoder.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.RnnEncoder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -336,7 +336,7 @@
         <span class="n">bidirectional</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">latent_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">196</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct RnnEncoder.</span>
+<span class="w">        </span><span class="sd">"""Construct RnnEncoder.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            vocab_size: size of the vocabulary.</span>
@@ -345,7 +345,7 @@
 <span class="sd">            n_layers: number of layers. Defaults to 2.</span>
 <span class="sd">            bidirectional: whether the RNN cell is bidirectional. Defaults to False.</span>
 <span class="sd">            latent_size: latent size. Defaults to 196.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="n">embedding_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
@@ -366,14 +366,14 @@
 <div class="viewcode-block" id="RnnEncoder.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.RnnEncoder.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_sequence</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input_sequence: input sequence tensor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            a tuple containing hidden state and embedded sequence.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">input_embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">input_sequence</span><span class="p">)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rnn</span><span class="p">(</span><span class="n">input_embedding</span><span class="p">)</span>
         <span class="n">hidden</span> <span class="o">=</span> <span class="n">hidden</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -382,7 +382,7 @@
 
 
 <div class="viewcode-block" id="RnnDecoder"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.RnnDecoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RnnDecoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;RNN decoder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""RNN decoder."""</span>
 
 <div class="viewcode-block" id="RnnDecoder.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.RnnDecoder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -392,7 +392,7 @@
         <span class="n">n_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
         <span class="n">latent_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">196</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct RnnDecoder.</span>
+<span class="w">        </span><span class="sd">"""Construct RnnDecoder.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            vocab_size: size of the vocabulary.</span>
@@ -400,7 +400,7 @@
 <span class="sd">            hidden_size: hidden size. Defaults to 256.</span>
 <span class="sd">            n_layers: number of layers. Defaults to 2.</span>
 <span class="sd">            latent_size: latent size. Defaults to 196.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span> <span class="o">=</span> <span class="n">vocab_size</span>
@@ -422,7 +422,7 @@
 <div class="viewcode-block" id="RnnDecoder.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.RnnDecoder.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">latent</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">input_embedding</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            latent: latent tensor.</span>
@@ -430,7 +430,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent2hidden</span><span class="p">(</span><span class="n">latent</span><span class="p">)</span>
         <span class="n">hidden</span> <span class="o">=</span> <span class="n">hidden</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_factor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
         <span class="n">hidden</span> <span class="o">=</span> <span class="n">hidden</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
@@ -449,7 +449,7 @@
         <span class="n">tokenizer</span><span class="p">:</span> <span class="n">Tokenizer</span><span class="p">,</span>
         <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Direct inference from latent space.</span>
+<span class="w">        </span><span class="sd">"""Direct inference from latent space.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            latent: latent tensor.</span>
@@ -459,7 +459,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            a tuple containing decoded strings and indices.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="n">latent</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent2hidden</span><span class="p">(</span><span class="n">latent</span><span class="p">)</span>
         <span class="n">hidden</span> <span class="o">=</span> <span class="n">hidden</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_factor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
@@ -484,7 +484,7 @@
                 <span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_id_to_token</span><span class="p">(</span><span class="n">vocab_index</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
                 <span class="k">for</span> <span class="n">vocab_index</span> <span class="ow">in</span> <span class="n">token_indices</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
             <span class="p">]</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">decoded_texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">decoded_texts</span><span class="p">,</span> <span class="n">token_indices</span></div></div>
 
@@ -496,7 +496,7 @@
     <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dropout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute scaled dot product attention (adapted from Viswani et al.).</span>
+<span class="w">    </span><span class="sd">"""Compute scaled dot product attention (adapted from Viswani et al.).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        query: query tensor.</span>
@@ -507,7 +507,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        a tuple containing the applied attention and the attention weights.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">d_k</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d_k</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -519,7 +519,7 @@
 
 
 <div class="viewcode-block" id="clones"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.clones">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">clones</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Produce N identical layers (adapted from http://nlp.seas.harvard.edu/2018/04/03/attention.html).</span>
+<span class="w">    </span><span class="sd">"""Produce N identical layers (adapted from http://nlp.seas.harvard.edu/2018/04/03/attention.html).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        module: a module.</span>
@@ -527,29 +527,29 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        a module list.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span></div>
 
 
 <div class="viewcode-block" id="subsequent_mask"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.subsequent_mask">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">subsequent_mask</span><span class="p">(</span><span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mask out subsequent positions (adapted from http://nlp.seas.harvard.edu/2018/04/03/attention.html).</span>
+<span class="w">    </span><span class="sd">"""Mask out subsequent positions (adapted from http://nlp.seas.harvard.edu/2018/04/03/attention.html).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        size: size of the attention matrix.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        the mask tensor.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">attn_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-    <span class="n">subsequent_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">attn_shape</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+    <span class="n">subsequent_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">attn_shape</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"uint8"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">subsequent_mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></div>
 
 
 <div class="viewcode-block" id="ListModule"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.ListModule">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ListModule</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create single pytorch module from list of modules.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Create single pytorch module from list of modules."""</span>
 
 <div class="viewcode-block" id="ListModule.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.ListModule.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct ListModule.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Construct ListModule."""</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
@@ -557,7 +557,7 @@
             <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="ListModule.__getitem__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.ListModule.__getitem__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get item from the module list.</span>
+<span class="w">        </span><span class="sd">"""Get item from the module list.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            idx: index of the item.</span>
@@ -567,42 +567,42 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            the item.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;index </span><span class="si">{}</span><span class="s2"> is out of range&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">"index </span><span class="si">{}</span><span class="s2"> is out of range"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span>
         <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span>
             <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ListModule.__iter__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.ListModule.__iter__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;An iterator over the module list values.</span>
+<span class="w">        </span><span class="sd">"""An iterator over the module list values.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            the iterator over values.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="ListModule.__len__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.ListModule.__len__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Length of the module list.</span>
+<span class="w">        </span><span class="sd">"""Length of the module list.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            the number of modules.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="MultiHeadedAttention"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.MultiHeadedAttention">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MultiHeadedAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Multihead attention implementation (based on Vaswani et al.).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Multihead attention implementation (based on Vaswani et al.)."""</span>
 
 <div class="viewcode-block" id="MultiHeadedAttention.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.MultiHeadedAttention.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct MultiHeadedAttention.</span>
+<span class="w">        </span><span class="sd">"""Construct MultiHeadedAttention.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            h: number of heads.</span>
 <span class="sd">            d_model: model size.</span>
 <span class="sd">            dropout: dropout rate. Defaults to 0.1.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="k">assert</span> <span class="n">d_model</span> <span class="o">%</span> <span class="n">h</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="c1"># we assume d_v always equals d_k</span>
@@ -620,7 +620,7 @@
         <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">return_attn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            query: query tensor.</span>
@@ -632,7 +632,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            either the last layer output of the attention matrix.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Same mask applied to all h heads</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -649,7 +649,7 @@
             <span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout</span>
         <span class="p">)</span>  <span class="c1"># type:ignore</span>
 
-        <span class="c1"># 3) &quot;concat&quot; using a view and apply a final linear</span>
+        <span class="c1"># 3) "concat" using a view and apply a final linear</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">nbatches</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_k</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">return_attn</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn</span>
@@ -658,43 +658,43 @@
 
 
 <div class="viewcode-block" id="PositionwiseFeedForward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.PositionwiseFeedForward">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PositionwiseFeedForward</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Feed forward implementation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Feed forward implementation."""</span>
 
 <div class="viewcode-block" id="PositionwiseFeedForward.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.PositionwiseFeedForward.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct PositionwiseFeedForward.</span>
+<span class="w">        </span><span class="sd">"""Construct PositionwiseFeedForward.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            d_model: model size.</span>
 <span class="sd">            d_ff: feed forward size.</span>
 <span class="sd">            dropout: dropout rate. Defaults to 0.1.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w_1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w_2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_ff</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PositionwiseFeedForward.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.PositionwiseFeedForward.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            feed forward output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">w_2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w_1</span><span class="p">(</span><span class="n">x</span><span class="p">))))</span></div></div>
 
 
 <div class="viewcode-block" id="ConvBottleneck"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.ConvBottleneck">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ConvBottleneck</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set of convolutional layers to reduce memory matrix to single latent vector.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Set of convolutional layers to reduce memory matrix to single latent vector."""</span>
 
 <div class="viewcode-block" id="ConvBottleneck.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.ConvBottleneck.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">number_of_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct ConvBottleneck.</span>
+<span class="w">        </span><span class="sd">"""Construct ConvBottleneck.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            size: input size.</span>
 <span class="sd">            number_of_layers: convolutional layers number. Defaults to 3.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">conv_layers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">in_d</span> <span class="o">=</span> <span class="n">size</span>
@@ -715,30 +715,30 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">conv_layers</span> <span class="o">=</span> <span class="n">ListModule</span><span class="p">(</span><span class="o">*</span><span class="n">conv_layers</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConvBottleneck.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.ConvBottleneck.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">for</span> <span class="n">conv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_layers</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">x</span></div></div>
 
 
 <div class="viewcode-block" id="DeconvBottleneck"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.DeconvBottleneck">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DeconvBottleneck</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set of deconvolutional layers to reshape latent vector back into memory matrix.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Set of deconvolutional layers to reshape latent vector back into memory matrix."""</span>
 
 <div class="viewcode-block" id="DeconvBottleneck.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.DeconvBottleneck.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dim_factor</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct DeconvBottleneck.</span>
+<span class="w">        </span><span class="sd">"""Construct DeconvBottleneck.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            size: size of the deconvolutional padding.</span>
 <span class="sd">            seq_len: length of the sequence.</span>
 <span class="sd">            dim_factor: dimensionality factor.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">deconv_layers</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -783,56 +783,56 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">deconv_layers</span> <span class="o">=</span> <span class="n">ListModule</span><span class="p">(</span><span class="o">*</span><span class="n">deconv_layers</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DeconvBottleneck.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.DeconvBottleneck.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">for</span> <span class="n">deconv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deconv_layers</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">deconv</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">x</span></div></div>
 
 
 <div class="viewcode-block" id="Embeddings"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.Embeddings">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Embeddings</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="s2">&quot;Transforms input token id tensors to size d_model embeddings.&quot;</span>
+    <span class="s2">"Transforms input token id tensors to size d_model embeddings."</span>
 
 <div class="viewcode-block" id="Embeddings.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.Embeddings.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Costruct Embeddings.</span>
+<span class="w">        </span><span class="sd">"""Costruct Embeddings.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            d_model: size of the embedding vectors.</span>
 <span class="sd">            vocab_size: size of the vocabulary.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lut</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d_model</span> <span class="o">=</span> <span class="n">d_model</span></div>
 
 <div class="viewcode-block" id="Embeddings.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.Embeddings.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lut</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_model</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="PositionalEncoding"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.PositionalEncoding">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PositionalEncoding</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Static sinusoidal positional encoding layer.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Static sinusoidal positional encoding layer."""</span>
 
 <div class="viewcode-block" id="PositionalEncoding.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.PositionalEncoding.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct PositionalEncoding.</span>
+<span class="w">        </span><span class="sd">"""Construct PositionalEncoding.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            d_model: model size.</span>
 <span class="sd">            dropout: dropout rate.</span>
 <span class="sd">            max_len: maximum sequence length. Defaults to 5000.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span>
 
@@ -845,17 +845,17 @@
         <span class="n">pe</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">position</span> <span class="o">*</span> <span class="n">div_term</span><span class="p">)</span>
         <span class="n">pe</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">position</span> <span class="o">*</span> <span class="n">div_term</span><span class="p">)</span>
         <span class="n">pe</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;pe&quot;</span><span class="p">,</span> <span class="n">pe</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">"pe"</span><span class="p">,</span> <span class="n">pe</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PositionalEncoding.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.PositionalEncoding.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pe</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span>  <span class="c1"># type:ignore</span>
         <span class="p">)</span>
@@ -863,65 +863,65 @@
 
 
 <div class="viewcode-block" id="TorchLayerNorm"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TorchLayerNorm">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TorchLayerNorm</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Layer normalization using torch BatchNorm1d.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Layer normalization using torch BatchNorm1d."""</span>
 
 <div class="viewcode-block" id="TorchLayerNorm.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TorchLayerNorm.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct TorchLayerNorm.</span>
+<span class="w">        </span><span class="sd">"""Construct TorchLayerNorm.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            features: number of features.</span>
 <span class="sd">            eps: espilon to add to denominator for numerical stability. Defaults to 1e-6.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TorchLayerNorm.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TorchLayerNorm.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="LayerNorm"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.LayerNorm">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">LayerNorm</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom layer normalization.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Custom layer normalization."""</span>
 
 <div class="viewcode-block" id="LayerNorm.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.LayerNorm.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct LayerNorm.</span>
+<span class="w">        </span><span class="sd">"""Construct LayerNorm.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            features: number of features.</span>
 <span class="sd">            eps: espilon to add to denominator for numerical stability. Defaults to 1e-6.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span></div>
 
 <div class="viewcode-block" id="LayerNorm.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.LayerNorm.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">mean</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">std</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">std</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span></div></div>
 
 
 <div class="viewcode-block" id="SublayerConnection"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.SublayerConnection">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SublayerConnection</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A residual connection followed by a layer normalization.</span>
+<span class="w">    </span><span class="sd">"""A residual connection followed by a layer normalization.</span>
 
 <span class="sd">    Note for code simplicity the norm is first as opposed to last. A dropout layer</span>
 <span class="sd">    is also applied.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="SublayerConnection.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.SublayerConnection.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -929,7 +929,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SublayerConnection.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.SublayerConnection.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">sublayer</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
@@ -937,12 +937,12 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">sublayer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span></div></div>
 
 
 <div class="viewcode-block" id="TransformerEncoder"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerEncoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TransformerEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base transformer encoder architecture.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Base transformer encoder architecture."""</span>
 
 <div class="viewcode-block" id="TransformerEncoder.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerEncoder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -955,7 +955,7 @@
         <span class="n">vocab_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">bypass_bottleneck</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct TransformerEncoder.</span>
+<span class="w">        </span><span class="sd">"""Construct TransformerEncoder.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            hidden_size: hidden size.</span>
@@ -966,7 +966,7 @@
 <span class="sd">            n_layers_enc: number of encoding layers.</span>
 <span class="sd">            vocab_size: vocabulary size.</span>
 <span class="sd">            bypass_bottleneck: whether the bottleneck should be by passed.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">PositionalEncoding</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">dropout</span><span class="p">)</span>
@@ -990,7 +990,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">conv_output_shape</span> <span class="o">=</span> <span class="n">conv_output_shape</span></div>
 
 <div class="viewcode-block" id="TransformerEncoder.calc_output_shape"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerEncoder.calc_output_shape">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">calc_output_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute output shape.</span>
+<span class="w">        </span><span class="sd">"""Compute output shape.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            seq_len: sequence length.</span>
@@ -998,13 +998,13 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            convolutional bottleneck output shape.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">))</span>
         <span class="n">x_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_bottleneck</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x_out</span><span class="o">.</span><span class="n">shape</span></div>
 
 <div class="viewcode-block" id="TransformerEncoder.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerEncoder.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
@@ -1012,7 +1012,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">attn_layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">):</span>  <span class="c1"># type:ignore</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">attn_layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
@@ -1024,7 +1024,7 @@
 
 
 <div class="viewcode-block" id="TransformerEncoderLayer"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerEncoderLayer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TransformerEncoderLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Self-attention/feedforward implementation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Self-attention/feedforward implementation."""</span>
 
 <div class="viewcode-block" id="TransformerEncoderLayer.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerEncoderLayer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1034,7 +1034,7 @@
         <span class="n">feed_forward</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct TransformerEncoderLayer.</span>
+<span class="w">        </span><span class="sd">"""Construct TransformerEncoderLayer.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            size: model size.</span>
@@ -1042,7 +1042,7 @@
 <span class="sd">            self_attn: self-attention layer.</span>
 <span class="sd">            feed_forward: feed forward layer.</span>
 <span class="sd">            dropout: droupout rate.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span> <span class="o">=</span> <span class="n">seq_len</span>
@@ -1053,7 +1053,7 @@
 <div class="viewcode-block" id="TransformerEncoderLayer.forward"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerEncoderLayer.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">return_attn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
@@ -1063,7 +1063,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">return_attn</span><span class="p">:</span>
             <span class="n">attn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">self_attn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">return_attn</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sublayer</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span>  <span class="c1"># type:ignore</span>
@@ -1078,7 +1078,7 @@
 
 
 <div class="viewcode-block" id="TransformerDecoder"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerDecoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TransformerDecoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base transformer decoder architecture.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Base transformer decoder architecture."""</span>
 
 <div class="viewcode-block" id="TransformerDecoder.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerDecoder.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1093,7 +1093,7 @@
         <span class="n">bypass_bottleneck</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">deconv_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct TransformerDecoder.</span>
+<span class="w">        </span><span class="sd">"""Construct TransformerDecoder.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            hidden_size: hidden size.</span>
@@ -1107,7 +1107,7 @@
 <span class="sd">            bypass_bottleneck: whether the bottleneck should be by passed.</span>
 <span class="sd">            deconv_shape: shape of the deconvoluted samples. A tuple with three</span>
 <span class="sd">                dimensions.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">PositionalEncoding</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">dropout</span><span class="p">)</span>
@@ -1153,7 +1153,7 @@
         <span class="n">src_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">tgt_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor.</span>
@@ -1163,7 +1163,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bypass_bottleneck</span><span class="p">:</span>
             <span class="n">mem</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">mem</span><span class="p">))</span>
@@ -1185,7 +1185,7 @@
         <span class="n">mask_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">tokenizer</span><span class="p">:</span> <span class="n">Tokenizer</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Direct inference from latent space.</span>
+<span class="w">        </span><span class="sd">"""Direct inference from latent space.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            latent: latent tensor.</span>
@@ -1194,7 +1194,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            a tuple containing decoded strings and indices.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">get_device_from_tensor</span><span class="p">(</span><span class="n">latent</span><span class="p">)</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="n">latent</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">token_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
@@ -1225,13 +1225,13 @@
                 <span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_id_to_token</span><span class="p">(</span><span class="n">vocab_index</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
                 <span class="k">for</span> <span class="n">vocab_index</span> <span class="ow">in</span> <span class="n">token_indices</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
             <span class="p">]</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">decoded_texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">decoded_texts</span><span class="p">,</span> <span class="n">token_indices</span></div></div>
 
 
 <div class="viewcode-block" id="TransformerDecoderLayer"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerDecoderLayer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TransformerDecoderLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Self-attention/source-attention/feedforward implementation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Self-attention/source-attention/feedforward implementation."""</span>
 
 <div class="viewcode-block" id="TransformerDecoderLayer.__init__"><a class="viewcode-back" href="../../../../../../api/gt4sd.frameworks.granular.ml.models.module.html#gt4sd.frameworks.granular.ml.models.module.TransformerDecoderLayer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1242,7 +1242,7 @@
         <span class="n">feed_forward</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct TransformerDecoderLayer.</span>
+<span class="w">        </span><span class="sd">"""Construct TransformerDecoderLayer.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            size: model size.</span>
@@ -1251,7 +1251,7 @@
 <span class="sd">            src_attn: source attention layer.</span>
 <span class="sd">            feed_forward: feed forward layer.</span>
 <span class="sd">            dropout: droupout rate.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tgt_len</span> <span class="o">=</span> <span class="n">seq_len</span>
@@ -1269,7 +1269,7 @@
         <span class="n">tgt_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">return_attn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass in the model.</span>
+<span class="w">        </span><span class="sd">"""Forward pass in the model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: input tensor</span>
@@ -1282,7 +1282,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            model output.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">m_key</span> <span class="o">=</span> <span class="n">memory_key</span>
         <span class="n">m_val</span> <span class="o">=</span> <span class="n">memory_val</span>
         <span class="k">if</span> <span class="n">return_attn</span><span class="p">:</span>

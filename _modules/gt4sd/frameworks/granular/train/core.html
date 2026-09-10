@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Train module implementation.&quot;&quot;&quot;</span>
+<span class="sd">"""Train module implementation."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">argparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
@@ -216,24 +216,24 @@
 
 
 <div class="viewcode-block" id="train_granular"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.train.core.html#gt4sd.frameworks.granular.train.core.train_granular">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">train_granular</span><span class="p">(</span><span class="n">configuration</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Train a granular given a configuration.</span>
+<span class="w">    </span><span class="sd">"""Train a granular given a configuration.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        configuration: a configuration dictionary.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">arguments</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="o">**</span><span class="n">configuration</span><span class="p">)</span>
     <span class="n">datasets</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">architecture_autoencoders</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">architecture_latent_models</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">arguments</span><span class="o">.</span><span class="n">model_list</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dataset preparation for model=</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"dataset preparation for model=</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">hparams</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="n">model</span><span class="p">]</span>
-        <span class="n">model_type</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">model_type</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">dataset</span><span class="p">,</span> <span class="n">architecture</span> <span class="o">=</span> <span class="n">build_dataset_and_architecture</span><span class="p">(</span>
-            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
-            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;data_path&quot;</span><span class="p">],</span>
-            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;data_file&quot;</span><span class="p">],</span>
-            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;dataset_type&quot;</span><span class="p">],</span>
-            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">"data_path"</span><span class="p">],</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">"data_file"</span><span class="p">],</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">"dataset_type"</span><span class="p">],</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">"type"</span><span class="p">],</span>
             <span class="n">hparams</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
@@ -243,41 +243,41 @@
             <span class="n">architecture_latent_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">architecture</span><span class="p">)</span>
     <span class="n">dm</span> <span class="o">=</span> <span class="n">GranularDataModule</span><span class="p">(</span>
         <span class="n">datasets</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
-        <span class="n">validation_split</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;validation_split&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-        <span class="n">validation_indices_file</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;validation_indices_file&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-        <span class="n">stratified_batch_file</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;stratified_batch_file&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-        <span class="n">stratified_value_name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;stratified_value_name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-        <span class="n">num_workers</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;num_workers&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"batch_size"</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+        <span class="n">validation_split</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"validation_split"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">validation_indices_file</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"validation_indices_file"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">stratified_batch_file</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"stratified_batch_file"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">stratified_value_name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"stratified_value_name"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"num_workers"</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">dm</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">()</span>
     <span class="n">module</span> <span class="o">=</span> <span class="n">GranularModule</span><span class="p">(</span>
         <span class="n">architecture_autoencoders</span><span class="o">=</span><span class="n">architecture_autoencoders</span><span class="p">,</span>
         <span class="n">architecture_latent_models</span><span class="o">=</span><span class="n">architecture_latent_models</span><span class="p">,</span>
-        <span class="n">lr</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;lr&quot;</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">),</span>
-        <span class="n">test_output_path</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;test_output_path&quot;</span><span class="p">,</span> <span class="s2">&quot;./test&quot;</span><span class="p">),</span>
+        <span class="n">lr</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"lr"</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">),</span>
+        <span class="n">test_output_path</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"test_output_path"</span><span class="p">,</span> <span class="s2">"./test"</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">tensorboard_logger</span> <span class="o">=</span> <span class="n">TensorBoardLogger</span><span class="p">(</span>
-        <span class="s2">&quot;logs&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;basename&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
+        <span class="s2">"logs"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"basename"</span><span class="p">,</span> <span class="s2">"default"</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">checkpoint_callback</span> <span class="o">=</span> <span class="n">ModelCheckpoint</span><span class="p">(</span>
-        <span class="n">every_n_epochs</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;checkpoint_every_n_val_epochs&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="n">every_n_epochs</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"checkpoint_every_n_val_epochs"</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
         <span class="n">save_top_k</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="o">.</span><span class="n">from_argparse_args</span><span class="p">(</span>
         <span class="n">arguments</span><span class="p">,</span>
-        <span class="n">profiler</span><span class="o">=</span><span class="s2">&quot;simple&quot;</span><span class="p">,</span>
+        <span class="n">profiler</span><span class="o">=</span><span class="s2">"simple"</span><span class="p">,</span>
         <span class="n">logger</span><span class="o">=</span><span class="n">tensorboard_logger</span><span class="p">,</span>
         <span class="n">auto_lr_find</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">log_every_n_steps</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;trainer_log_every_n_steps&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+        <span class="n">log_every_n_steps</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"trainer_log_every_n_steps"</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">checkpoint_callback</span><span class="p">],</span>
-        <span class="n">max_epochs</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;epoch&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">max_epochs</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">"epoch"</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">dm</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="train_granular_main"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.train.core.html#gt4sd.frameworks.granular.train.core.train_granular_main">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">train_granular_main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Train a granular module parsing arguments from config and standard input.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Train a granular module parsing arguments from config and standard input."""</span>
     <span class="n">train_granular</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="nb">vars</span><span class="p">(</span><span class="n">parse_arguments_from_config</span><span class="p">()))</span></div>
 </pre></div>
 

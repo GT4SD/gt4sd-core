@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Utilities for algorithms retrieval.&quot;&quot;&quot;</span>
+<span class="sd">"""Utilities for algorithms retrieval."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
@@ -199,23 +199,23 @@
 <span class="n">AVAILABLE_ALGORITHMS</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
     <span class="n">ApplicationsRegistry</span><span class="o">.</span><span class="n">list_available</span><span class="p">(),</span>
     <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">algorithm</span><span class="p">:</span> <span class="p">(</span>
-        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;domain&quot;</span><span class="p">],</span>
-        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_type&quot;</span><span class="p">],</span>
-        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_name&quot;</span><span class="p">],</span>
-        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_application&quot;</span><span class="p">],</span>
-        <span class="n">algorithm</span><span class="p">[</span><span class="s2">&quot;algorithm_version&quot;</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">"domain"</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">"algorithm_type"</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">"algorithm_name"</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">"algorithm_application"</span><span class="p">],</span>
+        <span class="n">algorithm</span><span class="p">[</span><span class="s2">"algorithm_version"</span><span class="p">],</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">AVAILABLE_ALGORITHMS_CATEGORIES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">category</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">algorithm</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="k">for</span> <span class="n">algorithm</span> <span class="ow">in</span> <span class="n">AVAILABLE_ALGORITHMS</span><span class="p">]))</span>
-    <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;domain&quot;</span><span class="p">,</span> <span class="s2">&quot;algorithm_type&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"domain"</span><span class="p">,</span> <span class="s2">"algorithm_type"</span><span class="p">]</span>
 <span class="p">}</span>
 
 
 <div class="viewcode-block" id="filter_algorithm_applications"><a class="viewcode-back" href="../../../api/gt4sd.cli.algorithms.html#gt4sd.cli.algorithms.filter_algorithm_applications">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">filter_algorithm_applications</span><span class="p">(</span>
     <span class="n">algorithms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">filters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returning algorithms with given filters.</span>
 
 <span class="sd">    Args:</span>
@@ -224,7 +224,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        the filtered algorithms.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">[</span>
         <span class="n">application</span>
         <span class="k">for</span> <span class="n">application</span> <span class="ow">in</span> <span class="n">algorithms</span>
@@ -240,7 +240,7 @@
 <div class="viewcode-block" id="get_configuration_tuples"><a class="viewcode-back" href="../../../api/gt4sd.cli.algorithms.html#gt4sd.cli.algorithms.get_configuration_tuples">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_configuration_tuples</span><span class="p">(</span>
     <span class="n">algorithms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ConfigurationTuple</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returning configuration tuples from a list of applications.</span>
 
 <span class="sd">    Args:</span>
@@ -248,7 +248,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        the configuration tuples.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
         <span class="nb">list</span><span class="p">(</span>
             <span class="p">{</span>

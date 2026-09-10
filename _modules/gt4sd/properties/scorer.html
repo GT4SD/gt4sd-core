@@ -172,7 +172,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -181,7 +181,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -200,7 +200,7 @@
 
 
 <div class="viewcode-block" id="PropertyPredictorScorer"><a class="viewcode-back" href="../../../api/gt4sd.properties.scorer.html#gt4sd.properties.scorer.PropertyPredictorScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PropertyPredictorScorer</span><span class="p">(</span><span class="n">DistanceScorer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Property Predictor Scorer.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Property Predictor Scorer."""</span>
 
 <div class="viewcode-block" id="PropertyPredictorScorer.__init__"><a class="viewcode-back" href="../../../api/gt4sd.properties.scorer.html#gt4sd.properties.scorer.PropertyPredictorScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -208,13 +208,13 @@
         <span class="n">scoring_function</span><span class="p">:</span> <span class="n">PropertyPredictor</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scoring function that calculates a generic score for a property.</span>
+<span class="w">        </span><span class="sd">"""Scoring function that calculates a generic score for a property.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name: name of the property to score. Needed for validation.</span>
 <span class="sd">            scoring_function: callable scoring function.</span>
-<span class="sd">            target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters[&quot;target&quot;]).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters["target"]).</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
 
@@ -222,47 +222,47 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="PropertyPredictorScorer.score"><a class="viewcode-back" href="../../../api/gt4sd.properties.scorer.html#gt4sd.properties.scorer.PropertyPredictorScorer.score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a score for a given molecule or protein.</span>
+<span class="w">        </span><span class="sd">"""Generates a score for a given molecule or protein.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            sample: molecule or protein.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A score for the given molecule or protein.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_input</span><span class="p">(</span><span class="n">sample</span><span class="o">=</span><span class="n">sample</span><span class="p">,</span> <span class="n">property_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scoring_function</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PropertyPredictorScorer.score_list"><a class="viewcode-back" href="../../../api/gt4sd.properties.scorer.html#gt4sd.properties.scorer.PropertyPredictorScorer.score_list">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">score_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a list of scores for a given molecule or protein list.</span>
+<span class="w">        </span><span class="sd">"""Generates a list of scores for a given molecule or protein list.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            samples_list: A List of molecules or proteins.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A List of scores</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">sample_list</span><span class="p">:</span>
             <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">sample</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">scores</span></div>
 
 <div class="viewcode-block" id="PropertyPredictorScorer.predictor"><a class="viewcode-back" href="../../../api/gt4sd.properties.scorer.html#gt4sd.properties.scorer.PropertyPredictorScorer.predictor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predictor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a prediction for a given molecule or protein.</span>
+<span class="w">        </span><span class="sd">"""Generates a prediction for a given molecule or protein.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            sample: molecule or protein.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A score for the given SMILES</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_input</span><span class="p">(</span><span class="n">sample</span><span class="o">=</span><span class="n">sample</span><span class="p">,</span> <span class="n">property_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scoring_function</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PropertyPredictorScorer.validate_input"><a class="viewcode-back" href="../../../api/gt4sd.properties.scorer.html#gt4sd.properties.scorer.PropertyPredictorScorer.validate_input">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">property_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates the sample in input.</span>
+<span class="w">        </span><span class="sd">"""Validates the sample in input.</span>
 <span class="sd">        If self.name is a property available for molecules, check that sample is a SMILES.</span>
 <span class="sd">        If self.name is a property available for proteins, check that sample is a protein.</span>
 
@@ -274,30 +274,30 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            True if the input is valid.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># if selected property is available for molecules</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">AVAILABLE_MOLECULES_PROPERTY_PREDICTOR</span><span class="p">:</span>
             <span class="c1"># check that sample is a valid SMILES, if not raise error</span>
             <span class="k">if</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">property_name</span><span class="si">}</span><span class="s2"> is a property available for molecules and </span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s2"> is not a valid SMILES. Please input a molecule.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">property_name</span><span class="si">}</span><span class="s2"> is a property available for molecules and </span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s2"> is not a valid SMILES. Please input a molecule."</span>
                 <span class="p">)</span>
         <span class="c1"># if selected property is available for proteins</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">AVAILABLE_PROTEINS_PROPERTY_PREDICTOR</span><span class="p">:</span>
             <span class="c1"># check that sample is a valid FASTA, if not raise error</span>
             <span class="k">if</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromFASTA</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">property_name</span><span class="si">}</span><span class="s2"> is a property available for proteins and </span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s2"> is not a valid FASTA. Plese input a protein.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">property_name</span><span class="si">}</span><span class="s2"> is a property available for proteins and </span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s2"> is not a valid FASTA. Plese input a protein."</span>
                 <span class="p">)</span>
         <span class="c1"># if property is not available, raise error</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">property_name</span><span class="si">}</span><span class="s2"> is not available or not a valid property.&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">property_name</span><span class="si">}</span><span class="s2"> is not available or not a valid property."</span>
             <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="MoleculePropertyPredictorScorer"><a class="viewcode-back" href="../../../api/gt4sd.properties.scorer.html#gt4sd.properties.scorer.MoleculePropertyPredictorScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MoleculePropertyPredictorScorer</span><span class="p">(</span><span class="n">PropertyPredictorScorer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Property Predictor Scorer for molecules.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Property Predictor Scorer for molecules."""</span>
 
 <div class="viewcode-block" id="MoleculePropertyPredictorScorer.__init__"><a class="viewcode-back" href="../../../api/gt4sd.properties.scorer.html#gt4sd.properties.scorer.MoleculePropertyPredictorScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -305,21 +305,21 @@
         <span class="n">scoring_function</span><span class="p">:</span> <span class="n">PropertyPredictor</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scoring function that calculates a generic score for a property in molecules.</span>
+<span class="w">        </span><span class="sd">"""Scoring function that calculates a generic score for a property in molecules.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name: name of the property to score.</span>
 <span class="sd">            scoring_function: callable scoring function.</span>
-<span class="sd">            target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters[&quot;target&quot;]).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters["target"]).</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AVAILABLE_MOLECULES_PROPERTY_PREDICTOR</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;property </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not available for molecules.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"property </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not available for molecules."</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="n">scoring_function</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ProteinPropertyPredictorScorer"><a class="viewcode-back" href="../../../api/gt4sd.properties.scorer.html#gt4sd.properties.scorer.ProteinPropertyPredictorScorer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ProteinPropertyPredictorScorer</span><span class="p">(</span><span class="n">PropertyPredictorScorer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Property Predictor Scorer for protein.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Property Predictor Scorer for protein."""</span>
 
 <div class="viewcode-block" id="ProteinPropertyPredictorScorer.__init__"><a class="viewcode-back" href="../../../api/gt4sd.properties.scorer.html#gt4sd.properties.scorer.ProteinPropertyPredictorScorer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -327,15 +327,15 @@
         <span class="n">scoring_function</span><span class="p">:</span> <span class="n">PropertyPredictor</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scoring function that calculates a generic score for a property in proteins.</span>
+<span class="w">        </span><span class="sd">"""Scoring function that calculates a generic score for a property in proteins.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name: name of the property to score.</span>
 <span class="sd">            scoring_function: callable scoring function.</span>
-<span class="sd">            target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters[&quot;target&quot;]).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            target: target score that will be used to get the distance to the score of a molecule or protein (not be confused with parameters["target"]).</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AVAILABLE_PROTEINS_PROPERTY_PREDICTOR</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;property </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not available for proteins.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"property </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not available for proteins."</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="n">scoring_function</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span></div></div>
 </pre></div>

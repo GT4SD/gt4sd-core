@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Implementation of the zero-shot classifier.&quot;&quot;&quot;</span>
+<span class="sd">"""Implementation of the zero-shot classifier."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
@@ -207,33 +207,33 @@
 
 
 <div class="viewcode-block" id="MCAPredictor"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.MCAPredictor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MCAPredictor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base implementation of an MCAPredictor.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Base implementation of an MCAPredictor."""</span>
 
 <div class="viewcode-block" id="MCAPredictor.predict"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.MCAPredictor.predict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get prediction.</span>
+<span class="w">        </span><span class="sd">"""Get prediction.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            predicted affinity</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;No prediction implemented for base MCAPredictor&quot;</span><span class="p">)</span></div>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"No prediction implemented for base MCAPredictor"</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MCAPredictor.predict_values"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.MCAPredictor.predict_values">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get prediction for algorithm sample method.</span>
+<span class="w">        </span><span class="sd">"""Get prediction for algorithm sample method.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            predicted values as list.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;No values prediction implemented for base MCAPredictor&quot;</span>
+            <span class="s2">"No values prediction implemented for base MCAPredictor"</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="BimodalMCAAffinityPredictor"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">BimodalMCAAffinityPredictor</span><span class="p">(</span><span class="n">MCAPredictor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bimodal MCA (Multiscale Convolutional Attention) affinity prediction model.</span>
+<span class="w">    </span><span class="sd">"""Bimodal MCA (Multiscale Convolutional Attention) affinity prediction model.</span>
 
 <span class="sd">    For details see: https://pubs.acs.org/doi/10.1021/acs.molpharmaceut.9b00520</span>
 <span class="sd">    and https://iopscience.iop.org/article/10.1088/2632-2153/abe808.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="BimodalMCAAffinityPredictor.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -243,7 +243,7 @@
         <span class="n">confidence</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize BimodalMCAAffinityPredictor.</span>
+<span class="w">        </span><span class="sd">"""Initialize BimodalMCAAffinityPredictor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: path where to load model weights and cofiguration.</span>
@@ -252,7 +252,7 @@
 <span class="sd">            confidence: whether the confidence for the prediction should be returned.</span>
 <span class="sd">            device: device where the inference</span>
 <span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span> <span class="o">=</span> <span class="n">resources_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">protein_targets</span> <span class="o">=</span> <span class="n">protein_targets</span>
@@ -260,18 +260,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="n">confidence</span>
 
         <span class="c1"># setting affinity predictor parameters</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;mca_model_params.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"mca_model_params.json"</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">predictor_params</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span> <span class="o">=</span> <span class="n">MODEL_FACTORY</span><span class="p">[</span><span class="s2">&quot;bimodal_mca&quot;</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span> <span class="o">=</span> <span class="n">MODEL_FACTORY</span><span class="p">[</span><span class="s2">"bimodal_mca"</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_params</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;mca_weights.pt&quot;</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"mca_weights.pt"</span><span class="p">),</span>
             <span class="n">map_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">affinity_protein_language</span> <span class="o">=</span> <span class="n">ProteinLanguage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;protein_language.pkl&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"protein_language.pkl"</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">affinity_smiles_language</span> <span class="o">=</span> <span class="n">SMILESLanguage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;smiles_language.pkl&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"smiles_language.pkl"</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span><span class="o">.</span><span class="n">_associate_language</span><span class="p">(</span><span class="n">affinity_smiles_language</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">affinity_predictor</span><span class="o">.</span><span class="n">_associate_language</span><span class="p">(</span><span class="n">affinity_protein_language</span><span class="p">)</span>
@@ -290,11 +290,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">to_tensor</span> <span class="o">=</span> <span class="n">ToTensor</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="BimodalMCAAffinityPredictor.predict"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor.predict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get predicted affinity.</span>
+<span class="w">        </span><span class="sd">"""Get predicted affinity.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            predicted affinity.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># prepare ligand representation</span>
         <span class="n">ligand_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
             <span class="p">[</span>
@@ -341,11 +341,11 @@
         <span class="k">return</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">predictions_dict</span></div>
 
 <div class="viewcode-block" id="BimodalMCAAffinityPredictor.predict_values"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.paccmann.implementation.html#gt4sd.algorithms.prediction.paccmann.implementation.BimodalMCAAffinityPredictor.predict_values">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get prediction for algorithm sample method.</span>
+<span class="w">        </span><span class="sd">"""Get prediction for algorithm sample method.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            predicted values as list.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">predictions</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">predictions</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span></div></div>
 </pre></div>

@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Implementation of PaccMann^RL conditional generators.&quot;&quot;&quot;</span>
+<span class="sd">"""Implementation of PaccMann^RL conditional generators."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
@@ -214,7 +214,7 @@
 
 
 <div class="viewcode-block" id="ConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ConditionalGenerator</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract interface for a conditional generator.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Abstract interface for a conditional generator."""</span>
 
     <span class="c1">#: device where the inference is running.</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span>
@@ -234,14 +234,14 @@
     <span class="n">encoder_latent_size</span><span class="p">:</span> <span class="nb">int</span>
 
 <div class="viewcode-block" id="ConditionalGenerator.get_smiles_from_latent"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.get_smiles_from_latent">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_smiles_from_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latent</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Take samples from the latent space.</span>
+<span class="w">        </span><span class="sd">"""Take samples from the latent space.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            latent: latent vector tensor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            SMILES list and indexes for the valid ones.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_latent_size</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_latent_size</span><span class="p">:</span>
             <span class="n">latent</span> <span class="o">=</span> <span class="n">latent</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
@@ -264,7 +264,7 @@
         <span class="p">]</span>
 
         <span class="c1"># convert SELFIES to SMILES</span>
-        <span class="k">if</span> <span class="s2">&quot;selfies&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">smiles_language</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"selfies"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">smiles_language</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
             <span class="n">molecules</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">smiles_language</span><span class="o">.</span><span class="n">selfies_to_smiles</span><span class="p">(</span><span class="n">a_selfies</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">a_selfies</span> <span class="ow">in</span> <span class="n">molecules</span>
@@ -280,15 +280,15 @@
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="ConditionalGenerator.generate_batch"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ConditionalGenerator.generate_batch">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;embedding condition and getting reparametrized latent samples&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"embedding condition and getting reparametrized latent samples"</span><span class="p">)</span>
         <span class="n">latent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_latent</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;starting generation of molecules&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"starting generation of molecules"</span><span class="p">)</span>
         <span class="c1"># generate the molecules</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_smiles_from_latent</span><span class="p">(</span><span class="n">latent</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ProteinSequenceConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ProteinSequenceConditionalGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ProteinSequenceConditionalGenerator</span><span class="p">(</span><span class="n">ConditionalGenerator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Protein conditional generator as implemented in https://doi.org/10.1088/2632-2153/abe808</span>
 <span class="sd">    (originally https://arxiv.org/abs/2005.13285).</span>
 <span class="sd">    It generates highly binding and low toxic ligands.</span>
@@ -298,7 +298,7 @@
 <span class="sd">            It has to be greater than 1.</span>
 <span class="sd">        protein_embedding_encoder_params: parameter for the protein embedding encoder.</span>
 <span class="sd">        protein_embedding_encoder: protein embedding encoder.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="ProteinSequenceConditionalGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ProteinSequenceConditionalGenerator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -308,7 +308,7 @@
         <span class="n">samples_per_protein</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize the generator.</span>
 
 <span class="sd">        Args:</span>
@@ -320,7 +320,7 @@
 <span class="sd">                It has to be greater than 1. Defaults to 10.</span>
 <span class="sd">            device: device where the inference</span>
 <span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
         <span class="c1"># setting sampling parameters</span>
@@ -328,20 +328,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">generated_length</span> <span class="o">=</span> <span class="n">generated_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_protein</span> <span class="o">=</span> <span class="n">samples_per_protein</span>
         <span class="c1"># instantiate protein embedding encoder</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;protein_embedding_params.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"protein_embedding_params.json"</span><span class="p">))</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding_encoder_params</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding_encoder</span> <span class="o">=</span> <span class="n">ENCODER_FACTORY</span><span class="p">[</span><span class="s2">&quot;dense&quot;</span><span class="p">](</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding_encoder</span> <span class="o">=</span> <span class="n">ENCODER_FACTORY</span><span class="p">[</span><span class="s2">"dense"</span><span class="p">](</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding_encoder_params</span>
         <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding_encoder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;protein_embedding_encoder.pt&quot;</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"protein_embedding_encoder.pt"</span><span class="p">),</span>
             <span class="n">map_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding_encoder</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder_latent_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding_encoder</span><span class="o">.</span><span class="n">latent_size</span>
         <span class="c1"># instantiate selfies conditional generator</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;selfies_conditional_generator.json&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"selfies_conditional_generator.json"</span><span class="p">)</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">selfies_conditional_generator_params</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selfies_conditional_generator</span> <span class="o">=</span> <span class="n">TeacherVAE</span><span class="p">(</span>
@@ -349,7 +349,7 @@
             <span class="n">StackGRUDecoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selfies_conditional_generator_params</span><span class="p">),</span>
         <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selfies_conditional_generator</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;selfies_conditional_generator.pt&quot;</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"selfies_conditional_generator.pt"</span><span class="p">),</span>
             <span class="n">map_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selfies_conditional_generator</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
@@ -358,18 +358,18 @@
         <span class="p">)</span>
         <span class="c1"># loading SMILES language for decoding and conversion of SELFIES to SMILES</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">smiles_language</span> <span class="o">=</span> <span class="n">SMILESLanguage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;selfies_language.pkl&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"selfies_language.pkl"</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="c1"># protein embedding from primary sequence (via tape)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">primary_sequence_embedder</span> <span class="o">=</span> <span class="n">PrimarySequenceEncoder</span><span class="p">(</span>
-            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;transformer&quot;</span><span class="p">,</span>
-            <span class="n">from_pretrained</span><span class="o">=</span><span class="s2">&quot;bert-base&quot;</span><span class="p">,</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">"transformer"</span><span class="p">,</span>
+            <span class="n">from_pretrained</span><span class="o">=</span><span class="s2">"bert-base"</span><span class="p">,</span>
             <span class="n">model_config_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">tokenizer</span><span class="o">=</span><span class="s2">&quot;iupac&quot;</span><span class="p">,</span>
+            <span class="n">tokenizer</span><span class="o">=</span><span class="s2">"iupac"</span><span class="p">,</span>
         <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ProteinSequenceConditionalGenerator.get_latent"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.ProteinSequenceConditionalGenerator.get_latent">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Given a protein generate the latent representation.</span>
 
 <span class="sd">        Args:</span>
@@ -378,7 +378,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            the latent representation for the given context. It contains</span>
 <span class="sd">                self.samples_per_protein repeats.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># encode embedded sequence once, ignore the returned dummy ids</span>
         <span class="n">embeddings</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">primary_sequence_embedder</span><span class="o">.</span><span class="n">forward</span><span class="p">([[</span><span class="n">protein</span><span class="p">]])</span>
         <span class="n">protein_mu</span><span class="p">,</span> <span class="n">protein_logvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protein_embedding_encoder</span><span class="p">(</span>
@@ -396,7 +396,7 @@
 
 
 <div class="viewcode-block" id="TranscriptomicConditionalGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.TranscriptomicConditionalGenerator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TranscriptomicConditionalGenerator</span><span class="p">(</span><span class="n">ConditionalGenerator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Transcriptomic conditional generator as implemented in https://doi.org/10.1016/j.isci.2021.102269</span>
 <span class="sd">    (originally https://doi.org/10.1007/978-3-030-45257-5_18, https://arxiv.org/abs/1909.05114).</span>
 <span class="sd">    It generates highly effective small molecules against transcriptomic progiles.</span>
@@ -406,7 +406,7 @@
 <span class="sd">            It has to be greater than 1.</span>
 <span class="sd">        transcriptomic_encoder_params: parameter for the protein embedding encoder.</span>
 <span class="sd">        transcriptomic_encoder: protein embedding encoder.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="TranscriptomicConditionalGenerator.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.TranscriptomicConditionalGenerator.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -416,7 +416,7 @@
         <span class="n">samples_per_profile</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize the generator.</span>
 
 <span class="sd">        Args:</span>
@@ -428,30 +428,30 @@
 <span class="sd">                It has to be greater than 1. Defaults to 10.</span>
 <span class="sd">            device: device where the inference</span>
 <span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
         <span class="c1"># setting sampling parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">generated_length</span> <span class="o">=</span> <span class="n">generated_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_profile</span> <span class="o">=</span> <span class="n">samples_per_profile</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;genes.txt&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"genes.txt"</span><span class="p">))</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">genes</span> <span class="o">=</span> <span class="p">[</span><span class="n">gene</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">gene</span> <span class="ow">in</span> <span class="n">fp</span> <span class="k">if</span> <span class="n">gene</span><span class="p">]</span>
         <span class="c1"># instantiate protein embedding encoder</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;transcriptomic_params.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"transcriptomic_params.json"</span><span class="p">))</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">transcriptomic_encoder_params</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transcriptomic_encoder</span> <span class="o">=</span> <span class="n">ENCODER_FACTORY</span><span class="p">[</span><span class="s2">&quot;dense&quot;</span><span class="p">](</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transcriptomic_encoder</span> <span class="o">=</span> <span class="n">ENCODER_FACTORY</span><span class="p">[</span><span class="s2">"dense"</span><span class="p">](</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">transcriptomic_encoder_params</span>
         <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transcriptomic_encoder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;transcriptomic_encoder.pt&quot;</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"transcriptomic_encoder.pt"</span><span class="p">),</span>
             <span class="n">map_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transcriptomic_encoder</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder_latent_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transcriptomic_encoder</span><span class="o">.</span><span class="n">latent_size</span>
         <span class="c1"># instantiate selfies conditional generator</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;selfies_conditional_generator.json&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"selfies_conditional_generator.json"</span><span class="p">)</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">selfies_conditional_generator_params</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selfies_conditional_generator</span> <span class="o">=</span> <span class="n">TeacherVAE</span><span class="p">(</span>
@@ -459,7 +459,7 @@
             <span class="n">StackGRUDecoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selfies_conditional_generator_params</span><span class="p">),</span>
         <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selfies_conditional_generator</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;selfies_conditional_generator.pt&quot;</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"selfies_conditional_generator.pt"</span><span class="p">),</span>
             <span class="n">map_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selfies_conditional_generator</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
@@ -468,11 +468,11 @@
         <span class="p">)</span>
         <span class="c1"># loading SMILES language for decoding and conversion of SELFIES to SMILES</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">smiles_language</span> <span class="o">=</span> <span class="n">SMILESLanguage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">&quot;selfies_language.pkl&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resources_path</span><span class="p">,</span> <span class="s2">"selfies_language.pkl"</span><span class="p">)</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TranscriptomicConditionalGenerator.get_latent"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.html#gt4sd.algorithms.conditional_generation.paccmann_rl.implementation.TranscriptomicConditionalGenerator.get_latent">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_latent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Given a profile generate the latent representation.</span>
 
 <span class="sd">        Args:</span>
@@ -484,16 +484,16 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            the latent representation for the given context. It contains</span>
 <span class="sd">                self.samples_per_profile repeats.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
             <span class="c1"># make sure genes are sorted</span>
             <span class="n">profile</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">genes</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;profile passed as string, serializing it to a list&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"profile passed as string, serializing it to a list"</span><span class="p">)</span>
             <span class="n">profile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">profile</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genes</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;provided profile size (</span><span class="si">{</span><span class="n">profile</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">) does not match required size </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"provided profile size (</span><span class="si">{</span><span class="n">profile</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">) does not match required size </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genes</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="c1"># encode embedded progiles</span>
         <span class="n">transcriptomic_mu</span><span class="p">,</span> <span class="n">transcriptomic_logvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transcriptomic_encoder</span><span class="p">(</span>

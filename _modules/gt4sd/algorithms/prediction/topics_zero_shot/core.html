@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Algortihms for topic modelling using zero-shot learning via MLNI models.&quot;&quot;&quot;</span>
+<span class="sd">"""Algortihms for topic modelling using zero-shot learning via MLNI models."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">field</span>
@@ -200,20 +200,20 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
-<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"S"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
 <span class="n">Targeted</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
 
 
 <div class="viewcode-block" id="TopicsZeroShot"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.topics_zero_shot.core.html#gt4sd.algorithms.prediction.topics_zero_shot.core.TopicsZeroShot">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TopicsZeroShot</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Topics prediction algorithm.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Topics prediction algorithm."""</span>
 
 <div class="viewcode-block" id="TopicsZeroShot.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.topics_zero_shot.core.html#gt4sd.algorithms.prediction.topics_zero_shot.core.TopicsZeroShot.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate TopicsZeroShot ready to predict topics.</span>
+<span class="w">        </span><span class="sd">"""Instantiate TopicsZeroShot ready to predict topics.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            configuration: domain and application</span>
@@ -224,10 +224,10 @@
 <span class="sd">            An example for predicting topics for a given text::</span>
 
 <span class="sd">                config = TopicsPredictor()</span>
-<span class="sd">                algorithm = TopicsZeroShot(configuration=config, target=&quot;This is a text I want to understand better&quot;)</span>
+<span class="sd">                algorithm = TopicsZeroShot(configuration=config, target="This is a text I want to understand better")</span>
 <span class="sd">                items = list(algorithm.sample(1))</span>
 <span class="sd">                print(items)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
         <span class="c1"># TODO there might also be a validation/check on the target input</span>
@@ -242,7 +242,7 @@
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Targeted</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the function to perform the prediction via TopicsZeroShot&#39;s generator.</span>
+<span class="w">        </span><span class="sd">"""Get the function to perform the prediction via TopicsZeroShot's generator.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            configuration: helps to set up specific application of TopicsZeroShot.</span>
@@ -250,8 +250,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            callable with target predicting topics sorted by relevance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ensure artifacts for the application are present.&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"ensure artifacts for the application are present."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">ensure_artifacts</span><span class="p">()</span>
         <span class="n">implementation</span><span class="p">:</span> <span class="n">ZeroShotClassifier</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">get_conditional_generator</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span>
@@ -261,40 +261,40 @@
 
 <div class="viewcode-block" id="TopicsPredictor"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.topics_zero_shot.core.html#gt4sd.algorithms.prediction.topics_zero_shot.core.TopicsPredictor">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">TopicsZeroShot</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TopicsPredictor</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration to generate topics.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Configuration to generate topics."""</span>
 
-    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;prediction&quot;</span>
-    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;nlp&quot;</span>
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dbpedia&quot;</span>
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"prediction"</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"nlp"</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"dbpedia"</span>
 
     <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;facebook/bart-large-mnli&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"facebook/bart-large-mnli"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;MLNI model name to use. If the  model is not found in the cache, a download from HuggingFace will be attempted.&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"MLNI model name to use. If the  model is not found in the cache, a download from HuggingFace will be attempted."</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="TopicsPredictor.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.topics_zero_shot.core.html#gt4sd.algorithms.prediction.topics_zero_shot.core.TopicsPredictor.get_target_description">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+<span class="w">        </span><span class="sd">"""Get description of the target for generation.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            target description.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Text to analyze&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Text considered for the topics prediction task.&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+            <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Text to analyze"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Text considered for the topics prediction task."</span><span class="p">,</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="TopicsPredictor.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.prediction.topics_zero_shot.core.html#gt4sd.algorithms.prediction.topics_zero_shot.core.TopicsPredictor.get_conditional_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ZeroShotClassifier</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual generator implementation.</span>
+<span class="w">        </span><span class="sd">"""Instantiate the actual generator implementation.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: local path to model files.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            instance with :meth:`generate_batch&lt;gt4sd.algorithms.prediction.topics_zero_shot.implementation.ZeroShotClassifier.predict&gt;` method for targeted generation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ZeroShotClassifier</span><span class="p">(</span>
             <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span>
         <span class="p">)</span></div></div>

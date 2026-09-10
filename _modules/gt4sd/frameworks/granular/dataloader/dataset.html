@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Dataset module.&quot;&quot;&quot;</span>
+<span class="sd">"""Dataset module."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -206,24 +206,24 @@
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 <span class="n">SCALING_FACTORY_FN</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;onehot&quot;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-    <span class="s2">&quot;min-max&quot;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">MinMaxScaler</span><span class="p">(),</span>
-    <span class="s2">&quot;standard&quot;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">StandardScaler</span><span class="p">(),</span>
+    <span class="s2">"onehot"</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s2">"error"</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="s2">"min-max"</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">MinMaxScaler</span><span class="p">(),</span>
+    <span class="s2">"standard"</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">StandardScaler</span><span class="p">(),</span>
 <span class="p">}</span>
 <span class="n">MODEL_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ARCHITECTURE_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
 
 <div class="viewcode-block" id="GranularDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GranularDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A dataset wrapper for granular&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A dataset wrapper for granular"""</span>
 
 <div class="viewcode-block" id="GranularDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a granular dataset.</span>
+<span class="w">        </span><span class="sd">"""Initialize a granular dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name: dataset name.</span>
 <span class="sd">            data: dataset samples.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"data"</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">:</span> <span class="n">Tokenizer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_seq_size</span><span class="p">:</span> <span class="nb">int</span>
@@ -231,70 +231,70 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">target_size</span><span class="p">:</span> <span class="nb">int</span></div>
 
 <div class="viewcode-block" id="GranularDataset.__len__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__len__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dataset length.</span>
+<span class="w">        </span><span class="sd">"""Dataset length.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            length of the dataset.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">lengths</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="sd">        """</span>
+        <span class="n">lengths</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"data"</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">lengths</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mismatching dimensions for the data: </span><span class="si">{</span><span class="n">lengths</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mismatching dimensions for the data: </span><span class="si">{</span><span class="n">lengths</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">lengths</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="GranularDataset.__getitem__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.GranularDataset.__getitem__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve an item from the dataset by index.</span>
+<span class="w">        </span><span class="sd">"""Retrieve an item from the dataset by index.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            index: index for the item.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            an item.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]:</span>
-            <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"data"</span><span class="p">]:</span>
+            <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"_"</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">result</span></div></div>
 
 
 <div class="viewcode-block" id="CombinedGranularDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CombinedGranularDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;General dataset combining multiple granular datasets.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""General dataset combining multiple granular datasets."""</span>
 
 <div class="viewcode-block" id="CombinedGranularDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a general dataset.</span>
+<span class="w">        </span><span class="sd">"""Initialize a general dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            datasets: list of dataset configurations.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">datasets</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="CombinedGranularDataset.__len__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__len__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dataset length.</span>
+<span class="w">        </span><span class="sd">"""Dataset length.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            length of the dataset.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">([</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()][</span><span class="mi">0</span><span class="p">])</span></div>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">([</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"data"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()][</span><span class="mi">0</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="CombinedGranularDataset.__getitem__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.CombinedGranularDataset.__getitem__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve an item from the dataset by index.</span>
+<span class="w">        </span><span class="sd">"""Retrieve an item from the dataset by index.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            index: index for the item.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            an item.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]]</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"data"</span><span class="p">]]</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"_"</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">result</span></div></div>
 
 
 <div class="viewcode-block" id="SmilesTokenizationPreProcessingDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SmilesTokenizationPreProcessingDataset</span><span class="p">(</span><span class="n">GranularDataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset for SMILES/SELFIES preprocessing.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Dataset for SMILES/SELFIES preprocessing."""</span>
 
 <div class="viewcode-block" id="SmilesTokenizationPreProcessingDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -305,7 +305,7 @@
         <span class="n">tokenizer</span><span class="p">:</span> <span class="n">Tokenizer</span><span class="p">,</span>
         <span class="n">set_seq_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a SmilesTokenizationPreProcessingDataset.</span>
+<span class="w">        </span><span class="sd">"""Construct a SmilesTokenizationPreProcessingDataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name: dataset name.</span>
@@ -315,7 +315,7 @@
 <span class="sd">            tokenizer: a tokenizer defining the molecule representation used.</span>
 <span class="sd">            set_seq_size: sequence size. Defaults to None, a.k.a., define this</span>
 <span class="sd">                using the input SMILES.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_smiles</span> <span class="o">=</span> <span class="n">input_smiles</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_smiles</span> <span class="o">=</span> <span class="n">target_smiles</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -338,20 +338,20 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">data</span><span class="o">=</span><span class="p">{</span>
-                <span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_tokens</span><span class="p">,</span>
-                <span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_tokens</span><span class="p">,</span>
+                <span class="n">data_columns</span><span class="p">[</span><span class="s2">"input"</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_tokens</span><span class="p">,</span>
+                <span class="n">data_columns</span><span class="p">[</span><span class="s2">"target"</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_tokens</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SmilesTokenizationPreProcessingDataset.smiles_to_ids"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.SmilesTokenizationPreProcessingDataset.smiles_to_ids">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">smiles_to_ids</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_smiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">target_smiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process input SMILES lists generating examples by tokenizing strings and converting them to tensors.</span>
+<span class="w">        </span><span class="sd">"""Process input SMILES lists generating examples by tokenizing strings and converting them to tensors.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input_smiles: list of input SMILES representations. Defaults to [].</span>
 <span class="sd">            target_smiles: list of target SMILES representations. Defaults to [].</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_smiles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_smiles</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">input_smiles</span> <span class="o">=</span> <span class="n">input_smiles</span>
             <span class="n">smiles</span> <span class="o">=</span> <span class="n">input_smiles</span>
@@ -360,7 +360,7 @@
             <span class="n">smiles</span> <span class="o">=</span> <span class="n">target_smiles</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s2">&quot;Either input_smiles or target_smiles needs to be specified&quot;</span>
+                <span class="s2">"Either input_smiles or target_smiles needs to be specified"</span>
             <span class="p">)</span>
 
         <span class="n">tokens_ids</span> <span class="o">=</span> <span class="p">[</span>
@@ -389,7 +389,7 @@
 
 
 <div class="viewcode-block" id="LatentModelDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">LatentModelDataset</span><span class="p">(</span><span class="n">GranularDataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Latent model dataset.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Latent model dataset."""</span>
 
 <div class="viewcode-block" id="LatentModelDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.LatentModelDataset.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -398,7 +398,7 @@
         <span class="n">target_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
         <span class="n">scaling</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a LatentModelDataset.</span>
+<span class="w">        </span><span class="sd">"""Construct a LatentModelDataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name: dataset name.</span>
@@ -408,18 +408,18 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            NotImplementedError: in case a scaling is selected.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="k">if</span> <span class="n">scaling</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Scaling not yet supported&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Scaling not yet supported"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">target_data</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_data</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_size</span> <span class="o">=</span> <span class="n">target_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_data</span><span class="p">})</span></div></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">"target"</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_data</span><span class="p">})</span></div></div>
 
 
 <div class="viewcode-block" id="AutoEncoderDataset"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AutoEncoderDataset</span><span class="p">(</span><span class="n">GranularDataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Autoencoder dataset.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Autoencoder dataset."""</span>
 
 <div class="viewcode-block" id="AutoEncoderDataset.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.AutoEncoderDataset.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -429,18 +429,18 @@
         <span class="n">target_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
         <span class="n">scaling</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an AutoEncoderDataset.</span>
+<span class="w">        </span><span class="sd">"""Construct an AutoEncoderDataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name: dataset name.</span>
 <span class="sd">            data_columns: data columns mapping.</span>
 <span class="sd">            input_data: dataframe for inputs.</span>
 <span class="sd">            target_data: dataframe for targets.</span>
-<span class="sd">            scaling: feature scaling process. Defaults to None, a.k.a. no scaling. Feasible values: &quot;onehot&quot;, &quot;min-max&quot; and &quot;standard&quot;.</span>
+<span class="sd">            scaling: feature scaling process. Defaults to None, a.k.a. no scaling. Feasible values: "onehot", "min-max" and "standard".</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: in case requested scaling is not supported.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_columns</span> <span class="o">=</span> <span class="n">data_columns</span>
 
@@ -450,24 +450,24 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">scaling</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SCALING_FACTORY_FN</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Scaling=</span><span class="si">{</span><span class="n">scaling</span><span class="si">}</span><span class="s2"> not supported. Pick a valid one: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">SCALING_FACTORY_FN</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Scaling=</span><span class="si">{</span><span class="n">scaling</span><span class="si">}</span><span class="s2"> not supported. Pick a valid one: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">SCALING_FACTORY_FN</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">input_scaling</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
                 <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
                     <span class="p">(</span>
-                        <span class="s2">&quot;InputScaling&quot;</span><span class="p">,</span>
+                        <span class="s2">"InputScaling"</span><span class="p">,</span>
                         <span class="n">SCALING_FACTORY_FN</span><span class="p">[</span><span class="n">scaling</span><span class="p">](),</span>
-                        <span class="p">[</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]],</span>
+                        <span class="p">[</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">"input"</span><span class="p">]],</span>
                     <span class="p">)</span>
                 <span class="p">]</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">target_scaling</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
                 <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
                     <span class="p">(</span>
-                        <span class="s2">&quot;TargetScaling&quot;</span><span class="p">,</span>
+                        <span class="s2">"TargetScaling"</span><span class="p">,</span>
                         <span class="n">SCALING_FACTORY_FN</span><span class="p">[</span><span class="n">scaling</span><span class="p">](),</span>
-                        <span class="p">[</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]],</span>
+                        <span class="p">[</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">"target"</span><span class="p">]],</span>
                     <span class="p">)</span>
                 <span class="p">]</span>
             <span class="p">)</span>
@@ -489,43 +489,43 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">data</span><span class="o">=</span><span class="p">{</span>
-                <span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span><span class="p">,</span>
-                <span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_data</span><span class="p">,</span>
+                <span class="n">data_columns</span><span class="p">[</span><span class="s2">"input"</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span><span class="p">,</span>
+                <span class="n">data_columns</span><span class="p">[</span><span class="s2">"target"</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_data</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">)</span></div></div>
 
 
 <span class="n">DATASET_FACTORY</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">GranularDataset</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;latentmodel&quot;</span><span class="p">:</span> <span class="n">LatentModelDataset</span><span class="p">,</span>
-    <span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="n">SmilesTokenizationPreProcessingDataset</span><span class="p">,</span>
-    <span class="s2">&quot;big-smiles&quot;</span><span class="p">:</span> <span class="n">SmilesTokenizationPreProcessingDataset</span><span class="p">,</span>
-    <span class="s2">&quot;selfies&quot;</span><span class="p">:</span> <span class="n">SmilesTokenizationPreProcessingDataset</span><span class="p">,</span>
-    <span class="s2">&quot;autoencoder&quot;</span><span class="p">:</span> <span class="n">AutoEncoderDataset</span><span class="p">,</span>
+    <span class="s2">"latentmodel"</span><span class="p">:</span> <span class="n">LatentModelDataset</span><span class="p">,</span>
+    <span class="s2">"smiles"</span><span class="p">:</span> <span class="n">SmilesTokenizationPreProcessingDataset</span><span class="p">,</span>
+    <span class="s2">"big-smiles"</span><span class="p">:</span> <span class="n">SmilesTokenizationPreProcessingDataset</span><span class="p">,</span>
+    <span class="s2">"selfies"</span><span class="p">:</span> <span class="n">SmilesTokenizationPreProcessingDataset</span><span class="p">,</span>
+    <span class="s2">"autoencoder"</span><span class="p">:</span> <span class="n">AutoEncoderDataset</span><span class="p">,</span>
 <span class="p">}</span>
 
 
 <div class="viewcode-block" id="build_data_columns"><a class="viewcode-back" href="../../../../../api/gt4sd.frameworks.granular.dataloader.dataset.html#gt4sd.frameworks.granular.dataloader.dataset.build_data_columns">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">build_data_columns</span><span class="p">(</span><span class="n">hparams</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build data columns from hyper-parameters.</span>
+<span class="w">    </span><span class="sd">"""Build data columns from hyper-parameters.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        hparams: hyper-parameters for the data columns.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        data columns.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">input_columns</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span>
+        <span class="n">input_columns</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"input"</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="n">input_columns</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">target_columns</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
+        <span class="n">target_columns</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"target"</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="n">target_columns</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1"># create dictionary</span>
     <span class="k">if</span> <span class="n">input_columns</span><span class="p">:</span>
-        <span class="n">data_columns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="n">input_columns</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="n">target_columns</span><span class="p">}</span>
+        <span class="n">data_columns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"input"</span><span class="p">:</span> <span class="n">input_columns</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">:</span> <span class="n">target_columns</span><span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">data_columns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="n">target_columns</span><span class="p">}</span>
+        <span class="n">data_columns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"target"</span><span class="p">:</span> <span class="n">target_columns</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">data_columns</span></div>
 
 
@@ -536,12 +536,12 @@
     <span class="n">data_columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">hparams</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GranularDataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a granular dataset.</span>
+<span class="w">    </span><span class="sd">"""Build a granular dataset.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: dataset name.</span>
 <span class="sd">        data: dataframe representing the dataset.</span>
-<span class="sd">        dataset_type: dataset type. Feasible values: &quot;latentmodel&quot;, &quot;smiles&quot;, &quot;selfies&quot;, &quot;big-smiles&quot; and &quot;autoencoder&quot;.</span>
+<span class="sd">        dataset_type: dataset type. Feasible values: "latentmodel", "smiles", "selfies", "big-smiles" and "autoencoder".</span>
 <span class="sd">        data_columns: data columns mapping.</span>
 <span class="sd">        hparams: hyper-parameters for the data columns.</span>
 
@@ -550,43 +550,43 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        a granular dataset.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">GranularDataset</span>
     <span class="n">dataset_type</span> <span class="o">=</span> <span class="n">dataset_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">dataset_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DATASET_FACTORY</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;dataset_type=</span><span class="si">{</span><span class="n">dataset_type</span><span class="si">}</span><span class="s2"> not supported. Pick a valid one: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">DATASET_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"dataset_type=</span><span class="si">{</span><span class="n">dataset_type</span><span class="si">}</span><span class="s2"> not supported. Pick a valid one: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">DATASET_FACTORY</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="n">input_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">&quot;latentmodel&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">"latentmodel"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data_columns</span><span class="p">[</span><span class="s2">"input"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"all"</span><span class="p">:</span>
             <span class="n">input_columns</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="n">input_columns</span> <span class="o">=</span> <span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">"input"</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">input_columns</span> <span class="o">=</span> <span class="n">data_columns</span><span class="p">[</span><span class="s2">"input"</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">input_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]]</span>
+                <span class="n">input_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">"input"</span><span class="p">]]</span>
 
     <span class="n">target_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">data_columns</span><span class="p">[</span><span class="s2">"target"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"all"</span><span class="p">:</span>
         <span class="n">target_columns</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">target_columns</span> <span class="o">=</span> <span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">"target"</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">target_columns</span> <span class="o">=</span> <span class="n">data_columns</span><span class="p">[</span><span class="s2">"target"</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">target_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]]</span>
+            <span class="n">target_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_columns</span><span class="p">[</span><span class="s2">"target"</span><span class="p">]]</span>
 
-    <span class="k">if</span> <span class="n">dataset_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;smiles&quot;</span><span class="p">,</span> <span class="s2">&quot;selfies&quot;</span><span class="p">,</span> <span class="s2">&quot;big-smiles&quot;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">dataset_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"smiles"</span><span class="p">,</span> <span class="s2">"selfies"</span><span class="p">,</span> <span class="s2">"big-smiles"</span><span class="p">}:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">build_vocab</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;build_vocab&quot;</span><span class="p">]</span>
+            <span class="n">build_vocab</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"build_vocab"</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="n">build_vocab</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">sequence_size</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;sequence_size&quot;</span><span class="p">]</span>
+            <span class="n">sequence_size</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"sequence_size"</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="n">sequence_size</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">vocab_file</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;vocab_file&quot;</span><span class="p">]</span>
+        <span class="n">vocab_file</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"vocab_file"</span><span class="p">]</span>
 
         <span class="c1"># build tokenizer</span>
         <span class="k">if</span> <span class="n">build_vocab</span><span class="p">:</span>
@@ -603,20 +603,20 @@
             <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
             <span class="n">set_seq_size</span><span class="o">=</span><span class="n">sequence_size</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">&quot;latentmodel&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">"latentmodel"</span><span class="p">:</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">LatentModelDataset</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">data_columns</span><span class="o">=</span><span class="n">data_columns</span><span class="p">,</span>
             <span class="n">target_data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">target_columns</span><span class="p">],</span>
             <span class="n">scaling</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">&quot;autoencoder&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">"autoencoder"</span><span class="p">:</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">AutoEncoderDataset</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">data_columns</span><span class="o">=</span><span class="n">data_columns</span><span class="p">,</span>
             <span class="n">input_data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">input_columns</span><span class="p">],</span>
             <span class="n">target_data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">target_columns</span><span class="p">],</span>
-            <span class="n">scaling</span><span class="o">=</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;scaling&quot;</span><span class="p">],</span>
+            <span class="n">scaling</span><span class="o">=</span><span class="n">hparams</span><span class="p">[</span><span class="s2">"scaling"</span><span class="p">],</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">dataset</span></div>
@@ -628,10 +628,10 @@
     <span class="n">dataset</span><span class="p">:</span> <span class="n">GranularDataset</span><span class="p">,</span>
     <span class="n">hparams</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build architecture configuration for the selected model type and dataset.</span>
+<span class="w">    </span><span class="sd">"""Build architecture configuration for the selected model type and dataset.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model_type: model type. Feasible values: &quot;vae_rnn&quot;, &quot;vae_trans&quot;, &quot;mlp_predictor&quot;, &quot;no_encoding&quot;, &quot;mlp_autoencoder&quot; and &quot;vae_mlp&quot;.</span>
+<span class="sd">        model_type: model type. Feasible values: "vae_rnn", "vae_trans", "mlp_predictor", "no_encoding", "mlp_autoencoder" and "vae_mlp".</span>
 <span class="sd">        data_columns: data columns mapping.</span>
 <span class="sd">        dataset: a granular dataset.</span>
 <span class="sd">        hparams: hyper-parameters for the data columns.</span>
@@ -641,39 +641,39 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        architecture configuration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">model_type</span> <span class="o">=</span> <span class="n">model_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">model_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MODEL_TYPES</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;model_type=</span><span class="si">{</span><span class="n">model_type</span><span class="si">}</span><span class="s2"> not supported. Pick a valid one: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">MODEL_TYPES</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"model_type=</span><span class="si">{</span><span class="n">model_type</span><span class="si">}</span><span class="s2"> not supported. Pick a valid one: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">MODEL_TYPES</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="n">architecture</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;start_from_checkpoint&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;start_from_checkpoint&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;freeze_weights&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;freeze_weights&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data_columns</span><span class="p">,</span>
-        <span class="s2">&quot;hparams&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="p">,</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+        <span class="s2">"type"</span><span class="p">:</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"type"</span><span class="p">],</span>
+        <span class="s2">"start_from_checkpoint"</span><span class="p">:</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"start_from_checkpoint"</span><span class="p">],</span>
+        <span class="s2">"freeze_weights"</span><span class="p">:</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"freeze_weights"</span><span class="p">],</span>
+        <span class="s2">"data"</span><span class="p">:</span> <span class="n">data_columns</span><span class="p">,</span>
+        <span class="s2">"hparams"</span><span class="p">:</span> <span class="n">hparams</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="n">AUTOENCODER_ARCHITECTURES</span><span class="p">:</span>
-        <span class="n">architecture</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;vae_rnn&quot;</span><span class="p">,</span> <span class="s2">&quot;vae_trans&quot;</span><span class="p">}:</span>
-            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;tokenizer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">tokenizer</span>
-            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;vocab_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">vocab_size</span>
-            <span class="k">if</span> <span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;vae_rnn&quot;</span><span class="p">:</span>
-                <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;embedding_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">set_seq_size</span>
-            <span class="k">else</span><span class="p">:</span>  <span class="c1"># &quot;vae_trans&quot;</span>
-                <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;sequence_len&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">set_seq_size</span>
-        <span class="k">elif</span> <span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;no_encoding&quot;</span><span class="p">:</span>
-            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;latent_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">input_size</span>
-        <span class="k">elif</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;mlp_autoencoder&quot;</span><span class="p">,</span> <span class="s2">&quot;vae_mlp&quot;</span><span class="p">}:</span>
-            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;input_size_enc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">input_size</span>
-            <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;output_size_dec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">target_size</span>
-    <span class="k">else</span><span class="p">:</span>  <span class="c1"># &quot;mlp_predictor&quot;</span>
-        <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;output_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">target_size</span>
-        <span class="n">architecture</span><span class="p">[</span><span class="s2">&quot;from_position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;from_position&quot;</span><span class="p">]</span>
+        <span class="n">architecture</span><span class="p">[</span><span class="s2">"position"</span><span class="p">]</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"position"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"vae_rnn"</span><span class="p">,</span> <span class="s2">"vae_trans"</span><span class="p">}:</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">"tokenizer"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">tokenizer</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">"vocab_size"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">vocab_size</span>
+            <span class="k">if</span> <span class="n">model_type</span> <span class="o">==</span> <span class="s2">"vae_rnn"</span><span class="p">:</span>
+                <span class="n">hparams</span><span class="p">[</span><span class="s2">"embedding_size"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">set_seq_size</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># "vae_trans"</span>
+                <span class="n">hparams</span><span class="p">[</span><span class="s2">"sequence_len"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">set_seq_size</span>
+        <span class="k">elif</span> <span class="n">model_type</span> <span class="o">==</span> <span class="s2">"no_encoding"</span><span class="p">:</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">"latent_size"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">input_size</span>
+        <span class="k">elif</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"mlp_autoencoder"</span><span class="p">,</span> <span class="s2">"vae_mlp"</span><span class="p">}:</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">"input_size_enc"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">input_size</span>
+            <span class="n">hparams</span><span class="p">[</span><span class="s2">"output_size_dec"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">target_size</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># "mlp_predictor"</span>
+        <span class="n">hparams</span><span class="p">[</span><span class="s2">"output_size"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">target_size</span>
+        <span class="n">architecture</span><span class="p">[</span><span class="s2">"from_position"</span><span class="p">]</span> <span class="o">=</span> <span class="n">hparams</span><span class="p">[</span><span class="s2">"from_position"</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">architecture</span></div>
 
@@ -687,14 +687,14 @@
     <span class="n">hparams</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GranularDataset</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a dataset and an architecture configuration.</span>
+<span class="w">    </span><span class="sd">"""Build a dataset and an architecture configuration.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: dataset name.</span>
 <span class="sd">        data_path: path to the dataset.</span>
 <span class="sd">        data_file: data file name.</span>
-<span class="sd">        dataset_type: dataset type. Feasible values: &quot;latentmodel&quot;, &quot;smiles&quot;, &quot;selfies&quot;, &quot;big-smiles&quot; and &quot;autoencoder&quot;.</span>
-<span class="sd">        model_type: model type. Feasible values: &quot;vae_rnn&quot;, &quot;vae_trans&quot;, &quot;mlp_predictor&quot;, &quot;no_encoding&quot;, &quot;mlp_autoencoder&quot; and &quot;vae_mlp&quot;.</span>
+<span class="sd">        dataset_type: dataset type. Feasible values: "latentmodel", "smiles", "selfies", "big-smiles" and "autoencoder".</span>
+<span class="sd">        model_type: model type. Feasible values: "vae_rnn", "vae_trans", "mlp_predictor", "no_encoding", "mlp_autoencoder" and "vae_mlp".</span>
 <span class="sd">        hparams: hyper-parameters for the data columns.</span>
 
 <span class="sd">    Raises:</span>
@@ -702,14 +702,14 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        a tuple containing a granular dataset and a related architecture configuration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">data_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_path</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="si">}{</span><span class="n">data_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">data_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.bz2&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pkl&quot;</span><span class="p">):</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_path</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="si">}{</span><span class="n">data_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">data_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".csv"</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">data_path</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="si">}{</span><span class="n">data_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">data_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".bz2"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".pkl"</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">data_path</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="si">}{</span><span class="n">data_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;data_file=</span><span class="si">{</span><span class="n">data_file</span><span class="si">}</span><span class="s2"> extension not supported. Use a compatible extension/format: </span><span class="si">{</span><span class="p">[</span><span class="s1">&#39;.csv&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;.bz2&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;.pkl&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"data_file=</span><span class="si">{</span><span class="n">data_file</span><span class="si">}</span><span class="s2"> extension not supported. Use a compatible extension/format: </span><span class="si">{</span><span class="p">[</span><span class="s1">'.csv'</span><span class="p">,</span><span class="w"> </span><span class="s1">'.bz2'</span><span class="p">,</span><span class="w"> </span><span class="s1">'.pkl'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="n">data_columns</span> <span class="o">=</span> <span class="n">build_data_columns</span><span class="p">(</span><span class="n">hparams</span><span class="p">)</span>
     <span class="n">dataset</span> <span class="o">=</span> <span class="n">build_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">dataset_type</span><span class="p">,</span> <span class="n">data_columns</span><span class="p">,</span> <span class="n">hparams</span><span class="p">)</span>

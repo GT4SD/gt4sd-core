@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Patent Generative Transformer (PGT) generation algorithm.&quot;&quot;&quot;</span>
+<span class="sd">"""Patent Generative Transformer (PGT) generation algorithm."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -216,18 +216,18 @@
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"S"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="PGT"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGT">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PGT</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;PGT Algorithm.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""PGT Algorithm."""</span>
 
 <div class="viewcode-block" id="PGT.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGT.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate PGT ready to generate items.</span>
+<span class="w">        </span><span class="sd">"""Instantiate PGT ready to generate items.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            configuration: domain and application</span>
@@ -237,10 +237,10 @@
 <span class="sd">        Example:</span>
 <span class="sd">            An example for generating abstract from a given claim:</span>
 
-<span class="sd">                config = PGTGenerator(task=&quot;claim_to_abstract&quot;, input_text=&quot;My interesting claim&quot;)</span>
+<span class="sd">                config = PGTGenerator(task="claim_to_abstract", input_text="My interesting claim")</span>
 <span class="sd">                generator = PGT(configuration=config)</span>
 <span class="sd">                print(list(generator.sample(1)))</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
 
@@ -257,7 +257,7 @@
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Untargeted</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the function to sample with the given configuration.</span>
+<span class="w">        </span><span class="sd">"""Get the function to sample with the given configuration.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            configuration: helps to set up specific application of PGT.</span>
@@ -265,8 +265,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            callable with target generating a batch of items.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ensure artifacts for the application are present.&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"ensure artifacts for the application are present."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">ensure_artifacts</span><span class="p">()</span>
         <span class="n">implementation</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">get_generator</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span>
@@ -279,7 +279,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
         <span class="nd">@runtime_checkable</span>
         <span class="k">class</span><span class="w"> </span><span class="nc">AnyPGTConfiguration</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Protocol for PGT configurations.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">"""Protocol for PGT configurations."""</span>
 
             <span class="k">def</span><span class="w"> </span><span class="nf">get_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
                 <span class="o">...</span>
@@ -295,48 +295,48 @@
 
 <div class="viewcode-block" id="PGTAlgorithmConfiguration"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGTAlgorithmConfiguration">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">PGT</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PGTAlgorithmConfiguration</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Basic configuration for a PGT algorithm&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Basic configuration for a PGT algorithm"""</span>
 
-    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;generation&quot;</span>
-    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;nlp&quot;</span>
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;v0&quot;</span>
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"generation"</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"nlp"</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"v0"</span>
 
     <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Type of the model.&quot;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Type of the model."</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum length of the generated text.&quot;</span><span class="p">)</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Maximum length of the generated text."</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of top-k probability tokens to keep.&quot;</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Number of top-k probability tokens to keep."</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">top_p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Only tokens with cumulative probabilities summing up to this value are kept.&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"Only tokens with cumulative probabilities summing up to this value are kept."</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">num_return_sequences</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of alternatives to be generated.&quot;</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Number of alternatives to be generated."</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">no_repeat_ngram_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Size of n-gram to not appear twice.&quot;</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Size of n-gram to not appear twice."</span><span class="p">),</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="PGTAlgorithmConfiguration.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGTAlgorithmConfiguration.get_target_description">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+<span class="w">        </span><span class="sd">"""Get description of the target for generation.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            target description, returns None in case no target is used.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="PGTAlgorithmConfiguration.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGTAlgorithmConfiguration.get_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual PGT implementation.</span>
+<span class="w">        </span><span class="sd">"""Instantiate the actual PGT implementation.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">               resources_path: local path to model files.</span>
@@ -345,7 +345,7 @@
 <span class="sd">               instance with</span>
 <span class="sd">                :meth:`generate_batch&lt;gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case&gt;`</span>
 <span class="sd">                 method for targeted generation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">Generator</span><span class="p">(</span>
             <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
             <span class="n">model_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type</span><span class="p">,</span>
@@ -361,19 +361,19 @@
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Postprocess after saving. Remove temporarily converted hf model</span>
+<span class="w">        </span><span class="sd">"""Postprocess after saving. Remove temporarily converted hf model</span>
 <span class="sd">           if pytorch-lightning checkpoint is given.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">LanguageModelingSavingArguments</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">ckpt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">hf_model_path</span><span class="p">)</span>
 
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Cleaning up temporary files from </span><span class="si">{</span><span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">hf_model_path</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Cleaning up temporary files from </span><span class="si">{</span><span class="n">training_pipeline_arguments</span><span class="o">.</span><span class="n">hf_model_path</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save_version_from_training_pipeline_arguments_postprocess</span><span class="p">(</span>
@@ -384,14 +384,14 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">get_filepath_mappings_for_training_pipeline_arguments</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">training_pipeline_arguments</span><span class="p">:</span> <span class="n">TrainingPipelineArguments</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ger filepath mappings for the given training pipeline arguments.</span>
+<span class="w">        </span><span class="sd">"""Ger filepath mappings for the given training pipeline arguments.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            training_pipeline_arguments: training pipeline arguments.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            a mapping between artifacts&#39; files and training pipeline&#39;s output files.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            a mapping between artifacts' files and training pipeline's output files.</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_pipeline_arguments</span><span class="p">,</span> <span class="n">LanguageModelingSavingArguments</span><span class="p">):</span>
 
@@ -415,21 +415,21 @@
 
 <div class="viewcode-block" id="PGTGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGTGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">PGT</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PGTGenerator</span><span class="p">(</span><span class="n">PGTAlgorithmConfiguration</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for a PGT Generator algorithm&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Configuration for a PGT Generator algorithm"""</span>
 
     <span class="n">input_text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;This is my input&quot;</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Input text.&quot;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"This is my input"</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Input text."</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">task</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;title-to-abstract&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"title-to-abstract"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Generation tasks. Supported: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">GENERATION_PROMPTS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Generation tasks. Supported: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">GENERATION_PROMPTS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="PGTGenerator.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGTGenerator.get_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual PGT implementation for part of patent generation.</span>
+<span class="w">        </span><span class="sd">"""Instantiate the actual PGT implementation for part of patent generation.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">           resources_path: local path to model files.</span>
@@ -438,7 +438,7 @@
 <span class="sd">           instance with</span>
 <span class="sd">            :meth:`generate_batch&lt;gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case&gt;`</span>
 <span class="sd">             method for targeted generation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">return</span> <span class="n">PartGenerator</span><span class="p">(</span>
             <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
@@ -456,21 +456,21 @@
 
 <div class="viewcode-block" id="PGTEditor"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGTEditor">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">PGT</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PGTEditor</span><span class="p">(</span><span class="n">PGTAlgorithmConfiguration</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for a PGT Editor algorithm.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Configuration for a PGT Editor algorithm."""</span>
 
     <span class="n">input_text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;This is my input&quot;</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Input text.&quot;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"This is my input"</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Input text."</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">input_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;abstract&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"abstract"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Part of a patent the input text belongs. Supported: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">EDITING_TYPES</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Part of a patent the input text belongs. Supported: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">EDITING_TYPES</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="PGTEditor.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGTEditor.get_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual PGT implementation for part of patent editing.</span>
+<span class="w">        </span><span class="sd">"""Instantiate the actual PGT implementation for part of patent editing.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">           resources_path: local path to model files.</span>
@@ -479,7 +479,7 @@
 <span class="sd">           instance with</span>
 <span class="sd">            :meth:`generate_batch&lt;gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case&gt;`</span>
 <span class="sd">             method for targeted generation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">return</span> <span class="n">EditGenerator</span><span class="p">(</span>
             <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>
@@ -497,34 +497,34 @@
 
 <div class="viewcode-block" id="PGTCoherenceChecker"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGTCoherenceChecker">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">PGT</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PGTCoherenceChecker</span><span class="p">(</span><span class="n">PGTAlgorithmConfiguration</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for a PGT coherence check algorithm&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Configuration for a PGT coherence check algorithm"""</span>
 
     <span class="n">num_return_sequences</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of alternatives should be always 1 for coherence check.&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"Number of alternatives should be always 1 for coherence check."</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
     <span class="n">input_a</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;I&#39;m a stochastic parrot.&quot;</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;First input for coherence check.&quot;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"I'm a stochastic parrot."</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"First input for coherence check."</span><span class="p">),</span>
     <span class="p">)</span>
 
     <span class="n">input_b</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;I&#39;m a stochastic parrot.&quot;</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Second input for coherence check.&quot;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"I'm a stochastic parrot."</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Second input for coherence check."</span><span class="p">),</span>
     <span class="p">)</span>
 
     <span class="n">coherence_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;title-abstract&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"title-abstract"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Input types for the check. Supported: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">COHERENCE_TYPES</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Input types for the check. Supported: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">COHERENCE_TYPES</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="PGTCoherenceChecker.get_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.pgt.core.html#gt4sd.algorithms.generation.pgt.core.PGTCoherenceChecker.get_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate the actual PGT implementation for patent coherence check.</span>
+<span class="w">        </span><span class="sd">"""Instantiate the actual PGT implementation for patent coherence check.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">           resources_path: local path to model files.</span>
@@ -533,7 +533,7 @@
 <span class="sd">           instance with</span>
 <span class="sd">            :meth:`generate_batch&lt;gt4sd.algorithms.generation.pgt.implementation.Generator.generate_case&gt;`</span>
 <span class="sd">            method for targeted generation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">return</span> <span class="n">CoherenceCheckGenerator</span><span class="p">(</span>
             <span class="n">resources_path</span><span class="o">=</span><span class="n">resources_path</span><span class="p">,</span>

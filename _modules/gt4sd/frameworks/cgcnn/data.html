@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Data module.&quot;&quot;&quot;</span>
+<span class="sd">"""Data module."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
@@ -226,7 +226,7 @@
     <span class="n">Tuple</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
     <span class="n">Tuple</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">DataLoader</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Utility function for dividing a dataset to train, val, test datasets.</span>
+<span class="w">    </span><span class="sd">"""Utility function for dividing a dataset to train, val, test datasets.</span>
 
 <span class="sd">    !!! The dataset needs to be shuffled before using the function !!!</span>
 
@@ -252,30 +252,30 @@
 <span class="sd">        (test_loader): torch.utils.data.DataLoader</span>
 <span class="sd">          DataLoader that random samples the test data, Returns if</span>
 <span class="sd">            return_test=True.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">total_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;train_size&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"train_size"</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">train_ratio</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">val_ratio</span> <span class="o">+</span> <span class="n">test_ratio</span> <span class="o">&lt;</span> <span class="mi">1</span>
             <span class="n">train_ratio</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">val_ratio</span> <span class="o">-</span> <span class="n">test_ratio</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;train_ratio is None, using 1 - val_ratio - &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;test_ratio = </span><span class="si">{</span><span class="n">train_ratio</span><span class="si">}</span><span class="s2"> as training data.&quot;</span>
+                <span class="sa">f</span><span class="s2">"train_ratio is None, using 1 - val_ratio - "</span>
+                <span class="sa">f</span><span class="s2">"test_ratio = </span><span class="si">{</span><span class="n">train_ratio</span><span class="si">}</span><span class="s2"> as training data."</span>
             <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">train_ratio</span> <span class="o">+</span> <span class="n">val_ratio</span> <span class="o">+</span> <span class="n">test_ratio</span> <span class="o">&lt;=</span> <span class="mi">1</span>
     <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">total_size</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;train_size&quot;</span><span class="p">]:</span>
-        <span class="n">train_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;train_size&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"train_size"</span><span class="p">]:</span>
+        <span class="n">train_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"train_size"</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">train_ratio</span> <span class="o">*</span> <span class="n">total_size</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;test_size&quot;</span><span class="p">]:</span>
-        <span class="n">test_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;test_size&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"test_size"</span><span class="p">]:</span>
+        <span class="n">test_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"test_size"</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">test_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">test_ratio</span> <span class="o">*</span> <span class="n">total_size</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;val_size&quot;</span><span class="p">]:</span>
-        <span class="n">valid_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;val_size&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"val_size"</span><span class="p">]:</span>
+        <span class="n">valid_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"val_size"</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">valid_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val_ratio</span> <span class="o">*</span> <span class="n">total_size</span><span class="p">)</span>
     <span class="n">train_sampler</span> <span class="o">=</span> <span class="n">SubsetRandomSampler</span><span class="p">(</span><span class="n">indices</span><span class="p">[:</span><span class="n">train_size</span><span class="p">])</span>
@@ -318,7 +318,7 @@
 <div class="viewcode-block" id="collate_pool"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.collate_pool">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">collate_pool</span><span class="p">(</span>
     <span class="n">dataset_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">LongTensor</span><span class="p">]],</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collate a list of data and return a batch for predicting crystal properties.</span>
+<span class="w">    </span><span class="sd">"""Collate a list of data and return a batch for predicting crystal properties.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        dataset_list: list of tuples for each data point.</span>
@@ -335,7 +335,7 @@
 <span class="sd">        batch_atom_fea: torch.Tensor shape (N, orig_atom_fea_len)</span>
 <span class="sd">          Atom features from atom type.</span>
 <span class="sd">        batch_nbr_fea: torch.Tensor shape (N, M, nbr_fea_len)</span>
-<span class="sd">          Bond features of each atom&#39;s M neighbors.</span>
+<span class="sd">          Bond features of each atom's M neighbors.</span>
 <span class="sd">        batch_nbr_fea_idx: torch.LongTensor shape (N, M)</span>
 <span class="sd">          Indices of M neighbors of each atom.</span>
 <span class="sd">        crystal_atom_idx: list of torch.LongTensor of length N0</span>
@@ -343,7 +343,7 @@
 <span class="sd">        target: torch.Tensor shape (N, 1)</span>
 <span class="sd">          Target value for prediction.</span>
 <span class="sd">        batch_cif_ids: list.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">batch_atom_fea</span><span class="p">,</span> <span class="n">batch_nbr_fea</span><span class="p">,</span> <span class="n">batch_nbr_fea_idx</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
     <span class="n">crystal_atom_idx</span><span class="p">,</span> <span class="n">batch_target</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
     <span class="n">batch_cif_ids</span> <span class="o">=</span> <span class="p">[]</span>
@@ -373,15 +373,15 @@
 
 
 <div class="viewcode-block" id="GaussianDistance"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.GaussianDistance">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GaussianDistance</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expands the distance by Gaussian basis.</span>
+<span class="w">    </span><span class="sd">"""Expands the distance by Gaussian basis.</span>
 
 <span class="sd">    Unit: angstrom</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="GaussianDistance.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.GaussianDistance.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">dmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">var</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Args:</span>
 <span class="sd">            dmin: float</span>
 <span class="sd">              Minimum interatomic distance.</span>
@@ -389,7 +389,7 @@
 <span class="sd">              Maximum interatomic distance.</span>
 <span class="sd">            step: float</span>
 <span class="sd">              Step size for the Gaussian filter.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">assert</span> <span class="n">dmin</span> <span class="o">&lt;</span> <span class="n">dmax</span>
         <span class="k">assert</span> <span class="n">dmax</span> <span class="o">-</span> <span class="n">dmin</span> <span class="o">&gt;</span> <span class="n">step</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="n">dmax</span> <span class="o">+</span> <span class="n">step</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
@@ -398,7 +398,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">var</span> <span class="o">=</span> <span class="n">var</span></div>
 
 <div class="viewcode-block" id="GaussianDistance.expand"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.GaussianDistance.expand">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distances</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply Gaussian disntance filter to a numpy distance array.</span>
+<span class="w">        </span><span class="sd">"""Apply Gaussian disntance filter to a numpy distance array.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            distance: np.array shape n-d array</span>
@@ -408,17 +408,17 @@
 <span class="sd">            expanded_distance: shape (n+1)-d array</span>
 <span class="sd">              Expanded distance matrix with the last dimension of length</span>
 <span class="sd">              len(self.filter).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
             <span class="o">-</span><span class="p">((</span><span class="n">distances</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">var</span><span class="o">**</span><span class="mi">2</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="AtomInitializer"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomInitializer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AtomInitializer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for intializing the vector representation for atoms.</span>
+<span class="w">    </span><span class="sd">"""Base class for intializing the vector representation for atoms.</span>
 
 <span class="sd">    !!! Use one AtomInitializer per dataset !!!</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="AtomInitializer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomInitializer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_types</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">atom_types</span><span class="p">)</span>
@@ -439,7 +439,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span></div>
 
 <div class="viewcode-block" id="AtomInitializer.decode"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomInitializer.decode">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_decodedict&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_decodedict"</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_decodedict</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="n">idx</span><span class="p">:</span> <span class="n">atom_type</span> <span class="k">for</span> <span class="n">atom_type</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="p">}</span>
@@ -447,19 +447,19 @@
 
 
 <div class="viewcode-block" id="AtomCustomJSONInitializer"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomCustomJSONInitializer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AtomCustomJSONInitializer</span><span class="p">(</span><span class="n">AtomInitializer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Initialize atom feature vectors using a JSON file, which is a python</span>
 <span class="sd">    dictionary mapping from element number to a list representing the</span>
 <span class="sd">    feature vector of the element.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="AtomCustomJSONInitializer.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.AtomCustomJSONInitializer.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem_embedding_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Args:</span>
 <span class="sd">            elem_embedding_file: str</span>
 <span class="sd">                The path to the .json file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">elem_embedding_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">elem_embedding</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="n">elem_embedding</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">elem_embedding</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -470,7 +470,7 @@
 
 
 <div class="viewcode-block" id="CIFData"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.CIFData">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CIFData</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    The CIFData dataset is a wrapper for a dataset where the crystal structures</span>
 <span class="sd">    are stored in the form of CIF files. The dataset should have the following</span>
 <span class="sd">    directory structure:</span>
@@ -491,7 +491,7 @@
 
 <span class="sd">    ID.cif: a CIF file that recodes the crystal structure, where ID is the</span>
 <span class="sd">    unique ID for the crystal.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="CIFData.__init__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.CIFData.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -503,7 +503,7 @@
         <span class="n">random_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">123</span><span class="p">,</span>
         <span class="n">atom_initialization</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AtomCustomJSONInitializer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Args:</span>
 <span class="sd">            root_dir: str</span>
 <span class="sd">                The path to the root directory of the dataset.</span>
@@ -520,12 +520,12 @@
 <span class="sd">            atom_initialization: AtomInitializer</span>
 <span class="sd">                The atom initializer for initializing the atom feature vectors.</span>
 <span class="sd">                Defaults to None, in which case a `atom_init.json` should be in `root_dir`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">=</span> <span class="n">root_dir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_num_nbr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">max_num_nbr</span><span class="p">,</span> <span class="n">radius</span>
-        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">root_dir</span><span class="p">),</span> <span class="s2">&quot;root_dir does not exist!&quot;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">root_dir</span><span class="p">),</span> <span class="s2">"root_dir does not exist!"</span>
 
-        <span class="n">id_prop_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="s2">&quot;id_prop.csv&quot;</span><span class="p">)</span>
+        <span class="n">id_prop_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="s2">"id_prop.csv"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">id_prop_file</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
@@ -535,22 +535,22 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Emulate the label file</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id_prop_data</span> <span class="o">=</span> <span class="p">[</span>  <span class="c1"># type: ignore</span>
-                <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">cif_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;NaN&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+                <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">cif_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"NaN"</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
                 <span class="k">for</span> <span class="n">cif_id</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">cif_id</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.cif&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cif_id</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".cif"</span><span class="p">)</span>
             <span class="p">]</span>
         <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_prop_data</span><span class="p">)</span>
         <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">atom_initialization</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">atom_init_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="s2">&quot;atom_init.json&quot;</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">atom_init_file</span><span class="p">),</span> <span class="s2">&quot;atom_init.json does not exist!&quot;</span>
+            <span class="n">atom_init_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="s2">"atom_init.json"</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">atom_init_file</span><span class="p">),</span> <span class="s2">"atom_init.json does not exist!"</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ari</span> <span class="o">=</span> <span class="n">AtomCustomJSONInitializer</span><span class="p">(</span><span class="n">atom_init_file</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom_initialization</span><span class="p">,</span> <span class="n">AtomInitializer</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="s2">&quot;atom_initialization should be an instance of AtomInitializer, &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">atom_initialization</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="s2">"atom_initialization should be an instance of AtomInitializer, "</span>
+                    <span class="sa">f</span><span class="s2">"not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">atom_initialization</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ari</span> <span class="o">=</span> <span class="n">atom_initialization</span>
 
@@ -561,7 +561,7 @@
 
 <div class="viewcode-block" id="CIFData.__getitem__"><a class="viewcode-back" href="../../../../api/gt4sd.frameworks.cgcnn.data.html#gt4sd.frameworks.cgcnn.data.CIFData.__getitem__">[docs]</a>    <span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># Cache loaded structures</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Args:</span>
 <span class="sd">           idx: index.</span>
 <span class="sd">        Returns:</span>
@@ -570,9 +570,9 @@
 <span class="sd">            nbr_fea_idx: torch.LongTensor shape (n_i, M).</span>
 <span class="sd">            target: torch.Tensor shape (1, ).</span>
 <span class="sd">            cif_id: str or int.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">cif_id</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_prop_data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-        <span class="n">crystal</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">cif_id</span> <span class="o">+</span> <span class="s2">&quot;.cif&quot;</span><span class="p">))</span>
+        <span class="n">crystal</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">cif_id</span> <span class="o">+</span> <span class="s2">".cif"</span><span class="p">))</span>
         <span class="n">atom_fea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ari</span><span class="o">.</span><span class="n">get_atom_fea</span><span class="p">(</span><span class="n">crystal</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">specie</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
@@ -586,9 +586,9 @@
         <span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">all_nbrs</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nbr</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_num_nbr</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> not find enough neighbors to build graph. &quot;</span>
-                    <span class="s2">&quot;If it happens frequently, consider increase &quot;</span>
-                    <span class="s2">&quot;radius.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cif_id</span><span class="p">)</span>
+                    <span class="s2">"</span><span class="si">{}</span><span class="s2"> not find enough neighbors to build graph. "</span>
+                    <span class="s2">"If it happens frequently, consider increase "</span>
+                    <span class="s2">"radius."</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cif_id</span><span class="p">)</span>
                 <span class="p">)</span>
                 <span class="n">nbr_fea_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">nbr</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_num_nbr</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">nbr</span><span class="p">))</span>

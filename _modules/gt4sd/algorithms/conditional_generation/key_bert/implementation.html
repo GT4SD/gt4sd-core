@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;Implementation of the KeyBERT keyword extractor.&quot;&quot;&quot;</span>
+<span class="sd">"""Implementation of the KeyBERT keyword extractor."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
@@ -200,9 +200,9 @@
 
 
 <div class="viewcode-block" id="KeyBERT"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.implementation.html#gt4sd.algorithms.conditional_generation.key_bert.implementation.KeyBERT">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">KeyBERT</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Keyword extractor based on [KeyBERT](https://github.com/MaartenGr/KeyBERT).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="KeyBERT.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.implementation.html#gt4sd.algorithms.conditional_generation.key_bert.implementation.KeyBERT.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -218,7 +218,7 @@
         <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize KeyBERT.</span>
+<span class="w">        </span><span class="sd">"""Initialize KeyBERT.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            resources_path: path where to load hypothesis, candidate labels and, optionally, the model.</span>
@@ -233,7 +233,7 @@
 <span class="sd">            model_name: name of the model to load from the cache or download from SentenceTransformers.</span>
 <span class="sd">            device: device where the inference</span>
 <span class="sd">                is running either as a dedicated class or a string. If not provided is inferred.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device_claim</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span> <span class="o">=</span> <span class="n">resources_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minimum_keyphrase_ngram</span> <span class="o">=</span> <span class="n">minimum_keyphrase_ngram</span>
@@ -248,7 +248,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="KeyBERT.load_model"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.implementation.html#gt4sd.algorithms.conditional_generation.key_bert.implementation.KeyBERT.load_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load KeyBERT model.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Load KeyBERT model."""</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span><span class="p">)</span>
             <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources_path</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span>
@@ -260,14 +260,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">KeyBERTCore</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">sentence_model</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KeyBERT.predict"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.conditional_generation.key_bert.implementation.html#gt4sd.algorithms.conditional_generation.key_bert.implementation.KeyBERT.predict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get keywords sorted by relevance.</span>
+<span class="w">        </span><span class="sd">"""Get keywords sorted by relevance.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            text: text to extract keywords from.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            keywords sorted by score from highest to lowest.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="n">keyword</span>
             <span class="k">for</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">extract_keywords</span><span class="p">(</span>

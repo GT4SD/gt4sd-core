@@ -170,7 +170,7 @@
 <span class="c1"># Copyright (c) 2022 GT4SD team</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -179,7 +179,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
 <span class="c1"># copies or substantial portions of the Software.</span>
 <span class="c1">#</span>
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -187,7 +187,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;HuggingFace Diffusers generation algorithm. Code and models adapted from https://github.com/huggingface/diffusers.&quot;&quot;&quot;</span>
+<span class="sd">"""HuggingFace Diffusers generation algorithm. Code and models adapted from https://github.com/huggingface/diffusers."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">field</span>
@@ -206,14 +206,14 @@
 <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"S"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="DiffusersGenerationAlgorithm"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.DiffusersGenerationAlgorithm">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DiffusersGenerationAlgorithm</span><span class="p">(</span><span class="n">GeneratorAlgorithm</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
 <div class="viewcode-block" id="DiffusersGenerationAlgorithm.__init__"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.DiffusersGenerationAlgorithm.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">S</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Diffusers generation algorithm.</span>
+<span class="w">        </span><span class="sd">"""Diffusers generation algorithm.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            configuration: domain and application</span>
@@ -227,7 +227,7 @@
 <span class="sd">                algorithm = DiffusersGenerationAlgorithm(configuration=configuration)</span>
 <span class="sd">                items = list(algorithm.sample(1))</span>
 <span class="sd">                print(items)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
         <span class="c1"># TODO there might also be a validation/check on the target input</span>
@@ -242,7 +242,7 @@
         <span class="n">configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Untargeted</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the function to sample batches.</span>
+<span class="w">        </span><span class="sd">"""Get the function to sample batches.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            configuration: helps to set up the application.</span>
@@ -250,8 +250,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            callable generating a batch of items.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ensure artifacts for the application are present.&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"ensure artifacts for the application are present."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">ensure_artifacts</span><span class="p">()</span>
         <span class="n">implementation</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">get_conditional_generator</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">local_artifacts</span>
@@ -267,35 +267,35 @@
 
 <div class="viewcode-block" id="DiffusersConfiguration"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.DiffusersConfiguration">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">DiffusersGenerationAlgorithm</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DiffusersConfiguration</span><span class="p">(</span><span class="n">AlgorithmConfiguration</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Basic configuration for a diffusion algorithm.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Basic configuration for a diffusion algorithm."""</span>
 
-    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;generation&quot;</span>
-    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;vision&quot;</span>
+    <span class="n">algorithm_type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"generation"</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"vision"</span>
 
     <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"image"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Modality.  Supported: &#39;image&#39;, &#39;text&#39;, &#39;audio&#39;, &#39;molecule&#39;.&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"Modality.  Supported: 'image', 'text', 'audio', 'molecule'."</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
     <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;diffusion&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"diffusion"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Type of the model. Supported: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Type of the model. Supported: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
     <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Type of the noise scheduler. Supported: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SCHEDULER_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Type of the noise scheduler. Supported: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SCHEDULER_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
     <span class="n">prompt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prompt for conditional generation.&quot;</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Prompt for conditional generation."</span><span class="p">),</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="DiffusersConfiguration.get_conditional_generator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.DiffusersConfiguration.get_conditional_generator">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_conditional_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
@@ -310,24 +310,24 @@
 
 <div class="viewcode-block" id="DDPMGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.DDPMGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">DiffusersGenerationAlgorithm</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DDPMGenerator</span><span class="p">(</span><span class="n">DiffusersConfiguration</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;DDPM - Configuration to generate using unconditional denoising diffusion models.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""DDPM - Configuration to generate using unconditional denoising diffusion models."""</span>
 
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;google/ddpm-cifar10-32&quot;</span>
-    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;diffusion&quot;</span>
-    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ddpm&quot;</span>
-    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"google/ddpm-cifar10-32"</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"diffusion"</span>
+    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"ddpm"</span>
+    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"image"</span>
 
 <div class="viewcode-block" id="DDPMGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.DDPMGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+<span class="w">        </span><span class="sd">"""Get possible algorithm versions.</span>
 
 <span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;more algorithm versions can be found on https://github.com/huggingface/diffusers&quot;</span>
+            <span class="s2">"more algorithm versions can be found on https://github.com/huggingface/diffusers"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
@@ -338,24 +338,24 @@
 
 <div class="viewcode-block" id="DDIMGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.DDIMGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">DiffusersGenerationAlgorithm</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DDIMGenerator</span><span class="p">(</span><span class="n">DiffusersConfiguration</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;DDIM - Configuration to generate using a denoising diffusion implicit model.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""DDIM - Configuration to generate using a denoising diffusion implicit model."""</span>
 
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dboshardy/ddim-butterflies-128&quot;</span>
-    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;diffusion_implicit&quot;</span>
-    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ddim&quot;</span>
-    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"dboshardy/ddim-butterflies-128"</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"diffusion_implicit"</span>
+    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"ddim"</span>
+    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"image"</span>
 
 <div class="viewcode-block" id="DDIMGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.DDIMGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+<span class="w">        </span><span class="sd">"""Get possible algorithm versions.</span>
 
 <span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;more algorithm versions can be found on https://github.com/huggingface/diffusers&quot;</span>
+            <span class="s2">"more algorithm versions can be found on https://github.com/huggingface/diffusers"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
@@ -366,24 +366,24 @@
 
 <div class="viewcode-block" id="LDMGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.LDMGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">DiffusersGenerationAlgorithm</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LDMGenerator</span><span class="p">(</span><span class="n">DiffusersConfiguration</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unconditional Latent Diffusion Model - Configuration to generate using a latent diffusion model.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Unconditional Latent Diffusion Model - Configuration to generate using a latent diffusion model."""</span>
 
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CompVis/ldm-celebahq-256&quot;</span>
-    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;latent_diffusion&quot;</span>
-    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;discrete&quot;</span>
-    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"CompVis/ldm-celebahq-256"</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"latent_diffusion"</span>
+    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"discrete"</span>
+    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"image"</span>
 
 <div class="viewcode-block" id="LDMGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.LDMGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+<span class="w">        </span><span class="sd">"""Get possible algorithm versions.</span>
 
 <span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;more algorithm versions can be found on https://github.com/huggingface/diffusers&quot;</span>
+            <span class="s2">"more algorithm versions can be found on https://github.com/huggingface/diffusers"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
@@ -394,24 +394,24 @@
 
 <div class="viewcode-block" id="ScoreSdeGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.ScoreSdeGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">DiffusersGenerationAlgorithm</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScoreSdeGenerator</span><span class="p">(</span><span class="n">DiffusersConfiguration</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Score SDE Generative Model - Configuration to generate using a score-based diffusion generative model.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Score SDE Generative Model - Configuration to generate using a score-based diffusion generative model."""</span>
 
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;google/ncsnpp-celebahq-256&quot;</span>
-    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;score_sde&quot;</span>
-    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;continuous&quot;</span>
-    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"google/ncsnpp-celebahq-256"</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"score_sde"</span>
+    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"continuous"</span>
+    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"image"</span>
 
 <div class="viewcode-block" id="ScoreSdeGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.ScoreSdeGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+<span class="w">        </span><span class="sd">"""Get possible algorithm versions.</span>
 
 <span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;more algorithm versions can be found on https://github.com/huggingface/diffusers&quot;</span>
+            <span class="s2">"more algorithm versions can be found on https://github.com/huggingface/diffusers"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
@@ -422,24 +422,24 @@
 
 <div class="viewcode-block" id="LDMTextToImageGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.LDMTextToImageGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">DiffusersGenerationAlgorithm</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LDMTextToImageGenerator</span><span class="p">(</span><span class="n">DiffusersConfiguration</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conditional Latent Diffusion Model - Configuration for conditional text2image generation using a latent diffusion model.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Conditional Latent Diffusion Model - Configuration for conditional text2image generation using a latent diffusion model."""</span>
 
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CompVis/ldm-text2im-large-256&quot;</span>
-    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;latent_diffusion_conditional&quot;</span>
-    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;discrete&quot;</span>
-    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;token2image&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"CompVis/ldm-text2im-large-256"</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"latent_diffusion_conditional"</span>
+    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"discrete"</span>
+    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"token2image"</span>
 
 <div class="viewcode-block" id="LDMTextToImageGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.LDMTextToImageGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+<span class="w">        </span><span class="sd">"""Get possible algorithm versions.</span>
 
 <span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;more algorithm versions can be found on https://github.com/huggingface/diffusers&quot;</span>
+            <span class="s2">"more algorithm versions can be found on https://github.com/huggingface/diffusers"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
@@ -450,26 +450,26 @@
 
 <div class="viewcode-block" id="StableDiffusionGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.StableDiffusionGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">DiffusersGenerationAlgorithm</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">StableDiffusionGenerator</span><span class="p">(</span><span class="n">DiffusersConfiguration</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stable Diffusion Model - Configuration for conditional text2image generation using a stable diffusion model.</span>
+<span class="w">    </span><span class="sd">"""Stable Diffusion Model - Configuration for conditional text2image generation using a stable diffusion model.</span>
 <span class="sd">    You have to provide authentication credentials to use this model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CompVis/stable-diffusion-v1-4&quot;</span>
-    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;stable_diffusion&quot;</span>
-    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;discrete&quot;</span>
-    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;token2image&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"CompVis/stable-diffusion-v1-4"</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"stable_diffusion"</span>
+    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"discrete"</span>
+    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"token2image"</span>
 
 <div class="viewcode-block" id="StableDiffusionGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.StableDiffusionGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+<span class="w">        </span><span class="sd">"""Get possible algorithm versions.</span>
 
 <span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;more algorithm versions can be found on https://github.com/huggingface/diffusers&quot;</span>
+            <span class="s2">"more algorithm versions can be found on https://github.com/huggingface/diffusers"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
@@ -480,24 +480,24 @@
 
 <div class="viewcode-block" id="GeoDiffGenerator"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.GeoDiffGenerator">[docs]</a><span class="nd">@ApplicationsRegistry</span><span class="o">.</span><span class="n">register_algorithm_application</span><span class="p">(</span><span class="n">DiffusersGenerationAlgorithm</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">GeoDiffGenerator</span><span class="p">(</span><span class="n">DiffusersConfiguration</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;GeoDiff Diffusion Model - Configuration for conditional 3D molecule structure generation given 2D information using a GeoDiff diffusion model.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""GeoDiff Diffusion Model - Configuration for conditional 3D molecule structure generation given 2D information using a GeoDiff diffusion model."""</span>
 
-    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;fusing/gfn-molecule-gen-drugs&quot;</span>
-    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;geodiff&quot;</span>
-    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ddpm&quot;</span>
-    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;molecule&quot;</span>
+    <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"fusing/gfn-molecule-gen-drugs"</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"geodiff"</span>
+    <span class="n">scheduler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"ddpm"</span>
+    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"molecule"</span>
 
 <div class="viewcode-block" id="GeoDiffGenerator.list_versions"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.GeoDiffGenerator.list_versions">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">list_versions</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get possible algorithm versions.</span>
+<span class="w">        </span><span class="sd">"""Get possible algorithm versions.</span>
 
 <span class="sd">        Standard S3 and cache search adding the version used in the configuration.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            viable values as :attr:`algorithm_version` for the environment.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;more algorithm versions can be found on https://github.com/huggingface/diffusers&quot;</span>
+            <span class="s2">"more algorithm versions can be found on https://github.com/huggingface/diffusers"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">get_configuration_class_with_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
@@ -506,15 +506,15 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GeoDiffGenerator.get_target_description"><a class="viewcode-back" href="../../../../../api/gt4sd.algorithms.generation.diffusion.core.html#gt4sd.algorithms.generation.diffusion.core.GeoDiffGenerator.get_target_description">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get description of the target for generation.</span>
+<span class="w">        </span><span class="sd">"""Get description of the target for generation.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            target description, returns None in case no target is used.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Prompt 2d representation for the molecule.&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;A dictionary containing all the information to build a molecule graph. Supported keys: [&#39;atom_type&#39;, &#39;bond_edge_index&#39;, &#39;edge_index&#39;, &#39;edge_order&#39;, &#39;edge_type&#39;, &#39;idx&#39;, &#39;is_bond&#39;, &#39;num_nodes_per_graph&#39;, &#39;num_pos_ref&#39;, &#39;nx&#39;, &#39;pos&#39;, &#39;pos_ref&#39;, &#39;rdmol&#39;, &#39;smiles&#39;]&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dictionary&quot;</span><span class="p">,</span>
+            <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Prompt 2d representation for the molecule."</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"A dictionary containing all the information to build a molecule graph. Supported keys: ['atom_type', 'bond_edge_index', 'edge_index', 'edge_order', 'edge_type', 'idx', 'is_bond', 'num_nodes_per_graph', 'num_pos_ref', 'nx', 'pos', 'pos_ref', 'rdmol', 'smiles']"</span><span class="p">,</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"dictionary"</span><span class="p">,</span>
         <span class="p">}</span></div></div>
 </pre></div>
 
